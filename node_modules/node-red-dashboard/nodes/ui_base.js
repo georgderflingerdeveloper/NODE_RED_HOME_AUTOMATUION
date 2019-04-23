@@ -2,6 +2,7 @@ module.exports = function(RED) {
     var ui = require('../ui')(RED);
     var path= require('path');
     var node;
+    var set = RED.settings.ui || "{}";
 
     function BaseNode(config) {
         RED.nodes.createNode(this, config);
@@ -21,6 +22,12 @@ module.exports = function(RED) {
             baseColor: defaultLightTheme.baseColor,
             baseFont: baseFontName
         }
+        var defaultAngularTheme = {
+            primary:'indigo',
+            accents:'teal',
+            warn: "red",
+            background:'grey'
+        };
 
         // Setup theme name
         // First try old format (for upgrading with old flow file)
@@ -62,6 +69,7 @@ module.exports = function(RED) {
             lightTheme: config.theme.lightTheme || defaultLightTheme,
             darkTheme: config.theme.darkTheme || defaultDarkTheme,
             customTheme: config.theme.customTheme || defaultCustomTheme,
+            angularTheme: config.theme.angularTheme || defaultAngularTheme,
             themeState: config.theme.themeState || defaultThemeState
         }
 
@@ -76,8 +84,7 @@ module.exports = function(RED) {
     RED.library.register("themes");
 
     RED.httpAdmin.get('/uisettings', function(req, res) {
-        var ret = RED.settings.ui || "{}";
-        res.json(ret);
+        res.json(set);
     });
 
     RED.httpAdmin.get('/ui_base/js/*', function(req, res) {

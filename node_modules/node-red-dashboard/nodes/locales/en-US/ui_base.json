@@ -13,6 +13,7 @@
             "group-padding" : "Group Padding",
             "group-spacing" : "Group Spacing",
             "layout" : "Layout",
+            "angular": "Angular",
             "theme" : "Theme",
             "site" : "Site"
         },
@@ -23,7 +24,8 @@
             "tab" : "tab",
             "link" : "link",
             "group" : "group",
-            "edit" : "edit"
+            "edit" : "edit",
+            "spacer": "spacer"
         },
         "theme" : {
             "style" : "Style",
@@ -52,7 +54,12 @@
         "style" : {
             "light" : "Light (default)",
             "dark" : "Dark",
-            "custom" : "Custom"
+            "custom" : "Custom",
+            "primary" : "Primary",
+            "accents" : "Accents",
+            "background" : "Background",
+            "warnings" : "Warnings",
+            "palette": "Light / Dark"
         },
         "base" : {
             "colour" : "Colour",
@@ -73,9 +80,14 @@
             "no-swipe" : "No swipe between tabs",
             "allow-swipe" : "Allow swipe between tabs"
         },
+        "lock" : {
+            "clicked" : "Click to show side menu",
+            "locked" : "Always show side menu"
+        },
         "temp" : {
-            "no-theme" : "No theme in ui_template",
-            "allow-theme" : "Set theme in ui_template"
+            "allow-theme" : "Node-RED theme everywhere",
+            "no-theme" : "Use Angular theme in ui_template",
+            "none" : "Angular theme everywhere"
         }
     }
 }

@@ -32,6 +32,17 @@ module.exports = function(RED) {
                 height: config.height || 1,
                 layout: angLayout,
                 layoutAlign: angLayoutAlign
+            },
+            convert: function(value, oldValue, msg) {
+                if (value !== undefined) {
+                    if (Buffer.isBuffer(value)) {
+                        value = value.toString('binary');
+                    }
+                    else {
+                        value = value.toString();
+                    }
+                }
+                return value;
             }
         });
         node.on("close", done);
