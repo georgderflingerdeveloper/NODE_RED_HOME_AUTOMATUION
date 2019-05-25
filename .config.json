@@ -364,7 +364,7 @@
   },
   "node-red-dashboard": {
    "name": "node-red-dashboard",
-   "version": "2.14.0",
+   "version": "2.15.2",
    "local": true,
    "nodes": {
     "ui_base": {
@@ -703,7 +703,8 @@
      "name": "georgderflingerdeveloper",
      "email": "georgderflinger@gmail.com"
     }
-   }
+   },
+   "menu-menu-item-palette": true
   }
  },
  "projects": {
@@ -715,6 +716,6 @@
     "rootPath": ""
    }
   },
-  "activeProject": "ANDISHOME"
+  "activeProject": "GEORGSHOME"
  }
 }
