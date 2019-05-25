@@ -1,0 +1,12 @@
+{
+    "name": "ANDISHOME",
+    "description": "Ein Node-RED-Projekt",
+    "version": "0.0.1",
+    "dependencies": {},
+    "node-red": {
+        "settings": {
+            "flowFile": "AndisHome.json",
+            "credentialsFile": "AndisHome_cred.json"
+        }
+    }
+}
