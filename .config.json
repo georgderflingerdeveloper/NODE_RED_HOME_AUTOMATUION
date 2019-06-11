@@ -364,7 +364,7 @@
   },
   "node-red-dashboard": {
    "name": "node-red-dashboard",
-   "version": "2.15.3",
+   "version": "2.15.4",
    "local": true,
    "nodes": {
     "ui_base": {
@@ -683,7 +683,23 @@
      "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-twitter\\27-twitter.js"
     }
    }
- 
+  },
+  "node-red-contrib-play-audio": {
+   "name": "node-red-contrib-play-audio",
+   "version": "2.3.2",
+   "local": true,
+   "nodes": {
+    "play-audio": {
+     "name": "play-audio",
+     "types": [
+      "play audio"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-play-audio",
+     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-play-audio\\play-audio.js"
+    }
+   }
   }
  },
  "_credentialSecret": "b673bc523099f139fa7204f866300baa0accab9d622f15dac2875673635013b0",
