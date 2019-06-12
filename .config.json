@@ -765,6 +765,9 @@
    },
    "GEORGSHOME": {
     "rootPath": ""
+   },
+   "TRIAL": {
+    "credentialSecret": false
    }
   },
   "activeProject": "ANDISHOME"
