@@ -704,7 +704,7 @@
   "node-red-contrib-bigtimer": {
    "name": "node-red-contrib-bigtimer",
    "version": "2.1.9",
-   "local": false,
+   "local": true,
    "nodes": {
     "bigtimer": {
      "name": "bigtimer",
@@ -721,7 +721,7 @@
   "node-red-contrib-simple-gate": {
    "name": "node-red-contrib-simple-gate",
    "version": "0.2.3",
-   "local": false,
+   "local": true,
    "nodes": {
     "gate": {
      "name": "gate",
@@ -770,6 +770,6 @@
     "credentialSecret": false
    }
   },
-  "activeProject": "ANDISHOME"
+  "activeProject": "TRIAL"
  }
 }
