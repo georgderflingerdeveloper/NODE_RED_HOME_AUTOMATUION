@@ -364,7 +364,7 @@
   },
   "node-red-dashboard": {
    "name": "node-red-dashboard",
-   "version": "2.15.3",
+   "version": "2.15.4",
    "local": true,
    "nodes": {
     "ui_base": {
@@ -683,6 +683,57 @@
      "file": "C:\\Users\\GeorgDerflinger\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-twitter\\27-twitter.js"
     }
    }
+  },
+  "node-red-contrib-play-audio": {
+   "name": "node-red-contrib-play-audio",
+   "version": "2.3.2",
+   "local": true,
+   "nodes": {
+    "play-audio": {
+     "name": "play-audio",
+     "types": [
+      "play audio"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-play-audio",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-play-audio\\play-audio.js"
+    }
+   }
+  },
+  "node-red-contrib-bigtimer": {
+   "name": "node-red-contrib-bigtimer",
+   "version": "2.1.9",
+   "local": true,
+   "nodes": {
+    "bigtimer": {
+     "name": "bigtimer",
+     "types": [
+      "bigtimer"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-bigtimer",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-bigtimer\\bigtimer.js"
+    }
+   }
+  },
+  "node-red-contrib-simple-gate": {
+   "name": "node-red-contrib-simple-gate",
+   "version": "0.2.3",
+   "local": true,
+   "nodes": {
+    "gate": {
+     "name": "gate",
+     "types": [
+      "gate"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-simple-gate",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-simple-gate\\gate.js"
+    }
+   }
   }
  },
  "_credentialSecret": "b673bc523099f139fa7204f866300baa0accab9d622f15dac2875673635013b0",
@@ -690,10 +741,10 @@
   "georgderflinger": {
    "editor": {
     "view": {
-     "view-grid-size": 20,
+     "view-grid-size": "20",
      "view-node-status": true,
      "view-node-show-label": true,
-     "view-show-tips": true,
+     "view-show-tips": false,
      "view-snap-grid": true,
      "view-show-grid": true
     }
@@ -714,6 +765,9 @@
    },
    "GEORGSHOME": {
     "rootPath": ""
+   },
+   "TRIAL": {
+    "credentialSecret": false
    }
   },
   "activeProject": "GEORGSHOME"
