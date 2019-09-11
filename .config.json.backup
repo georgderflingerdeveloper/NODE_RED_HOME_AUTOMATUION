@@ -734,6 +734,23 @@
      "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-simple-gate\\gate.js"
     }
    }
+  },
+  "node-red-contrib-eztimer": {
+   "name": "node-red-contrib-eztimer",
+   "version": "1.1.1",
+   "local": true,
+   "nodes": {
+    "eztimer": {
+     "name": "eztimer",
+     "types": [
+      "eztimer"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-eztimer",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-eztimer\\index.js"
+    }
+   }
   }
  },
  "_credentialSecret": "b673bc523099f139fa7204f866300baa0accab9d622f15dac2875673635013b0",
@@ -770,6 +787,6 @@
     "credentialSecret": false
    }
   },
-  "activeProject": "GEORGSHOME"
+  "activeProject": "TRIAL"
  }
 }
