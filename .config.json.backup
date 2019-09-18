@@ -772,7 +772,8 @@
      "email": "georgderflinger@gmail.com"
     }
    },
-   "menu-menu-item-palette": true
+   "menu-menu-item-palette": true,
+   "menu-menu-item-sidebar": false
   }
  },
  "projects": {
