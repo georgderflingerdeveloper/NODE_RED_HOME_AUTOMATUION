@@ -2,7 +2,7 @@
  "nodes": {
   "node-red": {
    "name": "node-red",
-   "version": "1.0.2",
+   "version": "1.0.3",
    "local": false,
    "nodes": {
     "inject": {
@@ -578,7 +578,7 @@
   },
   "node-red-node-rbe": {
    "name": "node-red-node-rbe",
-   "version": "0.2.5",
+   "version": "0.2.6",
    "local": false,
    "nodes": {
     "rbe": {
@@ -731,6 +731,6 @@
     "credentialSecret": false
    }
   },
-  "activeProject": "TRIAL"
+  "activeProject": "ANDISHOME"
  }
 }
