@@ -709,7 +709,7 @@
      "view-show-grid": true
     },
     "context": {
-     "flowRefresh": true
+     "flowRefresh": false
     }
    },
    "git": {
