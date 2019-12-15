@@ -719,7 +719,7 @@
     }
    },
    "menu-menu-item-palette": true,
-   "menu-menu-item-sidebar": true
+   "menu-menu-item-sidebar": false
   }
  },
  "projects": {
@@ -734,6 +734,6 @@
     "credentialSecret": false
    }
   },
-  "activeProject": "GEORGSHOME"
+  "activeProject": "ANDISHOME"
  }
 }
