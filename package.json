@@ -6,6 +6,7 @@
         "node-red-contrib-bigtimer": "~2.1.9",
         "node-red-contrib-chatbot": "~0.18.3",
         "node-red-contrib-eztimer": "~1.1.1",
+        "node-red-contrib-flow-asserter": "~0.4.0",
         "node-red-contrib-function-npm": "~0.3.0",
         "node-red-contrib-mytimeout": "~3.2.0",
         "node-red-contrib-play-audio": "~2.3.2",
