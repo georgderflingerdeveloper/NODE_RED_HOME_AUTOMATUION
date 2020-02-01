@@ -694,6 +694,664 @@
      "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-mytimeout\\mytimeout.js"
     }
    }
+  },
+  "node-red-contrib-function-npm": {
+   "name": "node-red-contrib-function-npm",
+   "version": "0.3.0",
+   "local": true,
+   "nodes": {
+    "function-npm": {
+     "name": "function-npm",
+     "types": [
+      "function-npm"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-function-npm",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-function-npm\\function-npm\\function-npm.js"
+    }
+   }
+  },
+  "node-red-contrib-chatbot": {
+   "name": "node-red-contrib-chatbot",
+   "version": "0.18.3",
+   "local": true,
+   "nodes": {
+    "chatbot-redbot": {
+     "name": "chatbot-redbot",
+     "types": [],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-redbot.js"
+    },
+    "redbot-config": {
+     "name": "redbot-config",
+     "types": [],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\redbot.config.js"
+    },
+    "chatbot-telegram-receive": {
+     "name": "chatbot-telegram-receive",
+     "types": [
+      "chatbot-telegram-node",
+      "chatbot-telegram-receive",
+      "chatbot-telegram-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-telegram-receive.js"
+    },
+    "chatbot-universal-receive": {
+     "name": "chatbot-universal-receive",
+     "types": [
+      "chatbot-universal-node",
+      "chatbot-universal-receive",
+      "chatbot-universal-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-universal-receive.js"
+    },
+    "chatbot-slack-receive": {
+     "name": "chatbot-slack-receive",
+     "types": [
+      "chatbot-slack-node",
+      "chatbot-slack-receive",
+      "chatbot-slack-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-slack-receive.js"
+    },
+    "chatbot-twilio-receive": {
+     "name": "chatbot-twilio-receive",
+     "types": [
+      "chatbot-twilio-node",
+      "chatbot-twilio-receive",
+      "chatbot-twilio-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-twilio-receive.js"
+    },
+    "chatbot-routee-receive": {
+     "name": "chatbot-routee-receive",
+     "types": [
+      "chatbot-routee-node",
+      "chatbot-routee-receive",
+      "chatbot-routee-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-routee-receive.js"
+    },
+    "chatbot-facebook-receive": {
+     "name": "chatbot-facebook-receive",
+     "types": [
+      "chatbot-facebook-node",
+      "chatbot-facebook-receive",
+      "chatbot-facebook-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-facebook-receive.js"
+    },
+    "chatbot-viber-receive": {
+     "name": "chatbot-viber-receive",
+     "types": [
+      "chatbot-viber-node",
+      "chatbot-viber-receive",
+      "chatbot-viber-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-viber-receive.js"
+    },
+    "chatbot-alexa-receive": {
+     "name": "chatbot-alexa-receive",
+     "types": [
+      "chatbot-alexa-node",
+      "chatbot-alexa-receive",
+      "chatbot-alexa-send"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-receive.js"
+    },
+    "chatbot-message": {
+     "name": "chatbot-message",
+     "types": [
+      "chatbot-message"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-message.js"
+    },
+    "chatbot-analytics": {
+     "name": "chatbot-analytics",
+     "types": [
+      "chatbot-analytics"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-analytics.js"
+    },
+    "chatbot-context": {
+     "name": "chatbot-context",
+     "types": [
+      "chatbot-context"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-context.js"
+    },
+    "chatbot-topic": {
+     "name": "chatbot-topic",
+     "types": [
+      "chatbot-topic"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-topic.js"
+    },
+    "chatbot-voice": {
+     "name": "chatbot-voice",
+     "types": [
+      "chatbot-voice"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-voice.js"
+    },
+    "chatbot-language": {
+     "name": "chatbot-language",
+     "types": [
+      "chatbot-language"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-language.js"
+    },
+    "chatbot-listen": {
+     "name": "chatbot-listen",
+     "types": [
+      "chatbot-listen"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-listen.js"
+    },
+    "chatbot-listen-lexicon": {
+     "name": "chatbot-listen-lexicon",
+     "types": [
+      "chatbot-listen-lexicon"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-listen-lexicon.js"
+    },
+    "chatbot-parse": {
+     "name": "chatbot-parse",
+     "types": [
+      "chatbot-parse"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-parse.js"
+    },
+    "chatbot-command": {
+     "name": "chatbot-command",
+     "types": [
+      "chatbot-command"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-command.js"
+    },
+    "chatbot-document": {
+     "name": "chatbot-document",
+     "types": [
+      "chatbot-document"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-document.js"
+    },
+    "chatbot-video": {
+     "name": "chatbot-video",
+     "types": [
+      "chatbot-video"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-video.js"
+    },
+    "chatbot-image": {
+     "name": "chatbot-image",
+     "types": [
+      "chatbot-image"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-image.js"
+    },
+    "chatbot-sticker": {
+     "name": "chatbot-sticker",
+     "types": [
+      "chatbot-sticker"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-sticker.js"
+    },
+    "chatbot-animation": {
+     "name": "chatbot-animation",
+     "types": [
+      "chatbot-animation"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-animation.js"
+    },
+    "chatbot-audio": {
+     "name": "chatbot-audio",
+     "types": [
+      "chatbot-audio"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-audio.js"
+    },
+    "chatbot-location": {
+     "name": "chatbot-location",
+     "types": [
+      "chatbot-location"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-location.js"
+    },
+    "chatbot-ask": {
+     "name": "chatbot-ask",
+     "types": [
+      "chatbot-ask"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-ask.js"
+    },
+    "chatbot-inline-buttons": {
+     "name": "chatbot-inline-buttons",
+     "types": [
+      "chatbot-inline-buttons"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-inline-buttons.js"
+    },
+    "chatbot-quick-replies": {
+     "name": "chatbot-quick-replies",
+     "types": [
+      "chatbot-quick-replies"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-quick-replies.js"
+    },
+    "chatbot-generic-template": {
+     "name": "chatbot-generic-template",
+     "types": [
+      "chatbot-generic-template"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-generic-template.js"
+    },
+    "chatbot-list-template": {
+     "name": "chatbot-list-template",
+     "types": [
+      "chatbot-list-template"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-list-template.js"
+    },
+    "chatbot-request": {
+     "name": "chatbot-request",
+     "types": [
+      "chatbot-request"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-request.js"
+    },
+    "chatbot-log": {
+     "name": "chatbot-log",
+     "types": [
+      "chatbot-log"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-log.js"
+    },
+    "chatbot-qrcode": {
+     "name": "chatbot-qrcode",
+     "types": [
+      "chatbot-qrcode"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-qrcode.js"
+    },
+    "chatbot-conversation": {
+     "name": "chatbot-conversation",
+     "types": [
+      "chatbot-conversation"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-conversation.js"
+    },
+    "chatbot-debug": {
+     "name": "chatbot-debug",
+     "types": [
+      "chatbot-debug"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-debug.js"
+    },
+    "chatbot-waiting": {
+     "name": "chatbot-waiting",
+     "types": [
+      "chatbot-waiting"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-waiting.js"
+    },
+    "chatbot-authorized": {
+     "name": "chatbot-authorized",
+     "types": [
+      "chatbot-authorized"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-authorized.js"
+    },
+    "chatbot-transport": {
+     "name": "chatbot-transport",
+     "types": [
+      "chatbot-transport"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-transport.js"
+    },
+    "chatbot-rivescript": {
+     "name": "chatbot-rivescript",
+     "types": [
+      "chatbot-rivescript"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-rivescript.js"
+    },
+    "chatbot-messenger-menu": {
+     "name": "chatbot-messenger-menu",
+     "types": [
+      "chatbot-messenger-menu"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-messenger-menu.js"
+    },
+    "chatbot-context-store": {
+     "name": "chatbot-context-store",
+     "types": [
+      "chatbot-context-store"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-context-store.js"
+    },
+    "chatbot-inline-query": {
+     "name": "chatbot-inline-query",
+     "types": [
+      "chatbot-inline-query"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-inline-query.js"
+    },
+    "chatbot-dialog": {
+     "name": "chatbot-dialog",
+     "types": [
+      "chatbot-dialog"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-dialog.js"
+    },
+    "chatbot-rules": {
+     "name": "chatbot-rules",
+     "types": [
+      "chatbot-rules"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-rules.js"
+    },
+    "chatbot-params": {
+     "name": "chatbot-params",
+     "types": [
+      "chatbot-params"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-params.js"
+    },
+    "chatbot-recast": {
+     "name": "chatbot-recast",
+     "types": [
+      "chatbot-recast-token",
+      "chatbot-recast"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-recast.js"
+    },
+    "chatbot-dialogflow": {
+     "name": "chatbot-dialogflow",
+     "types": [
+      "chatbot-dialogflow-token",
+      "chatbot-dialogflow"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-dialogflow.js"
+    },
+    "chatbot-invoice": {
+     "name": "chatbot-invoice",
+     "types": [
+      "chatbot-invoice"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-invoice.js"
+    },
+    "chatbot-invoice-shipping": {
+     "name": "chatbot-invoice-shipping",
+     "types": [
+      "chatbot-invoice-shipping"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-invoice-shipping.js"
+    },
+    "chatbot-extend": {
+     "name": "chatbot-extend",
+     "types": [
+      "chatbot-extend"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-extend.js"
+    },
+    "chatbot-support-table": {
+     "name": "chatbot-support-table",
+     "types": [
+      "chatbot-support-table"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-support-table.js"
+    },
+    "chatbot-alexa-card": {
+     "name": "chatbot-alexa-card",
+     "types": [
+      "chatbot-alexa-card"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-card.js"
+    },
+    "chatbot-alexa-directive": {
+     "name": "chatbot-alexa-directive",
+     "types": [
+      "chatbot-alexa-directive"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-directive.js"
+    },
+    "chatbot-broadcast": {
+     "name": "chatbot-broadcast",
+     "types": [
+      "chatbot-broadcast"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-broadcast.js"
+    },
+    "chatbot-alexa-speech": {
+     "name": "chatbot-alexa-speech",
+     "types": [
+      "chatbot-alexa-speech"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-speech.js"
+    },
+    "chatbot-slack-blocks": {
+     "name": "chatbot-slack-blocks",
+     "types": [
+      "chatbot-slack-blocks"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-chatbot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-slack-blocks.js"
+    }
+   }
+  },
+  "node-red-contrib-telegrambot": {
+   "name": "node-red-contrib-telegrambot",
+   "version": "7.1.1",
+   "local": true,
+   "nodes": {
+    "telegrambot": {
+     "name": "telegrambot",
+     "types": [
+      "telegram bot",
+      "telegram receiver",
+      "telegram command",
+      "telegram event",
+      "telegram sender",
+      "telegram reply"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-telegrambot",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-telegrambot\\telegrambot\\99-telegrambot.js"
+    }
+   }
+  },
+  "node-red-contrib-flow-asserter": {
+   "name": "node-red-contrib-flow-asserter",
+   "version": "0.4.0",
+   "local": false,
+   "nodes": {
+    "flow-asserter": {
+     "name": "flow-asserter",
+     "types": [
+      "flow-asserter in",
+      "flow-asserter out"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-flow-asserter",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-flow-asserter\\flow-asserter.js"
+    }
+   }
   }
  },
  "_credentialSecret": "b673bc523099f139fa7204f866300baa0accab9d622f15dac2875673635013b0",
@@ -704,7 +1362,7 @@
      "view-grid-size": "20",
      "view-node-status": true,
      "view-node-show-label": true,
-     "view-show-tips": true,
+     "view-show-tips": false,
      "view-snap-grid": true,
      "view-show-grid": true
     },
@@ -735,5 +1393,6 @@
    }
   },
   "activeProject": "ANDISHOME"
- }
+ },
+ "contextProviders": {}
 }
