@@ -1338,7 +1338,7 @@
   "node-red-contrib-flow-asserter": {
    "name": "node-red-contrib-flow-asserter",
    "version": "0.4.0",
-   "local": false,
+   "local": true,
    "nodes": {
     "flow-asserter": {
      "name": "flow-asserter",
@@ -1395,4 +1395,4 @@
   "activeProject": "ANDISHOME"
  },
  "contextProviders": {}
-}
+}}
