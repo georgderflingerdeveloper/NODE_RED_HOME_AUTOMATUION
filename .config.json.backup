@@ -1367,6 +1367,24 @@
      "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-test-node-library\\node-red-test-node-library.js"
     }
    }
+  },
+  "node-red-contrib-flow-asserter": {
+   "name": "node-red-contrib-flow-asserter",
+   "version": "0.4.0",
+   "local": false,
+   "nodes": {
+    "flow-asserter": {
+     "name": "flow-asserter",
+     "types": [
+      "flow-asserter in",
+      "flow-asserter out"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-flow-asserter",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-flow-asserter\\flow-asserter.js"
+    }
+   }
   }
  },
  "_credentialSecret": "b673bc523099f139fa7204f866300baa0accab9d622f15dac2875673635013b0",
