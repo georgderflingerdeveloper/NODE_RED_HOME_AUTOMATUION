@@ -1367,6 +1367,23 @@
      "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-test-node-library\\node-red-test-node-library.js"
     }
    }
+  },
+  "node-red-contrib-assert": {
+   "name": "node-red-contrib-assert",
+   "version": "1.3.2",
+   "local": true,
+   "nodes": {
+    "assert": {
+     "name": "assert",
+     "types": [
+      "assert"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-assert",
+     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-assert\\assert.js"
+    }
+   }
   }
  },
  "_credentialSecret": "b673bc523099f139fa7204f866300baa0accab9d622f15dac2875673635013b0",
@@ -1410,4 +1427,4 @@
   "activeProject": "ANDISHOME"
  },
  "contextProviders": {}
-}
+}}
