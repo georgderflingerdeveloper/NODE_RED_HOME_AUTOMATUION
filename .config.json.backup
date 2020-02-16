@@ -1353,21 +1353,6 @@
     }
    }
   },
-  "node-red-contrib-test-node-library": {
-   "name": "node-red-contrib-test-node-library",
-   "version": "1.0.16",
-   "local": true,
-   "nodes": {
-    "node-red-test-node-library": {
-     "name": "node-red-test-node-library",
-     "types": [],
-     "enabled": true,
-     "local": true,
-     "module": "node-red-contrib-test-node-library",
-     "file": "\\Users\\GeorgDerflinger\\.node-red\\node_modules\\node-red-contrib-test-node-library\\node-red-test-node-library.js"
-    }
-   }
-  },
   "node-red-contrib-assert": {
    "name": "node-red-contrib-assert",
    "version": "1.3.2",
@@ -1409,7 +1394,7 @@
     }
    },
    "menu-menu-item-palette": true,
-   "menu-menu-item-sidebar": true
+   "menu-menu-item-sidebar": false
   }
  },
  "projects": {
@@ -1427,4 +1412,4 @@
   "activeProject": "ANDISHOME"
  },
  "contextProviders": {}
-}}
+}
