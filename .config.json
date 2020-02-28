@@ -1373,7 +1373,7 @@
   "node-red-contrib-finite-statemachine": {
    "name": "node-red-contrib-finite-statemachine",
    "version": "0.2.10",
-   "local": false,
+   "local": true,
    "nodes": {
     "finite-state-machine": {
      "name": "finite-state-machine",
@@ -1429,4 +1429,4 @@
   "activeProject": "ANDISHOME"
  },
  "contextProviders": {}
-}
+}}
