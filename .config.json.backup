@@ -1411,7 +1411,11 @@
   }
  },
  "projects": {
-  "projects": {},
+  "projects": {
+   "ANDISHOME": {
+    "credentialSecret": "polarstern"
+   }
+  },
   "activeProject": "ANDISHOME"
  }
 }
