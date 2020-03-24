@@ -997,7 +997,7 @@
   },
   "node-red-contrib-eztimer": {
    "name": "node-red-contrib-eztimer",
-   "version": "1.1.1",
+   "version": "1.2.2",
    "local": true,
    "nodes": {
     "eztimer": {
@@ -1064,33 +1064,6 @@
     }
    }
   },
-  "node-red-contrib-msg-queue": {
-   "name": "node-red-contrib-msg-queue",
-   "version": "1.0.2",
-   "local": true,
-   "nodes": {
-    "queue": {
-     "name": "queue",
-     "types": [
-      "queue"
-     ],
-     "enabled": true,
-     "local": true,
-     "module": "node-red-contrib-msg-queue",
-     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
-    },
-    "retry-queue": {
-     "name": "retry-queue",
-     "types": [
-      "retry-queue"
-     ],
-     "enabled": true,
-     "local": true,
-     "module": "node-red-contrib-msg-queue",
-     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
-    }
-   }
-  },
   "node-red-contrib-bigtimer": {
    "name": "node-red-contrib-bigtimer",
    "version": "2.2.6",
@@ -1110,7 +1083,7 @@
   },
   "node-red-contrib-play-audio": {
    "name": "node-red-contrib-play-audio",
-   "version": "2.3.2",
+   "version": "2.4.0",
    "local": true,
    "nodes": {
     "play-audio": {
@@ -1127,7 +1100,7 @@
   },
   "node-red-contrib-simple-gate": {
    "name": "node-red-contrib-simple-gate",
-   "version": "0.2.3",
+   "version": "0.2.4",
    "local": true,
    "nodes": {
     "gate": {
@@ -1453,6 +1426,25 @@
     }
    },
    "menu-menu-item-sidebar": true
+  },
+  "_": {
+   "menu-menu-item-sidebar": true,
+   "git": {
+    "user": {
+     "name": "georgderflingerdeveloper",
+     "email": "georgderflinger@gmail.com"
+    }
+   },
+   "editor": {
+    "view": {
+     "view-show-grid": true,
+     "view-snap-grid": true,
+     "view-grid-size": "20",
+     "view-node-status": true,
+     "view-node-show-label": true,
+     "view-show-tips": true
+    }
+   }
   }
  },
  "projects": {
