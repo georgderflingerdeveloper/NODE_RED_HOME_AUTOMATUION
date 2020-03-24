@@ -3,3 +3,4 @@ queue.sqlite
 .sessions.json
 .config.json.backup
 queue.sqlite
+/projects/ANDISHOME/.AndisHome.json.backup
