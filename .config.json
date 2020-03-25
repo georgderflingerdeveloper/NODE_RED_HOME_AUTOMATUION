@@ -1064,6 +1064,33 @@
     }
    }
   },
+  "node-red-contrib-msg-queue": {
+   "name": "node-red-contrib-msg-queue",
+   "version": "1.0.2",
+   "local": true,
+   "nodes": {
+    "queue": {
+     "name": "queue",
+     "types": [
+      "queue"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-msg-queue",
+     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
+    },
+    "retry-queue": {
+     "name": "retry-queue",
+     "types": [
+      "retry-queue"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-msg-queue",
+     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
+    }
+   }
+  },
   "node-red-contrib-bigtimer": {
    "name": "node-red-contrib-bigtimer",
    "version": "2.2.6",
@@ -1404,38 +1431,11 @@
      "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-tail\\28-tail.js"
     }
    }
-  },
-  "node-red-contrib-msg-queue": {
-   "name": "node-red-contrib-msg-queue",
-   "version": "1.0.2",
-   "local": true,
-   "nodes": {
-    "queue": {
-     "name": "queue",
-     "types": [
-      "queue"
-     ],
-     "enabled": true,
-     "local": true,
-     "module": "node-red-contrib-msg-queue",
-     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
-    },
-    "retry-queue": {
-     "name": "retry-queue",
-     "types": [
-      "retry-queue"
-     ],
-     "enabled": true,
-     "local": true,
-     "module": "node-red-contrib-msg-queue",
-     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
-    }
-   }
   }
  },
- "_credentialSecret": "f873d99364ae4d58ab41fc9e2d6e5f36b8d6ec16228472e65336a6274ce3f477",
+ "_credentialSecret": "a4b45ba2961b75c0df386338e0199abbca8dbd51cd75dd8ff6872006be1bca59",
  "users": {
-  "georgderflinger": {
+  "_": {
    "editor": {
     "view": {
      "view-show-grid": true,
@@ -1451,38 +1451,15 @@
      "name": "georgderflingerdeveloper",
      "email": "georgderflinger@gmail.com"
     }
-   },
-   "menu-menu-item-sidebar": true
-  },
-  "_": {
-   "menu-menu-item-sidebar": true,
-   "git": {
-    "user": {
-     "name": "georgderflingerdeveloper",
-     "email": "georgderflinger@gmail.com"
-    }
-   },
-   "editor": {
-    "view": {
-     "view-show-grid": true,
-     "view-snap-grid": true,
-     "view-grid-size": "20",
-     "view-node-status": true,
-     "view-node-show-label": true,
-     "view-show-tips": true
-    }
    }
   }
  },
  "projects": {
   "projects": {
-   "test_": {
-    "credentialSecret": "1"
-   },
-   "ANDISHOME": {
-    "credentialSecret": "polarstern"
+   "test": {
+    "credentialSecret": false
    }
   },
-  "activeProject": "ANDISHOME"
+  "activeProject": "UNCRYPTED_ART"
  }
-}}
+}
