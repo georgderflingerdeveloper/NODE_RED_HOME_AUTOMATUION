@@ -1404,6 +1404,33 @@
      "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-tail\\28-tail.js"
     }
    }
+  },
+  "node-red-contrib-msg-queue": {
+   "name": "node-red-contrib-msg-queue",
+   "version": "1.0.2",
+   "local": true,
+   "nodes": {
+    "queue": {
+     "name": "queue",
+     "types": [
+      "queue"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-msg-queue",
+     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
+    },
+    "retry-queue": {
+     "name": "retry-queue",
+     "types": [
+      "retry-queue"
+     ],
+     "enabled": true,
+     "local": true,
+     "module": "node-red-contrib-msg-queue",
+     "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
+    }
+   }
   }
  },
  "_credentialSecret": "f873d99364ae4d58ab41fc9e2d6e5f36b8d6ec16228472e65336a6274ce3f477",
@@ -1458,4 +1485,4 @@
   },
   "activeProject": "ANDISHOME"
  }
-}
+}}
