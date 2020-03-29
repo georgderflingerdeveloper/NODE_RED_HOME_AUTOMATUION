@@ -14,16 +14,19 @@ module.exports = function(RED) {
         this.ok = config.ok;
         this.cancel = config.cancel;
         this.topic = config.topic;
+        if (config.sendall === undefined) { this.sendall = true; }
+        else { this.sendall = config.sendall; }
+        this.raw = config.raw || false;
         var node = this;
 
-        var noscript = function (content) {
-            if (typeof content === "object") { return null; }
-            content = '' + content;
-            content = content.replace(/<.*cript.*\/scrip.*>/ig, '');
-            content = content.replace(/ on\w+=".*"/g, '');
-            content = content.replace(/ on\w+=\'.*\'/g, '');
-            return content;
-        }
+        // var noscript = function (content) {
+        //     if (typeof content === "object") { return null; }
+        //     content = '' + content;
+        //     content = content.replace(/<.*cript.*/ig, '');
+        //     content = content.replace(/.on\w+=.*".*"/g, '');
+        //     content = content.replace(/.on\w+=.*\'.*\'/g, '');
+        //     return content;
+        // }
 
         var done = ui.add({
             node: node,
@@ -38,8 +41,8 @@ module.exports = function(RED) {
         });
 
         node.on('input', function(msg) {
-            if (node.position !== "dialog") { delete msg.socketid; }
-            msg.payload = noscript(msg.payload);
+            if (node.sendall === true) { delete msg.socketid; }
+            //msg.payload = noscript(msg.payload);
             ui.emitSocket('show-toast', {
                 title: node.topic || msg.topic,
                 message: msg.payload,
@@ -47,10 +50,12 @@ module.exports = function(RED) {
                 displayTime: node.displayTime,
                 position: node.position,
                 id: node.id,
-                dialog: (node.position === "dialog") || false,
+                dialog: (node.position === "dialog" || node.position === "prompt") || false,
+                prompt: (node.position === "prompt") || false,
                 ok: node.ok,
                 cancel: node.cancel,
                 socketid: msg.socketid,
+                raw: node.raw,
                 msg: msg
             });
         });
