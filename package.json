@@ -11,6 +11,7 @@
         "node-red-contrib-flow-asserter": "~0.4.0",
         "node-red-contrib-function-npm": "~0.3.0",
         "node-red-contrib-mytimeout": "~3.2.0",
+        "node-red-contrib-phidget22": "~1.0.3",
         "node-red-contrib-play-audio": "~2.3.2",
         "node-red-contrib-simple-gate": "~0.2.3",
         "node-red-contrib-simpletime": "~2.8.1",
