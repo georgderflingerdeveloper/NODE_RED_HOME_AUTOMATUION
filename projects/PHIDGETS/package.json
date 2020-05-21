@@ -1,0 +1,12 @@
+{
+    "name": "empty",
+    "description": "Ein Node-RED-Projekt",
+    "version": "0.0.1",
+    "dependencies": {},
+    "node-red": {
+        "settings": {
+            "flowFile": "flow.json",
+            "credentialsFile": "flow_cred.json"
+        }
+    }
+}
