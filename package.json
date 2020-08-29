@@ -18,7 +18,7 @@
         "node-red-contrib-simple-gate": "~0.2.3",
         "node-red-contrib-simpletime": "~2.8.1",
         "node-red-contrib-telegrambot": "~7.1.1",
-        "node-red-dashboard": "~2.19.4",
+        "node-red-dashboard": "~2.23.2",
         "phidget22": "^2.5.1"
     }
 }
