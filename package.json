@@ -15,10 +15,10 @@
         "node-red-contrib-osc": "~1.1.0",
         "node-red-contrib-phidget22": "~1.0.3",
         "node-red-contrib-play-audio": "~2.5.0",
-        "node-red-contrib-simple-gate": "~0.2.3",
+        "node-red-contrib-simple-gate": "~0.3.1",
         "node-red-contrib-simpletime": "~2.8.1",
         "node-red-contrib-telegrambot": "~7.1.1",
-        "node-red-dashboard": "~2.23.2",
+        "node-red-dashboard": "~2.23.3",
         "phidget22": "^2.5.1"
     }
 }
