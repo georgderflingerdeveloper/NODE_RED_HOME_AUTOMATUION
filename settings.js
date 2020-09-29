@@ -200,12 +200,7 @@ module.exports = {
    
 
     functionGlobalContext: {
-        // os:require('os'),
-        // octalbonescript:require('octalbonescript'),
-        // jfive:require("johnny-five"),
-        // j5board:require("johnny-five").Board({repl:false})
-		//DigitalOutput:require("SwitchOutput"),
-        phidget22:require("phidget22")
+         phidget22:require("phidget22")
     },
 	
 	   editorTheme: {
