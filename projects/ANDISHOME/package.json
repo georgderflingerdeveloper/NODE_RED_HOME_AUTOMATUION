@@ -2,7 +2,9 @@
     "name": "ANDISHOME",
     "description": "Ein Node-RED-Projekt",
     "version": "0.0.1",
-    "dependencies": {},
+    "dependencies": {
+        "node-red-dashboard": "2.15.4"
+    },
     "node-red": {
         "settings": {
             "flowFile": "AndisHome.json",

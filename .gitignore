@@ -3,3 +3,9 @@ queue.sqlite
 .sessions.json
 .config.json.backup
 queue.sqlite
+/.config.json
+/projects/ANDISHOME/.AndisHome.json.backup
+/.flows_GEORGLAPTOP.json.backup
+/.flows_WIN-04L2L9UMOVJ.json.backup
+/windows-service.js
+/flows_GEORGLAPTOP.json
