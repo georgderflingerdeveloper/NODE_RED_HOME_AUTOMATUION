@@ -1,0 +1,8 @@
+{
+    "projects": {
+        "ART1": {
+            "credentialSecret": false
+        }
+    },
+    "activeProject": "ART1"
+}
