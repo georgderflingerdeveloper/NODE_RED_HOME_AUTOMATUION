@@ -371,7 +371,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-osc",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-osc\\osc.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-osc\\osc.js"
             }
         }
     },
@@ -388,7 +388,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-assert",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-assert\\assert.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-assert\\assert.js"
             }
         }
     },
@@ -405,7 +405,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\BooleanLogicUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\BooleanLogicUltimate.js"
             },
             "InvertUltimate": {
                 "name": "InvertUltimate",
@@ -415,7 +415,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InvertUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InvertUltimate.js"
             },
             "FilterUltimate": {
                 "name": "FilterUltimate",
@@ -425,7 +425,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\FilterUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\FilterUltimate.js"
             },
             "InterruptFlowUltimate": {
                 "name": "InterruptFlowUltimate",
@@ -435,7 +435,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InterruptFlowUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InterruptFlowUltimate.js"
             },
             "BlinkerUltimate": {
                 "name": "BlinkerUltimate",
@@ -445,7 +445,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\BlinkerUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\BlinkerUltimate.js"
             },
             "SimpleOutputUltimate": {
                 "name": "SimpleOutputUltimate",
@@ -455,7 +455,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\SimpleOutputUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\SimpleOutputUltimate.js"
             },
             "InjectUltimate": {
                 "name": "InjectUltimate",
@@ -465,7 +465,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InjectUltimate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InjectUltimate.js"
             }
         }
     },
@@ -480,7 +480,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-redbot.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-redbot.js"
             },
             "redbot-config": {
                 "name": "redbot-config",
@@ -488,7 +488,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\redbot.config.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\redbot.config.js"
             },
             "chatbot-telegram-receive": {
                 "name": "chatbot-telegram-receive",
@@ -500,7 +500,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-telegram-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-telegram-receive.js"
             },
             "chatbot-universal-receive": {
                 "name": "chatbot-universal-receive",
@@ -512,7 +512,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-universal-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-universal-receive.js"
             },
             "chatbot-slack-receive": {
                 "name": "chatbot-slack-receive",
@@ -524,7 +524,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-slack-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-slack-receive.js"
             },
             "chatbot-twilio-receive": {
                 "name": "chatbot-twilio-receive",
@@ -536,7 +536,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-twilio-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-twilio-receive.js"
             },
             "chatbot-routee-receive": {
                 "name": "chatbot-routee-receive",
@@ -548,7 +548,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-routee-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-routee-receive.js"
             },
             "chatbot-facebook-receive": {
                 "name": "chatbot-facebook-receive",
@@ -560,7 +560,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-facebook-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-facebook-receive.js"
             },
             "chatbot-viber-receive": {
                 "name": "chatbot-viber-receive",
@@ -572,7 +572,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-viber-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-viber-receive.js"
             },
             "chatbot-alexa-receive": {
                 "name": "chatbot-alexa-receive",
@@ -584,7 +584,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-receive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-receive.js"
             },
             "chatbot-message": {
                 "name": "chatbot-message",
@@ -594,7 +594,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-message.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-message.js"
             },
             "chatbot-analytics": {
                 "name": "chatbot-analytics",
@@ -604,7 +604,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-analytics.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-analytics.js"
             },
             "chatbot-context": {
                 "name": "chatbot-context",
@@ -614,7 +614,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-context.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-context.js"
             },
             "chatbot-topic": {
                 "name": "chatbot-topic",
@@ -624,7 +624,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-topic.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-topic.js"
             },
             "chatbot-voice": {
                 "name": "chatbot-voice",
@@ -634,7 +634,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-voice.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-voice.js"
             },
             "chatbot-language": {
                 "name": "chatbot-language",
@@ -644,7 +644,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-language.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-language.js"
             },
             "chatbot-listen": {
                 "name": "chatbot-listen",
@@ -654,7 +654,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-listen.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-listen.js"
             },
             "chatbot-listen-lexicon": {
                 "name": "chatbot-listen-lexicon",
@@ -664,7 +664,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-listen-lexicon.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-listen-lexicon.js"
             },
             "chatbot-parse": {
                 "name": "chatbot-parse",
@@ -674,7 +674,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-parse.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-parse.js"
             },
             "chatbot-command": {
                 "name": "chatbot-command",
@@ -684,7 +684,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-command.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-command.js"
             },
             "chatbot-document": {
                 "name": "chatbot-document",
@@ -694,7 +694,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-document.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-document.js"
             },
             "chatbot-video": {
                 "name": "chatbot-video",
@@ -704,7 +704,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-video.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-video.js"
             },
             "chatbot-image": {
                 "name": "chatbot-image",
@@ -714,7 +714,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-image.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-image.js"
             },
             "chatbot-sticker": {
                 "name": "chatbot-sticker",
@@ -724,7 +724,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-sticker.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-sticker.js"
             },
             "chatbot-animation": {
                 "name": "chatbot-animation",
@@ -734,7 +734,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-animation.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-animation.js"
             },
             "chatbot-audio": {
                 "name": "chatbot-audio",
@@ -744,7 +744,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-audio.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-audio.js"
             },
             "chatbot-location": {
                 "name": "chatbot-location",
@@ -754,7 +754,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-location.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-location.js"
             },
             "chatbot-ask": {
                 "name": "chatbot-ask",
@@ -764,7 +764,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-ask.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-ask.js"
             },
             "chatbot-inline-buttons": {
                 "name": "chatbot-inline-buttons",
@@ -774,7 +774,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-inline-buttons.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-inline-buttons.js"
             },
             "chatbot-quick-replies": {
                 "name": "chatbot-quick-replies",
@@ -784,7 +784,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-quick-replies.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-quick-replies.js"
             },
             "chatbot-generic-template": {
                 "name": "chatbot-generic-template",
@@ -794,7 +794,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-generic-template.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-generic-template.js"
             },
             "chatbot-list-template": {
                 "name": "chatbot-list-template",
@@ -804,7 +804,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-list-template.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-list-template.js"
             },
             "chatbot-request": {
                 "name": "chatbot-request",
@@ -814,7 +814,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-request.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-request.js"
             },
             "chatbot-log": {
                 "name": "chatbot-log",
@@ -824,7 +824,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-log.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-log.js"
             },
             "chatbot-qrcode": {
                 "name": "chatbot-qrcode",
@@ -834,7 +834,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-qrcode.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-qrcode.js"
             },
             "chatbot-conversation": {
                 "name": "chatbot-conversation",
@@ -844,7 +844,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-conversation.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-conversation.js"
             },
             "chatbot-debug": {
                 "name": "chatbot-debug",
@@ -854,7 +854,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-debug.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-debug.js"
             },
             "chatbot-waiting": {
                 "name": "chatbot-waiting",
@@ -864,7 +864,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-waiting.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-waiting.js"
             },
             "chatbot-authorized": {
                 "name": "chatbot-authorized",
@@ -874,7 +874,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-authorized.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-authorized.js"
             },
             "chatbot-transport": {
                 "name": "chatbot-transport",
@@ -884,7 +884,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-transport.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-transport.js"
             },
             "chatbot-rivescript": {
                 "name": "chatbot-rivescript",
@@ -894,7 +894,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-rivescript.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-rivescript.js"
             },
             "chatbot-messenger-menu": {
                 "name": "chatbot-messenger-menu",
@@ -904,7 +904,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-messenger-menu.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-messenger-menu.js"
             },
             "chatbot-context-store": {
                 "name": "chatbot-context-store",
@@ -914,7 +914,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-context-store.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-context-store.js"
             },
             "chatbot-inline-query": {
                 "name": "chatbot-inline-query",
@@ -924,7 +924,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-inline-query.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-inline-query.js"
             },
             "chatbot-dialog": {
                 "name": "chatbot-dialog",
@@ -934,7 +934,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-dialog.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-dialog.js"
             },
             "chatbot-rules": {
                 "name": "chatbot-rules",
@@ -944,7 +944,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-rules.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-rules.js"
             },
             "chatbot-params": {
                 "name": "chatbot-params",
@@ -954,7 +954,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-params.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-params.js"
             },
             "chatbot-recast": {
                 "name": "chatbot-recast",
@@ -965,7 +965,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-recast.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-recast.js"
             },
             "chatbot-dialogflow": {
                 "name": "chatbot-dialogflow",
@@ -976,7 +976,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-dialogflow.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-dialogflow.js"
             },
             "chatbot-invoice": {
                 "name": "chatbot-invoice",
@@ -986,7 +986,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-invoice.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-invoice.js"
             },
             "chatbot-invoice-shipping": {
                 "name": "chatbot-invoice-shipping",
@@ -996,7 +996,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-invoice-shipping.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-invoice-shipping.js"
             },
             "chatbot-extend": {
                 "name": "chatbot-extend",
@@ -1006,7 +1006,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-extend.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-extend.js"
             },
             "chatbot-support-table": {
                 "name": "chatbot-support-table",
@@ -1016,7 +1016,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-support-table.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-support-table.js"
             },
             "chatbot-alexa-card": {
                 "name": "chatbot-alexa-card",
@@ -1026,7 +1026,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-card.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-card.js"
             },
             "chatbot-alexa-directive": {
                 "name": "chatbot-alexa-directive",
@@ -1036,7 +1036,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-directive.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-directive.js"
             },
             "chatbot-broadcast": {
                 "name": "chatbot-broadcast",
@@ -1046,7 +1046,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-broadcast.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-broadcast.js"
             },
             "chatbot-alexa-speech": {
                 "name": "chatbot-alexa-speech",
@@ -1056,7 +1056,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-speech.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-alexa-speech.js"
             },
             "chatbot-slack-blocks": {
                 "name": "chatbot-slack-blocks",
@@ -1066,7 +1066,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-chatbot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-slack-blocks.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-chatbot\\nodes\\chatbot-slack-blocks.js"
             }
         }
     },
@@ -1083,7 +1083,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-eztimer",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-eztimer\\index.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-eztimer\\index.js"
             }
         }
     },
@@ -1100,7 +1100,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-finite-statemachine",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-finite-statemachine\\dist\\finite-state-machine-node.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-finite-statemachine\\dist\\finite-state-machine-node.js"
             }
         }
     },
@@ -1118,7 +1118,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-flow-asserter",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-flow-asserter\\flow-asserter.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-flow-asserter\\flow-asserter.js"
             }
         }
     },
@@ -1135,7 +1135,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-function-npm",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-function-npm\\function-npm\\function-npm.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-function-npm\\function-npm\\function-npm.js"
             }
         }
     },
@@ -1152,7 +1152,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-msg-queue",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
             },
             "retry-queue": {
                 "name": "retry-queue",
@@ -1162,7 +1162,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-msg-queue",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
             }
         }
     },
@@ -1179,7 +1179,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\beat.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\beat.js"
             },
             "divider": {
                 "name": "divider",
@@ -1189,7 +1189,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\divider.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\divider.js"
             },
             "looper": {
                 "name": "looper",
@@ -1199,7 +1199,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\looper.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\looper.js"
             },
             "sequencer": {
                 "name": "sequencer",
@@ -1209,7 +1209,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\sequencer.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\sequencer.js"
             },
             "setting": {
                 "name": "setting",
@@ -1219,7 +1219,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\setting.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\setting.js"
             },
             "soundfx": {
                 "name": "soundfx",
@@ -1229,7 +1229,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\soundfx.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\soundfx.js"
             },
             "synth": {
                 "name": "synth",
@@ -1239,7 +1239,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-music",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\synth.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-music\\synth.js"
             }
         }
     },
@@ -1256,7 +1256,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-mytimeout",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-mytimeout\\mytimeout.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-mytimeout\\mytimeout.js"
             }
         }
     },
@@ -1273,7 +1273,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-bigtimer",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-bigtimer\\bigtimer.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-bigtimer\\bigtimer.js"
             }
         }
     },
@@ -1292,7 +1292,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-persist",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-persist\\persist.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-persist\\persist.js"
             }
         }
     },
@@ -1309,7 +1309,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-connect.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-connect.js"
             },
             "phidget22-accelerometer": {
                 "name": "phidget22-accelerometer",
@@ -1319,7 +1319,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-accelerometer.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-accelerometer.js"
             },
             "phidget22-bldcmotor": {
                 "name": "phidget22-bldcmotor",
@@ -1329,7 +1329,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-bldcmotor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-bldcmotor.js"
             },
             "phidget22-capacitivetouch": {
                 "name": "phidget22-capacitivetouch",
@@ -1339,7 +1339,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-capacitivetouch.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-capacitivetouch.js"
             },
             "phidget22-currentinput": {
                 "name": "phidget22-currentinput",
@@ -1349,7 +1349,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-currentinput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-currentinput.js"
             },
             "phidget22-dcmotor": {
                 "name": "phidget22-dcmotor",
@@ -1359,7 +1359,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dcmotor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dcmotor.js"
             },
             "phidget22-dictionary": {
                 "name": "phidget22-dictionary",
@@ -1369,7 +1369,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dictionary.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dictionary.js"
             },
             "phidget22-digitalinput": {
                 "name": "phidget22-digitalinput",
@@ -1379,7 +1379,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitalinput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitalinput.js"
             },
             "phidget22-digitaloutput": {
                 "name": "phidget22-digitaloutput",
@@ -1389,7 +1389,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitaloutput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitaloutput.js"
             },
             "phidget22-distancesensor": {
                 "name": "phidget22-distancesensor",
@@ -1399,7 +1399,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-distancesensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-distancesensor.js"
             },
             "phidget22-encoder": {
                 "name": "phidget22-encoder",
@@ -1409,7 +1409,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-encoder.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-encoder.js"
             },
             "phidget22-frequencycounter": {
                 "name": "phidget22-frequencycounter",
@@ -1419,7 +1419,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-frequencycounter.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-frequencycounter.js"
             },
             "phidget22-gps": {
                 "name": "phidget22-gps",
@@ -1429,7 +1429,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gps.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gps.js"
             },
             "phidget22-gyroscope": {
                 "name": "phidget22-gyroscope",
@@ -1439,7 +1439,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gyroscope.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gyroscope.js"
             },
             "phidget22-hub": {
                 "name": "phidget22-hub",
@@ -1449,7 +1449,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-hub.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-hub.js"
             },
             "phidget22-humiditysensor": {
                 "name": "phidget22-humiditysensor",
@@ -1459,7 +1459,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-humiditysensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-humiditysensor.js"
             },
             "phidget22-ir": {
                 "name": "phidget22-ir",
@@ -1469,7 +1469,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-ir.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-ir.js"
             },
             "phidget22-lcd": {
                 "name": "phidget22-lcd",
@@ -1479,7 +1479,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lcd.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lcd.js"
             },
             "phidget22-lightsensor": {
                 "name": "phidget22-lightsensor",
@@ -1489,7 +1489,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lightsensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lightsensor.js"
             },
             "phidget22-magnetometer": {
                 "name": "phidget22-magnetometer",
@@ -1499,7 +1499,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-magnetometer.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-magnetometer.js"
             },
             "phidget22-motorpositioncontroller": {
                 "name": "phidget22-motorpositioncontroller",
@@ -1509,7 +1509,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-motorpositioncontroller.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-motorpositioncontroller.js"
             },
             "phidget22-phsensor": {
                 "name": "phidget22-phsensor",
@@ -1519,7 +1519,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-phsensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-phsensor.js"
             },
             "phidget22-powerguard": {
                 "name": "phidget22-powerguard",
@@ -1529,7 +1529,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-powerguard.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-powerguard.js"
             },
             "phidget22-pressuresensor": {
                 "name": "phidget22-pressuresensor",
@@ -1539,7 +1539,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-pressuresensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-pressuresensor.js"
             },
             "phidget22-rcservo": {
                 "name": "phidget22-rcservo",
@@ -1549,7 +1549,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rcservo.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rcservo.js"
             },
             "phidget22-resistanceinput": {
                 "name": "phidget22-resistanceinput",
@@ -1559,7 +1559,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-resistanceinput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-resistanceinput.js"
             },
             "phidget22-rfid": {
                 "name": "phidget22-rfid",
@@ -1569,7 +1569,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rfid.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rfid.js"
             },
             "phidget22-soundsensor": {
                 "name": "phidget22-soundsensor",
@@ -1579,7 +1579,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-soundsensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-soundsensor.js"
             },
             "phidget22-spatial": {
                 "name": "phidget22-spatial",
@@ -1589,7 +1589,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-spatial.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-spatial.js"
             },
             "phidget22-stepper": {
                 "name": "phidget22-stepper",
@@ -1599,7 +1599,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-stepper.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-stepper.js"
             },
             "phidget22-temperaturesensor": {
                 "name": "phidget22-temperaturesensor",
@@ -1609,7 +1609,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-temperaturesensor.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-temperaturesensor.js"
             },
             "phidget22-voltageinput": {
                 "name": "phidget22-voltageinput",
@@ -1619,7 +1619,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageinput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageinput.js"
             },
             "phidget22-voltageoutput": {
                 "name": "phidget22-voltageoutput",
@@ -1629,7 +1629,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageoutput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageoutput.js"
             },
             "phidget22-voltageratioinput": {
                 "name": "phidget22-voltageratioinput",
@@ -1639,7 +1639,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-phidget22",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageratioinput.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageratioinput.js"
             }
         }
     },
@@ -1656,7 +1656,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-play-audio",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-play-audio\\play-audio.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-play-audio\\play-audio.js"
             }
         }
     },
@@ -1673,7 +1673,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-simple-gate",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simple-gate\\gate.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simple-gate\\gate.js"
             }
         }
     },
@@ -1690,7 +1690,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-simpletime",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simpletime\\simpletime.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simpletime\\simpletime.js"
             }
         }
     },
@@ -1712,7 +1712,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-telegrambot",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-telegrambot\\telegrambot\\99-telegrambot.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-telegrambot\\telegrambot\\99-telegrambot.js"
             }
         }
     },
@@ -1727,7 +1727,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-contrib-test-node-library",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-test-node-library\\node-red-test-node-library.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-test-node-library\\node-red-test-node-library.js"
             }
         }
     },
@@ -1744,7 +1744,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_base.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_base.js"
             },
             "ui_button": {
                 "name": "ui_button",
@@ -1754,7 +1754,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_button.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_button.js"
             },
             "ui_dropdown": {
                 "name": "ui_dropdown",
@@ -1764,7 +1764,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_dropdown.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_dropdown.js"
             },
             "ui_switch": {
                 "name": "ui_switch",
@@ -1774,7 +1774,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_switch.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_switch.js"
             },
             "ui_slider": {
                 "name": "ui_slider",
@@ -1784,7 +1784,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_slider.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_slider.js"
             },
             "ui_numeric": {
                 "name": "ui_numeric",
@@ -1794,7 +1794,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_numeric.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_numeric.js"
             },
             "ui_text_input": {
                 "name": "ui_text_input",
@@ -1804,7 +1804,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text_input.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text_input.js"
             },
             "ui_date_picker": {
                 "name": "ui_date_picker",
@@ -1814,7 +1814,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_date_picker.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_date_picker.js"
             },
             "ui_colour_picker": {
                 "name": "ui_colour_picker",
@@ -1824,7 +1824,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_colour_picker.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_colour_picker.js"
             },
             "ui_form": {
                 "name": "ui_form",
@@ -1834,7 +1834,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_form.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_form.js"
             },
             "ui_text": {
                 "name": "ui_text",
@@ -1844,7 +1844,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text.js"
             },
             "ui_gauge": {
                 "name": "ui_gauge",
@@ -1854,7 +1854,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_gauge.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_gauge.js"
             },
             "ui_chart": {
                 "name": "ui_chart",
@@ -1864,7 +1864,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_chart.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_chart.js"
             },
             "ui_audio": {
                 "name": "ui_audio",
@@ -1874,7 +1874,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_audio.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_audio.js"
             },
             "ui_toast": {
                 "name": "ui_toast",
@@ -1884,7 +1884,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_toast.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_toast.js"
             },
             "ui_ui_control": {
                 "name": "ui_ui_control",
@@ -1894,7 +1894,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_ui_control.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_ui_control.js"
             },
             "ui_template": {
                 "name": "ui_template",
@@ -1904,7 +1904,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_template.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_template.js"
             },
             "ui_link": {
                 "name": "ui_link",
@@ -1914,7 +1914,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_link.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_link.js"
             },
             "ui_tab": {
                 "name": "ui_tab",
@@ -1924,7 +1924,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_tab.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_tab.js"
             },
             "ui_group": {
                 "name": "ui_group",
@@ -1934,7 +1934,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_group.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_group.js"
             },
             "ui_spacer": {
                 "name": "ui_spacer",
@@ -1944,7 +1944,7 @@
                 "enabled": true,
                 "local": true,
                 "module": "node-red-dashboard",
-                "file": "C:\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_spacer.js"
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_spacer.js"
             }
         }
     },

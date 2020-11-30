@@ -13,3 +13,4 @@ queue.sqlite
 /projects/TRIAL/Trialflow_cred.json
 /package-lock.json
 /*.backup
+/projects/.sshkeys
