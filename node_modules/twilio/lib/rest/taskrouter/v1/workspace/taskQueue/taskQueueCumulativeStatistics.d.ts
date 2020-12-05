@@ -8,7 +8,6 @@
 import Page = require('../../../../../base/Page');
 import Response = require('../../../../../http/response');
 import V1 = require('../../../V1');
-import serialize = require('../../../../../base/serialize');
 import { SerializableClass } from '../../../../../interfaces';
 
 /**
@@ -74,6 +73,7 @@ interface TaskQueueCumulativeStatisticsResource {
   tasks_entered: number;
   tasks_moved: number;
   url: string;
+  wait_duration_in_queue_until_accepted: object;
   wait_duration_until_accepted: object;
   wait_duration_until_canceled: object;
   workspace_sid: string;
@@ -95,6 +95,12 @@ declare class TaskQueueCumulativeStatisticsContext {
    */
   constructor(version: V1, workspaceSid: string, taskQueueSid: string);
 
+  /**
+   * fetch a TaskQueueCumulativeStatisticsInstance
+   *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: TaskQueueCumulativeStatisticsInstance) => any): Promise<TaskQueueCumulativeStatisticsInstance>;
   /**
    * fetch a TaskQueueCumulativeStatisticsInstance
    *
@@ -127,6 +133,12 @@ declare class TaskQueueCumulativeStatisticsInstance extends SerializableClass {
   /**
    * fetch a TaskQueueCumulativeStatisticsInstance
    *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: TaskQueueCumulativeStatisticsInstance) => any): Promise<TaskQueueCumulativeStatisticsInstance>;
+  /**
+   * fetch a TaskQueueCumulativeStatisticsInstance
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle processed record
    */
@@ -137,7 +149,7 @@ declare class TaskQueueCumulativeStatisticsInstance extends SerializableClass {
   reservationsRejected: number;
   reservationsRescinded: number;
   reservationsTimedOut: number;
-  splitByWaitTime: object;
+  splitByWaitTime: any;
   startTime: Date;
   taskQueueSid: string;
   tasksCanceled: number;
@@ -150,8 +162,9 @@ declare class TaskQueueCumulativeStatisticsInstance extends SerializableClass {
    */
   toJSON(): any;
   url: string;
-  waitDurationUntilAccepted: object;
-  waitDurationUntilCanceled: object;
+  waitDurationInQueueUntilAccepted: any;
+  waitDurationUntilAccepted: any;
+  waitDurationUntilCanceled: any;
   workspaceSid: string;
 }
 

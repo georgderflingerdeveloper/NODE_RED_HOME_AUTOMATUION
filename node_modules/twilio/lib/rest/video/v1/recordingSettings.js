@@ -25,10 +25,6 @@ var RecordingSettingsContext;
 /**
  * Initialize the RecordingSettingsList
  *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
- *
  * @constructor Twilio.Video.V1.RecordingSettingsList
  *
  * @param {Twilio.Video.V1} version - Version of the resource
@@ -92,10 +88,6 @@ RecordingSettingsList = function RecordingSettingsList(version) {
 /* jshint ignore:start */
 /**
  * Initialize the RecordingSettingsPage
- *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
  *
  * @constructor Twilio.Video.V1.RecordingSettingsPage
  *
@@ -163,10 +155,6 @@ RecordingSettingsPage.prototype[util.inspect.custom] = function inspect(depth,
 /**
  * Initialize the RecordingSettingsContext
  *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
- *
  * @constructor Twilio.Video.V1.RecordingSettingsInstance
  *
  * @property {string} accountSid - The SID of the Account that created the resource
@@ -208,13 +196,13 @@ RecordingSettingsInstance = function RecordingSettingsInstance(version, payload)
 
 Object.defineProperty(RecordingSettingsInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new RecordingSettingsContext(this._version);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new RecordingSettingsContext(this._version);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -290,10 +278,6 @@ RecordingSettingsInstance.prototype[util.inspect.custom] = function
 /* jshint ignore:start */
 /**
  * Initialize the RecordingSettingsContext
- *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
  *
  * @constructor Twilio.Video.V1.RecordingSettingsContext
  *
