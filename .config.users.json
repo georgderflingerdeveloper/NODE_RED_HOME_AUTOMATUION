@@ -16,7 +16,7 @@
                 "email": "georgderflinger@gmail.com"
             },
             "workflow": {
-                "mode": "auto"
+                "mode": "manual"
             }
         }
     }

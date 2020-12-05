@@ -358,43 +358,9 @@
             }
         }
     },
-    "node-red-contrib-osc": {
-        "name": "node-red-contrib-osc",
-        "version": "1.1.0",
-        "local": true,
-        "nodes": {
-            "osc": {
-                "name": "osc",
-                "types": [
-                    "osc"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-osc",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-osc\\osc.js"
-            }
-        }
-    },
-    "node-red-contrib-assert": {
-        "name": "node-red-contrib-assert",
-        "version": "1.3.2",
-        "local": true,
-        "nodes": {
-            "assert": {
-                "name": "assert",
-                "types": [
-                    "assert"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-assert",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-assert\\assert.js"
-            }
-        }
-    },
     "node-red-contrib-boolean-logic-ultimate": {
         "name": "node-red-contrib-boolean-logic-ultimate",
-        "version": "1.0.20",
+        "version": "1.0.23",
         "local": true,
         "nodes": {
             "BooleanLogicUltimate": {
@@ -466,6 +432,638 @@
                 "local": true,
                 "module": "node-red-contrib-boolean-logic-ultimate",
                 "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-boolean-logic-ultimate\\boolean-logic-ultimate\\InjectUltimate.js"
+            }
+        }
+    },
+    "node-red-contrib-bigtimer": {
+        "name": "node-red-contrib-bigtimer",
+        "version": "2.6.3",
+        "local": true,
+        "nodes": {
+            "bigtimer": {
+                "name": "bigtimer",
+                "types": [
+                    "bigtimer"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-bigtimer",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-bigtimer\\bigtimer.js"
+            }
+        }
+    },
+    "node-red-contrib-phidget22": {
+        "name": "node-red-contrib-phidget22",
+        "version": "1.0.3",
+        "local": true,
+        "nodes": {
+            "phidget22-connect": {
+                "name": "phidget22-connect",
+                "types": [
+                    "phidget22-connect"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-connect.js"
+            },
+            "phidget22-accelerometer": {
+                "name": "phidget22-accelerometer",
+                "types": [
+                    "phidget22-accelerometer"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-accelerometer.js"
+            },
+            "phidget22-bldcmotor": {
+                "name": "phidget22-bldcmotor",
+                "types": [
+                    "phidget22-bldcmotor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-bldcmotor.js"
+            },
+            "phidget22-capacitivetouch": {
+                "name": "phidget22-capacitivetouch",
+                "types": [
+                    "phidget22-capacitivetouch"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-capacitivetouch.js"
+            },
+            "phidget22-currentinput": {
+                "name": "phidget22-currentinput",
+                "types": [
+                    "phidget22-currentinput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-currentinput.js"
+            },
+            "phidget22-dcmotor": {
+                "name": "phidget22-dcmotor",
+                "types": [
+                    "phidget22-dcmotor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dcmotor.js"
+            },
+            "phidget22-dictionary": {
+                "name": "phidget22-dictionary",
+                "types": [
+                    "phidget22-dictionary"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dictionary.js"
+            },
+            "phidget22-digitalinput": {
+                "name": "phidget22-digitalinput",
+                "types": [
+                    "phidget22-digitalinput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitalinput.js"
+            },
+            "phidget22-digitaloutput": {
+                "name": "phidget22-digitaloutput",
+                "types": [
+                    "phidget22-digitaloutput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitaloutput.js"
+            },
+            "phidget22-distancesensor": {
+                "name": "phidget22-distancesensor",
+                "types": [
+                    "phidget22-distancesensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-distancesensor.js"
+            },
+            "phidget22-encoder": {
+                "name": "phidget22-encoder",
+                "types": [
+                    "phidget22-encoder"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-encoder.js"
+            },
+            "phidget22-frequencycounter": {
+                "name": "phidget22-frequencycounter",
+                "types": [
+                    "phidget22-frequencycounter"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-frequencycounter.js"
+            },
+            "phidget22-gps": {
+                "name": "phidget22-gps",
+                "types": [
+                    "phidget22-gps"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gps.js"
+            },
+            "phidget22-gyroscope": {
+                "name": "phidget22-gyroscope",
+                "types": [
+                    "phidget22-gyroscope"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gyroscope.js"
+            },
+            "phidget22-hub": {
+                "name": "phidget22-hub",
+                "types": [
+                    "phidget22-hub"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-hub.js"
+            },
+            "phidget22-humiditysensor": {
+                "name": "phidget22-humiditysensor",
+                "types": [
+                    "phidget22-humiditysensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-humiditysensor.js"
+            },
+            "phidget22-ir": {
+                "name": "phidget22-ir",
+                "types": [
+                    "phidget22-ir"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-ir.js"
+            },
+            "phidget22-lcd": {
+                "name": "phidget22-lcd",
+                "types": [
+                    "phidget22-lcd"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lcd.js"
+            },
+            "phidget22-lightsensor": {
+                "name": "phidget22-lightsensor",
+                "types": [
+                    "phidget22-lightsensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lightsensor.js"
+            },
+            "phidget22-magnetometer": {
+                "name": "phidget22-magnetometer",
+                "types": [
+                    "phidget22-magnetometer"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-magnetometer.js"
+            },
+            "phidget22-motorpositioncontroller": {
+                "name": "phidget22-motorpositioncontroller",
+                "types": [
+                    "phidget22-motorpositioncontroller"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-motorpositioncontroller.js"
+            },
+            "phidget22-phsensor": {
+                "name": "phidget22-phsensor",
+                "types": [
+                    "phidget22-phsensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-phsensor.js"
+            },
+            "phidget22-powerguard": {
+                "name": "phidget22-powerguard",
+                "types": [
+                    "phidget22-powerguard"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-powerguard.js"
+            },
+            "phidget22-pressuresensor": {
+                "name": "phidget22-pressuresensor",
+                "types": [
+                    "phidget22-pressuresensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-pressuresensor.js"
+            },
+            "phidget22-rcservo": {
+                "name": "phidget22-rcservo",
+                "types": [
+                    "phidget22-rcservo"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rcservo.js"
+            },
+            "phidget22-resistanceinput": {
+                "name": "phidget22-resistanceinput",
+                "types": [
+                    "phidget22-resistanceinput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-resistanceinput.js"
+            },
+            "phidget22-rfid": {
+                "name": "phidget22-rfid",
+                "types": [
+                    "phidget22-rfid"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rfid.js"
+            },
+            "phidget22-soundsensor": {
+                "name": "phidget22-soundsensor",
+                "types": [
+                    "phidget22-soundsensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-soundsensor.js"
+            },
+            "phidget22-spatial": {
+                "name": "phidget22-spatial",
+                "types": [
+                    "phidget22-spatial"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-spatial.js"
+            },
+            "phidget22-stepper": {
+                "name": "phidget22-stepper",
+                "types": [
+                    "phidget22-stepper"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-stepper.js"
+            },
+            "phidget22-temperaturesensor": {
+                "name": "phidget22-temperaturesensor",
+                "types": [
+                    "phidget22-temperaturesensor"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-temperaturesensor.js"
+            },
+            "phidget22-voltageinput": {
+                "name": "phidget22-voltageinput",
+                "types": [
+                    "phidget22-voltageinput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageinput.js"
+            },
+            "phidget22-voltageoutput": {
+                "name": "phidget22-voltageoutput",
+                "types": [
+                    "phidget22-voltageoutput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageoutput.js"
+            },
+            "phidget22-voltageratioinput": {
+                "name": "phidget22-voltageratioinput",
+                "types": [
+                    "phidget22-voltageratioinput"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-phidget22",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageratioinput.js"
+            }
+        }
+    },
+    "node-red-node-rbe": {
+        "name": "node-red-node-rbe",
+        "version": "0.2.9",
+        "local": false,
+        "nodes": {
+            "rbe": {
+                "name": "rbe",
+                "types": [
+                    "rbe"
+                ],
+                "enabled": true,
+                "local": false,
+                "module": "node-red-node-rbe",
+                "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-rbe\\rbe.js"
+            }
+        }
+    },
+    "node-red-node-tail": {
+        "name": "node-red-node-tail",
+        "version": "0.1.1",
+        "local": false,
+        "nodes": {
+            "tail": {
+                "name": "tail",
+                "types": [
+                    "tail"
+                ],
+                "enabled": true,
+                "local": false,
+                "module": "node-red-node-tail",
+                "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-tail\\28-tail.js"
+            }
+        }
+    },
+    "ttb-node-red-counter": {
+        "name": "ttb-node-red-counter",
+        "version": "0.1.0",
+        "local": false,
+        "nodes": {
+            "counter": {
+                "name": "counter",
+                "types": [
+                    "counter"
+                ],
+                "enabled": true,
+                "local": false,
+                "module": "ttb-node-red-counter",
+                "file": "C:\\Users\\HPO05\\node_modules\\ttb-node-red-counter\\counter.js"
+            }
+        }
+    },
+    "node-red-dashboard": {
+        "name": "node-red-dashboard",
+        "version": "2.24.2",
+        "local": true,
+        "nodes": {
+            "ui_base": {
+                "name": "ui_base",
+                "types": [
+                    "ui_base"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_base.js"
+            },
+            "ui_button": {
+                "name": "ui_button",
+                "types": [
+                    "ui_button"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_button.js"
+            },
+            "ui_dropdown": {
+                "name": "ui_dropdown",
+                "types": [
+                    "ui_dropdown"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_dropdown.js"
+            },
+            "ui_switch": {
+                "name": "ui_switch",
+                "types": [
+                    "ui_switch"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_switch.js"
+            },
+            "ui_slider": {
+                "name": "ui_slider",
+                "types": [
+                    "ui_slider"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_slider.js"
+            },
+            "ui_numeric": {
+                "name": "ui_numeric",
+                "types": [
+                    "ui_numeric"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_numeric.js"
+            },
+            "ui_text_input": {
+                "name": "ui_text_input",
+                "types": [
+                    "ui_text_input"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text_input.js"
+            },
+            "ui_date_picker": {
+                "name": "ui_date_picker",
+                "types": [
+                    "ui_date_picker"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_date_picker.js"
+            },
+            "ui_colour_picker": {
+                "name": "ui_colour_picker",
+                "types": [
+                    "ui_colour_picker"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_colour_picker.js"
+            },
+            "ui_form": {
+                "name": "ui_form",
+                "types": [
+                    "ui_form"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_form.js"
+            },
+            "ui_text": {
+                "name": "ui_text",
+                "types": [
+                    "ui_text"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text.js"
+            },
+            "ui_gauge": {
+                "name": "ui_gauge",
+                "types": [
+                    "ui_gauge"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_gauge.js"
+            },
+            "ui_chart": {
+                "name": "ui_chart",
+                "types": [
+                    "ui_chart"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_chart.js"
+            },
+            "ui_audio": {
+                "name": "ui_audio",
+                "types": [
+                    "ui_audio"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_audio.js"
+            },
+            "ui_toast": {
+                "name": "ui_toast",
+                "types": [
+                    "ui_toast"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_toast.js"
+            },
+            "ui_ui_control": {
+                "name": "ui_ui_control",
+                "types": [
+                    "ui_ui_control"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_ui_control.js"
+            },
+            "ui_template": {
+                "name": "ui_template",
+                "types": [
+                    "ui_template"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_template.js"
+            },
+            "ui_link": {
+                "name": "ui_link",
+                "types": [
+                    "ui_link"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_link.js"
+            },
+            "ui_tab": {
+                "name": "ui_tab",
+                "types": [
+                    "ui_tab"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_tab.js"
+            },
+            "ui_group": {
+                "name": "ui_group",
+                "types": [
+                    "ui_group"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_group.js"
+            },
+            "ui_spacer": {
+                "name": "ui_spacer",
+                "types": [
+                    "ui_spacer"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-dashboard",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_spacer.js"
             }
         }
     },
@@ -1070,23 +1668,6 @@
             }
         }
     },
-    "node-red-contrib-eztimer": {
-        "name": "node-red-contrib-eztimer",
-        "version": "1.1.1",
-        "local": true,
-        "nodes": {
-            "eztimer": {
-                "name": "eztimer",
-                "types": [
-                    "eztimer"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-eztimer",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-eztimer\\index.js"
-            }
-        }
-    },
     "node-red-contrib-finite-statemachine": {
         "name": "node-red-contrib-finite-statemachine",
         "version": "1.0.4",
@@ -1101,6 +1682,81 @@
                 "local": true,
                 "module": "node-red-contrib-finite-statemachine",
                 "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-finite-statemachine\\dist\\finite-state-machine-node.js"
+            }
+        }
+    },
+    "node-red-contrib-persist": {
+        "name": "node-red-contrib-persist",
+        "version": "1.0.4",
+        "local": true,
+        "nodes": {
+            "persist": {
+                "name": "persist",
+                "types": [
+                    "persist-store",
+                    "persist in",
+                    "persist out"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-persist",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-persist\\persist.js"
+            }
+        }
+    },
+    "node-red-contrib-simple-gate": {
+        "name": "node-red-contrib-simple-gate",
+        "version": "0.3.1",
+        "local": true,
+        "nodes": {
+            "gate": {
+                "name": "gate",
+                "types": [
+                    "gate"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-simple-gate",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simple-gate\\gate.js"
+            }
+        }
+    },
+    "node-red-contrib-simpletime": {
+        "name": "node-red-contrib-simpletime",
+        "version": "2.8.1",
+        "local": true,
+        "nodes": {
+            "simpletime": {
+                "name": "simpletime",
+                "types": [
+                    "simpletime"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-simpletime",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simpletime\\simpletime.js"
+            }
+        }
+    },
+    "node-red-contrib-telegrambot": {
+        "name": "node-red-contrib-telegrambot",
+        "version": "7.1.1",
+        "local": true,
+        "nodes": {
+            "telegrambot": {
+                "name": "telegrambot",
+                "types": [
+                    "telegram bot",
+                    "telegram receiver",
+                    "telegram command",
+                    "telegram event",
+                    "telegram sender",
+                    "telegram reply"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-telegrambot",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-telegrambot\\telegrambot\\99-telegrambot.js"
             }
         }
     },
@@ -1122,47 +1778,20 @@
             }
         }
     },
-    "node-red-contrib-function-npm": {
-        "name": "node-red-contrib-function-npm",
-        "version": "0.3.0",
+    "node-red-contrib-assert": {
+        "name": "node-red-contrib-assert",
+        "version": "1.3.2",
         "local": true,
         "nodes": {
-            "function-npm": {
-                "name": "function-npm",
+            "assert": {
+                "name": "assert",
                 "types": [
-                    "function-npm"
+                    "assert"
                 ],
                 "enabled": true,
                 "local": true,
-                "module": "node-red-contrib-function-npm",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-function-npm\\function-npm\\function-npm.js"
-            }
-        }
-    },
-    "node-red-contrib-msg-queue": {
-        "name": "node-red-contrib-msg-queue",
-        "version": "1.0.2",
-        "local": true,
-        "nodes": {
-            "queue": {
-                "name": "queue",
-                "types": [
-                    "queue"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-msg-queue",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\ready-queue.js"
-            },
-            "retry-queue": {
-                "name": "retry-queue",
-                "types": [
-                    "retry-queue"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-msg-queue",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-msg-queue\\queue\\retry-queue.js"
+                "module": "node-red-contrib-assert",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-assert\\assert.js"
             }
         }
     },
@@ -1243,742 +1872,20 @@
             }
         }
     },
-    "node-red-contrib-mytimeout": {
-        "name": "node-red-contrib-mytimeout",
-        "version": "3.2.0",
+    "node-red-contrib-osc": {
+        "name": "node-red-contrib-osc",
+        "version": "1.1.0",
         "local": true,
         "nodes": {
-            "mytimeout": {
-                "name": "mytimeout",
+            "osc": {
+                "name": "osc",
                 "types": [
-                    "mytimeout"
+                    "osc"
                 ],
                 "enabled": true,
                 "local": true,
-                "module": "node-red-contrib-mytimeout",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-mytimeout\\mytimeout.js"
-            }
-        }
-    },
-    "node-red-contrib-bigtimer": {
-        "name": "node-red-contrib-bigtimer",
-        "version": "2.2.6",
-        "local": true,
-        "nodes": {
-            "bigtimer": {
-                "name": "bigtimer",
-                "types": [
-                    "bigtimer"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-bigtimer",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-bigtimer\\bigtimer.js"
-            }
-        }
-    },
-    "node-red-contrib-persist": {
-        "name": "node-red-contrib-persist",
-        "version": "1.0.4",
-        "local": true,
-        "nodes": {
-            "persist": {
-                "name": "persist",
-                "types": [
-                    "persist-store",
-                    "persist in",
-                    "persist out"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-persist",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-persist\\persist.js"
-            }
-        }
-    },
-    "node-red-contrib-phidget22": {
-        "name": "node-red-contrib-phidget22",
-        "version": "1.0.3",
-        "local": true,
-        "nodes": {
-            "phidget22-connect": {
-                "name": "phidget22-connect",
-                "types": [
-                    "phidget22-connect"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-connect.js"
-            },
-            "phidget22-accelerometer": {
-                "name": "phidget22-accelerometer",
-                "types": [
-                    "phidget22-accelerometer"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-accelerometer.js"
-            },
-            "phidget22-bldcmotor": {
-                "name": "phidget22-bldcmotor",
-                "types": [
-                    "phidget22-bldcmotor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-bldcmotor.js"
-            },
-            "phidget22-capacitivetouch": {
-                "name": "phidget22-capacitivetouch",
-                "types": [
-                    "phidget22-capacitivetouch"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-capacitivetouch.js"
-            },
-            "phidget22-currentinput": {
-                "name": "phidget22-currentinput",
-                "types": [
-                    "phidget22-currentinput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-currentinput.js"
-            },
-            "phidget22-dcmotor": {
-                "name": "phidget22-dcmotor",
-                "types": [
-                    "phidget22-dcmotor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dcmotor.js"
-            },
-            "phidget22-dictionary": {
-                "name": "phidget22-dictionary",
-                "types": [
-                    "phidget22-dictionary"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-dictionary.js"
-            },
-            "phidget22-digitalinput": {
-                "name": "phidget22-digitalinput",
-                "types": [
-                    "phidget22-digitalinput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitalinput.js"
-            },
-            "phidget22-digitaloutput": {
-                "name": "phidget22-digitaloutput",
-                "types": [
-                    "phidget22-digitaloutput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-digitaloutput.js"
-            },
-            "phidget22-distancesensor": {
-                "name": "phidget22-distancesensor",
-                "types": [
-                    "phidget22-distancesensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-distancesensor.js"
-            },
-            "phidget22-encoder": {
-                "name": "phidget22-encoder",
-                "types": [
-                    "phidget22-encoder"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-encoder.js"
-            },
-            "phidget22-frequencycounter": {
-                "name": "phidget22-frequencycounter",
-                "types": [
-                    "phidget22-frequencycounter"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-frequencycounter.js"
-            },
-            "phidget22-gps": {
-                "name": "phidget22-gps",
-                "types": [
-                    "phidget22-gps"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gps.js"
-            },
-            "phidget22-gyroscope": {
-                "name": "phidget22-gyroscope",
-                "types": [
-                    "phidget22-gyroscope"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-gyroscope.js"
-            },
-            "phidget22-hub": {
-                "name": "phidget22-hub",
-                "types": [
-                    "phidget22-hub"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-hub.js"
-            },
-            "phidget22-humiditysensor": {
-                "name": "phidget22-humiditysensor",
-                "types": [
-                    "phidget22-humiditysensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-humiditysensor.js"
-            },
-            "phidget22-ir": {
-                "name": "phidget22-ir",
-                "types": [
-                    "phidget22-ir"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-ir.js"
-            },
-            "phidget22-lcd": {
-                "name": "phidget22-lcd",
-                "types": [
-                    "phidget22-lcd"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lcd.js"
-            },
-            "phidget22-lightsensor": {
-                "name": "phidget22-lightsensor",
-                "types": [
-                    "phidget22-lightsensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-lightsensor.js"
-            },
-            "phidget22-magnetometer": {
-                "name": "phidget22-magnetometer",
-                "types": [
-                    "phidget22-magnetometer"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-magnetometer.js"
-            },
-            "phidget22-motorpositioncontroller": {
-                "name": "phidget22-motorpositioncontroller",
-                "types": [
-                    "phidget22-motorpositioncontroller"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-motorpositioncontroller.js"
-            },
-            "phidget22-phsensor": {
-                "name": "phidget22-phsensor",
-                "types": [
-                    "phidget22-phsensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-phsensor.js"
-            },
-            "phidget22-powerguard": {
-                "name": "phidget22-powerguard",
-                "types": [
-                    "phidget22-powerguard"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-powerguard.js"
-            },
-            "phidget22-pressuresensor": {
-                "name": "phidget22-pressuresensor",
-                "types": [
-                    "phidget22-pressuresensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-pressuresensor.js"
-            },
-            "phidget22-rcservo": {
-                "name": "phidget22-rcservo",
-                "types": [
-                    "phidget22-rcservo"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rcservo.js"
-            },
-            "phidget22-resistanceinput": {
-                "name": "phidget22-resistanceinput",
-                "types": [
-                    "phidget22-resistanceinput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-resistanceinput.js"
-            },
-            "phidget22-rfid": {
-                "name": "phidget22-rfid",
-                "types": [
-                    "phidget22-rfid"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-rfid.js"
-            },
-            "phidget22-soundsensor": {
-                "name": "phidget22-soundsensor",
-                "types": [
-                    "phidget22-soundsensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-soundsensor.js"
-            },
-            "phidget22-spatial": {
-                "name": "phidget22-spatial",
-                "types": [
-                    "phidget22-spatial"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-spatial.js"
-            },
-            "phidget22-stepper": {
-                "name": "phidget22-stepper",
-                "types": [
-                    "phidget22-stepper"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-stepper.js"
-            },
-            "phidget22-temperaturesensor": {
-                "name": "phidget22-temperaturesensor",
-                "types": [
-                    "phidget22-temperaturesensor"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-temperaturesensor.js"
-            },
-            "phidget22-voltageinput": {
-                "name": "phidget22-voltageinput",
-                "types": [
-                    "phidget22-voltageinput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageinput.js"
-            },
-            "phidget22-voltageoutput": {
-                "name": "phidget22-voltageoutput",
-                "types": [
-                    "phidget22-voltageoutput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageoutput.js"
-            },
-            "phidget22-voltageratioinput": {
-                "name": "phidget22-voltageratioinput",
-                "types": [
-                    "phidget22-voltageratioinput"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-phidget22",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-phidget22\\phidget22-voltageratioinput.js"
-            }
-        }
-    },
-    "node-red-contrib-play-audio": {
-        "name": "node-red-contrib-play-audio",
-        "version": "2.5.0",
-        "local": true,
-        "nodes": {
-            "play-audio": {
-                "name": "play-audio",
-                "types": [
-                    "play audio"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-play-audio",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-play-audio\\play-audio.js"
-            }
-        }
-    },
-    "node-red-contrib-simple-gate": {
-        "name": "node-red-contrib-simple-gate",
-        "version": "0.3.1",
-        "local": true,
-        "nodes": {
-            "gate": {
-                "name": "gate",
-                "types": [
-                    "gate"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-simple-gate",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simple-gate\\gate.js"
-            }
-        }
-    },
-    "node-red-contrib-simpletime": {
-        "name": "node-red-contrib-simpletime",
-        "version": "2.8.1",
-        "local": true,
-        "nodes": {
-            "simpletime": {
-                "name": "simpletime",
-                "types": [
-                    "simpletime"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-simpletime",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-simpletime\\simpletime.js"
-            }
-        }
-    },
-    "node-red-contrib-telegrambot": {
-        "name": "node-red-contrib-telegrambot",
-        "version": "7.1.1",
-        "local": true,
-        "nodes": {
-            "telegrambot": {
-                "name": "telegrambot",
-                "types": [
-                    "telegram bot",
-                    "telegram receiver",
-                    "telegram command",
-                    "telegram event",
-                    "telegram sender",
-                    "telegram reply"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-telegrambot",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-telegrambot\\telegrambot\\99-telegrambot.js"
-            }
-        }
-    },
-    "node-red-contrib-test-node-library": {
-        "name": "node-red-contrib-test-node-library",
-        "version": "1.0.16",
-        "local": true,
-        "nodes": {
-            "node-red-test-node-library": {
-                "name": "node-red-test-node-library",
-                "types": [],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-contrib-test-node-library",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-test-node-library\\node-red-test-node-library.js"
-            }
-        }
-    },
-    "node-red-dashboard": {
-        "name": "node-red-dashboard",
-        "version": "2.23.3",
-        "local": true,
-        "nodes": {
-            "ui_base": {
-                "name": "ui_base",
-                "types": [
-                    "ui_base"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_base.js"
-            },
-            "ui_button": {
-                "name": "ui_button",
-                "types": [
-                    "ui_button"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_button.js"
-            },
-            "ui_dropdown": {
-                "name": "ui_dropdown",
-                "types": [
-                    "ui_dropdown"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_dropdown.js"
-            },
-            "ui_switch": {
-                "name": "ui_switch",
-                "types": [
-                    "ui_switch"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_switch.js"
-            },
-            "ui_slider": {
-                "name": "ui_slider",
-                "types": [
-                    "ui_slider"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_slider.js"
-            },
-            "ui_numeric": {
-                "name": "ui_numeric",
-                "types": [
-                    "ui_numeric"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_numeric.js"
-            },
-            "ui_text_input": {
-                "name": "ui_text_input",
-                "types": [
-                    "ui_text_input"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text_input.js"
-            },
-            "ui_date_picker": {
-                "name": "ui_date_picker",
-                "types": [
-                    "ui_date_picker"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_date_picker.js"
-            },
-            "ui_colour_picker": {
-                "name": "ui_colour_picker",
-                "types": [
-                    "ui_colour_picker"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_colour_picker.js"
-            },
-            "ui_form": {
-                "name": "ui_form",
-                "types": [
-                    "ui_form"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_form.js"
-            },
-            "ui_text": {
-                "name": "ui_text",
-                "types": [
-                    "ui_text"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_text.js"
-            },
-            "ui_gauge": {
-                "name": "ui_gauge",
-                "types": [
-                    "ui_gauge"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_gauge.js"
-            },
-            "ui_chart": {
-                "name": "ui_chart",
-                "types": [
-                    "ui_chart"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_chart.js"
-            },
-            "ui_audio": {
-                "name": "ui_audio",
-                "types": [
-                    "ui_audio"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_audio.js"
-            },
-            "ui_toast": {
-                "name": "ui_toast",
-                "types": [
-                    "ui_toast"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_toast.js"
-            },
-            "ui_ui_control": {
-                "name": "ui_ui_control",
-                "types": [
-                    "ui_ui_control"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_ui_control.js"
-            },
-            "ui_template": {
-                "name": "ui_template",
-                "types": [
-                    "ui_template"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_template.js"
-            },
-            "ui_link": {
-                "name": "ui_link",
-                "types": [
-                    "ui_link"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_link.js"
-            },
-            "ui_tab": {
-                "name": "ui_tab",
-                "types": [
-                    "ui_tab"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_tab.js"
-            },
-            "ui_group": {
-                "name": "ui_group",
-                "types": [
-                    "ui_group"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_group.js"
-            },
-            "ui_spacer": {
-                "name": "ui_spacer",
-                "types": [
-                    "ui_spacer"
-                ],
-                "enabled": true,
-                "local": true,
-                "module": "node-red-dashboard",
-                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-dashboard\\nodes\\ui_spacer.js"
-            }
-        }
-    },
-    "node-red-node-rbe": {
-        "name": "node-red-node-rbe",
-        "version": "0.2.9",
-        "local": false,
-        "nodes": {
-            "rbe": {
-                "name": "rbe",
-                "types": [
-                    "rbe"
-                ],
-                "enabled": true,
-                "local": false,
-                "module": "node-red-node-rbe",
-                "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-rbe\\rbe.js"
-            }
-        }
-    },
-    "node-red-node-tail": {
-        "name": "node-red-node-tail",
-        "version": "0.1.1",
-        "local": false,
-        "nodes": {
-            "tail": {
-                "name": "tail",
-                "types": [
-                    "tail"
-                ],
-                "enabled": true,
-                "local": false,
-                "module": "node-red-node-tail",
-                "file": "C:\\Users\\HPO05\\AppData\\Roaming\\npm\\node_modules\\node-red\\node_modules\\node-red-node-tail\\28-tail.js"
+                "module": "node-red-contrib-osc",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-osc\\osc.js"
             }
         }
     }

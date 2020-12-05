@@ -2,7 +2,13 @@
     "projects": {
         "ART1": {
             "credentialSecret": false
+        },
+        "GEORGSHOME": {
+            "credentialSecret": false
+        },
+        "TRIAL2": {
+            "credentialSecret": false
         }
     },
-    "activeProject": "ART1"
+    "activeProject": "TRIAL2"
 }
