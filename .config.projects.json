@@ -8,7 +8,10 @@
         },
         "TRIAL2": {
             "credentialSecret": false
+        },
+        "TRIAL1": {
+            "credentialSecret": false
         }
     },
-    "activeProject": "TRIAL2"
+    "activeProject": "TRIAL1"
 }

@@ -1888,5 +1888,39 @@
                 "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-osc\\osc.js"
             }
         }
+    },
+    "node-red-contrib-curve": {
+        "name": "node-red-contrib-curve",
+        "version": "1.0.1",
+        "local": true,
+        "nodes": {
+            "curve": {
+                "name": "curve",
+                "types": [
+                    "curve"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-curve",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-curve\\curve\\curve.js"
+            }
+        }
+    },
+    "node-red-contrib-calc": {
+        "name": "node-red-contrib-calc",
+        "version": "1.0.5",
+        "local": true,
+        "nodes": {
+            "math": {
+                "name": "math",
+                "types": [
+                    "calculator"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-calc",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-calc\\math.js"
+            }
+        }
     }
 }
