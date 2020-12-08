@@ -1922,5 +1922,22 @@
                 "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-calc\\math.js"
             }
         }
+    },
+    "node-red-contrib-blockly": {
+        "name": "node-red-contrib-blockly",
+        "version": "1.1.0",
+        "local": false,
+        "nodes": {
+            "blockly": {
+                "name": "blockly",
+                "types": [
+                    "Blockly"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-blockly",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-blockly\\blockly.js"
+            }
+        }
     }
 }
