@@ -1926,7 +1926,7 @@
     "node-red-contrib-blockly": {
         "name": "node-red-contrib-blockly",
         "version": "1.1.0",
-        "local": false,
+        "local": true,
         "nodes": {
             "blockly": {
                 "name": "blockly",
@@ -1937,6 +1937,23 @@
                 "local": true,
                 "module": "node-red-contrib-blockly",
                 "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-blockly\\blockly.js"
+            }
+        }
+    },
+    "node-red-contrib-config": {
+        "name": "node-red-contrib-config",
+        "version": "1.2.1",
+        "local": true,
+        "nodes": {
+            "config": {
+                "name": "config",
+                "types": [
+                    "config"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-config",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-config\\config.js"
             }
         }
     }
