@@ -1956,5 +1956,39 @@
                 "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-config\\config.js"
             }
         }
+    },
+    "node-red-contrib-publishflows": {
+        "name": "node-red-contrib-publishflows",
+        "version": "0.0.2",
+        "local": true,
+        "nodes": {
+            "publishflows": {
+                "name": "publishflows",
+                "types": [],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-publishflows",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-publishflows\\publishflows\\publishflows.js"
+            }
+        }
+    },
+    "node-red-contrib-actionflows": {
+        "name": "node-red-contrib-actionflows",
+        "version": "2.0.3",
+        "local": false,
+        "nodes": {
+            "actionfilters": {
+                "name": "actionfilters",
+                "types": [
+                    "actionflows",
+                    "actionflows_in",
+                    "actionflows_out"
+                ],
+                "enabled": true,
+                "local": true,
+                "module": "node-red-contrib-actionflows",
+                "file": "\\Users\\HPO05\\.node-red\\node_modules\\node-red-contrib-actionflows\\actionflows\\actionflows.js"
+            }
+        }
     }
 }

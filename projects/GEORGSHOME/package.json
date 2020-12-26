@@ -1,6 +1,6 @@
 {
     "name": "GEORGSHOME",
-    "description": "A Node-RED Project",
+    "description": "Ein Node-RED-Projekt",
     "version": "0.0.1",
     "dependencies": {},
     "node-red": {
