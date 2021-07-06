@@ -471,7 +471,7 @@ AlphaSenderPage.prototype[util.inspect.custom] = function inspect(depth,
  * @property {Date} dateUpdated -
  *          The ISO 8601 date and time in GMT when the resource was last updated
  * @property {string} alphaSender - The Alphanumeric Sender ID string
- * @property {object} capabilities -
+ * @property {string} capabilities -
  *          An array of values that describe whether the number can receive calls or messages
  * @property {string} url - The absolute URL of the AlphaSender resource
  *
@@ -503,17 +503,17 @@ AlphaSenderInstance = function AlphaSenderInstance(version, payload, serviceSid,
 
 Object.defineProperty(AlphaSenderInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new AlphaSenderContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new AlphaSenderContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */

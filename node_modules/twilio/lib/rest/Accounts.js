@@ -21,7 +21,11 @@ var V1 = require('./accounts/V1');  /* jshint ignore:line */
  * @constructor Twilio.Accounts
  *
  * @property {Twilio.Accounts.V1} v1 - v1 version
+ * @property {Twilio.Accounts.V1.AuthTokenPromotionList} authTokenPromotion -
+ *          authTokenPromotion resource
  * @property {Twilio.Accounts.V1.CredentialList} credentials - credentials resource
+ * @property {Twilio.Accounts.V1.SecondaryAuthTokenList} secondaryAuthToken -
+ *          secondaryAuthToken resource
  *
  * @param {Twilio} twilio - The twilio client
  */
@@ -38,17 +42,31 @@ Accounts.prototype.constructor = Accounts;
 
 Object.defineProperty(Accounts.prototype,
   'v1', {
-  get: function() {
-    this._v1 = this._v1 || new V1(this);
-    return this._v1;
-  }
+    get: function() {
+      this._v1 = this._v1 || new V1(this);
+      return this._v1;
+    }
+});
+
+Object.defineProperty(Accounts.prototype,
+  'authTokenPromotion', {
+    get: function() {
+      return this.v1.authTokenPromotion;
+    }
 });
 
 Object.defineProperty(Accounts.prototype,
   'credentials', {
-  get: function() {
-    return this.v1.credentials;
-  }
+    get: function() {
+      return this.v1.credentials;
+    }
+});
+
+Object.defineProperty(Accounts.prototype,
+  'secondaryAuthToken', {
+    get: function() {
+      return this.v1.secondaryAuthToken;
+    }
 });
 
 module.exports = Accounts;

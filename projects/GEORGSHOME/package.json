@@ -2,13 +2,11 @@
     "name": "GEORGSHOME",
     "description": "Ein Node-RED-Projekt",
     "version": "0.0.1",
-    "dependencies": {
-        "node-red-dashboard": "2.15.3"
-    },
+    "dependencies": {},
     "node-red": {
         "settings": {
-            "flowFile": "flows.json",
-            "credentialsFile": "flows_cred.json"
+            "flowFile": "flow.json",
+            "credentialsFile": "flow_cred.json"
         }
     }
 }

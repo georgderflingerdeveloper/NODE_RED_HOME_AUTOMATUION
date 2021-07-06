@@ -49,6 +49,8 @@ interface TaskQueueRealTimeStatisticsPayload extends TaskQueueRealTimeStatistics
 interface TaskQueueRealTimeStatisticsResource {
   account_sid: string;
   activity_statistics: object[];
+  longest_relative_task_age_in_queue: number;
+  longest_relative_task_sid_in_queue: string;
   longest_task_waiting_age: number;
   longest_task_waiting_sid: string;
   task_queue_sid: string;
@@ -80,6 +82,12 @@ declare class TaskQueueRealTimeStatisticsContext {
   /**
    * fetch a TaskQueueRealTimeStatisticsInstance
    *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: TaskQueueRealTimeStatisticsInstance) => any): Promise<TaskQueueRealTimeStatisticsInstance>;
+  /**
+   * fetch a TaskQueueRealTimeStatisticsInstance
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle processed record
    */
@@ -108,15 +116,23 @@ declare class TaskQueueRealTimeStatisticsInstance extends SerializableClass {
   /**
    * fetch a TaskQueueRealTimeStatisticsInstance
    *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: TaskQueueRealTimeStatisticsInstance) => any): Promise<TaskQueueRealTimeStatisticsInstance>;
+  /**
+   * fetch a TaskQueueRealTimeStatisticsInstance
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle processed record
    */
   fetch(opts?: TaskQueueRealTimeStatisticsInstanceFetchOptions, callback?: (error: Error | null, items: TaskQueueRealTimeStatisticsInstance) => any): Promise<TaskQueueRealTimeStatisticsInstance>;
+  longestRelativeTaskAgeInQueue: number;
+  longestRelativeTaskSidInQueue: string;
   longestTaskWaitingAge: number;
   longestTaskWaitingSid: string;
   taskQueueSid: string;
-  tasksByPriority: object;
-  tasksByStatus: object;
+  tasksByPriority: any;
+  tasksByStatus: any;
   /**
    * Provide a user-friendly representation
    */

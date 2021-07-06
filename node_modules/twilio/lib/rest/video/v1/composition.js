@@ -75,7 +75,7 @@ CompositionList = function CompositionList(version) {
    * @param {composition.status} [opts.status] -
    *          Read only Composition resources with this status
    * @param {Date} [opts.dateCreatedAfter] -
-   *          Read only Composition resources created on or after this [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone
+   *          Read only Composition resources created on or after this {@link https://en.wikipedia.org/wiki/ISO_8601|ISO 8601} date-time with time zone
    * @param {Date} [opts.dateCreatedBefore] -
    *          Read only Composition resources created before this ISO 8601 date-time with time zone
    * @param {string} [opts.roomSid] -
@@ -172,7 +172,7 @@ CompositionList = function CompositionList(version) {
    * @param {composition.status} [opts.status] -
    *          Read only Composition resources with this status
    * @param {Date} [opts.dateCreatedAfter] -
-   *          Read only Composition resources created on or after this [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone
+   *          Read only Composition resources created on or after this {@link https://en.wikipedia.org/wiki/ISO_8601|ISO 8601} date-time with time zone
    * @param {Date} [opts.dateCreatedBefore] -
    *          Read only Composition resources created before this ISO 8601 date-time with time zone
    * @param {string} [opts.roomSid] -
@@ -240,7 +240,7 @@ CompositionList = function CompositionList(version) {
    * @param {composition.status} [opts.status] -
    *          Read only Composition resources with this status
    * @param {Date} [opts.dateCreatedAfter] -
-   *          Read only Composition resources created on or after this [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone
+   *          Read only Composition resources created on or after this {@link https://en.wikipedia.org/wiki/ISO_8601|ISO 8601} date-time with time zone
    * @param {Date} [opts.dateCreatedBefore] -
    *          Read only Composition resources created before this ISO 8601 date-time with time zone
    * @param {string} [opts.roomSid] -
@@ -578,13 +578,13 @@ CompositionInstance = function CompositionInstance(version, payload, sid) {
 
 Object.defineProperty(CompositionInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new CompositionContext(this._version, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new CompositionContext(this._version, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */

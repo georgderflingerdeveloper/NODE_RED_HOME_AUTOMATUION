@@ -8,7 +8,6 @@
 import Page = require('../../../../../base/Page');
 import Response = require('../../../../../http/response');
 import V1 = require('../../../V1');
-import serialize = require('../../../../../base/serialize');
 import { SerializableClass } from '../../../../../interfaces';
 
 /**
@@ -99,6 +98,12 @@ declare class WorkflowCumulativeStatisticsContext {
   /**
    * fetch a WorkflowCumulativeStatisticsInstance
    *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: WorkflowCumulativeStatisticsInstance) => any): Promise<WorkflowCumulativeStatisticsInstance>;
+  /**
+   * fetch a WorkflowCumulativeStatisticsInstance
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle processed record
    */
@@ -128,6 +133,12 @@ declare class WorkflowCumulativeStatisticsInstance extends SerializableClass {
   /**
    * fetch a WorkflowCumulativeStatisticsInstance
    *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: WorkflowCumulativeStatisticsInstance) => any): Promise<WorkflowCumulativeStatisticsInstance>;
+  /**
+   * fetch a WorkflowCumulativeStatisticsInstance
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle processed record
    */
@@ -138,7 +149,7 @@ declare class WorkflowCumulativeStatisticsInstance extends SerializableClass {
   reservationsRejected: number;
   reservationsRescinded: number;
   reservationsTimedOut: number;
-  splitByWaitTime: object;
+  splitByWaitTime: any;
   startTime: Date;
   tasksCanceled: number;
   tasksCompleted: number;
@@ -151,8 +162,8 @@ declare class WorkflowCumulativeStatisticsInstance extends SerializableClass {
    */
   toJSON(): any;
   url: string;
-  waitDurationUntilAccepted: object;
-  waitDurationUntilCanceled: object;
+  waitDurationUntilAccepted: any;
+  waitDurationUntilCanceled: any;
   workflowSid: string;
   workspaceSid: string;
 }

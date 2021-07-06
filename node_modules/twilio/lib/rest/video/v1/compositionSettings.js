@@ -25,10 +25,6 @@ var CompositionSettingsContext;
 /**
  * Initialize the CompositionSettingsList
  *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
- *
  * @constructor Twilio.Video.V1.CompositionSettingsList
  *
  * @param {Twilio.Video.V1} version - Version of the resource
@@ -92,10 +88,6 @@ CompositionSettingsList = function CompositionSettingsList(version) {
 /* jshint ignore:start */
 /**
  * Initialize the CompositionSettingsPage
- *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
  *
  * @constructor Twilio.Video.V1.CompositionSettingsPage
  *
@@ -163,10 +155,6 @@ CompositionSettingsPage.prototype[util.inspect.custom] = function inspect(depth,
 /**
  * Initialize the CompositionSettingsContext
  *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
- *
  * @constructor Twilio.Video.V1.CompositionSettingsInstance
  *
  * @property {string} accountSid - The SID of the Account that created the resource
@@ -208,13 +196,13 @@ CompositionSettingsInstance = function CompositionSettingsInstance(version,
 
 Object.defineProperty(CompositionSettingsInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new CompositionSettingsContext(this._version);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new CompositionSettingsContext(this._version);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -291,10 +279,6 @@ CompositionSettingsInstance.prototype[util.inspect.custom] = function
 /* jshint ignore:start */
 /**
  * Initialize the CompositionSettingsContext
- *
- * PLEASE NOTE that this class contains preview products that are subject to
- * change. Use them with caution. If you currently do not have developer preview
- * access, please contact help@twilio.com.
  *
  * @constructor Twilio.Video.V1.CompositionSettingsContext
  *
