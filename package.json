@@ -22,5 +22,11 @@
         "node-red-contrib-simpletime": "~2.8.1",
         "node-red-contrib-telegrambot": "~7.1.1",
         "node-red-dashboard": "~2.24.2"
+    },
+    "node-red": {
+        "settings": {
+            "flowFile": "flows.json",
+            "credentialsFile": "flows_cred.json"
+        }
     }
 }
