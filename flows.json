@@ -114,7 +114,29 @@
     {
         "id": "79160448dc533f1d",
         "type": "tab",
-        "label": "SE3 – AC Power → Watt",
+        "label": "SOLAR_POWER",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b86cb602995b0261",
+        "type": "tab",
+        "label": "SOLAR_DASHBOARD",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f1b9a5e0f2f0aa01",
+        "type": "tab",
+        "label": "SOLAR_INCOMMING_POWER",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "tab_read_feedin",
+        "type": "tab",
+        "label": "SE: READ Einspeiseleistung",
         "disabled": false,
         "info": ""
     },
@@ -2390,20 +2412,6 @@
         "h": 302
     },
     {
-        "id": "2211de52.b114b2",
-        "type": "ui_tab",
-        "name": "KÜCHE",
-        "icon": "dashboard",
-        "order": 3
-    },
-    {
-        "id": "e72dbf90.dc0d1",
-        "type": "ui_tab",
-        "name": "VORHAUS",
-        "icon": "dashboard",
-        "order": 4
-    },
-    {
         "id": "79166127.536b1",
         "type": "ui_base",
         "theme": {
@@ -2588,30 +2596,10 @@
         "collapse": false
     },
     {
-        "id": "1d52af1b.24d841",
-        "type": "ui_group",
-        "name": "LUEFTER",
-        "tab": "60261446.7371fc",
-        "order": 2,
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
         "id": "ef7f35ee.d69248",
         "type": "ui_group",
         "name": "Heizung",
         "tab": "c1a8c6ed.e57098",
-        "order": 2,
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "f9c180f2.4091",
-        "type": "ui_group",
-        "name": "Heizkörper",
-        "tab": "ea22f5b5.5af548",
         "order": 2,
         "disp": true,
         "width": "6",
@@ -2645,43 +2633,6 @@
         "disp": true,
         "width": "6",
         "collapse": true
-    },
-    {
-        "id": "e8c8455b.fcfee8",
-        "type": "ui_tab",
-        "name": "Zooland Sys",
-        "icon": "home",
-        "order": 1,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "43746246.80f00c",
-        "type": "ui_tab",
-        "name": "Zooland Sys",
-        "icon": "home",
-        "order": 1,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "68419d26.ef9f84",
-        "type": "ui_group",
-        "name": "KÜCHE",
-        "tab": "2211de52.b114b2",
-        "order": 1,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "a24fb5d0.f805f8",
-        "type": "ui_group",
-        "name": "VORHAUS",
-        "tab": "e72dbf90.dc0d1",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false
     },
     {
         "id": "f082d23.5870f3",
@@ -2762,26 +2713,6 @@
         "collapse": true
     },
     {
-        "id": "b0db099e.93d0d8",
-        "type": "ui_group",
-        "name": "hidden_group",
-        "tab": "e8c8455b.fcfee8",
-        "order": 1,
-        "disp": false,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "713baee.661de5",
-        "type": "ui_group",
-        "name": "hidden_group",
-        "tab": "43746246.80f00c",
-        "order": 1,
-        "disp": false,
-        "width": "6",
-        "collapse": false
-    },
-    {
         "id": "befceeb9cba11998",
         "type": "modbus-client",
         "name": "",
@@ -2810,6 +2741,26 @@
         "showErrors": false,
         "showWarnings": true,
         "showLogs": true
+    },
+    {
+        "id": "1132541c42ce2a8d",
+        "type": "ui_tab",
+        "name": "SOLAR",
+        "icon": "wi-wu-sunny",
+        "order": 13,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "24a6bcc7d3d966ac",
+        "type": "ui_group",
+        "name": "SUNPOWER",
+        "tab": "1132541c42ce2a8d",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
     },
     {
         "id": "a952ee58.75f5b",
@@ -7459,7 +7410,7 @@
         "dataType": "HoldingRegister",
         "adr": "40083",
         "quantity": "2",
-        "rate": "15000",
+        "rate": "1000",
         "rateUnit": "ms",
         "delayOnStart": false,
         "startDelayTime": "",
@@ -7468,11 +7419,11 @@
         "ioFile": "",
         "useIOForPayload": false,
         "emptyMsgOnFail": false,
-        "x": 230,
-        "y": 200,
+        "x": 210,
+        "y": 100,
         "wires": [
             [
-                "7db9c065c104320e"
+                "33d7fc2ec0eeb8d5"
             ],
             []
         ]
@@ -7481,14 +7432,445 @@
         "id": "7db9c065c104320e",
         "type": "debug",
         "z": "79160448dc533f1d",
-        "name": "PV-Leistung (W)",
+        "name": "RAW POWER",
         "active": true,
         "tosidebar": true,
         "console": false,
+        "tostatus": false,
         "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
-        "x": 640,
+        "statusType": "auto",
+        "x": 740,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5a499b5d44485fa5",
+        "type": "link out",
+        "z": "79160448dc533f1d",
+        "name": "LINK_SOLAR_POWER_OUT",
+        "mode": "link",
+        "links": [
+            "214546f88e881fdd"
+        ],
+        "x": 775,
         "y": 280,
+        "wires": []
+    },
+    {
+        "id": "33d7fc2ec0eeb8d5",
+        "type": "change",
+        "z": "79160448dc533f1d",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload[0]",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 40,
+        "wires": [
+            [
+                "f3d67b639657a483"
+            ]
+        ]
+    },
+    {
+        "id": "6daa8027d6a447e1",
+        "type": "debug",
+        "z": "79160448dc533f1d",
+        "name": "SCALING_FACTOR",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "read_power_sf",
+        "type": "modbus-read",
+        "z": "79160448dc533f1d",
+        "name": "I_AC_Power_SF",
+        "topic": "I_AC_Power_SF",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "40084",
+        "quantity": "1",
+        "rate": "500",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "befceeb9cba11998",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 140,
+        "y": 220,
+        "wires": [
+            [
+                "c95465c9b9d28a72"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c95465c9b9d28a72",
+        "type": "buffer-parser",
+        "z": "79160448dc533f1d",
+        "name": "",
+        "data": "payload",
+        "dataType": "msg",
+        "specification": "spec",
+        "specificationType": "ui",
+        "items": [
+            {
+                "type": "int16be",
+                "name": "item1",
+                "offset": 0,
+                "length": 1,
+                "offsetbit": 0,
+                "scale": "1",
+                "mask": ""
+            }
+        ],
+        "swap1": "",
+        "swap2": "",
+        "swap3": "",
+        "swap1Type": "swap",
+        "swap2Type": "swap",
+        "swap3Type": "swap",
+        "msgProperty": "payload",
+        "msgPropertyType": "str",
+        "resultType": "keyvalue",
+        "resultTypeType": "return",
+        "multipleResult": false,
+        "fanOutMultipleResult": false,
+        "setTopic": true,
+        "outputs": 1,
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "fff48bd538f411b2"
+            ]
+        ]
+    },
+    {
+        "id": "f3d67b639657a483",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "GetActualSolarPower",
+        "func": "let SCALING_FACTOR = global.get(\"SCALING_FACTOR\") || 0;\n\nif (msg.payload > 0) \n{\n    msg.payload = msg.payload * Math.pow(10, SCALING_FACTOR);\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 160,
+        "wires": [
+            [
+                "5a499b5d44485fa5",
+                "7db9c065c104320e"
+            ]
+        ]
+    },
+    {
+        "id": "b16c65d737f41486",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "GET_SCALING_FACTOR",
+        "func": "let ScalingFactor = global.get(\"SCALING_FACTOR\") || 0;\nmsg.payload = ScalingFactor;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 400,
+        "wires": [
+            [
+                "6daa8027d6a447e1"
+            ]
+        ]
+    },
+    {
+        "id": "178f178e886e61be",
+        "type": "inject",
+        "z": "79160448dc533f1d",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 90,
+        "y": 400,
+        "wires": [
+            [
+                "b16c65d737f41486"
+            ]
+        ]
+    },
+    {
+        "id": "a76994740dc9a8d9",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "SET_SCALING_FACTOR",
+        "func": "global.set(\"SCALING_FACTOR\", msg.payload || 0);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 440,
+        "wires": [
+            [
+                "d0344a70fcecb32c"
+            ]
+        ]
+    },
+    {
+        "id": "ccf9512db4ad1494",
+        "type": "inject",
+        "z": "79160448dc533f1d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload[0]",
+                "v": "999",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 90,
+        "y": 440,
+        "wires": [
+            [
+                "a76994740dc9a8d9"
+            ]
+        ]
+    },
+    {
+        "id": "d0344a70fcecb32c",
+        "type": "debug",
+        "z": "79160448dc533f1d",
+        "name": "SCALING_FACTOR",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "fff48bd538f411b2",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "SET_SCALING_FACTOR",
+        "func": "global.set(\"SCALING_FACTOR\", msg.item1 || 0);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "214546f88e881fdd",
+        "type": "link in",
+        "z": "b86cb602995b0261",
+        "name": "LINK_SOLAR_POWER_IN",
+        "links": [
+            "5a499b5d44485fa5"
+        ],
+        "x": 145,
+        "y": 220,
+        "wires": [
+            [
+                "8ed0b94af7bbae46"
+            ]
+        ]
+    },
+    {
+        "id": "8ed0b94af7bbae46",
+        "type": "ui_text",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Sun Power Actual [WATT]",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 410,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "88d6339b4262d430",
+        "type": "ui_text",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Incomming Power [WATT]",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 410,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "34ed305c9274a3c8",
+        "type": "link in",
+        "z": "b86cb602995b0261",
+        "name": "LINK_SOLAR_FROM_GRID_POWER_IN",
+        "links": [
+            "357ea9edd14fe171"
+        ],
+        "x": 145,
+        "y": 160,
+        "wires": [
+            [
+                "88d6339b4262d430"
+            ]
+        ]
+    },
+    {
+        "id": "se_read_power",
+        "type": "modbus-read",
+        "z": "tab_read_feedin",
+        "name": "READ: Meter M_AC_Power (+SF)",
+        "topic": "",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "206",
+        "quantity": "5",
+        "rate": "2",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "befceeb9cba11998",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 260,
+        "y": 120,
+        "wires": [
+            [
+                "calc_feedin"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "calc_feedin",
+        "type": "function",
+        "z": "tab_read_feedin",
+        "name": "Einspeiseleistung (W) – nur payload",
+        "func": "// erwartet Array mit 5 Werten ab 40207..40211\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) return null;\n\nconst toI16 = v => (v & 0x8000) ? v - 0x10000 : v;\n\nconst rawPower = toI16(vals[0]);   // 40207 M_AC_Power\nconst sf = toI16(vals[4]);   // 40211 M_AC_Power_SF  (typisch -3..0)\nconst watts = rawPower * Math.pow(10, sf);\n\n// Einspeisung (Export) positiv ausgeben:\nmsg.payload = Math.max(0, -watts); // FeedInW\nmsg.topic = 'FeedInW';\nmsg.payload = Math.round((msg.payload + Number.EPSILON) * 10) / 10;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 260,
+        "y": 240,
+        "wires": [
+            [
+                "dbg_feedin",
+                "357ea9edd14fe171"
+            ]
+        ]
+    },
+    {
+        "id": "dbg_feedin",
+        "type": "debug",
+        "z": "tab_read_feedin",
+        "name": "Einspeiseleistung (W)",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 620,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "357ea9edd14fe171",
+        "type": "link out",
+        "z": "tab_read_feedin",
+        "name": "LINK_POWER_FROM_GRID_OUT",
+        "mode": "link",
+        "links": [
+            "34ed305c9274a3c8"
+        ],
+        "x": 765,
+        "y": 40,
         "wires": []
     }
 ]
