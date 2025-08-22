@@ -7433,7 +7433,7 @@
         "type": "debug",
         "z": "79160448dc533f1d",
         "name": "RAW POWER",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -7490,7 +7490,7 @@
         "type": "debug",
         "z": "79160448dc533f1d",
         "name": "SCALING_FACTOR",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -7498,8 +7498,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 570,
-        "y": 400,
+        "x": 670,
+        "y": 380,
         "wires": []
     },
     {
@@ -7529,51 +7529,9 @@
         "y": 220,
         "wires": [
             [
-                "c95465c9b9d28a72"
+                "fff48bd538f411b2"
             ],
             []
-        ]
-    },
-    {
-        "id": "c95465c9b9d28a72",
-        "type": "buffer-parser",
-        "z": "79160448dc533f1d",
-        "name": "",
-        "data": "payload",
-        "dataType": "msg",
-        "specification": "spec",
-        "specificationType": "ui",
-        "items": [
-            {
-                "type": "int16be",
-                "name": "item1",
-                "offset": 0,
-                "length": 1,
-                "offsetbit": 0,
-                "scale": "1",
-                "mask": ""
-            }
-        ],
-        "swap1": "",
-        "swap2": "",
-        "swap3": "",
-        "swap1Type": "swap",
-        "swap2Type": "swap",
-        "swap3Type": "swap",
-        "msgProperty": "payload",
-        "msgPropertyType": "str",
-        "resultType": "keyvalue",
-        "resultTypeType": "return",
-        "multipleResult": false,
-        "fanOutMultipleResult": false,
-        "setTopic": true,
-        "outputs": 1,
-        "x": 330,
-        "y": 220,
-        "wires": [
-            [
-                "fff48bd538f411b2"
-            ]
         ]
     },
     {
@@ -7703,7 +7661,7 @@
         "type": "function",
         "z": "79160448dc533f1d",
         "name": "SET_SCALING_FACTOR",
-        "func": "global.set(\"SCALING_FACTOR\", msg.item1 || 0);\nreturn msg;",
+        "func": "let ScalingFactorRaw = msg.payload | 0;\n\nlet ScalingFactor = (ScalingFactorRaw << 16) >> 16;\n\n\nglobal.set(\"SCALING_FACTOR\", ScalingFactor || 0);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
