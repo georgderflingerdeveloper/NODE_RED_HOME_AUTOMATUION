@@ -1,0 +1,12 @@
+{
+    "name": "TRIAL",
+    "description": "diverse tests and pattern",
+    "version": "0.0.1",
+    "dependencies": {},
+    "node-red": {
+        "settings": {
+            "flowFile": "Trialflow.json",
+            "credentialsFile": "Trialflow_cred.json"
+        }
+    }
+}
