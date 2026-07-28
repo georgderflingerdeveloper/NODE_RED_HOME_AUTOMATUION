@@ -123,15 +123,27 @@
         "type": "tab",
         "label": "SOLAR_DASHBOARD",
         "disabled": false,
-        "info": "",
+        "info": "Solar-Dashboard mit klar getrennten Leistungswerten: Solarleistung, Netzbezug ins Haus, Einspeisung ins Stromnetz und verfügbarer Solarüberschuss. Alle Anzeigen verwenden Watt [W].",
         "env": []
     },
     {
         "id": "tab_read_feedin",
         "type": "tab",
-        "label": "SE: READ Einspeiseleistung",
+        "label": "SE · GRID POWER",
         "disabled": false,
-        "info": ""
+        "info": "SolarEdge-Meterleistung lesen und nach Vorzeichen trennen: positiv = Netzbezug, negativ = Einspeisung. Ausgang 1: FeedInW. Ausgang 2: GridImportWatt."
+    },
+    {
+        "id": "tab-fixsf",
+        "type": "tab",
+        "label": "SE • House Consumption (Auto-SF)"
+    },
+    {
+        "id": "weather_flow",
+        "type": "tab",
+        "label": "WETTER",
+        "disabled": false,
+        "info": "Eigenständiger Wetter-Flow für Reindlmühl bei Altmünster am Traunsee mit Open-Meteo. Stündliche Aktualisierung, sicherer Ausfallzustand und strukturierte Payload für spätere Gerätesteuerungen."
     },
     {
         "id": "f6dd1fca.6c306",
@@ -2714,7 +2726,7 @@
         "stateLogEnabled": false,
         "queueLogEnabled": false,
         "failureLogEnabled": true,
-        "tcpHost": "192.168.0.132",
+        "tcpHost": "192.168.0.128",
         "tcpPort": "502",
         "tcpType": "DEFAULT",
         "serialPort": "/dev/ttyUSB",
@@ -2754,6 +2766,25 @@
         "width": 6,
         "collapse": false,
         "className": ""
+    },
+    {
+        "id": "weather_dashboard_tab",
+        "type": "ui_tab",
+        "name": "WETTER",
+        "icon": "dashboard",
+        "order": 11,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "weather_dashboard_group",
+        "type": "ui_group",
+        "name": "WETTERÜBERSICHT",
+        "tab": "weather_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
     },
     {
         "id": "a952ee58.75f5b",
@@ -6339,9 +6370,7 @@
         "active": true,
         "x": 1360,
         "y": 60,
-        "wires": [
-            []
-        ]
+        "wires": []
     },
     {
         "id": "2a0fb1c8.57c7ae",
@@ -7424,8 +7453,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 740,
-        "y": 80,
+        "x": 820,
+        "y": 140,
         "wires": []
     },
     {
@@ -7635,7 +7664,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 570,
+        "x": 670,
         "y": 440,
         "wires": []
     },
@@ -7652,7 +7681,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 280,
+        "y": 220,
         "wires": [
             []
         ]
@@ -7661,11 +7690,11 @@
         "id": "214546f88e881fdd",
         "type": "link in",
         "z": "b86cb602995b0261",
-        "name": "LINK_SOLAR_POWER_IN",
+        "name": "LINK_SOLARLEISTUNG_DASHBOARD_IN",
         "links": [
             "5a499b5d44485fa5"
         ],
-        "x": 325,
+        "x": 225,
         "y": 100,
         "wires": [
             [
@@ -7679,11 +7708,11 @@
         "type": "ui_text",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
-        "order": 0,
+        "order": 1,
         "width": 0,
         "height": 0,
-        "name": "",
-        "label": "Sun Power Actual [WATT]",
+        "name": "Solarleistung",
+        "label": "Aktuelle Solarleistung [W]",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
         "className": "",
@@ -7691,7 +7720,7 @@
         "font": "",
         "fontSize": 16,
         "color": "#000000",
-        "x": 510,
+        "x": 520,
         "y": 100,
         "wires": []
     },
@@ -7700,11 +7729,11 @@
         "type": "ui_text",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
-        "order": 0,
+        "order": 3,
         "width": 0,
         "height": 0,
-        "name": "",
-        "label": "Incomming Power [WATT]",
+        "name": "Netzeinspeisung",
+        "label": "Einspeisung ins Stromnetz [W]",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
         "className": "",
@@ -7712,20 +7741,20 @@
         "font": "",
         "fontSize": 16,
         "color": "#000000",
-        "x": 470,
-        "y": 40,
+        "x": 520,
+        "y": 220,
         "wires": []
     },
     {
         "id": "34ed305c9274a3c8",
         "type": "link in",
         "z": "b86cb602995b0261",
-        "name": "LINK_SOLAR_FROM_GRID_POWER_IN",
+        "name": "LINK_NETZEINSPEISUNG_DASHBOARD_IN",
         "links": [
             "357ea9edd14fe171"
         ],
         "x": 225,
-        "y": 40,
+        "y": 220,
         "wires": [
             [
                 "88d6339b4262d430",
@@ -7775,8 +7804,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 750,
-        "y": 280,
+        "x": 390,
+        "y": 400,
         "wires": []
     },
     {
@@ -7798,8 +7827,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 480,
-        "y": 140,
+        "x": 280,
+        "y": 240,
         "wires": [
             [
                 "join-pv-grid"
@@ -7810,7 +7839,7 @@
         "id": "3909f886b0c9d4d6",
         "type": "change",
         "z": "b86cb602995b0261",
-        "name": "GridPowerWatt",
+        "name": "Vorzeichenbehaftete Netzleistung",
         "rules": [
             {
                 "t": "set",
@@ -7818,6 +7847,13 @@
                 "pt": "msg",
                 "to": "GridPowerWatt",
                 "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "gridPowerWatt",
+                "tot": "msg"
             }
         ],
         "action": "",
@@ -7825,11 +7861,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 360,
-        "y": 360,
+        "x": 280,
+        "y": 300,
         "wires": [
             [
-                "join-pv-grid"
+                "join-pv-grid",
+                "debug-out"
             ]
         ]
     },
@@ -7858,7 +7895,7 @@
         "type": "debug",
         "z": "b86cb602995b0261",
         "name": "ExcessPower",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -7875,11 +7912,11 @@
         "type": "ui_text",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
-        "order": 0,
+        "order": 4,
         "width": 0,
         "height": 0,
-        "name": "",
-        "label": "EXCESS Power [WATT]",
+        "name": "Solarüberschuss",
+        "label": "Verfügbarer Solarüberschuss [W]",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
         "className": "",
@@ -7913,6 +7950,53 @@
         ]
     },
     {
+        "id": "link_grid_import_in",
+        "type": "link in",
+        "z": "b86cb602995b0261",
+        "name": "LINK_NETZBEZUG_DASHBOARD_IN",
+        "links": [
+            "link_grid_import_out"
+        ],
+        "x": 225,
+        "y": 160,
+        "wires": [
+            [
+                "ui_grid_import"
+            ]
+        ]
+    },
+    {
+        "id": "ui_grid_import",
+        "type": "ui_text",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Netzbezug",
+        "label": "Netzbezug ins Haus [W]",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 520,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "comment_dashboard_power",
+        "type": "comment",
+        "z": "b86cb602995b0261",
+        "name": "LEISTUNGSFLÜSSE · DEUTSCHE, EINDEUTIGE ANZEIGEN",
+        "info": "Solarleistung = aktuell erzeugte Leistung. Netzbezug = Leistung, die aus dem öffentlichen Stromnetz ins Haus fließt. Einspeisung = Leistung, die das Haus ins öffentliche Stromnetz abgibt. Solarüberschuss = aktuell verfügbare überschüssige Solarleistung.",
+        "x": 440,
+        "y": 40,
+        "wires": []
+    },
+    {
         "id": "se_read_power",
         "type": "modbus-read",
         "z": "tab_read_feedin",
@@ -7935,8 +8019,8 @@
         "ioFile": "",
         "useIOForPayload": false,
         "emptyMsgOnFail": false,
-        "x": 260,
-        "y": 120,
+        "x": 220,
+        "y": 140,
         "wires": [
             [
                 "calc_feedin"
@@ -7948,20 +8032,24 @@
         "id": "calc_feedin",
         "type": "function",
         "z": "tab_read_feedin",
-        "name": "Einspeiseleistung (W) – nur payload",
-        "func": "// erwartet Array mit 5 Werten ab 40207..40211\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) return null;\n\nconst toI16 = v => (v & 0x8000) ? v - 0x10000 : v;\n\nconst rawPower = toI16(vals[0]);   // 40207 M_AC_Power\nconst sf = toI16(vals[4]);   // 40211 M_AC_Power_SF  (typisch -3..0)\nconst watts = rawPower * Math.pow(10, sf);\n\n// Einspeisung (Export) positiv ausgeben:\nmsg.payload = Math.max(0, -watts); // FeedInW\nmsg.topic = 'FeedInW';\nmsg.payload = Math.round((msg.payload + Number.EPSILON) * 10) / 10;\nreturn msg;\n",
-        "outputs": 1,
+        "name": "Netzleistung aufteilen · Import / Einspeisung",
+        "func": "// SolarEdge Netzleistung aufteilen\n// Vorzeichenkonvention: positiv = Netzbezug, negativ = Einspeisung\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"keine Modbus-Daten\"});\n    return [null, null];\n}\n\nconst toI16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst roundWatt = value => Math.round((value + Number.EPSILON) * 10) / 10;\n\nconst rawPower = toI16(vals[0]);       // 40207 M_AC_Power\nconst scaleFactor = toI16(vals[4]);    // 40211 M_AC_Power_SF\n\nif (rawPower === -32768 || scaleFactor === -32768 || scaleFactor < -5 || scaleFactor > 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"ungültige Registerwerte\"});\n    return [null, null];\n}\n\nconst gridPowerWatt = roundWatt(rawPower * Math.pow(10, scaleFactor));\nconst feedInWatt = roundWatt(Math.max(0, -gridPowerWatt));\nconst gridImportWatt = roundWatt(Math.max(0, gridPowerWatt));\n\nnode.status({\n    fill: gridImportWatt > 0 ? \"red\" : \"green\",\n    shape: \"dot\",\n    text: gridImportWatt > 0\n        ? \"Netzbezug \" + gridImportWatt + \" W\"\n        : \"Einspeisung \" + feedInWatt + \" W\"\n});\n\nconst common = {\n    gridPowerWatt,\n    rawPower,\n    scaleFactor,\n    timestamp: Date.now()\n};\n\nreturn [\n    { ...msg, topic: \"FeedInW\", payload: feedInWatt, ...common },\n    { ...msg, topic: \"GridImportWatt\", payload: gridImportWatt, ...common }\n];",
+        "outputs": 2,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 260,
-        "y": 240,
+        "x": 350,
+        "y": 220,
         "wires": [
             [
                 "dbg_feedin",
                 "357ea9edd14fe171"
+            ],
+            [
+                "dbg_grid_import",
+                "link_grid_import_out"
             ]
         ]
     },
@@ -7978,21 +8066,382 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "auto",
-        "x": 620,
-        "y": 340,
+        "x": 720,
+        "y": 180,
         "wires": []
     },
     {
         "id": "357ea9edd14fe171",
         "type": "link out",
         "z": "tab_read_feedin",
-        "name": "LINK_POWER_FROM_GRID_OUT",
+        "name": "LINK_NETZEINSPEISUNG_DASHBOARD_OUT",
         "mode": "link",
         "links": [
             "34ed305c9274a3c8"
         ],
-        "x": 765,
+        "x": 820,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "dbg_grid_import",
+        "type": "debug",
+        "z": "tab_read_feedin",
+        "name": "NETZBEZUG INS HAUS (W)",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 720,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "comment_grid_direction",
+        "type": "comment",
+        "z": "tab_read_feedin",
+        "name": "NETZFLUSS · IMPORT (+) UND EINSPEISUNG (-) SAUBER TRENNEN",
+        "info": "M_AC_Power wird einmal gelesen. Die Function erzeugt zwei ausschließlich positive Werte: FeedInW und GridImportWatt. GridImportWatt ist zunächst nur mit einem Debug-Node verbunden und kann später direkt ans Dashboard geführt werden.",
+        "x": 410,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "link_grid_import_out",
+        "type": "link out",
+        "z": "tab_read_feedin",
+        "name": "LINK_NETZBEZUG_DASHBOARD_OUT",
+        "mode": "link",
+        "links": [
+            "link_grid_import_in"
+        ],
+        "x": 815,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "c_hint",
+        "type": "comment",
+        "z": "tab-fixsf",
+        "name": "WICHTIG: adr = (PowerAdr - 2), quantity = 16",
+        "x": 250,
         "y": 40,
         "wires": []
+    },
+    {
+        "id": "read_win",
+        "type": "modbus-read",
+        "z": "tab-fixsf",
+        "name": "Read Window um Power",
+        "topic": "",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "205",
+        "quantity": "2",
+        "rate": "2",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "befceeb9cba11998",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": true,
+        "x": 240,
+        "y": 120,
+        "wires": [
+            [
+                "fn_autosf",
+                "dbg_raw"
+            ],
+            [
+                "dbg_err"
+            ]
+        ]
+    },
+    {
+        "id": "fn_autosf",
+        "type": "function",
+        "z": "tab-fixsf",
+        "name": "Auto-SF + skalieren → HouseConsumptionWatt",
+        "func": "",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 120,
+        "wires": [
+            [
+                "dbg_out"
+            ]
+        ]
+    },
+    {
+        "id": "dbg_raw",
+        "type": "debug",
+        "z": "tab-fixsf",
+        "name": "RAW regs (unsigned)",
+        "active": true,
+        "tosidebar": true,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 530,
+        "y": 70,
+        "wires": []
+    },
+    {
+        "id": "dbg_out",
+        "type": "debug",
+        "z": "tab-fixsf",
+        "name": "HouseConsumption (W)",
+        "active": false,
+        "tosidebar": true,
+        "tostatus": true,
+        "complete": "payload",
+        "statusVal": "payload.HouseConsumptionWatt & ' W'",
+        "statusType": "jsonata",
+        "x": 910,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "dbg_err",
+        "type": "debug",
+        "z": "tab-fixsf",
+        "name": "Modbus Error",
+        "active": false,
+        "tosidebar": true,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "x": 530,
+        "y": 170,
+        "wires": []
+    },
+    {
+        "id": "weather_comment",
+        "type": "comment",
+        "z": "weather_flow",
+        "name": "WETTERDIENST · OPEN-METEO · REINDLMÜHL · STÜNDLICH",
+        "info": "Standort: Reindlmühl bei Altmünster am Traunsee, Oberösterreich. Koordinaten 47.89464 / 13.7163, Höhe 596 m, Europe/Vienna. Kostenlos und ohne API-Schlüssel. Bestehende Flows bleiben unverändert.",
+        "x": 460,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "weather_hourly_reindlmuehl",
+        "type": "inject",
+        "z": "weather_flow",
+        "name": "JEDE STUNDE + BEIM START · REINDLMÜHL",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "weather/update",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "weather_build_request"
+            ]
+        ]
+    },
+    {
+        "id": "weather_build_request",
+        "type": "function",
+        "z": "weather_flow",
+        "name": "WETTER KONFIGURATION · Reindlmühl",
+        "func": "// Zentral änderbare Standortkonfiguration\nconst LATITUDE = 47.89464;\nconst LONGITUDE = 13.7163;\nconst TIMEZONE = \"Europe/Vienna\";\n\nconst parameters = new URLSearchParams({\n    latitude: String(LATITUDE),\n    longitude: String(LONGITUDE),\n    timezone: TIMEZONE,\n    elevation: \"596\",\n    past_hours: \"1\",\n    forecast_hours: \"7\",\n    current: \"temperature_2m,weather_code,cloud_cover,is_day\",\n    hourly: \"sunshine_duration,temperature_2m,cloud_cover,precipitation_probability,weather_code\"\n});\nmsg.method = \"GET\";\nmsg.url = \"https://api.open-meteo.com/v1/forecast?\" + parameters.toString();\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 100,
+        "wires": [
+            [
+                "weather_http"
+            ]
+        ]
+    },
+    {
+        "id": "weather_http",
+        "type": "http request",
+        "z": "weather_flow",
+        "name": "Open-Meteo Wetterdaten abrufen",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 800,
+        "y": 80,
+        "wires": [
+            [
+                "weather_parse"
+            ]
+        ]
+    },
+    {
+        "id": "weather_parse",
+        "type": "function",
+        "z": "weather_flow",
+        "name": "Wetterdaten prüfen und Payload aufbauen",
+        "func": "// Open-Meteo-Antwort in eine stabile Steuerungs-Payload umwandeln\nif (Number(msg.statusCode) !== 200 || !msg.payload || !msg.payload.hourly) {\n    return [null, { payload: { reason: \"HTTP- oder Datenfehler\", statusCode: msg.statusCode } }];\n}\n\nconst data = msg.payload;\nconst hourly = data.hourly;\nconst times = Array.isArray(hourly.time) ? hourly.time : [];\nconst sunshine = Array.isArray(hourly.sunshine_duration) ? hourly.sunshine_duration : [];\nconst temperatures = Array.isArray(hourly.temperature_2m) ? hourly.temperature_2m : [];\nconst clouds = Array.isArray(hourly.cloud_cover) ? hourly.cloud_cover : [];\nconst rainProbability = Array.isArray(hourly.precipitation_probability) ? hourly.precipitation_probability : [];\nconst weatherCodes = Array.isArray(hourly.weather_code) ? hourly.weather_code : [];\n\nif (!times.length || times.length !== sunshine.length) {\n    return [null, { payload: { reason: \"Unvollständige Wetterdaten\" } }];\n}\n\nconst clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));\nconst sunshinePercent = seconds => clampPercent((Number(seconds) || 0) / 36);\nconst now = new Date(data.current?.time || Date.now());\nconst currentHour = new Date(now);\ncurrentHour.setMinutes(0, 0, 0);\n\nconst parsedTimes = times.map(value => new Date(value));\nlet lastHourIndex = -1;\nfor (let index = 0; index < parsedTimes.length; index += 1) {\n    if (parsedTimes[index] < currentHour) lastHourIndex = index;\n}\nconst futureIndexes = parsedTimes\n    .map((time, index) => ({ time, index }))\n    .filter(item => item.time > currentHour)\n    .slice(0, 6);\n\nif (lastHourIndex < 0 || futureIndexes.length < 1) {\n    return [null, { payload: { reason: \"Keine passende Stundenprognose\" } }];\n}\n\nconst nextHourIndex = futureIndexes[0].index;\nconst actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex]);\nconst expectedNextHour = sunshinePercent(sunshine[nextHourIndex]);\nconst forecastNext6Hours = futureIndexes.map(item => ({\n    Time: times[item.index],\n    TimeLabel: times[item.index].slice(11, 16),\n    SunshinePercent: sunshinePercent(sunshine[item.index]),\n    TemperatureC: Number(temperatures[item.index]) || 0,\n    CloudCoverPercent: clampPercent(clouds[item.index]),\n    PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),\n    WeatherCode: Number(weatherCodes[item.index]) || 0\n}));\nconst expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => sum + item.SunshinePercent, 0) / forecastNext6Hours.length);\nconst expectedThresholdPercent = 10;\nconst sunPowerExpected = expectedNextHour >= expectedThresholdPercent;\nconst activeFlag = true;\n\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"AKTIV\",\n    ActiveFlag: activeFlag,\n    ActiveFlagf: activeFlag,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    Location: {\n        Name: \"Reindlmühl bei Altmünster am Traunsee\",\n        Latitude: Number(data.latitude),\n        Longitude: Number(data.longitude),\n        Timezone: data.timezone || \"Europe/Vienna\"\n    },\n    Current: {\n        Time: data.current?.time || \"\",\n        TemperatureC: Number(data.current?.temperature_2m) || 0,\n        CloudCoverPercent: clampPercent(data.current?.cloud_cover),\n        WeatherCode: Number(data.current?.weather_code) || 0,\n        IsDay: Number(data.current?.is_day) === 1\n    },\n    ActualSunshineLastHour: actualSunshineLastHour,\n    ActualSunshineLastHourPercent: actualSunshineLastHour,\n    ExpectedPercentSunshineNextHour: expectedNextHour,\n    ExpectetPercentSunshineNextHour: expectedNextHour,\n    ExpectedPercentSunshineNext6Hours: expectedNext6Hours,\n    SunPowerExpected: sunPowerExpected,\n    SunPowerExpectedText: sunPowerExpected ? \"JA · nächste Stunde\" : \"NEIN\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: times[nextHourIndex],\n    ExpectedSunshineThresholdPercent: expectedThresholdPercent,\n    ForecastNext6Hours: forecastNext6Hours\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: \" + msg.payload.WeatherServiceStatusText +\n    \" | Temperatur: \" + msg.payload.Current.TemperatureC + \" Grad C\" +\n    \" | Sonne letzte Stunde: \" + msg.payload.ActualSunshineLastHour + \"%\" +\n    \" | Sonne nächste Stunde: \" + msg.payload.ExpectedPercentSunshineNextHour + \"%\" +\n    \" | Sonne nächste 6 Stunden: \" + msg.payload.ExpectedPercentSunshineNext6Hours + \"%\" +\n    \" | Solarleistung erwartet: \" + msg.payload.SunPowerExpectedText +\n    \" | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 80,
+        "wires": [
+            [
+                "weather_publish"
+            ],
+            [
+                "weather_fallback"
+            ]
+        ]
+    },
+    {
+        "id": "weather_catch",
+        "type": "catch",
+        "z": "weather_flow",
+        "name": "Fehler Wetterabfrage",
+        "scope": [
+            "weather_http",
+            "weather_parse"
+        ],
+        "uncaught": false,
+        "x": 500,
+        "y": 260,
+        "wires": [
+            [
+                "weather_fallback"
+            ]
+        ]
+    },
+    {
+        "id": "weather_fallback",
+        "type": "function",
+        "z": "weather_flow",
+        "name": "SICHERER AUSFALL · Wetterwerte auf 0",
+        "func": "// Sicherer Ausfallzustand: keine Prognose darf Verbraucher einschalten\nconst reason = msg.payload?.reason || msg.error?.message || \"Wetterdienst nicht erreichbar\";\nconst emptyForecast = Array.from({ length: 6 }, (_, index) => ({\n    Time: \"\",\n    TimeLabel: \"+\" + (index + 1) + \" h\",\n    SunshinePercent: 0,\n    TemperatureC: 0,\n    CloudCoverPercent: 0,\n    PrecipitationProbabilityPercent: 0,\n    WeatherCode: 0\n}));\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"NICHT AKTIV\",\n    ActiveFlag: false,\n    ActiveFlagf: false,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    ErrorReason: reason,\n    Location: { Name: \"Reindlmühl bei Altmünster am Traunsee\", Latitude: 47.89464, Longitude: 13.7163, Timezone: \"Europe/Vienna\" },\n    Current: { Time: \"\", TemperatureC: 0, CloudCoverPercent: 0, WeatherCode: 0, IsDay: false },\n    ActualSunshineLastHour: 0,\n    ActualSunshineLastHourPercent: 0,\n    ExpectedPercentSunshineNextHour: 0,\n    ExpectetPercentSunshineNextHour: 0,\n    ExpectedPercentSunshineNext6Hours: 0,\n    SunPowerExpected: false,\n    SunPowerExpectedText: \"NEIN · Wetterdienst nicht aktiv\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: \"\",\n    ExpectedSunshineThresholdPercent: 10,\n    ForecastNext6Hours: emptyForecast\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: NICHT AKTIV | Temperatur: 0 Grad C | Sonne letzte Stunde: 0%\" +\n    \" | Sonne nächste Stunde: 0% | Sonne nächste 6 Stunden: 0%\" +\n    \" | Solarleistung erwartet: NEIN | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 260,
+        "wires": [
+            [
+                "weather_publish"
+            ]
+        ]
+    },
+    {
+        "id": "weather_publish",
+        "type": "function",
+        "z": "weather_flow",
+        "name": "Wetterdaten veröffentlichen",
+        "func": "global.set(\"WeatherData\", msg.payload);\nmsg.topic = \"WeatherData\";\nnode.status({\n fill: msg.payload.ActiveFlag ? \"green\" : \"red\",\n shape: msg.payload.ActiveFlag ? \"dot\" : \"ring\",\n text: msg.payload.WeatherServiceStatusText\n});\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 260,
+        "wires": [
+            [
+                "weather_debug",
+                "weather_link_out",
+                "weather_ui_overview_table"
+            ]
+        ]
+    },
+    {
+        "id": "weather_debug",
+        "type": "debug",
+        "z": "weather_flow",
+        "name": "WETTER PAYLOAD · VOLLSTÄNDIG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload.WeatherServiceStatusText",
+        "statusType": "jsonata",
+        "x": 1430,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "weather_link_out",
+        "type": "link out",
+        "z": "weather_flow",
+        "name": "LINK_WETTERDATEN_OUT",
+        "mode": "link",
+        "links": [],
+        "x": 1305,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "weather_ui_overview_table",
+        "type": "ui_template",
+        "z": "weather_flow",
+        "group": "weather_dashboard_group",
+        "name": "Wettertabelle & Sonnenampel",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n  .weather-card {\n    font-family: Roboto, Arial, sans-serif;\n    color: #263238;\n    padding: 4px 2px 10px\n  }\n\n  .weather-head {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    margin-bottom: 14px;\n    padding: 14px 16px;\n    border-radius: 12px;\n    background: linear-gradient(135deg, #f7fafc, #edf2f7)\n  }\n\n  .weather-light {\n    width: 54px;\n    height: 54px;\n    border-radius: 50%;\n    flex: 0 0 54px;\n    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .65), 0 3px 10px rgba(0, 0, 0, .18)\n  }\n\n  .weather-light.sun {\n    background: #facc15\n  }\n\n  .weather-light.low {\n    background: #94a3b8\n  }\n\n  .weather-title {\n    font-size: 20px;\n    font-weight: 700;\n    line-height: 1.15\n  }\n\n  .weather-status {\n    margin-top: 4px;\n    color: #546e7a\n  }\n\n  .weather-kpis {\n    display: grid;\n    grid-template-columns: repeat(4, minmax(90px, 1fr));\n    gap: 8px;\n    margin-bottom: 14px\n  }\n\n  .weather-kpi {\n    padding: 10px;\n    border-radius: 9px;\n    background: #fff;\n    border: 1px solid #dfe7ec;\n    text-align: center\n  }\n\n  .weather-kpi b {\n    display: block;\n    font-size: 19px;\n    color: #263238\n  }\n\n  .weather-kpi span {\n    font-size: 11px;\n    color: #607d8b\n  }\n\n  .weather-table-wrap {\n    overflow-x: auto;\n    border: 1px solid #dfe7ec;\n    border-radius: 9px\n  }\n\n  .weather-table {\n    width: 100%;\n    border-collapse: collapse;\n    min-width: 560px;\n    background: #fff\n  }\n\n  .weather-table th {\n    padding: 9px 8px;\n    text-align: left;\n    background: #455a64;\n    color: #fff;\n    font-size: 12px\n  }\n\n  .weather-table td {\n    padding: 9px 8px;\n    border-top: 1px solid #e8eef2;\n    font-size: 13px\n  }\n\n  .weather-table tr:nth-child(even) td {\n    background: #f8fafb\n  }\n\n  .sun-cell {\n    font-weight: 700;\n    color: #9a7400\n  }\n\n  .weather-legend {\n    display: flex;\n    gap: 16px;\n    margin-top: 10px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .legend-dot {\n    display: inline-block;\n    width: 11px;\n    height: 11px;\n    border-radius: 50%;\n    margin-right: 5px\n  }\n\n  .legend-yellow {\n    background: #facc15\n  }\n\n  .legend-grey {\n    background: #94a3b8\n  }\n\n  @media(max-width:600px) {\n    .weather-kpis {\n      grid-template-columns: repeat(2, 1fr)\n    }\n\n    .weather-title {\n      font-size: 17px\n    }\n  }\n</style>\n<div class=\"weather-card\">\n  <div class=\"weather-head\">\n    <div class=\"weather-light\" ng-class=\"msg.payload.SunPowerExpected ? 'sun' : 'low'\"></div>\n    <div>\n      <div class=\"weather-title\">Sonnenprognose Reindlmühl</div>\n      <div class=\"weather-status\">{{msg.payload.SunPowerExpected ? 'Sonnenstunden vorhanden' : 'Wenig bis keine Sonne\n        erwartet'}}</div>\n    </div>\n  </div>\n  <div class=\"weather-kpis\">\n    <div class=\"weather-kpi\"><b>{{msg.payload.ActualSunshineLastHour}} %</b><span>Sonne letzte Stunde</span></div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.ExpectedPercentSunshineNextHour}} %</b><span>Sonne nächste Stunde</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.ExpectedPercentSunshineNext6Hours}} %</b><span>Ø nächste 6 Stunden</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.Current.TemperatureC | number:1}} °C</b><span>Aktuelle Temperatur</span>\n    </div>\n  </div>\n  <div class=\"weather-table-wrap\">\n    <table class=\"weather-table\">\n      <thead>\n        <tr>\n          <th>Zeit</th>\n          <th>Sonne</th>\n          <th>Temperatur</th>\n          <th>Wolken</th>\n          <th>Regenrisiko</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat=\"hour in msg.payload.ForecastNext6Hours track by $index\">\n          <td>{{hour.TimeLabel}}</td>\n          <td class=\"sun-cell\">{{hour.SunshinePercent}} %</td>\n          <td>{{hour.TemperatureC | number:1}} °C</td>\n          <td>{{hour.CloudCoverPercent}} %</td>\n          <td>{{hour.PrecipitationProbabilityPercent}} %</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"weather-legend\">\n    <span><i class=\"legend-dot legend-yellow\"></i>Sonnenstunden vorhanden</span><span><i class=\"legend-dot legend-grey\"></i>wenig bis keine Sonne</span>\n  </div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 750,
+        "y": 480,
+        "wires": [
+            []
+        ]
     }
 ]
