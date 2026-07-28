@@ -7566,9 +7566,7 @@
                 "5a499b5d44485fa5",
                 "7db9c065c104320e"
             ],
-            [
-                "se_status_out"
-            ],
+            [],
             [
                 "se_pv_offline_handler"
             ]
@@ -8118,7 +8116,7 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "format": "<style>\n.se-state{padding:10px 12px;border-radius:8px;margin-bottom:8px;font-family:Roboto,Arial,sans-serif}\n.se-state.online{background:#e8f5e9;border:1px solid #66bb6a;color:#1b5e20}\n.se-state.offline{background:#ffebee;border:1px solid #ef5350;color:#b71c1c}\n.se-state-title{font-weight:700;font-size:16px}.se-state-reason{font-size:12px;margin-top:4px;overflow-wrap:anywhere}\n</style>\n<div class=\"se-state\" ng-class=\"msg.payload.OfflineFlag ? 'offline' : 'online'\">\n  <div class=\"se-state-title\">SolarEdge · {{msg.payload.OfflineFlag ? 'OFFLINE' : 'ONLINE'}}</div>\n  <div class=\"se-state-reason\" ng-if=\"msg.payload.OfflineFlag\">{{msg.payload.OfflineReason}}</div>\n  <div class=\"se-state-reason\">Stand: {{msg.payload.UpdatedAt | date:'dd.MM.yyyy HH:mm:ss'}}</div>\n</div>",
+        "format": "<style>\n.se-state{padding:10px 12px;border-radius:8px;margin-bottom:8px;font-family:Roboto,Arial,sans-serif}\n.se-state.online{background:#e8f5e9;border:1px solid #66bb6a;color:#1b5e20}\n.se-state.recovering{background:#fff8e1;border:1px solid #ffb300;color:#7a4f00}\n.se-state.offline{background:#ffebee;border:1px solid #ef5350;color:#b71c1c}\n.se-state-title{font-weight:700;font-size:16px}.se-state-reason{font-size:12px;margin-top:4px;overflow-wrap:anywhere}\n</style>\n<div class=\"se-state\" ng-class=\"msg.payload.State === 'RECOVERING' ? 'recovering' : (msg.payload.OfflineFlag ? 'offline' : 'online')\">\n  <div class=\"se-state-title\">SolarEdge · {{msg.payload.State === 'RECOVERING' ? 'VERBINDE' : (msg.payload.OfflineFlag ? 'OFFLINE' : 'ONLINE')}}</div>\n  <div class=\"se-state-reason\" ng-if=\"msg.payload.OfflineReason\">{{msg.payload.OfflineReason}}</div>\n  <div class=\"se-state-reason\">Stand: {{msg.payload.UpdatedAt | date:'dd.MM.yyyy HH:mm:ss'}}</div>\n</div>",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
@@ -8648,6 +8646,64 @@
         "y": 460,
         "wires": [
             []
+        ]
+    },
+    {
+        "id": "se_watchdog_tick",
+        "type": "inject",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge Watchdog · alle 2 s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "SolarEdgeWatchdog",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 380,
+        "wires": [
+            [
+                "se_connection_watchdog"
+            ]
+        ]
+    },
+    {
+        "id": "se_connection_watchdog",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge Verbindung überwachen",
+        "func": "// Unabhängiger Heartbeat für WLAN-/Routingwechsel und Dashboard-Synchronisierung\nconst nowMs = Date.now();\nconst pvLastMs = Number(global.get(\"SolarEdgePvLastSuccessMs\")) || 0;\nconst gridLastMs = Number(global.get(\"SolarEdgeGridLastSuccessMs\")) || 0;\nconst lastErrorMs = Number(global.get(\"SolarEdgeLastErrorMs\")) || 0;\nconst staleAfterMs = 7000;\nconst errorGraceMs = 4000;\n\nconst pvFresh = nowMs - pvLastMs <= staleAfterMs;\nconst gridFresh = nowMs - gridLastMs <= staleAfterMs;\nconst errorExpired = nowMs - lastErrorMs > errorGraceMs;\nconst communicationHealthy = pvFresh && gridFresh && errorExpired;\n\nlet healthyCycles = Number(context.get(\"healthyCycles\")) || 0;\nhealthyCycles = communicationHealthy ? Math.min(healthyCycles + 1, 2) : 0;\ncontext.set(\"healthyCycles\", healthyCycles);\n\nconst online = communicationHealthy && healthyCycles >= 2;\nconst recovering = communicationHealthy && !online;\nlet reason = \"\";\nif (!online) {\n    if (recovering) {\n        reason = \"Verbindung wiederhergestellt · Messwerte werden bestätigt\";\n    } else if (!pvFresh && !gridFresh) {\n        reason = \"Keine aktuellen SolarEdge-Daten · Netzwerk oder Modbus/TCP prüfen\";\n    } else if (!pvFresh) {\n        reason = \"Keine aktuellen Wechselrichterdaten\";\n    } else if (!gridFresh) {\n        reason = \"Keine aktuellen Smart-Meter-Daten\";\n    } else {\n        reason = global.get(\"SolarEdgeLastErrorReason\") || \"SolarEdge-Verbindung wird neu aufgebaut\";\n    }\n}\n\nconst previous = global.get(\"SolarEdgeData\") || {};\nconst status = {\n    ...previous,\n    State: online ? \"ONLINE\" : (recovering ? \"RECOVERING\" : \"OFFLINE\"),\n    OnlineFlag: online,\n    OfflineFlag: !online,\n    OfflineReason: reason,\n    UpdatedAt: new Date(nowMs).toISOString(),\n    Source: \"SolarEdge Modbus/TCP\",\n    PvLastSuccessMs: pvLastMs,\n    GridLastSuccessMs: gridLastMs\n};\n\nif (!online) {\n    status.PvPowerWatt = 0;\n    status.FeedInWatt = 0;\n    status.GridImportWatt = 0;\n    status.GridPowerWatt = 0;\n}\nglobal.set(\"SolarEdgeData\", status);\n\nnode.status(online\n    ? {fill:\"green\", shape:\"dot\", text:\"ONLINE · Daten aktuell\"}\n    : recovering\n        ? {fill:\"yellow\", shape:\"ring\", text:\"VERBINDE · bestätige Messwerte\"}\n        : {fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\n\nif (online) {\n    return [null, null, null, {topic:\"SolarEdgeStatus\", payload:status}];\n}\n\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: status.UpdatedAt,\n    Source: status.Source\n};\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status}\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 380,
+        "wires": [
+            [
+                "5a499b5d44485fa5"
+            ],
+            [
+                "se_feed_offline_out"
+            ],
+            [
+                "se_import_offline_out"
+            ],
+            [
+                "se_status_out"
+            ]
         ]
     }
 ]
