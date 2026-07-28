@@ -5774,7 +5774,7 @@
         "order": 9,
         "width": "0",
         "height": "0",
-        "format": "<script id=\"titleScript\" type=\"text/javascript\">\n\n$(function() {\n    if($('.md-toolbar-tools').length != 0){\n        loadClock();\n    }else setTimeout(loadClock, 500)\n});\n\nfunction loadClock(){\n    $('#clock').remove();\n    var toolbar = $('.md-toolbar-tools');\n    \n    var div = $('<div/>');\n    var p = $('<p/ id=\"clock\">');\n    \n    div.append(p);\n    div[0].style.margin = '5px 5px 5px auto';\n    toolbar.append(div);\n\n    function displayTitle(lh) {\n        p.text(lh); \n    }\n    \n    function upTime() {\n        var d = new Date();\n        p.text(d.toLocaleString());\n    }\n\n    if(document.clockInterval){ \n            clearInterval(document.clockInterval);\n            document.clockInterval = null;\n    }\n        \n    document.clockInterval = setInterval(upTime,1000);\n}\n\n</script>\n<script id=\"global-dashboard-reconnect\" type=\"text/javascript\">\n(function() {\n    if (document.dashboardReconnectInterval) {\n        clearInterval(document.dashboardReconnectInterval);\n    }\n\n    var routeKey = 'nodeRedDashboardLastRoute';\n    var lostSinceMs = 0;\n\n    function cleanRoute() {\n        var route = (window.location.hash || '').split('?')[0];\n        return /^#!\\/\\d+$/.test(route) ? route : '';\n    }\n\n    function rememberRoute() {\n        var route = cleanRoute();\n        if (route) sessionStorage.setItem(routeKey, route);\n    }\n\n    function connectionIsLost() {\n        var toast = document.querySelector('.md-toast-error');\n        return !!toast && (toast.textContent || '').indexOf('Connection lost') >= 0;\n    }\n\n    function reconnectDashboard(force) {\n        var now = Date.now();\n        var lastReloadMs = Number(sessionStorage.getItem('nodeRedDashboardLastReloadMs')) || 0;\n        if (!force && (!navigator.onLine || now - lastReloadMs < 10000)) return;\n\n        sessionStorage.setItem('nodeRedDashboardLastReloadMs', String(now));\n        var route = sessionStorage.getItem(routeKey) || cleanRoute() || '#!/0';\n        var target = window.location.origin + window.location.pathname +\n            '?reconnect=' + now + route;\n        window.location.replace(target);\n    }\n\n    function installReconnectButton() {\n        if (document.getElementById('dashboard-reconnect-button')) return;\n        var toolbar = document.querySelector('.md-toolbar-tools');\n        if (!toolbar) {\n            setTimeout(installReconnectButton, 500);\n            return;\n        }\n        var button = document.createElement('button');\n        button.id = 'dashboard-reconnect-button';\n        button.type = 'button';\n        button.className = 'md-button';\n        button.title = 'Dashboard-Verbindung neu aufbauen';\n        button.setAttribute('aria-label', 'Neu verbinden');\n        button.textContent = '↻ NEU VERBINDEN';\n        button.style.marginLeft = '8px';\n        button.addEventListener('click', function() {\n            reconnectDashboard(true);\n        });\n        toolbar.appendChild(button);\n    }\n\n    function compareWithBackendHeartbeat() {\n        var marker = document.querySelector('.se-state[data-updated-at]');\n        if (!marker || !navigator.onLine) return;\n        var displayedMs = Date.parse(marker.getAttribute('data-updated-at') || '');\n        fetch(window.location.origin + '/context/global/SolarEdgeData?_=' + Date.now(), {\n            cache: 'no-store'\n        })\n        .then(function(response) { return response.json(); })\n        .then(function(envelope) {\n            var data = typeof envelope.msg === 'string' ? JSON.parse(envelope.msg) : envelope.msg;\n            var backendMs = Date.parse(data && data.UpdatedAt || '');\n            if (Number.isFinite(displayedMs) && Number.isFinite(backendMs) &&\n                backendMs - displayedMs > 8000) {\n                reconnectDashboard(false);\n            }\n        })\n        .catch(function() {});\n    }\n\n    function checkConnection() {\n        rememberRoute();\n        installReconnectButton();\n        compareWithBackendHeartbeat();\n        if (!connectionIsLost()) {\n            lostSinceMs = 0;\n            return;\n        }\n        if (!lostSinceMs) lostSinceMs = Date.now();\n        if (Date.now() - lostSinceMs >= 3000) reconnectDashboard(false);\n    }\n\n    window.addEventListener('hashchange', rememberRoute);\n    window.addEventListener('online', function() {\n        setTimeout(checkConnection, 1200);\n    });\n    rememberRoute();\n    installReconnectButton();\n    document.dashboardReconnectInterval = setInterval(checkConnection, 2000);\n})();\n</script>",
+        "format": "<script id=\"titleScript\" type=\"text/javascript\">\n\n$(function() {\n    if($('.md-toolbar-tools').length != 0){\n        loadClock();\n    }else setTimeout(loadClock, 500)\n});\n\nfunction loadClock(){\n    $('#clock').remove();\n    var toolbar = $('.md-toolbar-tools');\n    \n    var div = $('<div/>');\n    var p = $('<p/ id=\"clock\">');\n    \n    div.append(p);\n    div[0].style.margin = '5px 5px 5px auto';\n    toolbar.append(div);\n\n    function displayTitle(lh) {\n        p.text(lh); \n    }\n    \n    function upTime() {\n        var d = new Date();\n        p.text(d.toLocaleString());\n    }\n\n    if(document.clockInterval){ \n            clearInterval(document.clockInterval);\n            document.clockInterval = null;\n    }\n        \n    document.clockInterval = setInterval(upTime,1000);\n}\n\n</script>\n<script id=\"global-dashboard-reconnect\" type=\"text/javascript\">\n(function() {\n    if (document.dashboardReconnectInterval) {\n        clearInterval(document.dashboardReconnectInterval);\n    }\n\n    var routeKey = 'nodeRedDashboardLastRoute';\n    var lostSinceMs = 0;\n\n    function cleanRoute() {\n        var route = (window.location.hash || '').split('?')[0];\n        return /^#!\\/\\d+$/.test(route) ? route : '';\n    }\n\n    function rememberRoute() {\n        var route = cleanRoute();\n        if (route) sessionStorage.setItem(routeKey, route);\n    }\n\n    function connectionIsLost() {\n        var toast = document.querySelector('.md-toast-error');\n        return !!toast && (toast.textContent || '').indexOf('Connection lost') >= 0;\n    }\n\n    function reconnectDashboard(force) {\n        var now = Date.now();\n        var lastReloadMs = Number(sessionStorage.getItem('nodeRedDashboardLastReloadMs')) || 0;\n        if (!force && (!navigator.onLine || now - lastReloadMs < 10000)) return;\n\n        sessionStorage.setItem('nodeRedDashboardLastReloadMs', String(now));\n        var route = sessionStorage.getItem(routeKey) || cleanRoute() || '#!/0';\n        var target = window.location.origin + window.location.pathname +\n            '?reconnect=' + now + route;\n        window.location.replace(target);\n    }\n\n    function installReconnectButton() {\n        if (document.getElementById('dashboard-reconnect-button')) return;\n        var toolbar = document.querySelector('.md-toolbar-tools');\n        if (!toolbar) {\n            setTimeout(installReconnectButton, 500);\n            return;\n        }\n        var button = document.createElement('button');\n        button.id = 'dashboard-reconnect-button';\n        button.type = 'button';\n        button.className = 'md-button';\n        button.title = 'Dashboard-Verbindung neu aufbauen';\n        button.setAttribute('aria-label', 'Neu verbinden');\n        button.textContent = '↻ DASHBOARD NEU VERBINDEN';\n        button.style.marginLeft = '8px';\n        button.addEventListener('click', function() {\n            reconnectDashboard(true);\n        });\n        toolbar.appendChild(button);\n    }\n\n    function compareWithBackendHeartbeat() {\n        var marker = document.querySelector('.se-state[data-updated-at]');\n        if (!marker || !navigator.onLine) return;\n        var displayedMs = Date.parse(marker.getAttribute('data-updated-at') || '');\n        fetch(window.location.origin + '/context/global/SolarEdgeData?_=' + Date.now(), {\n            cache: 'no-store'\n        })\n        .then(function(response) { return response.json(); })\n        .then(function(envelope) {\n            var data = typeof envelope.msg === 'string' ? JSON.parse(envelope.msg) : envelope.msg;\n            var backendMs = Date.parse(data && data.UpdatedAt || '');\n            if (Number.isFinite(displayedMs) && Number.isFinite(backendMs) &&\n                backendMs - displayedMs > 8000) {\n                reconnectDashboard(false);\n            }\n        })\n        .catch(function() {});\n    }\n\n    function checkConnection() {\n        rememberRoute();\n        installReconnectButton();\n        compareWithBackendHeartbeat();\n        if (!connectionIsLost()) {\n            lostSinceMs = 0;\n            return;\n        }\n        if (!lostSinceMs) lostSinceMs = Date.now();\n        if (Date.now() - lostSinceMs >= 3000) reconnectDashboard(false);\n    }\n\n    window.addEventListener('hashchange', rememberRoute);\n    window.addEventListener('online', function() {\n        setTimeout(checkConnection, 1200);\n    });\n    rememberRoute();\n    installReconnectButton();\n    document.dashboardReconnectInterval = setInterval(checkConnection, 2000);\n})();\n</script>",
         "storeOutMessages": false,
         "fwdInMessages": false,
         "templateScope": "global",
@@ -7552,7 +7552,7 @@
         "type": "function",
         "z": "79160448dc533f1d",
         "name": "GetActualSolarPower",
-        "func": "let SCALING_FACTOR = global.get(\"SCALING_FACTOR\") || 0;\nconst rawPower = Number(msg.payload);\nif (!Number.isFinite(rawPower)) {\n    return [null, null, {payload:{message:\"Ungültige SolarEdge-Leistungsdaten\"}}];\n}\n\nconst nowMs = Date.now();\nglobal.set(\"SolarEdgePvLastSuccessMs\", nowMs);\nconst gridLastSuccessMs = Number(global.get(\"SolarEdgeGridLastSuccessMs\")) || 0;\nconst lastErrorMs = Number(global.get(\"SolarEdgeLastErrorMs\")) || 0;\nconst healthyWindowMs = 6000;\nconst online = nowMs - gridLastSuccessMs <= healthyWindowMs &&\n               nowMs - lastErrorMs > healthyWindowMs;\nconst reason = online ? \"\" : (global.get(\"SolarEdgeLastErrorReason\") || \"SolarEdge-Verbindung noch nicht vollständig bestätigt\");\nconst calculatedPower = rawPower > 0 ? rawPower * Math.pow(10, SCALING_FACTOR) : 0;\nconst pvPowerWatt = online ? calculatedPower : 0;\nconst now = new Date(nowMs).toISOString();\nconst common = {\n    OfflineFlag: !online,\n    OfflineReason: reason,\n    UpdatedAt: now,\n    Source: \"SolarEdge Modbus/TCP\"\n};\nconst status = {\n    ...common,\n    OnlineFlag: online,\n    PvPowerWatt: pvPowerWatt\n};\nglobal.set(\"SolarEdgeData\", {...(global.get(\"SolarEdgeData\") || {}), ...status});\nnode.status(online\n    ? {fill:\"green\", shape:\"dot\", text:\"ONLINE · \" + Math.round(pvPowerWatt) + \" W\"}\n    : {fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\nreturn [\n    {...msg, payload:pvPowerWatt, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status},\n    null\n];",
+        "func": "let SCALING_FACTOR = global.get(\"SCALING_FACTOR\") || 0;\nconst rawPower = Number(msg.payload);\nif (!Number.isFinite(rawPower)) {\n    return [null, null, {payload:{message:\"Ungültige SolarEdge-Leistungsdaten\"}}];\n}\n\nconst nowMs = Date.now();\nconst pvPowerWatt = rawPower > 0 ? rawPower * Math.pow(10, SCALING_FACTOR) : 0;\nglobal.set(\"SolarEdgePvLastSuccessMs\", nowMs);\nglobal.set(\"SolarEdgePvPowerWatt\", pvPowerWatt);\nconst gridLastMs = Number(global.get(\"SolarEdgeGridLastSuccessMs\")) || 0;\nconst displayPvPowerWatt = nowMs - gridLastMs <= 7000 ? pvPowerWatt : 0;\n\nnode.status({fill:\"green\", shape:\"dot\", text:\"Messwert · \" + Math.round(pvPowerWatt) + \" W\"});\nreturn [\n    {...msg, payload:displayPvPowerWatt, timestamp:nowMs},\n    null,\n    null\n];",
         "outputs": 3,
         "timeout": 0,
         "noerr": 0,
@@ -7696,7 +7696,7 @@
         "type": "function",
         "z": "79160448dc533f1d",
         "name": "SolarEdge OFFLINE · sichere Nullwerte",
-        "func": "// SolarEdge-Kommunikationsfehler in einen sicheren, einheitlichen Zustand umwandeln\nconst rawReason = msg.error?.message || msg.payload?.message || msg.payload || \"SolarEdge nicht erreichbar\";\nconst technicalReason = typeof rawReason === \"string\" ? rawReason.trim() : \"\";\nconst reason = technicalReason && technicalReason !== \"[object Object]\"\n    ? technicalReason\n    : \"SolarEdge nicht erreichbar · Modbus/TCP-Verbindung fehlgeschlagen\";\nconst nowMs = Date.now();\nconst now = new Date(nowMs).toISOString();\nglobal.set(\"SolarEdgeLastErrorMs\", nowMs);\nglobal.set(\"SolarEdgeLastErrorReason\", reason);\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: now,\n    Source: \"SolarEdge Modbus/TCP\"\n};\nconst status = {\n    ...common,\n    OnlineFlag: false,\n    PvPowerWatt: 0,\n    FeedInWatt: 0,\n    GridImportWatt: 0,\n    GridPowerWatt: 0\n};\nglobal.set(\"SolarEdgeData\", status);\nnode.status({fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status}\n];",
+        "func": "// Fehler nur erfassen; der zentrale Watchdog entscheidet über OFFLINE.\n// So können verspätete Fehler keine frischen, bestätigten Messwerte überschreiben.\nconst rawReason = msg.error?.message || msg.payload?.message || msg.payload || \"SolarEdge nicht erreichbar\";\nconst technicalReason = typeof rawReason === \"string\" ? rawReason.trim() : \"\";\nconst reason = technicalReason && technicalReason !== \"[object Object]\"\n    ? technicalReason\n    : \"SolarEdge nicht erreichbar · Modbus/TCP-Verbindung fehlgeschlagen\";\nglobal.set(\"SolarEdgeLastErrorMs\", Date.now());\nglobal.set(\"SolarEdgeLastErrorReason\", reason);\nnode.status({fill:\"red\", shape:\"ring\", text:\"Fehler erfasst · \" + reason.slice(0, 38)});\nreturn [null, null, null, null];",
         "outputs": 4,
         "timeout": 0,
         "noerr": 0,
@@ -7774,6 +7774,67 @@
         "wires": [
             [
                 "se_pv_offline_handler"
+            ]
+        ]
+    },
+    {
+        "id": "se_watchdog_tick",
+        "type": "inject",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge Watchdog · alle 2 s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "SolarEdgeWatchdog",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 380,
+        "wires": [
+            [
+                "se_connection_watchdog"
+            ]
+        ]
+    },
+    {
+        "id": "se_connection_watchdog",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge Verbindung überwachen",
+        "func": "// Einzige Instanz, die SolarEdgeData und den Dashboard-Status schreibt.\nconst nowMs = Date.now();\nconst pvLastMs = Number(global.get(\"SolarEdgePvLastSuccessMs\")) || 0;\nconst gridLastMs = Number(global.get(\"SolarEdgeGridLastSuccessMs\")) || 0;\nconst staleAfterMs = 7000;\nconst pvFresh = nowMs - pvLastMs <= staleAfterMs;\nconst gridFresh = nowMs - gridLastMs <= staleAfterMs;\nconst communicationHealthy = pvFresh && gridFresh;\n\nlet healthyCycles = Number(context.get(\"healthyCycles\")) || 0;\nhealthyCycles = communicationHealthy ? Math.min(healthyCycles + 1, 2) : 0;\ncontext.set(\"healthyCycles\", healthyCycles);\n\nconst online = communicationHealthy && healthyCycles >= 2;\nconst recovering = communicationHealthy && !online;\nlet reason = \"\";\nif (!online) {\n    if (recovering) {\n        reason = \"Verbindung wiederhergestellt · Messwerte werden bestätigt\";\n    } else if (!pvFresh && !gridFresh) {\n        reason = \"Keine aktuellen SolarEdge-Daten · Modbus-Verbindung wird neu aufgebaut\";\n    } else if (!pvFresh) {\n        reason = \"Keine aktuellen Wechselrichterdaten · Modbus-Verbindung wird neu aufgebaut\";\n    } else {\n        reason = \"Keine aktuellen Smart-Meter-Daten · Modbus-Verbindung wird neu aufgebaut\";\n    }\n}\n\nconst status = {\n    State: online ? \"ONLINE\" : (recovering ? \"RECOVERING\" : \"OFFLINE\"),\n    OnlineFlag: online,\n    OfflineFlag: !online,\n    OfflineReason: reason,\n    UpdatedAt: new Date(nowMs).toISOString(),\n    Source: \"SolarEdge Modbus/TCP\",\n    PvLastSuccessMs: pvLastMs,\n    GridLastSuccessMs: gridLastMs,\n    LastErrorMs: Number(global.get(\"SolarEdgeLastErrorMs\")) || 0,\n    LastErrorReason: global.get(\"SolarEdgeLastErrorReason\") || \"\"\n};\n\nif (online) {\n    status.PvPowerWatt = Number(global.get(\"SolarEdgePvPowerWatt\")) || 0;\n    status.FeedInWatt = Number(global.get(\"SolarEdgeFeedInWatt\")) || 0;\n    status.GridImportWatt = Number(global.get(\"SolarEdgeGridImportWatt\")) || 0;\n    status.GridPowerWatt = Number(global.get(\"SolarEdgeGridPowerWatt\")) || 0;\n    status.RawGridPower = Number(global.get(\"SolarEdgeRawGridPower\")) || 0;\n    status.GridPowerScaleFactor = Number(global.get(\"SolarEdgeGridPowerScaleFactor\")) || 0;\n} else {\n    status.PvPowerWatt = 0;\n    status.FeedInWatt = 0;\n    status.GridImportWatt = 0;\n    status.GridPowerWatt = 0;\n}\nglobal.set(\"SolarEdgeData\", status);\n\nnode.status(online\n    ? {fill:\"green\", shape:\"dot\", text:\"ONLINE · Daten aktuell\"}\n    : recovering\n        ? {fill:\"yellow\", shape:\"ring\", text:\"VERBINDE · bestätige Messwerte\"}\n        : {fill:\"red\", shape:\"ring\", text:\"OFFLINE · Reconnect läuft\"});\n\nlet reconnectMsg = null;\nif (!communicationHealthy) {\n    const lastReconnectMs = Number(context.get(\"lastReconnectMs\")) || 0;\n    if (nowMs - lastReconnectMs >= 15000) {\n        context.set(\"lastReconnectMs\", nowMs);\n        reconnectMsg = {\n            topic: \"SolarEdgeModbusReconnect\",\n            payload: {\n                connectorType: \"TCP\",\n                tcpHost: \"192.168.0.128\",\n                tcpPort: \"502\",\n                tcpType: \"DEFAULT\",\n                unitId: 1,\n                commandDelay: 1,\n                clientTimeout: 1000,\n                reconnectTimeout: 2000\n            }\n        };\n    }\n}\n\nif (online) {\n    return [null, null, null, {topic:\"SolarEdgeStatus\", payload:status}, null];\n}\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: status.UpdatedAt,\n    Source: status.Source\n};\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status},\n    reconnectMsg\n];",
+        "outputs": 5,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 380,
+        "wires": [
+            [
+                "5a499b5d44485fa5"
+            ],
+            [
+                "se_feed_offline_out"
+            ],
+            [
+                "se_import_offline_out"
+            ],
+            [
+                "se_status_out"
+            ],
+            [
+                "se_modbus_reconnector"
             ]
         ]
     },
@@ -8165,7 +8226,7 @@
         "type": "function",
         "z": "tab_read_feedin",
         "name": "Netzleistung aufteilen · Import / Einspeisung",
-        "func": "// SolarEdge Netzleistung aufteilen\n// Gemessene Geräte-Konvention: positiv = Einspeisung, negativ = Netzbezug\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"keine Modbus-Daten\"});\n    return [null, null];\n}\n\nconst toI16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst roundWatt = value => Math.round((value + Number.EPSILON) * 10) / 10;\n\nconst rawPower = toI16(vals[0]);       // 40207 M_AC_Power\nconst scaleFactor = toI16(vals[4]);    // 40211 M_AC_Power_SF\n\nif (rawPower === -32768 || scaleFactor === -32768 || scaleFactor < -5 || scaleFactor > 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"ungültige Registerwerte\"});\n    return [null, null];\n}\n\nconst calculatedGridPowerWatt = roundWatt(rawPower * Math.pow(10, scaleFactor));\nconst nowMs = Date.now();\nglobal.set(\"SolarEdgeGridLastSuccessMs\", nowMs);\nconst pvLastSuccessMs = Number(global.get(\"SolarEdgePvLastSuccessMs\")) || 0;\nconst lastErrorMs = Number(global.get(\"SolarEdgeLastErrorMs\")) || 0;\nconst healthyWindowMs = 6000;\nconst online = nowMs - pvLastSuccessMs <= healthyWindowMs &&\n               nowMs - lastErrorMs > healthyWindowMs;\nconst gridPowerWatt = online ? calculatedGridPowerWatt : 0;\nconst feedInWatt = roundWatt(Math.max(0, gridPowerWatt));\nconst gridImportWatt = roundWatt(Math.max(0, -gridPowerWatt));\nconst reason = online ? \"\" : (global.get(\"SolarEdgeLastErrorReason\") || \"SolarEdge-Verbindung noch nicht vollständig bestätigt\");\nconst updatedAt = new Date(nowMs).toISOString();\n\nconst status = {\n    ...(global.get(\"SolarEdgeData\") || {}),\n    OfflineFlag: !online,\n    OfflineReason: reason,\n    OnlineFlag: online,\n    UpdatedAt: updatedAt,\n    Source: \"SolarEdge Modbus/TCP\",\n    FeedInWatt: feedInWatt,\n    GridImportWatt: gridImportWatt,\n    GridPowerWatt: gridPowerWatt,\n    RawGridPower: rawPower,\n    GridPowerScaleFactor: scaleFactor\n};\nglobal.set(\"SolarEdgeData\", status);\n\nnode.status({\n    fill: gridImportWatt > 0 ? \"red\" : \"green\",\n    shape: \"dot\",\n    text: gridImportWatt > 0\n        ? \"Netzbezug \" + gridImportWatt + \" W\"\n        : \"Einspeisung \" + feedInWatt + \" W\"\n});\n\nconst common = {\n    gridPowerWatt,\n    rawPower,\n    scaleFactor,\n    timestamp: nowMs\n};\n\nreturn [\n    { ...msg, topic: \"FeedInW\", payload: feedInWatt, ...common },\n    { ...msg, topic: \"GridImportWatt\", payload: gridImportWatt, ...common }\n];",
+        "func": "// SolarEdge Netzleistung aufteilen\n// Gemessene Geräte-Konvention: positiv = Einspeisung, negativ = Netzbezug\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"keine Modbus-Daten\"});\n    return [null, null];\n}\n\nconst toI16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst roundWatt = value => Math.round((value + Number.EPSILON) * 10) / 10;\nconst rawPower = toI16(vals[0]);\nconst scaleFactor = toI16(vals[4]);\n\nif (rawPower === -32768 || scaleFactor === -32768 || scaleFactor < -5 || scaleFactor > 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"ungültige Registerwerte\"});\n    return [null, null];\n}\n\nconst gridPowerWatt = roundWatt(rawPower * Math.pow(10, scaleFactor));\nconst feedInWatt = roundWatt(Math.max(0, gridPowerWatt));\nconst gridImportWatt = roundWatt(Math.max(0, -gridPowerWatt));\nconst nowMs = Date.now();\n\nglobal.set(\"SolarEdgeGridLastSuccessMs\", nowMs);\nglobal.set(\"SolarEdgeGridPowerWatt\", gridPowerWatt);\nglobal.set(\"SolarEdgeFeedInWatt\", feedInWatt);\nglobal.set(\"SolarEdgeGridImportWatt\", gridImportWatt);\nglobal.set(\"SolarEdgeRawGridPower\", rawPower);\nglobal.set(\"SolarEdgeGridPowerScaleFactor\", scaleFactor);\nconst pvLastMs = Number(global.get(\"SolarEdgePvLastSuccessMs\")) || 0;\nconst displayHealthy = nowMs - pvLastMs <= 7000;\nconst displayFeedInWatt = displayHealthy ? feedInWatt : 0;\nconst displayGridImportWatt = displayHealthy ? gridImportWatt : 0;\nconst displayGridPowerWatt = displayHealthy ? gridPowerWatt : 0;\n\nnode.status({\n    fill: gridImportWatt > 0 ? \"red\" : \"green\",\n    shape: \"dot\",\n    text: gridImportWatt > 0\n        ? \"Netzbezug \" + gridImportWatt + \" W\"\n        : \"Einspeisung \" + feedInWatt + \" W\"\n});\n\nconst common = {gridPowerWatt:displayGridPowerWatt, rawPower, scaleFactor, timestamp:nowMs};\nreturn [\n    {...msg, topic:\"FeedInW\", payload:displayFeedInWatt, ...common},\n    {...msg, topic:\"GridImportWatt\", payload:displayGridImportWatt, ...common}\n];",
         "outputs": 2,
         "timeout": "",
         "noerr": 0,
@@ -8260,7 +8321,7 @@
         "type": "function",
         "z": "tab_read_feedin",
         "name": "SolarEdge Meter OFFLINE · sichere Nullwerte",
-        "func": "// SolarEdge-Kommunikationsfehler in einen sicheren, einheitlichen Zustand umwandeln\nconst rawReason = msg.error?.message || msg.payload?.message || msg.payload || \"SolarEdge nicht erreichbar\";\nconst technicalReason = typeof rawReason === \"string\" ? rawReason.trim() : \"\";\nconst reason = technicalReason && technicalReason !== \"[object Object]\"\n    ? technicalReason\n    : \"SolarEdge nicht erreichbar · Modbus/TCP-Verbindung fehlgeschlagen\";\nconst nowMs = Date.now();\nconst now = new Date(nowMs).toISOString();\nglobal.set(\"SolarEdgeLastErrorMs\", nowMs);\nglobal.set(\"SolarEdgeLastErrorReason\", reason);\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: now,\n    Source: \"SolarEdge Modbus/TCP\"\n};\nconst status = {\n    ...common,\n    OnlineFlag: false,\n    PvPowerWatt: 0,\n    FeedInWatt: 0,\n    GridImportWatt: 0,\n    GridPowerWatt: 0\n};\nglobal.set(\"SolarEdgeData\", status);\nnode.status({fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status}\n];",
+        "func": "// Fehler nur erfassen; der zentrale Watchdog entscheidet über OFFLINE.\n// So können verspätete Fehler keine frischen, bestätigten Messwerte überschreiben.\nconst rawReason = msg.error?.message || msg.payload?.message || msg.payload || \"SolarEdge nicht erreichbar\";\nconst technicalReason = typeof rawReason === \"string\" ? rawReason.trim() : \"\";\nconst reason = technicalReason && technicalReason !== \"[object Object]\"\n    ? technicalReason\n    : \"SolarEdge nicht erreichbar · Modbus/TCP-Verbindung fehlgeschlagen\";\nglobal.set(\"SolarEdgeLastErrorMs\", Date.now());\nglobal.set(\"SolarEdgeLastErrorReason\", reason);\nnode.status({fill:\"red\", shape:\"ring\", text:\"Fehler erfasst · \" + reason.slice(0, 38)});\nreturn [null, null, null, null];",
         "outputs": 4,
         "timeout": 0,
         "noerr": 0,
@@ -8569,8 +8630,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 810,
-        "y": 260,
+        "x": 740,
+        "y": 300,
         "wires": [
             [
                 "weather_publish"
@@ -8589,8 +8650,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1110,
-        "y": 260,
+        "x": 1100,
+        "y": 280,
         "wires": [
             [
                 "weather_debug",
@@ -8649,61 +8710,116 @@
         ]
     },
     {
-        "id": "se_watchdog_tick",
-        "type": "inject",
+        "id": "se_modbus_reconnector",
+        "type": "modbus-flex-connector",
         "z": "79160448dc533f1d",
-        "name": "SolarEdge Watchdog · alle 2 s",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "2",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "1",
-        "topic": "SolarEdgeWatchdog",
-        "payload": "",
-        "payloadType": "date",
-        "x": 210,
-        "y": 380,
+        "name": "SolarEdge Modbus · Verbindung neu aufbauen",
+        "maxReconnectsPerMinute": 4,
+        "emptyQueue": true,
+        "showStatusActivities": true,
+        "showErrors": true,
+        "server": "befceeb9cba11998",
+        "emptyMsgOnFail": false,
+        "configMsgOnChange": false,
+        "x": 830,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "se_control_buttons",
+        "type": "ui_template",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "name": "SolarEdge und Node-RED Steuerung",
+        "order": 6,
+        "width": 0,
+        "height": 1,
+        "format": "<style>\n.se-control-row{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}\n.se-control-button{border:0;border-radius:6px;padding:9px 13px;font-weight:600;cursor:pointer}\n.se-control-reconnect{background:#1565c0;color:white}\n.se-control-restart{background:#b71c1c;color:white}\n</style>\n<div class=\"se-control-row\">\n  <button class=\"se-control-button se-control-reconnect\" ng-click=\"reconnectSolarEdge()\">↻ SOLAREDGE NEU VERBINDEN</button>\n  <button class=\"se-control-button se-control-restart\" ng-click=\"restartNodeRed()\">⏻ NODE-RED SERVER NEU STARTEN</button>\n</div>\n<script>\n(function(scope) {\n  scope.reconnectSolarEdge = function() {\n    scope.send({topic:\"modbus-reconnect\", payload:true});\n  };\n  scope.restartNodeRed = function() {\n    if (window.confirm(\"Node-RED wirklich neu starten? Alle Automations-Flows sind kurzzeitig unterbrochen.\")) {\n      scope.send({topic:\"node-red-restart\", payload:true});\n    }\n  };\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 450,
+        "y": 620,
         "wires": [
             [
-                "se_connection_watchdog"
+                "se_control_router"
             ]
         ]
     },
     {
-        "id": "se_connection_watchdog",
+        "id": "se_control_router",
         "type": "function",
-        "z": "79160448dc533f1d",
-        "name": "SolarEdge Verbindung überwachen",
-        "func": "// Unabhängiger Heartbeat für WLAN-/Routingwechsel und Dashboard-Synchronisierung\nconst nowMs = Date.now();\nconst pvLastMs = Number(global.get(\"SolarEdgePvLastSuccessMs\")) || 0;\nconst gridLastMs = Number(global.get(\"SolarEdgeGridLastSuccessMs\")) || 0;\nconst lastErrorMs = Number(global.get(\"SolarEdgeLastErrorMs\")) || 0;\nconst staleAfterMs = 7000;\nconst errorGraceMs = 4000;\n\nconst pvFresh = nowMs - pvLastMs <= staleAfterMs;\nconst gridFresh = nowMs - gridLastMs <= staleAfterMs;\nconst errorExpired = nowMs - lastErrorMs > errorGraceMs;\nconst communicationHealthy = pvFresh && gridFresh && errorExpired;\n\nlet healthyCycles = Number(context.get(\"healthyCycles\")) || 0;\nhealthyCycles = communicationHealthy ? Math.min(healthyCycles + 1, 2) : 0;\ncontext.set(\"healthyCycles\", healthyCycles);\n\nconst online = communicationHealthy && healthyCycles >= 2;\nconst recovering = communicationHealthy && !online;\nlet reason = \"\";\nif (!online) {\n    if (recovering) {\n        reason = \"Verbindung wiederhergestellt · Messwerte werden bestätigt\";\n    } else if (!pvFresh && !gridFresh) {\n        reason = \"Keine aktuellen SolarEdge-Daten · Netzwerk oder Modbus/TCP prüfen\";\n    } else if (!pvFresh) {\n        reason = \"Keine aktuellen Wechselrichterdaten\";\n    } else if (!gridFresh) {\n        reason = \"Keine aktuellen Smart-Meter-Daten\";\n    } else {\n        reason = global.get(\"SolarEdgeLastErrorReason\") || \"SolarEdge-Verbindung wird neu aufgebaut\";\n    }\n}\n\nconst previous = global.get(\"SolarEdgeData\") || {};\nconst status = {\n    ...previous,\n    State: online ? \"ONLINE\" : (recovering ? \"RECOVERING\" : \"OFFLINE\"),\n    OnlineFlag: online,\n    OfflineFlag: !online,\n    OfflineReason: reason,\n    UpdatedAt: new Date(nowMs).toISOString(),\n    Source: \"SolarEdge Modbus/TCP\",\n    PvLastSuccessMs: pvLastMs,\n    GridLastSuccessMs: gridLastMs\n};\n\nif (!online) {\n    status.PvPowerWatt = 0;\n    status.FeedInWatt = 0;\n    status.GridImportWatt = 0;\n    status.GridPowerWatt = 0;\n}\nglobal.set(\"SolarEdgeData\", status);\n\nnode.status(online\n    ? {fill:\"green\", shape:\"dot\", text:\"ONLINE · Daten aktuell\"}\n    : recovering\n        ? {fill:\"yellow\", shape:\"ring\", text:\"VERBINDE · bestätige Messwerte\"}\n        : {fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\n\nif (online) {\n    return [null, null, null, {topic:\"SolarEdgeStatus\", payload:status}];\n}\n\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: status.UpdatedAt,\n    Source: status.Source\n};\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status}\n];",
-        "outputs": 4,
+        "z": "b86cb602995b0261",
+        "name": "Reconnect / Serverneustart absichern",
+        "func": "if (msg.topic === \"modbus-reconnect\") {\n    return [{\n        topic:\"SolarEdgeModbusReconnectManual\",\n        payload:{\n            connectorType:\"TCP\",\n            tcpHost:\"192.168.0.128\",\n            tcpPort:\"502\",\n            tcpType:\"DEFAULT\",\n            unitId:1,\n            commandDelay:1,\n            clientTimeout:1000,\n            reconnectTimeout:2000\n        }\n    }, null];\n}\nif (msg.topic === \"node-red-restart\" && msg.payload === true) {\n    return [null, msg];\n}\nreturn [null, null];",
+        "outputs": 2,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 380,
+        "x": 720,
+        "y": 620,
         "wires": [
             [
-                "5a499b5d44485fa5"
+                "se_manual_modbus_link_out"
             ],
             [
-                "se_feed_offline_out"
-            ],
-            [
-                "se_import_offline_out"
-            ],
-            [
-                "se_status_out"
+                "se_node_red_restart_exec"
             ]
+        ]
+    },
+    {
+        "id": "se_manual_modbus_link_out",
+        "type": "link out",
+        "z": "b86cb602995b0261",
+        "name": "SolarEdge manueller Reconnect OUT",
+        "mode": "link",
+        "links": [
+            "se_manual_modbus_link_in"
+        ],
+        "x": 975,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "se_manual_modbus_link_in",
+        "type": "link in",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge manueller Reconnect IN",
+        "links": [
+            "se_manual_modbus_link_out"
+        ],
+        "x": 625,
+        "y": 440,
+        "wires": [
+            [
+                "se_modbus_reconnector"
+            ]
+        ]
+    },
+    {
+        "id": "se_node_red_restart_exec",
+        "type": "exec",
+        "z": "b86cb602995b0261",
+        "command": "/bin/launchctl kickstart -k gui/503/com.georg.node-red",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "10",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Node-RED über launchd neu starten",
+        "x": 1010,
+        "y": 660,
+        "wires": [
+            [],
+            [],
+            []
         ]
     }
 ]
