@@ -7438,7 +7438,9 @@
             [
                 "33d7fc2ec0eeb8d5"
             ],
-            []
+            [
+                "se_pv_offline_handler"
+            ]
         ]
     },
     {
@@ -7552,8 +7554,8 @@
         "type": "function",
         "z": "79160448dc533f1d",
         "name": "GetActualSolarPower",
-        "func": "let SCALING_FACTOR = global.get(\"SCALING_FACTOR\") || 0;\n\nif (msg.payload > 0) \n{\n    msg.payload = msg.payload * Math.pow(10, SCALING_FACTOR);\n}\nreturn msg;",
-        "outputs": 1,
+        "func": "let SCALING_FACTOR = global.get(\"SCALING_FACTOR\") || 0;\nconst rawPower = Number(msg.payload);\nif (!Number.isFinite(rawPower)) {\n    return [null, null, {payload:{message:\"Ungültige SolarEdge-Leistungsdaten\"}}];\n}\n\nconst nowMs = Date.now();\nglobal.set(\"SolarEdgePvLastSuccessMs\", nowMs);\nconst gridLastSuccessMs = Number(global.get(\"SolarEdgeGridLastSuccessMs\")) || 0;\nconst lastErrorMs = Number(global.get(\"SolarEdgeLastErrorMs\")) || 0;\nconst healthyWindowMs = 6000;\nconst online = nowMs - gridLastSuccessMs <= healthyWindowMs &&\n               nowMs - lastErrorMs > healthyWindowMs;\nconst reason = online ? \"\" : (global.get(\"SolarEdgeLastErrorReason\") || \"SolarEdge-Verbindung noch nicht vollständig bestätigt\");\nconst calculatedPower = rawPower > 0 ? rawPower * Math.pow(10, SCALING_FACTOR) : 0;\nconst pvPowerWatt = online ? calculatedPower : 0;\nconst now = new Date(nowMs).toISOString();\nconst common = {\n    OfflineFlag: !online,\n    OfflineReason: reason,\n    UpdatedAt: now,\n    Source: \"SolarEdge Modbus/TCP\"\n};\nconst status = {\n    ...common,\n    OnlineFlag: online,\n    PvPowerWatt: pvPowerWatt\n};\nglobal.set(\"SolarEdgeData\", {...(global.get(\"SolarEdgeData\") || {}), ...status});\nnode.status(online\n    ? {fill:\"green\", shape:\"dot\", text:\"ONLINE · \" + Math.round(pvPowerWatt) + \" W\"}\n    : {fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\nreturn [\n    {...msg, payload:pvPowerWatt, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status},\n    null\n];",
+        "outputs": 3,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
@@ -7565,6 +7567,12 @@
             [
                 "5a499b5d44485fa5",
                 "7db9c065c104320e"
+            ],
+            [
+                "se_status_out"
+            ],
+            [
+                "se_pv_offline_handler"
             ]
         ]
     },
@@ -7693,7 +7701,8 @@
         "z": "b86cb602995b0261",
         "name": "LINK_SOLARLEISTUNG_DASHBOARD_IN",
         "links": [
-            "5a499b5d44485fa5"
+            "5a499b5d44485fa5",
+            "se_grid_solar_zero_out"
         ],
         "x": 225,
         "y": 100,
@@ -7709,7 +7718,7 @@
         "type": "ui_text",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
-        "order": 1,
+        "order": 2,
         "width": 0,
         "height": 0,
         "name": "Solarleistung",
@@ -7730,7 +7739,7 @@
         "type": "ui_text",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
-        "order": 3,
+        "order": 4,
         "width": 0,
         "height": 0,
         "name": "Netzeinspeisung",
@@ -7752,7 +7761,8 @@
         "z": "b86cb602995b0261",
         "name": "LINK_NETZEINSPEISUNG_DASHBOARD_IN",
         "links": [
-            "357ea9edd14fe171"
+            "357ea9edd14fe171",
+            "se_feed_offline_out"
         ],
         "x": 225,
         "y": 220,
@@ -7956,7 +7966,8 @@
         "z": "b86cb602995b0261",
         "name": "LINK_NETZBEZUG_DASHBOARD_IN",
         "links": [
-            "link_grid_import_out"
+            "link_grid_import_out",
+            "se_import_offline_out"
         ],
         "x": 225,
         "y": 160,
@@ -7971,7 +7982,7 @@
         "type": "ui_text",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
-        "order": 2,
+        "order": 3,
         "width": 0,
         "height": 0,
         "name": "Netzbezug",
@@ -8026,7 +8037,9 @@
             [
                 "calc_feedin"
             ],
-            []
+            [
+                "se_grid_offline_handler"
+            ]
         ]
     },
     {
@@ -8034,7 +8047,7 @@
         "type": "function",
         "z": "tab_read_feedin",
         "name": "Netzleistung aufteilen · Import / Einspeisung",
-        "func": "// SolarEdge Netzleistung aufteilen\n// Vorzeichenkonvention: positiv = Netzbezug, negativ = Einspeisung\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"keine Modbus-Daten\"});\n    return [null, null];\n}\n\nconst toI16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst roundWatt = value => Math.round((value + Number.EPSILON) * 10) / 10;\n\nconst rawPower = toI16(vals[0]);       // 40207 M_AC_Power\nconst scaleFactor = toI16(vals[4]);    // 40211 M_AC_Power_SF\n\nif (rawPower === -32768 || scaleFactor === -32768 || scaleFactor < -5 || scaleFactor > 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"ungültige Registerwerte\"});\n    return [null, null];\n}\n\nconst gridPowerWatt = roundWatt(rawPower * Math.pow(10, scaleFactor));\nconst feedInWatt = roundWatt(Math.max(0, -gridPowerWatt));\nconst gridImportWatt = roundWatt(Math.max(0, gridPowerWatt));\n\nnode.status({\n    fill: gridImportWatt > 0 ? \"red\" : \"green\",\n    shape: \"dot\",\n    text: gridImportWatt > 0\n        ? \"Netzbezug \" + gridImportWatt + \" W\"\n        : \"Einspeisung \" + feedInWatt + \" W\"\n});\n\nconst common = {\n    gridPowerWatt,\n    rawPower,\n    scaleFactor,\n    timestamp: Date.now()\n};\n\nreturn [\n    { ...msg, topic: \"FeedInW\", payload: feedInWatt, ...common },\n    { ...msg, topic: \"GridImportWatt\", payload: gridImportWatt, ...common }\n];",
+        "func": "// SolarEdge Netzleistung aufteilen\n// Vorzeichenkonvention: positiv = Netzbezug, negativ = Einspeisung\nconst vals = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!vals || vals.length < 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"keine Modbus-Daten\"});\n    return [null, null];\n}\n\nconst toI16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst roundWatt = value => Math.round((value + Number.EPSILON) * 10) / 10;\n\nconst rawPower = toI16(vals[0]);       // 40207 M_AC_Power\nconst scaleFactor = toI16(vals[4]);    // 40211 M_AC_Power_SF\n\nif (rawPower === -32768 || scaleFactor === -32768 || scaleFactor < -5 || scaleFactor > 5) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"ungültige Registerwerte\"});\n    return [null, null];\n}\n\nconst calculatedGridPowerWatt = roundWatt(rawPower * Math.pow(10, scaleFactor));\nconst nowMs = Date.now();\nglobal.set(\"SolarEdgeGridLastSuccessMs\", nowMs);\nconst pvLastSuccessMs = Number(global.get(\"SolarEdgePvLastSuccessMs\")) || 0;\nconst lastErrorMs = Number(global.get(\"SolarEdgeLastErrorMs\")) || 0;\nconst healthyWindowMs = 6000;\nconst online = nowMs - pvLastSuccessMs <= healthyWindowMs &&\n               nowMs - lastErrorMs > healthyWindowMs;\nconst gridPowerWatt = online ? calculatedGridPowerWatt : 0;\nconst feedInWatt = roundWatt(Math.max(0, -gridPowerWatt));\nconst gridImportWatt = roundWatt(Math.max(0, gridPowerWatt));\n\nnode.status({\n    fill: gridImportWatt > 0 ? \"red\" : \"green\",\n    shape: \"dot\",\n    text: gridImportWatt > 0\n        ? \"Netzbezug \" + gridImportWatt + \" W\"\n        : \"Einspeisung \" + feedInWatt + \" W\"\n});\n\nconst common = {\n    gridPowerWatt,\n    rawPower,\n    scaleFactor,\n    timestamp: Date.now()\n};\n\nreturn [\n    { ...msg, topic: \"FeedInW\", payload: feedInWatt, ...common },\n    { ...msg, topic: \"GridImportWatt\", payload: gridImportWatt, ...common }\n];",
         "outputs": 2,
         "timeout": "",
         "noerr": 0,
@@ -8441,6 +8454,167 @@
         "className": "",
         "x": 1410,
         "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "se_pv_offline_handler",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge OFFLINE · sichere Nullwerte",
+        "func": "// SolarEdge-Kommunikationsfehler in einen sicheren, einheitlichen Zustand umwandeln\nconst rawReason = msg.error?.message || msg.payload?.message || msg.payload || \"SolarEdge nicht erreichbar\";\nconst technicalReason = typeof rawReason === \"string\" ? rawReason.trim() : \"\";\nconst reason = technicalReason && technicalReason !== \"[object Object]\"\n    ? technicalReason\n    : \"SolarEdge nicht erreichbar · Modbus/TCP-Verbindung fehlgeschlagen\";\nconst nowMs = Date.now();\nconst now = new Date(nowMs).toISOString();\nglobal.set(\"SolarEdgeLastErrorMs\", nowMs);\nglobal.set(\"SolarEdgeLastErrorReason\", reason);\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: now,\n    Source: \"SolarEdge Modbus/TCP\"\n};\nconst status = {\n    ...common,\n    OnlineFlag: false,\n    PvPowerWatt: 0,\n    FeedInWatt: 0,\n    GridImportWatt: 0,\n    GridPowerWatt: 0\n};\nglobal.set(\"SolarEdgeData\", status);\nnode.status({fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status}\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 260,
+        "wires": [
+            [
+                "5a499b5d44485fa5"
+            ],
+            [
+                "se_feed_offline_out"
+            ],
+            [
+                "se_import_offline_out"
+            ],
+            [
+                "se_status_out"
+            ]
+        ]
+    },
+    {
+        "id": "se_feed_offline_out",
+        "type": "link out",
+        "z": "79160448dc533f1d",
+        "name": "OFFLINE · Netzeinspeisung 0",
+        "mode": "link",
+        "links": [
+            "34ed305c9274a3c8"
+        ],
+        "x": 875,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "se_import_offline_out",
+        "type": "link out",
+        "z": "79160448dc533f1d",
+        "name": "OFFLINE · Netzbezug 0",
+        "mode": "link",
+        "links": [
+            "link_grid_import_in"
+        ],
+        "x": 875,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "se_status_out",
+        "type": "link out",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge Status OUT",
+        "mode": "link",
+        "links": [
+            "se_status_dashboard_in"
+        ],
+        "x": 855,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "se_grid_offline_handler",
+        "type": "function",
+        "z": "tab_read_feedin",
+        "name": "SolarEdge Meter OFFLINE · sichere Nullwerte",
+        "func": "// SolarEdge-Kommunikationsfehler in einen sicheren, einheitlichen Zustand umwandeln\nconst rawReason = msg.error?.message || msg.payload?.message || msg.payload || \"SolarEdge nicht erreichbar\";\nconst technicalReason = typeof rawReason === \"string\" ? rawReason.trim() : \"\";\nconst reason = technicalReason && technicalReason !== \"[object Object]\"\n    ? technicalReason\n    : \"SolarEdge nicht erreichbar · Modbus/TCP-Verbindung fehlgeschlagen\";\nconst nowMs = Date.now();\nconst now = new Date(nowMs).toISOString();\nglobal.set(\"SolarEdgeLastErrorMs\", nowMs);\nglobal.set(\"SolarEdgeLastErrorReason\", reason);\nconst common = {\n    OfflineFlag: true,\n    OfflineReason: reason,\n    UpdatedAt: now,\n    Source: \"SolarEdge Modbus/TCP\"\n};\nconst status = {\n    ...common,\n    OnlineFlag: false,\n    PvPowerWatt: 0,\n    FeedInWatt: 0,\n    GridImportWatt: 0,\n    GridPowerWatt: 0\n};\nglobal.set(\"SolarEdgeData\", status);\nnode.status({fill:\"red\", shape:\"ring\", text:\"OFFLINE · \" + reason.slice(0, 42)});\nreturn [\n    {topic:\"PvPowerWatt\", payload:0, ...common},\n    {topic:\"FeedInW\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"GridImportWatt\", payload:0, gridPowerWatt:0, ...common},\n    {topic:\"SolarEdgeStatus\", payload:status}\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 320,
+        "wires": [
+            [
+                "se_grid_solar_zero_out"
+            ],
+            [
+                "357ea9edd14fe171"
+            ],
+            [
+                "link_grid_import_out"
+            ],
+            [
+                "se_grid_status_out"
+            ]
+        ]
+    },
+    {
+        "id": "se_grid_solar_zero_out",
+        "type": "link out",
+        "z": "tab_read_feedin",
+        "name": "OFFLINE · Solarleistung 0",
+        "mode": "link",
+        "links": [
+            "214546f88e881fdd"
+        ],
+        "x": 695,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "se_grid_status_out",
+        "type": "link out",
+        "z": "tab_read_feedin",
+        "name": "SolarEdge Meter Status OUT",
+        "mode": "link",
+        "links": [
+            "se_status_dashboard_in"
+        ],
+        "x": 715,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "se_status_dashboard_in",
+        "type": "link in",
+        "z": "b86cb602995b0261",
+        "name": "SolarEdge Status IN",
+        "links": [
+            "se_status_out",
+            "se_grid_status_out"
+        ],
+        "x": 225,
+        "y": 40,
+        "wires": [
+            [
+                "se_status_dashboard"
+            ]
+        ]
+    },
+    {
+        "id": "se_status_dashboard",
+        "type": "ui_template",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "name": "SolarEdge Verbindungsstatus",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n.se-state{padding:10px 12px;border-radius:8px;margin-bottom:8px;font-family:Roboto,Arial,sans-serif}\n.se-state.online{background:#e8f5e9;border:1px solid #66bb6a;color:#1b5e20}\n.se-state.offline{background:#ffebee;border:1px solid #ef5350;color:#b71c1c}\n.se-state-title{font-weight:700;font-size:16px}.se-state-reason{font-size:12px;margin-top:4px;overflow-wrap:anywhere}\n</style>\n<div class=\"se-state\" ng-class=\"msg.payload.OfflineFlag ? 'offline' : 'online'\">\n  <div class=\"se-state-title\">SolarEdge · {{msg.payload.OfflineFlag ? 'OFFLINE' : 'ONLINE'}}</div>\n  <div class=\"se-state-reason\" ng-if=\"msg.payload.OfflineFlag\">{{msg.payload.OfflineReason}}</div>\n  <div class=\"se-state-reason\">Stand: {{msg.payload.UpdatedAt | date:'dd.MM.yyyy HH:mm:ss'}}</div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 500,
+        "y": 40,
         "wires": [
             []
         ]
