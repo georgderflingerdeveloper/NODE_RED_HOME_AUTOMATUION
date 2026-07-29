@@ -35,7 +35,7 @@
     "z": "398e4654.d2a5ea",
     "name": "LIGHT COMMAND ANTEROOM BACK",
     "func": {
-      "$flowSource": "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back--4bc9db11.460844.js"
+      "$flowSource": "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js"
     },
     "outputs": 1,
     "noerr": 0,

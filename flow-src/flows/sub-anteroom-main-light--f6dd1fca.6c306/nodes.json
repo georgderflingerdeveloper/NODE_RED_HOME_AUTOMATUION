@@ -35,7 +35,7 @@
     "z": "f6dd1fca.6c306",
     "name": "LIGHT COMMAND ANTEROOM MAIN",
     "func": {
-      "$flowSource": "flows/sub-anteroom-main-light--f6dd1fca.6c306/functions/light-command-anteroom-main--56b8eb53.8f1a84.js"
+      "$flowSource": "flows/sub-anteroom-main-light--f6dd1fca.6c306/functions/light-command-anteroom-main.js"
     },
     "outputs": 1,
     "noerr": 0,

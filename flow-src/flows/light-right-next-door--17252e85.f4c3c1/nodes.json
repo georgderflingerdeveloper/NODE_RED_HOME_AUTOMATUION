@@ -35,7 +35,7 @@
     "z": "17252e85.f4c3c1",
     "name": "LIGHT COMMAND INDOW BESIDE DOOR LIGHT",
     "func": {
-      "$flowSource": "flows/light-right-next-door--17252e85.f4c3c1/functions/light-command-indow-beside-door-light--457726bc.ce31c8.js"
+      "$flowSource": "flows/light-right-next-door--17252e85.f4c3c1/functions/light-command-indow-beside-door-light.js"
     },
     "outputs": 1,
     "noerr": 0,

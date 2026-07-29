@@ -46,7 +46,7 @@
     "z": "77dda60a.d7efe8",
     "name": "MAKE_DIMM",
     "func": {
-      "$flowSource": "flows/scenarios--77dda60a.d7efe8/functions/make-dimm--878f556e.dc77d8.js"
+      "$flowSource": "flows/scenarios--77dda60a.d7efe8/functions/make-dimm.js"
     },
     "outputs": 1,
     "noerr": 0,
@@ -62,7 +62,7 @@
     "z": "77dda60a.d7efe8",
     "name": "MAKE_ADVENTURE",
     "func": {
-      "$flowSource": "flows/scenarios--77dda60a.d7efe8/functions/make-adventure--34d1e102.250d5e.js"
+      "$flowSource": "flows/scenarios--77dda60a.d7efe8/functions/make-adventure.js"
     },
     "outputs": 1,
     "noerr": 0,

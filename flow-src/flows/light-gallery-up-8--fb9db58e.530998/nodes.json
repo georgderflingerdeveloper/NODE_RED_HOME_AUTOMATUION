@@ -35,7 +35,7 @@
     "z": "fb9db58e.530998",
     "name": "LIGHT COMMAND GALLERY UP 8",
     "func": {
-      "$flowSource": "flows/light-gallery-up-8--fb9db58e.530998/functions/light-command-gallery-up-8--5d8ab761.552368.js"
+      "$flowSource": "flows/light-gallery-up-8--fb9db58e.530998/functions/light-command-gallery-up-8.js"
     },
     "outputs": 1,
     "noerr": 0,

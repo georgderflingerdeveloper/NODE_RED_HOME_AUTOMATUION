@@ -21,8 +21,8 @@ flow-src/
             └── NAME--NODE_ID.html
 
 lib/functions/generated/
-└── FLOWNAME--FLOW_ID/
-    └── NAME--NODE_ID.js
+└── FLOWNAME/
+    └── FUNCTION-NAME.js
 ```
 
 In `nodes.json` ersetzt ein Verweis wie
@@ -51,6 +51,11 @@ gelesen oder verändert.
 Jeder Function-Node wird außerdem als eigenständige `.js`-Datei mit
 Node-RED-kompatiblen Metadatenzeilen gespeichert. Bestehende Dateien in
 `lib/functions/` werden dabei nicht überschrieben.
+
+Die sichtbaren Bibliotheksnamen enthalten keine Node-IDs oder Hashes. Kommt ein
+Function-Name innerhalb desselben Flows mehrfach vor, verwendet der Generator
+verständliche Suffixe wie `-2` und `-3`. Die unveränderliche Node-ID bleibt nur in
+der Metadatenzeile `// nodeId:` erhalten.
 
 ## Befehle
 

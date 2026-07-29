@@ -80,6 +80,16 @@ function walkFiles(directory) {
   return result.sort();
 }
 
+function removeEmptyDirectories(root) {
+  if (!fs.existsSync(root)) return;
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const directory = path.join(root, entry.name);
+    removeEmptyDirectories(directory);
+    if (fs.readdirSync(directory).length === 0) fs.rmdirSync(directory);
+  }
+}
+
 function sourceFieldsForNode(node) {
   const fields = [];
   if (node.type === "function") {
@@ -92,10 +102,14 @@ function sourceFieldsForNode(node) {
   return fields;
 }
 
-function sourceFileName(node, field, extension) {
-  const name = slugify(node.name || node.label || node.type);
+function clearFileName(node, field, extension, directory, counters) {
+  const name = slugify(node.name || node.label || node.type || "function");
   const suffix = field === "func" || field === "format" || field === "template" ? "" : `-${field}`;
-  return `${name}--${node.id}${suffix}.${extension}`;
+  const base = `${name}${suffix}`;
+  const counterKey = `${directory}/${base}.${extension}`;
+  const occurrence = (counters.get(counterKey) || 0) + 1;
+  counters.set(counterKey, occurrence);
+  return `${base}${occurrence > 1 ? `-${occurrence}` : ""}.${extension}`;
 }
 
 function workspaceNames(nodes) {
@@ -118,6 +132,20 @@ function workspaceFolders(nodes) {
   return folders;
 }
 
+function clearWorkspaceFolders(nodes) {
+  const names = workspaceNames(nodes);
+  const folders = new Map();
+  const counters = new Map();
+  for (const node of nodes) {
+    if (!node.z || folders.has(node.z)) continue;
+    const base = slugify(names.get(node.z) || "flow");
+    const occurrence = (counters.get(base) || 0) + 1;
+    counters.set(base, occurrence);
+    folders.set(node.z, `${base}${occurrence > 1 ? `-${occurrence}` : ""}`);
+  }
+  return folders;
+}
+
 function libraryHeader(node, flowName) {
   return [
     `// name: ${String(node.name || node.id).replace(/\r?\n/g, " ").trim()}`,
@@ -129,12 +157,15 @@ function libraryHeader(node, flowName) {
 
 export function createFunctionLibraryPlan(nodes) {
   const names = workspaceNames(nodes);
+  const folders = clearWorkspaceFolders(nodes);
+  const fileCounters = new Map();
   const library = new Map();
   for (const node of nodes) {
     if (node.type !== "function") continue;
     const flowName = names.get(node.z) || node.z || "Konfiguration";
-    const flowFolder = `${slugify(flowName)}--${node.z || "configuration"}`;
-    const relative = `${flowFolder}/${slugify(node.name || node.id)}--${node.id}.js`;
+    const flowFolder = folders.get(node.z) || "konfiguration";
+    const fileName = clearFileName(node, "func", "js", flowFolder, fileCounters);
+    const relative = `${flowFolder}/${fileName}`;
     library.set(relative, `${libraryHeader(node, flowName)}${node.func || ""}`);
   }
   return library;
@@ -145,6 +176,7 @@ export function createSourcePlan(nodes) {
   const groupedNodes = new Map();
   const sourceContents = new Map();
   const nodeFiles = {};
+  const sourceFileCounters = new Map();
 
   for (const original of nodes) {
     const groupFolder = original.z && folders.has(original.z) ? folders.get(original.z) : "configuration";
@@ -160,7 +192,14 @@ export function createSourcePlan(nodes) {
 
     for (const [key, value] of Object.entries(original)) {
       if (externalFields.has(key) && typeof value === "string") {
-        const sourcePath = `${sourceDirectory}/${sourceFileName(original, key, externalFields.get(key))}`;
+        const fileName = clearFileName(
+          original,
+          key,
+          externalFields.get(key),
+          sourceDirectory,
+          sourceFileCounters,
+        );
+        const sourcePath = `${sourceDirectory}/${fileName}`;
         sourceContents.set(sourcePath, value);
         exported[key] = { $flowSource: sourcePath };
       } else {
@@ -268,6 +307,7 @@ export function exportFlowSource({
     const stale = assertInside(sourceRoot, path.join(sourceRoot, relative));
     if (fs.existsSync(stale)) fs.unlinkSync(stale);
   }
+  removeEmptyDirectories(sourceRoot);
 
   writeFunctionLibrary({
     libraryRoot,
@@ -312,6 +352,7 @@ function writeFunctionLibrary({
     const stale = assertInside(libraryRoot, path.join(libraryRoot, relative));
     if (fs.existsSync(stale)) fs.unlinkSync(stale);
   }
+  removeEmptyDirectories(libraryRoot);
 }
 
 function resolveExternalSources(value, sourceRoot, usedSources) {

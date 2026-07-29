@@ -35,7 +35,7 @@
     "z": "8e0df9ea.dc6d98",
     "name": "LIGHT_WINDOW_UP_EAST",
     "func": {
-      "$flowSource": "flows/light-window-up-east--8e0df9ea.dc6d98/functions/light-window-up-east--d17830e4.5d856.js"
+      "$flowSource": "flows/light-window-up-east--8e0df9ea.dc6d98/functions/light-window-up-east.js"
     },
     "outputs": 1,
     "noerr": 0,

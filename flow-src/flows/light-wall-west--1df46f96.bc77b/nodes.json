@@ -35,7 +35,7 @@
     "z": "1df46f96.bc77b",
     "name": "LIGHT COMMAND WALL WEST",
     "func": {
-      "$flowSource": "flows/light-wall-west--1df46f96.bc77b/functions/light-command-wall-west--db8f3b2f.ceadb8.js"
+      "$flowSource": "flows/light-wall-west--1df46f96.bc77b/functions/light-command-wall-west.js"
     },
     "outputs": 1,
     "noerr": 0,

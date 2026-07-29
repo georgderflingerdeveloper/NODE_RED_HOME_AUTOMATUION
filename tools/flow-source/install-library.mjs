@@ -17,6 +17,16 @@ const activeRoot = process.env.NODE_RED_FUNCTION_LIBRARY
 const installManifestFile = path.join(activeRoot, ".homeautomation-ng-manifest.json");
 const sourceManifest = readManifest(DEFAULT_SOURCE_ROOT);
 
+function removeEmptyDirectories(root) {
+  if (!fs.existsSync(root)) return;
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const directory = path.join(root, entry.name);
+    removeEmptyDirectories(directory);
+    if (fs.readdirSync(directory).length === 0) fs.rmdirSync(directory);
+  }
+}
+
 if (!sourceManifest) throw new Error("flow-src/manifest.json fehlt.");
 const dirtySource = dirtyFunctionLibraryFiles(DEFAULT_FUNCTION_LIBRARY_ROOT, sourceManifest);
 if (dirtySource.length) {
@@ -68,6 +78,7 @@ for (const relative of Object.keys(sourceManifest.functionLibraryFiles || {})) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.copyFileSync(source, target);
 }
+removeEmptyDirectories(activeRoot);
 
 const installed = {
   project: "HOMEAUTOMATION_NG",

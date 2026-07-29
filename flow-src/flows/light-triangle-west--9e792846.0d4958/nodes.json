@@ -35,7 +35,7 @@
     "z": "9e792846.0d4958",
     "name": "LIGHT TRIANGLE WEST",
     "func": {
-      "$flowSource": "flows/light-triangle-west--9e792846.0d4958/functions/light-triangle-west--db3b4d8f.7e919.js"
+      "$flowSource": "flows/light-triangle-west--9e792846.0d4958/functions/light-triangle-west.js"
     },
     "outputs": 1,
     "noerr": 0,

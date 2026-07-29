@@ -35,7 +35,7 @@
     "z": "c08a9f29.c0364",
     "name": "LIGHT COMMAND TRIANGLE UP",
     "func": {
-      "$flowSource": "flows/light-triangle-up--c08a9f29.c0364/functions/light-command-triangle-up--8c5c28f0.07d728.js"
+      "$flowSource": "flows/light-triangle-up--c08a9f29.c0364/functions/light-command-triangle-up.js"
     },
     "outputs": 1,
     "noerr": 0,

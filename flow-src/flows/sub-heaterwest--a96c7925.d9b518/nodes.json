@@ -35,7 +35,7 @@
     "z": "a96c7925.d9b518",
     "name": "HEATER WEST COMMAND",
     "func": {
-      "$flowSource": "flows/sub-heaterwest--a96c7925.d9b518/functions/heater-west-command--2425aabe.c3d216.js"
+      "$flowSource": "flows/sub-heaterwest--a96c7925.d9b518/functions/heater-west-command.js"
     },
     "outputs": 1,
     "noerr": 0,

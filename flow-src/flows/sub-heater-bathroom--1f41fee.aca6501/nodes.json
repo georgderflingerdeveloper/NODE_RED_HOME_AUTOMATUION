@@ -35,7 +35,7 @@
     "z": "1f41fee.aca6501",
     "name": "HEATER BATH ",
     "func": {
-      "$flowSource": "flows/sub-heater-bathroom--1f41fee.aca6501/functions/heater-bath--3b3917c4.ca56a8.js"
+      "$flowSource": "flows/sub-heater-bathroom--1f41fee.aca6501/functions/heater-bath.js"
     },
     "outputs": 1,
     "noerr": 0,

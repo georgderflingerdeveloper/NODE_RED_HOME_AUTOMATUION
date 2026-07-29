@@ -35,7 +35,7 @@
     "z": "6246a200.ac18dc",
     "name": "LIGHT COMMAND GALLERY UP 11",
     "func": {
-      "$flowSource": "flows/light-gallery-up-11--6246a200.ac18dc/functions/light-command-gallery-up-11--5698937a.c33e4c.js"
+      "$flowSource": "flows/light-gallery-up-11--6246a200.ac18dc/functions/light-command-gallery-up-11.js"
     },
     "outputs": 1,
     "noerr": 0,

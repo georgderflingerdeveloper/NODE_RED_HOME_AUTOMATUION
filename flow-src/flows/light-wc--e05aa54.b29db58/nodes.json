@@ -35,7 +35,7 @@
     "z": "e05aa54.b29db58",
     "name": "LIGHT COMMAND WC ALL",
     "func": {
-      "$flowSource": "flows/light-wc--e05aa54.b29db58/functions/light-command-wc-all--2de0416d.3ababe.js"
+      "$flowSource": "flows/light-wc--e05aa54.b29db58/functions/light-command-wc-all.js"
     },
     "outputs": 1,
     "noerr": 0,

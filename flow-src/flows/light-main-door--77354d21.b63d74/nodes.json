@@ -35,7 +35,7 @@
     "z": "77354d21.b63d74",
     "name": "LIGHT COMMAND DOOR LIGHT",
     "func": {
-      "$flowSource": "flows/light-main-door--77354d21.b63d74/functions/light-command-door-light--e8dd3419.8cde48.js"
+      "$flowSource": "flows/light-main-door--77354d21.b63d74/functions/light-command-door-light.js"
     },
     "outputs": 1,
     "noerr": 0,

@@ -5,7 +5,7 @@
     "z": "27c430f0.58ebc",
     "name": "LIGHT COMMAND ALL LIGHTS WEST",
     "func": {
-      "$flowSource": "flows/flow-westside--27c430f0.58ebc/functions/light-command-all-lights-west--b461a748.541ac8.js"
+      "$flowSource": "flows/flow-westside--27c430f0.58ebc/functions/light-command-all-lights-west.js"
     },
     "outputs": 1,
     "noerr": 0,

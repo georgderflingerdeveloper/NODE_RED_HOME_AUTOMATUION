@@ -5,7 +5,7 @@
     "z": "32ef0b5e.c7e3c4",
     "name": "LIGHT COMMAND ",
     "func": {
-      "$flowSource": "flows/sub-cmd--32ef0b5e.c7e3c4/functions/light-command--5dbfb429.000f8c.js"
+      "$flowSource": "flows/sub-cmd--32ef0b5e.c7e3c4/functions/light-command.js"
     },
     "outputs": 1,
     "noerr": 0,

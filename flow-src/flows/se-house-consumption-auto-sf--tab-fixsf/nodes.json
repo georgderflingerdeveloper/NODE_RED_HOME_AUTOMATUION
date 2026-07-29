@@ -49,7 +49,7 @@
     "z": "tab-fixsf",
     "name": "Auto-SF + skalieren → HouseConsumptionWatt",
     "func": {
-      "$flowSource": "flows/se-house-consumption-auto-sf--tab-fixsf/functions/auto-sf-skalieren-houseconsumptionwatt--fn_autosf.js"
+      "$flowSource": "flows/se-house-consumption-auto-sf--tab-fixsf/functions/auto-sf-skalieren-houseconsumptionwatt.js"
     },
     "outputs": 1,
     "timeout": "",

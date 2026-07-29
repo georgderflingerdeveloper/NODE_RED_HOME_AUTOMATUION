@@ -37,7 +37,7 @@
     "z": "15e47868.0e5ea8",
     "name": "BOILER COMMAND",
     "func": {
-      "$flowSource": "flows/boiler--15e47868.0e5ea8/functions/boiler-command--583ee5d6.cac97c.js"
+      "$flowSource": "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js"
     },
     "outputs": 1,
     "timeout": "",

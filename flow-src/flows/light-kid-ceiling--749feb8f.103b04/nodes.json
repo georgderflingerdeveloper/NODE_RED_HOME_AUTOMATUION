@@ -5,7 +5,7 @@
     "z": "749feb8f.103b04",
     "name": "LIGHT COMMAND KID CEILING",
     "func": {
-      "$flowSource": "flows/light-kid-ceiling--749feb8f.103b04/functions/light-command-kid-ceiling--c3771cc1.4c77d.js"
+      "$flowSource": "flows/light-kid-ceiling--749feb8f.103b04/functions/light-command-kid-ceiling.js"
     },
     "outputs": 1,
     "noerr": 0,

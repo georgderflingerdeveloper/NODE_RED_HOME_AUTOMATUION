@@ -31,7 +31,7 @@
     "z": "fe7ff20.d2e8f1",
     "name": "",
     "func": {
-      "$flowSource": "flows/global--fe7ff20.d2e8f1/functions/function--659fa532.98cc7c.js"
+      "$flowSource": "flows/global--fe7ff20.d2e8f1/functions/function.js"
     },
     "outputs": 1,
     "noerr": 0,

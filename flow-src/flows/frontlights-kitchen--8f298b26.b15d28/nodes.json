@@ -5,7 +5,7 @@
     "z": "8f298b26.b15d28",
     "name": "FRONT LIGHT COMMAND",
     "func": {
-      "$flowSource": "flows/frontlights-kitchen--8f298b26.b15d28/functions/front-light-command--f72af37e.0c69a.js"
+      "$flowSource": "flows/frontlights-kitchen--8f298b26.b15d28/functions/front-light-command.js"
     },
     "outputs": 1,
     "noerr": 0,

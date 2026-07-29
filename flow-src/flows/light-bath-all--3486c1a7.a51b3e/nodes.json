@@ -35,7 +35,7 @@
     "z": "3486c1a7.a51b3e",
     "name": "LIGHT COMMAND BATHROOM ALL",
     "func": {
-      "$flowSource": "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all--8f311a56.6e0af8.js"
+      "$flowSource": "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js"
     },
     "outputs": 1,
     "noerr": 0,

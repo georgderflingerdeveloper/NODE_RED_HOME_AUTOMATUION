@@ -35,7 +35,7 @@
     "z": "f1f09036.8e6a5",
     "name": "LIGHT COMMAND GALLERY DOWN 4",
     "func": {
-      "$flowSource": "flows/light-gallery-down-4--f1f09036.8e6a5/functions/light-command-gallery-down-4--76dfd902.5d3618.js"
+      "$flowSource": "flows/light-gallery-down-4--f1f09036.8e6a5/functions/light-command-gallery-down-4.js"
     },
     "outputs": 1,
     "noerr": 0,

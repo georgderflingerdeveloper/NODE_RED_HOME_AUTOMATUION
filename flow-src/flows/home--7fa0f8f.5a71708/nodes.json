@@ -270,7 +270,7 @@
     "g": "c5095565.7f4e28",
     "name": "COMMAND ALL",
     "func": {
-      "$flowSource": "flows/home--7fa0f8f.5a71708/functions/command-all--65acd935.85f9b8.js"
+      "$flowSource": "flows/home--7fa0f8f.5a71708/functions/command-all.js"
     },
     "outputs": 1,
     "noerr": 0,
@@ -743,7 +743,7 @@
     "width": "0",
     "height": "0",
     "format": {
-      "$flowSource": "flows/home--7fa0f8f.5a71708/templates/clock-toolbar--22397ecd.9acf02.html"
+      "$flowSource": "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html"
     },
     "storeOutMessages": false,
     "fwdInMessages": false,

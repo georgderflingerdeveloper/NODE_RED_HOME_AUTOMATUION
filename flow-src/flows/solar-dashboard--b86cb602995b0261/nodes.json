@@ -27,7 +27,7 @@
     "width": 0,
     "height": 1,
     "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solarleistung--8ed0b94af7bbae46.html"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solarleistung.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": true,
@@ -50,7 +50,7 @@
     "width": 0,
     "height": 1,
     "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung--88d6339b4262d430.html"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": true,
@@ -195,7 +195,7 @@
     "z": "b86cb602995b0261",
     "name": "GetExcessPower",
     "func": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower--d22dd481e7e81932.js"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower.js"
     },
     "outputs": 1,
     "timeout": 0,
@@ -238,7 +238,7 @@
     "width": 0,
     "height": 1,
     "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaruberschuss--6c37f6f0e2cec1b6.html"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaruberschuss.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": true,
@@ -257,7 +257,7 @@
     "z": "b86cb602995b0261",
     "name": "MAKE_EXCESSPOWER_TO_PAYLOAD",
     "func": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload--e93f57326a18d2d1.js"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload.js"
     },
     "outputs": 1,
     "timeout": 0,
@@ -301,7 +301,7 @@
     "width": 0,
     "height": 1,
     "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug--ui_grid_import.html"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": true,
@@ -351,7 +351,7 @@
     "width": 0,
     "height": 0,
     "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus--se_status_dashboard.html"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": true,
@@ -374,7 +374,7 @@
     "width": 0,
     "height": 1,
     "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung--se_control_buttons.html"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html"
     },
     "storeOutMessages": false,
     "fwdInMessages": false,
@@ -395,7 +395,7 @@
     "z": "b86cb602995b0261",
     "name": "Reconnect / Serverneustart absichern",
     "func": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern--se_control_router.js"
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern.js"
     },
     "outputs": 2,
     "timeout": 0,

@@ -5,7 +5,7 @@
     "z": "658af8e2.d21c88",
     "name": "LIGHT COMMAND ANTEROOM MIDDLE",
     "func": {
-      "$flowSource": "flows/sub-light-anteroom-middle--658af8e2.d21c88/functions/light-command-anteroom-middle--4480e402.3d37fc.js"
+      "$flowSource": "flows/sub-light-anteroom-middle--658af8e2.d21c88/functions/light-command-anteroom-middle.js"
     },
     "outputs": 1,
     "noerr": 0,

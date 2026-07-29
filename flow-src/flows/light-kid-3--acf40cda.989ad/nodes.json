@@ -5,7 +5,7 @@
     "z": "acf40cda.989ad",
     "name": "LIGHT COMMAND KID 3",
     "func": {
-      "$flowSource": "flows/light-kid-3--acf40cda.989ad/functions/light-command-kid-3--62ec3391.b3b57c.js"
+      "$flowSource": "flows/light-kid-3--acf40cda.989ad/functions/light-command-kid-3.js"
     },
     "outputs": 1,
     "noerr": 0,

@@ -35,7 +35,7 @@
     "z": "58c186d2.cc7718",
     "name": "LIGHT DOOR ENTRY LEFT",
     "func": {
-      "$flowSource": "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left--7d276b21.d1de14.js"
+      "$flowSource": "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left.js"
     },
     "outputs": 1,
     "noerr": 0,

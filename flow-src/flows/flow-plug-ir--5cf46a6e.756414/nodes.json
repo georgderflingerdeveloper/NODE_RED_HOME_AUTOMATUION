@@ -37,7 +37,7 @@
     "z": "5cf46a6e.756414",
     "name": "PLUG-IR",
     "func": {
-      "$flowSource": "flows/flow-plug-ir--5cf46a6e.756414/functions/plug-ir--f968c49c.09d3b8.js"
+      "$flowSource": "flows/flow-plug-ir--5cf46a6e.756414/functions/plug-ir.js"
     },
     "outputs": 1,
     "noerr": 0,

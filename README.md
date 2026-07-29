@@ -110,6 +110,11 @@ Damit erscheinen sie im Function-Node unter **Bibliothek → Importieren**. Die 
 vorhandenen persönlichen Dateien direkt unter `~/.node-red/lib/functions/` werden
 nicht verändert.
 
+Ordner und JavaScript-Dateien verwenden ausschließlich verständliche Namen, zum
+Beispiel `wetter/wetterdaten-prufen-und-payload-aufbauen.js`. Bei identischen
+Function-Namen im selben Flow wird stabil mit `-2`, `-3` usw. unterschieden.
+Technische Node-IDs stehen nur in den unsichtbaren Metadaten zur sicheren Zuordnung.
+
 Nur die Bibliothek synchronisieren:
 
 ```bash

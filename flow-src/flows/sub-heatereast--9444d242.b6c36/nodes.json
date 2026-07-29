@@ -35,7 +35,7 @@
     "z": "9444d242.b6c36",
     "name": "HEATER EAST COMMAND",
     "func": {
-      "$flowSource": "flows/sub-heatereast--9444d242.b6c36/functions/heater-east-command--a7144b0b.29a108.js"
+      "$flowSource": "flows/sub-heatereast--9444d242.b6c36/functions/heater-east-command.js"
     },
     "outputs": 1,
     "noerr": 0,

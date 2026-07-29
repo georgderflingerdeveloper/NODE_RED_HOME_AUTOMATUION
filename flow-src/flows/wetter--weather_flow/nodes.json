@@ -44,7 +44,7 @@
     "z": "weather_flow",
     "name": "WETTER KONFIGURATION · Reindlmühl",
     "func": {
-      "$flowSource": "flows/wetter--weather_flow/functions/wetter-konfiguration-reindlmuhl--weather_build_request.js"
+      "$flowSource": "flows/wetter--weather_flow/functions/wetter-konfiguration-reindlmuhl.js"
     },
     "outputs": 1,
     "timeout": 0,
@@ -90,7 +90,7 @@
     "z": "weather_flow",
     "name": "Wetterdaten prüfen und Payload aufbauen",
     "func": {
-      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen--weather_parse.js"
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js"
     },
     "outputs": 2,
     "timeout": 0,
@@ -133,7 +133,7 @@
     "z": "weather_flow",
     "name": "SICHERER AUSFALL · Wetterwerte auf 0",
     "func": {
-      "$flowSource": "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0--weather_fallback.js"
+      "$flowSource": "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js"
     },
     "outputs": 1,
     "timeout": 0,
@@ -155,7 +155,7 @@
     "z": "weather_flow",
     "name": "Wetterdaten veröffentlichen",
     "func": {
-      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen--weather_publish.js"
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js"
     },
     "outputs": 1,
     "timeout": 0,
@@ -211,7 +211,7 @@
     "width": "0",
     "height": 9,
     "format": {
-      "$flowSource": "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel--weather_ui_overview_table.html"
+      "$flowSource": "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": true,
@@ -244,7 +244,7 @@
     "z": "weather_flow",
     "name": "Wetterübersicht nach Verbindung aktualisieren",
     "func": {
-      "$flowSource": "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren--weather_dashboard_refresh.js"
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren.js"
     },
     "outputs": 1,
     "timeout": 0,

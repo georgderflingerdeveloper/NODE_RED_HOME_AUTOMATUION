@@ -35,7 +35,7 @@
     "z": "732a823b.6349dc",
     "name": "LIGHT COMMAND ANTEROOM GALLERY UP",
     "func": {
-      "$flowSource": "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up--f4f718ca.73ad78.js"
+      "$flowSource": "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js"
     },
     "outputs": 1,
     "noerr": 0,

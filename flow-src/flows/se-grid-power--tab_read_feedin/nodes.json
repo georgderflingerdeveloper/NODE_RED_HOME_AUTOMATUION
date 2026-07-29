@@ -37,7 +37,7 @@
     "z": "tab_read_feedin",
     "name": "Netzleistung aufteilen · Import / Einspeisung",
     "func": {
-      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung--calc_feedin.js"
+      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung.js"
     },
     "outputs": 2,
     "timeout": "",
@@ -134,7 +134,7 @@
     "z": "tab_read_feedin",
     "name": "SolarEdge Meter OFFLINE · sichere Nullwerte",
     "func": {
-      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/solaredge-meter-offline-sichere-nullwerte--se_grid_offline_handler.js"
+      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/solaredge-meter-offline-sichere-nullwerte.js"
     },
     "outputs": 4,
     "timeout": 0,

@@ -35,7 +35,7 @@
     "z": "71195148.90b36",
     "name": "LIGHT COMMAND GALLERY DOWN 2",
     "func": {
-      "$flowSource": "flows/light-gallery-down-2--71195148.90b36/functions/light-command-gallery-down-2--92d9bb85.832db8.js"
+      "$flowSource": "flows/light-gallery-down-2--71195148.90b36/functions/light-command-gallery-down-2.js"
     },
     "outputs": 1,
     "noerr": 0,

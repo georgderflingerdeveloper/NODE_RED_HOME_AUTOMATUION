@@ -35,7 +35,7 @@
     "z": "24a391fc.9c0f9e",
     "name": "LIGHT_ COMMAND_GALLERY_UP",
     "func": {
-      "$flowSource": "flows/light-gallery-up--24a391fc.9c0f9e/functions/light-command-gallery-up--919e20c8.c749a.js"
+      "$flowSource": "flows/light-gallery-up--24a391fc.9c0f9e/functions/light-command-gallery-up.js"
     },
     "outputs": 1,
     "noerr": 0,

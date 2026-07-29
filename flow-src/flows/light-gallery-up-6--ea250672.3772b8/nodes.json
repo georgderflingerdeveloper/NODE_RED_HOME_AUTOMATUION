@@ -35,7 +35,7 @@
     "z": "ea250672.3772b8",
     "name": "LIGHT COMMAND GALLERY UP 6",
     "func": {
-      "$flowSource": "flows/light-gallery-up-6--ea250672.3772b8/functions/light-command-gallery-up-6--c617dc83.01e63.js"
+      "$flowSource": "flows/light-gallery-up-6--ea250672.3772b8/functions/light-command-gallery-up-6.js"
     },
     "outputs": 1,
     "noerr": 0,

@@ -5,7 +5,7 @@
     "z": "e1423e4a.93e71",
     "name": "LIGHT COMMAND WINDOW LEDGE WEST",
     "func": {
-      "$flowSource": "flows/light-window-ledge-west--e1423e4a.93e71/functions/light-command-window-ledge-west--bcb0c415.ab2f18.js"
+      "$flowSource": "flows/light-window-ledge-west--e1423e4a.93e71/functions/light-command-window-ledge-west.js"
     },
     "outputs": 1,
     "noerr": 0,

@@ -54,7 +54,7 @@
     "z": "1a1a1a1a1a1a1a1a",
     "name": "Decode ASCII 'SunS'",
     "func": {
-      "$flowSource": "flows/read-sunspec-id--1a1a1a1a1a1a1a1a/functions/decode-ascii-suns--ce5d4697c4a4a6b5.js"
+      "$flowSource": "flows/read-sunspec-id--1a1a1a1a1a1a1a1a/functions/decode-ascii-suns.js"
     },
     "outputs": 1,
     "noerr": 0,

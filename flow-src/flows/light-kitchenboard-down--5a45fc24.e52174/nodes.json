@@ -5,7 +5,7 @@
     "z": "5a45fc24.e52174",
     "name": "LIGHT COMMAND KITCHEN BOARD DOWN",
     "func": {
-      "$flowSource": "flows/light-kitchenboard-down--5a45fc24.e52174/functions/light-command-kitchen-board-down--ced3e08.3efb02.js"
+      "$flowSource": "flows/light-kitchenboard-down--5a45fc24.e52174/functions/light-command-kitchen-board-down.js"
     },
     "outputs": 1,
     "noerr": 0,
