@@ -1,0 +1,7 @@
+[
+  {
+    "key": "cmd+alt+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Tests: JavaScript Unit Tests"
+  }
+]
