@@ -7511,8 +7511,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 670,
-        "y": 380,
+        "x": 710,
+        "y": 640,
         "wires": []
     },
     {
@@ -7584,8 +7584,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 400,
+        "x": 370,
+        "y": 660,
         "wires": [
             [
                 "6daa8027d6a447e1"
@@ -7603,8 +7603,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 90,
-        "y": 400,
+        "x": 130,
+        "y": 660,
         "wires": [
             [
                 "b16c65d737f41486"
@@ -7623,8 +7623,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 440,
+        "x": 370,
+        "y": 700,
         "wires": [
             [
                 "d0344a70fcecb32c"
@@ -7648,8 +7648,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 90,
-        "y": 440,
+        "x": 130,
+        "y": 700,
         "wires": [
             [
                 "a76994740dc9a8d9"
@@ -7669,8 +7669,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 670,
-        "y": 440,
+        "x": 710,
+        "y": 700,
         "wires": []
     },
     {
@@ -7703,8 +7703,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 300,
+        "x": 560,
+        "y": 380,
         "wires": [
             [
                 "5a499b5d44485fa5"
@@ -7729,8 +7729,8 @@
         "links": [
             "34ed305c9274a3c8"
         ],
-        "x": 875,
-        "y": 240,
+        "x": 1075,
+        "y": 140,
         "wires": []
     },
     {
@@ -7742,8 +7742,8 @@
         "links": [
             "link_grid_import_in"
         ],
-        "x": 875,
-        "y": 280,
+        "x": 1085,
+        "y": 500,
         "wires": []
     },
     {
@@ -7755,8 +7755,8 @@
         "links": [
             "se_status_dashboard_in"
         ],
-        "x": 855,
-        "y": 320,
+        "x": 1095,
+        "y": 360,
         "wires": []
     },
     {
@@ -7769,8 +7769,8 @@
             "read_power_sf"
         ],
         "uncaught": false,
-        "x": 230,
-        "y": 260,
+        "x": 190,
+        "y": 380,
         "wires": [
             [
                 "se_pv_offline_handler"
@@ -7799,7 +7799,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 210,
-        "y": 380,
+        "y": 500,
         "wires": [
             [
                 "se_connection_watchdog"
@@ -7818,8 +7818,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 380,
+        "x": 520,
+        "y": 500,
         "wires": [
             [
                 "5a499b5d44485fa5"
@@ -7833,6 +7833,40 @@
             [
                 "se_status_out"
             ],
+            [
+                "se_modbus_reconnector"
+            ]
+        ]
+    },
+    {
+        "id": "se_modbus_reconnector",
+        "type": "modbus-flex-connector",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge Modbus · Verbindung neu aufbauen",
+        "maxReconnectsPerMinute": 4,
+        "emptyQueue": true,
+        "showStatusActivities": true,
+        "showErrors": true,
+        "server": "befceeb9cba11998",
+        "emptyMsgOnFail": false,
+        "configMsgOnChange": false,
+        "x": 1180,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "se_manual_modbus_link_in",
+        "type": "link in",
+        "z": "79160448dc533f1d",
+        "name": "SolarEdge manueller Reconnect IN",
+        "links": [
+            "se_manual_modbus_link_out"
+        ],
+        "x": 815,
+        "y": 820,
+        "wires": [
             [
                 "se_modbus_reconnector"
             ]
@@ -7861,38 +7895,42 @@
         "type": "ui_template",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
+        "name": "Solarleistung",
         "order": 2,
         "width": 0,
         "height": 1,
-        "name": "Solarleistung",
         "format": "<div class=\"se-power-row se-power-solar\" ng-class=\"{'is-active': (msg.payload * 1) > 0}\">\n  <span class=\"se-power-label\">Aktuelle Solarleistung [W]</span>\n  <span class=\"se-power-value\">{{msg.payload === undefined ? 0 : msg.payload}}</span>\n</div>",
-        "className": "",
-        "x": 520,
-        "y": 100,
-        "wires": [],
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
-        "templateScope": "local"
+        "templateScope": "local",
+        "className": "",
+        "x": 520,
+        "y": 100,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "88d6339b4262d430",
         "type": "ui_template",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
+        "name": "Netzeinspeisung",
         "order": 4,
         "width": 0,
         "height": 1,
-        "name": "Netzeinspeisung",
         "format": "<div class=\"se-power-row se-power-feed\" ng-class=\"{'is-active': (msg.payload * 1) > 0}\">\n  <span class=\"se-power-label\">Einspeisung ins Stromnetz [W]</span>\n  <span class=\"se-power-value\">{{msg.payload === undefined ? 0 : msg.payload}}</span>\n</div>",
-        "className": "",
-        "x": 520,
-        "y": 220,
-        "wires": [],
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
-        "templateScope": "local"
+        "templateScope": "local",
+        "className": "",
+        "x": 520,
+        "y": 220,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "34ed305c9274a3c8",
@@ -7933,8 +7971,8 @@
         "reduceInit": "",
         "reduceInitType": "",
         "reduceFixup": "",
-        "x": 520,
-        "y": 280,
+        "x": 660,
+        "y": 500,
         "wires": [
             [
                 "d22dd481e7e81932"
@@ -7954,8 +7992,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 390,
-        "y": 400,
+        "x": 430,
+        "y": 620,
         "wires": []
     },
     {
@@ -7977,8 +8015,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 280,
-        "y": 240,
+        "x": 500,
+        "y": 280,
         "wires": [
             [
                 "join-pv-grid"
@@ -8011,8 +8049,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 280,
-        "y": 300,
+        "x": 340,
+        "y": 540,
         "wires": [
             [
                 "join-pv-grid",
@@ -8032,8 +8070,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 610,
-        "y": 400,
+        "x": 650,
+        "y": 620,
         "wires": [
             [
                 "e93f57326a18d2d1"
@@ -8053,8 +8091,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 780,
-        "y": 480,
+        "x": 820,
+        "y": 700,
         "wires": []
     },
     {
@@ -8062,19 +8100,21 @@
         "type": "ui_template",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
+        "name": "Solarüberschuss",
         "order": 5,
         "width": 0,
         "height": 1,
-        "name": "Solarüberschuss",
         "format": "<div class=\"se-power-row se-power-excess\" ng-class=\"{'is-active': (msg.payload * 1) > 0}\">\n  <span class=\"se-power-label\">Verfügbarer Solarüberschuss [W]</span>\n  <span class=\"se-power-value\">{{msg.payload === undefined ? 0 : msg.payload}}</span>\n</div>",
-        "className": "",
-        "x": 510,
-        "y": 560,
-        "wires": [],
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
-        "templateScope": "local"
+        "templateScope": "local",
+        "className": "",
+        "x": 810,
+        "y": 760,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "e93f57326a18d2d1",
@@ -8088,8 +8128,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 460,
-        "y": 480,
+        "x": 500,
+        "y": 700,
         "wires": [
             [
                 "361eb71ca0080e07",
@@ -8119,19 +8159,21 @@
         "type": "ui_template",
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
+        "name": "Netzbezug",
         "order": 3,
         "width": 0,
         "height": 1,
-        "name": "Netzbezug",
         "format": "<div class=\"se-power-row se-power-import\" ng-class=\"{'is-active': (msg.payload * 1) > 0}\">\n  <span class=\"se-power-label\">Netzbezug ins Haus [W]</span>\n  <span class=\"se-power-value\">{{msg.payload === undefined ? 0 : msg.payload}}</span>\n</div>",
-        "className": "",
-        "x": 520,
-        "y": 160,
-        "wires": [],
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
-        "templateScope": "local"
+        "templateScope": "local",
+        "className": "",
+        "x": 520,
+        "y": 160,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "comment_dashboard_power",
@@ -8178,6 +8220,85 @@
         "x": 500,
         "y": 40,
         "wires": [
+            []
+        ]
+    },
+    {
+        "id": "se_control_buttons",
+        "type": "ui_template",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "name": "SolarEdge und Node-RED Steuerung",
+        "order": 6,
+        "width": 0,
+        "height": 1,
+        "format": "<style>\n.se-control-row{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}\n.se-control-button{border:0;border-radius:6px;padding:9px 13px;font-weight:600;cursor:pointer}\n.se-control-reconnect{background:#1565c0;color:white}\n.se-control-restart{background:#b71c1c;color:white}\n</style>\n<div class=\"se-control-row\">\n  <button class=\"se-control-button se-control-reconnect\" ng-click=\"reconnectSolarEdge()\">↻ SOLAREDGE NEU VERBINDEN</button>\n  <button class=\"se-control-button se-control-restart\" ng-click=\"restartNodeRed()\">⏻ NODE-RED SERVER NEU STARTEN</button>\n</div>\n<script>\n(function(scope) {\n  scope.reconnectSolarEdge = function() {\n    scope.send({topic:\"modbus-reconnect\", payload:true});\n  };\n  scope.restartNodeRed = function() {\n    if (window.confirm(\"Node-RED wirklich neu starten? Alle Automations-Flows sind kurzzeitig unterbrochen.\")) {\n      scope.send({topic:\"node-red-restart\", payload:true});\n    }\n  };\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 490,
+        "y": 840,
+        "wires": [
+            [
+                "se_control_router"
+            ]
+        ]
+    },
+    {
+        "id": "se_control_router",
+        "type": "function",
+        "z": "b86cb602995b0261",
+        "name": "Reconnect / Serverneustart absichern",
+        "func": "if (msg.topic === \"modbus-reconnect\") {\n    return [{\n        topic:\"SolarEdgeModbusReconnectManual\",\n        payload:{\n            connectorType:\"TCP\",\n            tcpHost:\"192.168.0.128\",\n            tcpPort:\"502\",\n            tcpType:\"DEFAULT\",\n            unitId:1,\n            commandDelay:1,\n            clientTimeout:1000,\n            reconnectTimeout:2000\n        }\n    }, null];\n}\nif (msg.topic === \"node-red-restart\" && msg.payload === true) {\n    return [null, msg];\n}\nreturn [null, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 940,
+        "wires": [
+            [
+                "se_manual_modbus_link_out"
+            ],
+            [
+                "se_node_red_restart_exec"
+            ]
+        ]
+    },
+    {
+        "id": "se_manual_modbus_link_out",
+        "type": "link out",
+        "z": "b86cb602995b0261",
+        "name": "SolarEdge manueller Reconnect OUT",
+        "mode": "link",
+        "links": [
+            "se_manual_modbus_link_in"
+        ],
+        "x": 1015,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "se_node_red_restart_exec",
+        "type": "exec",
+        "z": "b86cb602995b0261",
+        "command": "/bin/launchctl kickstart -k gui/503/com.georg.node-red",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "10",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Node-RED über launchd neu starten",
+        "x": 1150,
+        "y": 980,
+        "wires": [
+            [],
+            [],
             []
         ]
     },
@@ -8698,119 +8819,6 @@
         "x": 1410,
         "y": 460,
         "wires": [
-            []
-        ]
-    },
-    {
-        "id": "se_modbus_reconnector",
-        "type": "modbus-flex-connector",
-        "z": "79160448dc533f1d",
-        "name": "SolarEdge Modbus · Verbindung neu aufbauen",
-        "maxReconnectsPerMinute": 4,
-        "emptyQueue": true,
-        "showStatusActivities": true,
-        "showErrors": true,
-        "server": "befceeb9cba11998",
-        "emptyMsgOnFail": false,
-        "configMsgOnChange": false,
-        "x": 830,
-        "y": 400,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "se_control_buttons",
-        "type": "ui_template",
-        "z": "b86cb602995b0261",
-        "group": "24a6bcc7d3d966ac",
-        "name": "SolarEdge und Node-RED Steuerung",
-        "order": 6,
-        "width": 0,
-        "height": 1,
-        "format": "<style>\n.se-control-row{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}\n.se-control-button{border:0;border-radius:6px;padding:9px 13px;font-weight:600;cursor:pointer}\n.se-control-reconnect{background:#1565c0;color:white}\n.se-control-restart{background:#b71c1c;color:white}\n</style>\n<div class=\"se-control-row\">\n  <button class=\"se-control-button se-control-reconnect\" ng-click=\"reconnectSolarEdge()\">↻ SOLAREDGE NEU VERBINDEN</button>\n  <button class=\"se-control-button se-control-restart\" ng-click=\"restartNodeRed()\">⏻ NODE-RED SERVER NEU STARTEN</button>\n</div>\n<script>\n(function(scope) {\n  scope.reconnectSolarEdge = function() {\n    scope.send({topic:\"modbus-reconnect\", payload:true});\n  };\n  scope.restartNodeRed = function() {\n    if (window.confirm(\"Node-RED wirklich neu starten? Alle Automations-Flows sind kurzzeitig unterbrochen.\")) {\n      scope.send({topic:\"node-red-restart\", payload:true});\n    }\n  };\n})(scope);\n</script>",
-        "storeOutMessages": false,
-        "fwdInMessages": false,
-        "resendOnRefresh": false,
-        "templateScope": "local",
-        "className": "",
-        "x": 450,
-        "y": 620,
-        "wires": [
-            [
-                "se_control_router"
-            ]
-        ]
-    },
-    {
-        "id": "se_control_router",
-        "type": "function",
-        "z": "b86cb602995b0261",
-        "name": "Reconnect / Serverneustart absichern",
-        "func": "if (msg.topic === \"modbus-reconnect\") {\n    return [{\n        topic:\"SolarEdgeModbusReconnectManual\",\n        payload:{\n            connectorType:\"TCP\",\n            tcpHost:\"192.168.0.128\",\n            tcpPort:\"502\",\n            tcpType:\"DEFAULT\",\n            unitId:1,\n            commandDelay:1,\n            clientTimeout:1000,\n            reconnectTimeout:2000\n        }\n    }, null];\n}\nif (msg.topic === \"node-red-restart\" && msg.payload === true) {\n    return [null, msg];\n}\nreturn [null, null];",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 720,
-        "y": 620,
-        "wires": [
-            [
-                "se_manual_modbus_link_out"
-            ],
-            [
-                "se_node_red_restart_exec"
-            ]
-        ]
-    },
-    {
-        "id": "se_manual_modbus_link_out",
-        "type": "link out",
-        "z": "b86cb602995b0261",
-        "name": "SolarEdge manueller Reconnect OUT",
-        "mode": "link",
-        "links": [
-            "se_manual_modbus_link_in"
-        ],
-        "x": 975,
-        "y": 600,
-        "wires": []
-    },
-    {
-        "id": "se_manual_modbus_link_in",
-        "type": "link in",
-        "z": "79160448dc533f1d",
-        "name": "SolarEdge manueller Reconnect IN",
-        "links": [
-            "se_manual_modbus_link_out"
-        ],
-        "x": 625,
-        "y": 440,
-        "wires": [
-            [
-                "se_modbus_reconnector"
-            ]
-        ]
-    },
-    {
-        "id": "se_node_red_restart_exec",
-        "type": "exec",
-        "z": "b86cb602995b0261",
-        "command": "/bin/launchctl kickstart -k gui/503/com.georg.node-red",
-        "addpay": false,
-        "append": "",
-        "useSpawn": "false",
-        "timer": "10",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Node-RED über launchd neu starten",
-        "x": 1010,
-        "y": 660,
-        "wires": [
-            [],
-            [],
             []
         ]
     },
