@@ -8688,7 +8688,7 @@
         "name": "Wettertabelle & Sonnenampel",
         "order": 1,
         "width": "0",
-        "height": "0",
+        "height": 9,
         "format": "<style>\n  .weather-card {\n    font-family: Roboto, Arial, sans-serif;\n    color: #263238;\n    padding: 4px 2px 10px\n  }\n\n  .weather-head {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    margin-bottom: 14px;\n    padding: 14px 16px;\n    border-radius: 12px;\n    background: linear-gradient(135deg, #f7fafc, #edf2f7)\n  }\n\n  .weather-light {\n    width: 54px;\n    height: 54px;\n    border-radius: 50%;\n    flex: 0 0 54px;\n    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .65), 0 3px 10px rgba(0, 0, 0, .18)\n  }\n\n  .weather-light.sun {\n    background: #facc15\n  }\n\n  .weather-light.low {\n    background: #94a3b8\n  }\n\n  .weather-title {\n    font-size: 20px;\n    font-weight: 700;\n    line-height: 1.15\n  }\n\n  .weather-status {\n    margin-top: 4px;\n    color: #546e7a\n  }\n\n  .weather-kpis {\n    display: grid;\n    grid-template-columns: repeat(4, minmax(90px, 1fr));\n    gap: 8px;\n    margin-bottom: 14px\n  }\n\n  .weather-kpi {\n    padding: 10px;\n    border-radius: 9px;\n    background: #fff;\n    border: 1px solid #dfe7ec;\n    text-align: center\n  }\n\n  .weather-kpi b {\n    display: block;\n    font-size: 19px;\n    color: #263238\n  }\n\n  .weather-kpi span {\n    font-size: 11px;\n    color: #607d8b\n  }\n\n  .weather-table-wrap {\n    overflow-x: auto;\n    border: 1px solid #dfe7ec;\n    border-radius: 9px\n  }\n\n  .weather-table {\n    width: 100%;\n    border-collapse: collapse;\n    min-width: 560px;\n    background: #fff\n  }\n\n  .weather-table th {\n    padding: 9px 8px;\n    text-align: left;\n    background: #455a64;\n    color: #fff;\n    font-size: 12px\n  }\n\n  .weather-table td {\n    padding: 9px 8px;\n    border-top: 1px solid #e8eef2;\n    font-size: 13px\n  }\n\n  .weather-table tr:nth-child(even) td {\n    background: #f8fafb\n  }\n\n  .sun-cell {\n    font-weight: 700;\n    color: #9a7400\n  }\n\n  .weather-legend {\n    display: flex;\n    gap: 16px;\n    margin-top: 10px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .legend-dot {\n    display: inline-block;\n    width: 11px;\n    height: 11px;\n    border-radius: 50%;\n    margin-right: 5px\n  }\n\n  .legend-yellow {\n    background: #facc15\n  }\n\n  .legend-grey {\n    background: #94a3b8\n  }\n\n  .weather-suntimes {\n    margin-top: 5px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .weather-table tr.night-row td {\n    background: #eceff1;\n    color: #78909c\n  }\n\n  .night-label {\n    font-size: 10px;\n    margin-left: 5px;\n    color: #78909c\n  }\n\n  @media(max-width:600px) {\n    .weather-kpis {\n      grid-template-columns: repeat(2, 1fr)\n    }\n\n    .weather-title {\n      font-size: 17px\n    }\n  }\n</style>\n<div class=\"weather-card\">\n  <div class=\"weather-head\">\n    <div class=\"weather-light\" ng-class=\"msg.payload.SunPowerExpected ? 'sun' : 'low'\"></div>\n    <div>\n      <div class=\"weather-title\">Sonnenprognose Reindlmühl</div>\n      <div class=\"weather-status\">{{msg.payload.SunPowerExpected ? 'Sonnenstunden vorhanden' : 'Wenig bis keine Sonne\n        erwartet'}}</div>\n      <div class=\"weather-suntimes\">Sonnenaufgang {{msg.payload.SunriseToday.substring(11,16)}} · Sonnenuntergang\n        {{msg.payload.SunsetToday.substring(11,16)}}</div>\n    </div>\n  </div>\n  <div class=\"weather-kpis\">\n    <div class=\"weather-kpi\"><b>{{msg.payload.ActualSunshineLastHour}} %</b><span>Sonne letzte Stunde</span></div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.ExpectedPercentSunshineNextHour}} %</b><span>Sonne nächste Stunde</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.ExpectedPercentSunshineNext6Hours}} %</b><span>Ø nächste 6 Stunden</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.Current.TemperatureC | number:1}} °C</b><span>Aktuelle Temperatur</span>\n    </div>\n  </div>\n  <div class=\"weather-table-wrap\">\n    <table class=\"weather-table\">\n      <thead>\n        <tr>\n          <th>Zeit</th>\n          <th>Sonne</th>\n          <th>Temperatur</th>\n          <th>Wolken</th>\n          <th>Regenrisiko</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat=\"hour in msg.payload.ForecastNext6Hours track by $index\"\n          ng-class=\"{'night-row': !hour.IsDaylight}\">\n          <td>{{hour.TimeLabel}}<span class=\"night-label\" ng-if=\"!hour.IsDaylight\">Nacht</span></td>\n          <td class=\"sun-cell\">{{hour.SunshinePercent}} %</td>\n          <td>{{hour.TemperatureC | number:1}} °C</td>\n          <td>{{hour.CloudCoverPercent}} %</td>\n          <td>{{hour.PrecipitationProbabilityPercent}} %</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"weather-legend\">\n    <span><i class=\"legend-dot legend-yellow\"></i>Sonnenstunden vorhanden</span><span><i class=\"legend-dot legend-grey\"></i>wenig bis keine Sonne</span>\n  </div>\n</div>",
         "storeOutMessages": true,
         "fwdInMessages": true,
@@ -8812,6 +8812,40 @@
             [],
             [],
             []
+        ]
+    },
+    {
+        "id": "weather_dashboard_ui_control",
+        "type": "ui_ui_control",
+        "z": "weather_flow",
+        "name": "Dashboard-Verbindung überwachen",
+        "events": "all",
+        "x": 290,
+        "y": 400,
+        "wires": [
+            [
+                "weather_dashboard_refresh"
+            ]
+        ]
+    },
+    {
+        "id": "weather_dashboard_refresh",
+        "type": "function",
+        "z": "weather_flow",
+        "name": "Wetterübersicht nach Verbindung aktualisieren",
+        "func": "// Bei jeder neuen Dashboard-Verbindung den letzten vollständigen Wetterstand erneut senden.\n// msg.socketid bleibt erhalten, damit nur der neu verbundene Browser aktualisiert wird.\nif (msg.payload !== \"connect\" && !(msg.payload === \"change\" && msg.name === \"WETTER\")) {\n    return null;\n}\n\nconst weatherData = global.get(\"WeatherData\");\nif (!weatherData || !Array.isArray(weatherData.ForecastNext6Hours)) {\n    return null;\n}\n\nreturn {\n    topic: \"WeatherData\",\n    payload: weatherData,\n    socketid: msg.socketid,\n    dashboardRefresh: true\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 400,
+        "wires": [
+            [
+                "weather_ui_overview_table"
+            ]
         ]
     }
 ]
