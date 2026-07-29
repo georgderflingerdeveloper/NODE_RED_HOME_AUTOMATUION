@@ -1,0 +1,861 @@
+[
+  {
+    "id": "294b4b40.587a14",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "",
+    "style": {
+      "fill": "#ffbfbf",
+      "label": true
+    },
+    "nodes": [
+      "aeb3733c.98dd",
+      "e6986e20.446ed"
+    ],
+    "x": 2154,
+    "y": 39,
+    "w": 362,
+    "h": 82
+  },
+  {
+    "id": "72d4b200.765e6",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "SCENARIOCONTROL",
+    "style": {
+      "fill": "#ffffbf",
+      "label": true
+    },
+    "nodes": [
+      "4af67bd.b6c9e84",
+      "658ebf41.b879",
+      "42e30d78.045134",
+      "7b20a57f.06ad1c"
+    ],
+    "x": 1434,
+    "y": 379,
+    "w": 322,
+    "h": 202
+  },
+  {
+    "id": "a43b5fd0.86ab2",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "",
+    "style": {
+      "fill": "#d1d1d1",
+      "fill-opacity": "0.2",
+      "label": true
+    },
+    "nodes": [
+      "86c3cf93.eb9b",
+      "183696ab.96e4b9",
+      "6f154ce5.194d04",
+      "87280057.43332",
+      "c1487bb5.ec6388",
+      "4118db13.ed27a4",
+      "4875aa3e.f01994",
+      "880ac662.010978",
+      "84544b60.cc31d8",
+      "7aceb02d.3c6a8"
+    ],
+    "x": 2074,
+    "y": 619,
+    "w": 82,
+    "h": 442
+  },
+  {
+    "id": "e045aa73.92a308",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "",
+    "style": {
+      "fill": "#d1d1d1",
+      "fill-opacity": "0.2",
+      "label": true
+    },
+    "nodes": [
+      "66469f4f.823ff",
+      "234d0ad4.aa5936",
+      "a030b27e.8deae",
+      "419fc6fa.d20eb8",
+      "1f08d9ae.1ea606",
+      "2e6ea3e2.15e3bc",
+      "8902ca66.b29778"
+    ],
+    "x": 1274,
+    "y": 399,
+    "w": 82,
+    "h": 382
+  },
+  {
+    "id": "fc7cd29.614f63",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "",
+    "style": {
+      "fill": "#c8e7a7",
+      "label": true
+    },
+    "nodes": [
+      "34f4f74.85d2b08",
+      "b53402c9.abef1",
+      "6fc6b4bc.2db89c",
+      "528d8119.b5e69",
+      "2ef3deb7.89c4c2"
+    ],
+    "x": 1534,
+    "y": 59,
+    "w": 352,
+    "h": 282
+  },
+  {
+    "id": "d25553b5.e1268",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "",
+    "style": {
+      "fill": "#e3f3d3",
+      "label": true
+    },
+    "nodes": [
+      "46c0d0f8.ce014",
+      "f141cad7.25f818",
+      "7a79026c.f00c8c",
+      "71ee541a.3a062c"
+    ],
+    "x": 674,
+    "y": 119,
+    "w": 327,
+    "h": 382
+  },
+  {
+    "id": "c5095565.7f4e28",
+    "type": "group",
+    "z": "7fa0f8f.5a71708",
+    "name": "",
+    "style": {
+      "fill": "#e3f3d3",
+      "label": true
+    },
+    "nodes": [
+      "65acd935.85f9b8",
+      "d3afa9e1.b3b358"
+    ],
+    "x": 974,
+    "y": 699,
+    "w": 232,
+    "h": 242
+  },
+  {
+    "id": "aeb3733c.98dd",
+    "type": "catch",
+    "z": "7fa0f8f.5a71708",
+    "g": "294b4b40.587a14",
+    "name": "",
+    "scope": [
+      "46c0d0f8.ce014",
+      "d3afa9e1.b3b358",
+      "c06b7c90.f01f5",
+      "db8e698b.1cb928",
+      "43d49232.6f44ec",
+      "65acd935.85f9b8",
+      "66469f4f.823ff",
+      "1f9d4fc2.e1a9d",
+      "b34385ec.2753b8",
+      "2ef3deb7.89c4c2",
+      "e28b5401.036348",
+      "528d8119.b5e69",
+      "9e0ccec8.e35c6",
+      "5737bf6d.7d04a",
+      "e6f223c4.c9985",
+      "b94246db.6df208",
+      "503782ee.c533dc",
+      "6fc6b4bc.2db89c",
+      "cf07f1e5.e232e",
+      "53785039.61b07",
+      "acaaec64.f30f4",
+      "8ac35003.bac8d",
+      "b53402c9.abef1",
+      "32239554.bd7f4a",
+      "6de8f093.c6407",
+      "234d0ad4.aa5936",
+      "6f154ce5.194d04",
+      "a030b27e.8deae",
+      "87280057.43332",
+      "183696ab.96e4b9",
+      "86c3cf93.eb9b",
+      "db817ee0.d6c88",
+      "f141cad7.25f818",
+      "4af67bd.b6c9e84",
+      "f5547ea4.3e666",
+      "e6986e20.446ed",
+      "e7efa5e.6e36958",
+      "34f4f74.85d2b08"
+    ],
+    "uncaught": false,
+    "x": 2240,
+    "y": 80,
+    "wires": [
+      [
+        "e6986e20.446ed"
+      ]
+    ]
+  },
+  {
+    "id": "e6986e20.446ed",
+    "type": "ui_toast",
+    "z": "7fa0f8f.5a71708",
+    "g": "294b4b40.587a14",
+    "position": "top right",
+    "displayTime": "3",
+    "highlight": "",
+    "outputs": 0,
+    "ok": "OK",
+    "cancel": "",
+    "topic": "",
+    "name": "",
+    "x": 2400,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "46c0d0f8.ce014",
+    "type": "ui_switch",
+    "z": "7fa0f8f.5a71708",
+    "g": "d25553b5.e1268",
+    "name": "ALL LIGHTS",
+    "label": "ALLE LICHTER ",
+    "tooltip": "",
+    "group": "f082d23.5870f3",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 770,
+    "y": 320,
+    "wires": [
+      [
+        "65acd935.85f9b8",
+        "d3afa9e1.b3b358",
+        "34f4f74.85d2b08",
+        "6fc6b4bc.2db89c",
+        "528d8119.b5e69",
+        "2ef3deb7.89c4c2",
+        "234d0ad4.aa5936",
+        "a030b27e.8deae",
+        "7a79026c.f00c8c",
+        "1f08d9ae.1ea606",
+        "2e6ea3e2.15e3bc",
+        "8902ca66.b29778",
+        "71ee541a.3a062c"
+      ]
+    ]
+  },
+  {
+    "id": "65acd935.85f9b8",
+    "type": "function",
+    "z": "7fa0f8f.5a71708",
+    "g": "c5095565.7f4e28",
+    "name": "COMMAND ALL",
+    "func": {
+      "$flowSource": "flows/home--7fa0f8f.5a71708/functions/command-all--65acd935.85f9b8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 1100,
+    "y": 900,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "d3afa9e1.b3b358",
+    "type": "ui_switch",
+    "z": "7fa0f8f.5a71708",
+    "g": "c5095565.7f4e28",
+    "name": "ALL LIGHTS WEST",
+    "label": "ALLE LICHTER WESTEN",
+    "group": "848f3969.ede7f8",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 1090,
+    "y": 740,
+    "wires": [
+      [
+        "419fc6fa.d20eb8"
+      ]
+    ]
+  },
+  {
+    "id": "34f4f74.85d2b08",
+    "type": "ui_switch",
+    "z": "7fa0f8f.5a71708",
+    "g": "fc7cd29.614f63",
+    "name": "WINDOW LEDGE EAST AND WEST",
+    "label": "FENSTERBANK OSTEN UND WESTEN",
+    "group": "d8a967f.6ed2998",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 1710,
+    "y": 200,
+    "wires": [
+      [
+        "b53402c9.abef1"
+      ]
+    ]
+  },
+  {
+    "id": "f141cad7.25f818",
+    "type": "ui_button",
+    "z": "7fa0f8f.5a71708",
+    "g": "d25553b5.e1268",
+    "name": "RESET",
+    "group": "f082d23.5870f3",
+    "order": 8,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "ALLE LICHTER  AUS",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "",
+    "icon": "fa-2x fa-lightbulb-o",
+    "payload": "false",
+    "payloadType": "bool",
+    "topic": "",
+    "x": 760,
+    "y": 460,
+    "wires": [
+      [
+        "46c0d0f8.ce014",
+        "65acd935.85f9b8",
+        "34f4f74.85d2b08",
+        "d3afa9e1.b3b358",
+        "b53402c9.abef1",
+        "6fc6b4bc.2db89c",
+        "528d8119.b5e69",
+        "2ef3deb7.89c4c2",
+        "234d0ad4.aa5936",
+        "a030b27e.8deae",
+        "7a79026c.f00c8c",
+        "1f08d9ae.1ea606",
+        "2e6ea3e2.15e3bc",
+        "8902ca66.b29778"
+      ]
+    ]
+  },
+  {
+    "id": "b53402c9.abef1",
+    "type": "subflow:fd0015a.609c3e8",
+    "z": "7fa0f8f.5a71708",
+    "g": "fc7cd29.614f63",
+    "name": "LIGHT_WINDOW_LEDGE_EAST",
+    "x": 1700,
+    "y": 260,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "6fc6b4bc.2db89c",
+    "type": "subflow:2e8f2f3a.4b7f9",
+    "z": "7fa0f8f.5a71708",
+    "g": "fc7cd29.614f63",
+    "name": "LIGHT_OUTSIDE",
+    "x": 1650,
+    "y": 300,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "4af67bd.b6c9e84",
+    "type": "subflow:77dda60a.d7efe8",
+    "z": "7fa0f8f.5a71708",
+    "g": "72d4b200.765e6",
+    "name": "SCENARIOS",
+    "env": [],
+    "x": 1530,
+    "y": 500,
+    "wires": [
+      [
+        "b53402c9.abef1",
+        "7b20a57f.06ad1c"
+      ],
+      [
+        "658ebf41.b879",
+        "42e30d78.045134"
+      ]
+    ]
+  },
+  {
+    "id": "528d8119.b5e69",
+    "type": "subflow:3486c1a7.a51b3e",
+    "z": "7fa0f8f.5a71708",
+    "g": "fc7cd29.614f63",
+    "name": "",
+    "x": 1650,
+    "y": 160,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "2ef3deb7.89c4c2",
+    "type": "subflow:e05aa54.b29db58",
+    "z": "7fa0f8f.5a71708",
+    "g": "fc7cd29.614f63",
+    "name": "",
+    "env": [],
+    "x": 1630,
+    "y": 100,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "66469f4f.823ff",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "",
+    "links": [
+      "d2c402.64870c"
+    ],
+    "x": 1315,
+    "y": 480,
+    "wires": [
+      [
+        "234d0ad4.aa5936"
+      ]
+    ]
+  },
+  {
+    "id": "86c3cf93.eb9b",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_POWER_IN",
+    "links": [
+      "1be1736d.08c8ed"
+    ],
+    "x": 2115,
+    "y": 740,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "183696ab.96e4b9",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_HEATERS_IN",
+    "links": [
+      "529d6a10.414664"
+    ],
+    "x": 2115,
+    "y": 900,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "234d0ad4.aa5936",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "LINK_CONTROL_GALLERY_UP_OUT",
+    "links": [
+      "bb8b0123.c8baf"
+    ],
+    "x": 1315,
+    "y": 540,
+    "wires": []
+  },
+  {
+    "id": "6f154ce5.194d04",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_CONTROL_GALLERY_UP_TOSEND_IN",
+    "links": [
+      "a6da726f.2402a"
+    ],
+    "x": 2115,
+    "y": 820,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "a030b27e.8deae",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "LINK_CONTROL_TO_FLOWS_SOUTH_OUT",
+    "links": [
+      "935a3994.8e65b8"
+    ],
+    "x": 1315,
+    "y": 600,
+    "wires": []
+  },
+  {
+    "id": "87280057.43332",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_CONTROL_TOSEND_SOUTH_IN",
+    "links": [
+      "c7dc9b5.d390368"
+    ],
+    "x": 2115,
+    "y": 860,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "658ebf41.b879",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "72d4b200.765e6",
+    "name": "SCENARIO_TOFLOW_SOUTH_OUT",
+    "links": [
+      "aafe16d6.baf1b8"
+    ],
+    "x": 1715,
+    "y": 540,
+    "wires": []
+  },
+  {
+    "id": "7a79026c.f00c8c",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "d25553b5.e1268",
+    "name": "LINK_CONTROL_TO_FLOWS_ANTROOM_OUT",
+    "links": [
+      "cab34a8f.35c668"
+    ],
+    "x": 955,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "c1487bb5.ec6388",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_TO_SEND_ANTEROOM_IN",
+    "links": [
+      "d12deac3.fec6f8"
+    ],
+    "x": 2115,
+    "y": 780,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "42e30d78.045134",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "72d4b200.765e6",
+    "name": "SCENARIO_ADVENTURE",
+    "links": [
+      "8d7eff1b.47165"
+    ],
+    "x": 1715,
+    "y": 480,
+    "wires": []
+  },
+  {
+    "id": "4118db13.ed27a4",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_WETSIDE_IN",
+    "links": [
+      "85ffe774.57d6e8"
+    ],
+    "x": 2115,
+    "y": 940,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "419fc6fa.d20eb8",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "LINK_CONTROL_TO_WESTSIDE_OUT",
+    "links": [
+      "7d8ed4fd.6c780c"
+    ],
+    "x": 1315,
+    "y": 740,
+    "wires": []
+  },
+  {
+    "id": "7b20a57f.06ad1c",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "72d4b200.765e6",
+    "name": "SCENARIO_TO_FLOW_WESTSIDE",
+    "links": [
+      "5389fb5b.5a0244"
+    ],
+    "x": 1715,
+    "y": 420,
+    "wires": []
+  },
+  {
+    "id": "1f08d9ae.1ea606",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "LINK_TO_KITCHEN",
+    "links": [
+      "9ea353d9.0ebde"
+    ],
+    "x": 1315,
+    "y": 660,
+    "wires": []
+  },
+  {
+    "id": "4875aa3e.f01994",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_TO_SEND_KITCEN_IN",
+    "links": [
+      "48611f94.4d494"
+    ],
+    "x": 2115,
+    "y": 980,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "2e6ea3e2.15e3bc",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "LINK_TO_KID_ROOM_IN",
+    "links": [
+      "ba1c15b5.fe9038"
+    ],
+    "x": 1315,
+    "y": 700,
+    "wires": []
+  },
+  {
+    "id": "880ac662.010978",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_SEND_TO_KIDROOM_IN",
+    "links": [
+      "a56095e6.72c498"
+    ],
+    "x": 2115,
+    "y": 1020,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "22397ecd.9acf02",
+    "type": "ui_template",
+    "z": "7fa0f8f.5a71708",
+    "group": "f082d23.5870f3",
+    "name": "Clock Toolbar",
+    "order": 9,
+    "width": "0",
+    "height": "0",
+    "format": {
+      "$flowSource": "flows/home--7fa0f8f.5a71708/templates/clock-toolbar--22397ecd.9acf02.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "templateScope": "global",
+    "x": 1280,
+    "y": 40,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "8902ca66.b29778",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "e045aa73.92a308",
+    "name": "",
+    "links": [
+      "246b7513.745d1a"
+    ],
+    "x": 1315,
+    "y": 440,
+    "wires": []
+  },
+  {
+    "id": "84544b60.cc31d8",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_TO_SEND_GALLERY_DOWN_OUT",
+    "links": [
+      "9f75869f.9109f8"
+    ],
+    "x": 2115,
+    "y": 700,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "71ee541a.3a062c",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "g": "d25553b5.e1268",
+    "name": "LINK_TO_ALL_LIGHTS_OUT",
+    "links": [
+      "a56d14db.ae8e98"
+    ],
+    "x": 960,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "7aceb02d.3c6a8",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "g": "a43b5fd0.86ab2",
+    "name": "LINK_TOSEND_BOILER",
+    "links": [
+      "7df9b9dc.c4a298"
+    ],
+    "x": 2115,
+    "y": 660,
+    "wires": [
+      [
+        "67458fb3.fd5b5"
+      ]
+    ]
+  },
+  {
+    "id": "67458fb3.fd5b5",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "name": "TO_SENDER",
+    "links": [
+      "9dd3e2de.6f4df"
+    ],
+    "x": 2315,
+    "y": 420,
+    "wires": []
+  },
+  {
+    "id": "9dd3e2de.6f4df",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "name": "FORWARD_SENDER",
+    "links": [
+      "67458fb3.fd5b5"
+    ],
+    "x": 2395,
+    "y": 420,
+    "wires": [
+      [
+        "b5fdcfb9.05a01"
+      ]
+    ]
+  },
+  {
+    "id": "b5fdcfb9.05a01",
+    "type": "udp out",
+    "z": "7fa0f8f.5a71708",
+    "name": "SENDER",
+    "addr": "192.168.0.255",
+    "iface": "",
+    "port": "10000",
+    "ipv": "udp4",
+    "outport": "9700",
+    "base64": false,
+    "multicast": "broad",
+    "x": 2500,
+    "y": 420,
+    "wires": []
+  }
+]

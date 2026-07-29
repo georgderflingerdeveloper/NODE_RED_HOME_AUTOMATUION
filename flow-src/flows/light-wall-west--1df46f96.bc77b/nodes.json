@@ -1,0 +1,48 @@
+[
+  {
+    "id": "e96e682.5f9e098",
+    "type": "ui_switch",
+    "z": "1df46f96.bc77b",
+    "name": "WALL LIGHT WEST",
+    "label": "WANDLEUCHTE WESTEN",
+    "group": "848f3969.ede7f8",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2768.014331817627,
+    "y": 1342.8234837055206,
+    "wires": [
+      [
+        "db8f3b2f.ceadb8"
+      ]
+    ]
+  },
+  {
+    "id": "db8f3b2f.ceadb8",
+    "type": "function",
+    "z": "1df46f96.bc77b",
+    "name": "LIGHT COMMAND WALL WEST",
+    "func": {
+      "$flowSource": "flows/light-wall-west--1df46f96.bc77b/functions/light-command-wall-west--db8f3b2f.ceadb8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3143.014217376709,
+    "y": 1345.8236410617828,
+    "wires": [
+      []
+    ]
+  }
+]

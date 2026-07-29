@@ -1,0 +1,22 @@
+<style>
+.se-control-row{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}
+.se-control-button{border:0;border-radius:6px;padding:9px 13px;font-weight:600;cursor:pointer}
+.se-control-reconnect{background:#1565c0;color:white}
+.se-control-restart{background:#b71c1c;color:white}
+</style>
+<div class="se-control-row">
+  <button class="se-control-button se-control-reconnect" ng-click="reconnectSolarEdge()">↻ SOLAREDGE NEU VERBINDEN</button>
+  <button class="se-control-button se-control-restart" ng-click="restartNodeRed()">⏻ NODE-RED SERVER NEU STARTEN</button>
+</div>
+<script>
+(function(scope) {
+  scope.reconnectSolarEdge = function() {
+    scope.send({topic:"modbus-reconnect", payload:true});
+  };
+  scope.restartNodeRed = function() {
+    if (window.confirm("Node-RED wirklich neu starten? Alle Automations-Flows sind kurzzeitig unterbrochen.")) {
+      scope.send({topic:"node-red-restart", payload:true});
+    }
+  };
+})(scope);
+</script>

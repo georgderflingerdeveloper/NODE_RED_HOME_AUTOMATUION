@@ -1,0 +1,79 @@
+[
+  {
+    "id": "51fcd714.99f798",
+    "type": "group",
+    "z": "77c01f18.55ba",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "ebed91c4.eae14",
+      "7df9b9dc.c4a298",
+      "c6361c1b.c5f5c"
+    ],
+    "x": 254,
+    "y": 79,
+    "w": 562,
+    "h": 82
+  },
+  {
+    "id": "ebed91c4.eae14",
+    "type": "subflow:54f401c5.36b84",
+    "z": "77c01f18.55ba",
+    "g": "51fcd714.99f798",
+    "name": "SUB_BOILER",
+    "env": [],
+    "x": 620,
+    "y": 120,
+    "wires": [
+      [
+        "7df9b9dc.c4a298"
+      ]
+    ]
+  },
+  {
+    "id": "7df9b9dc.c4a298",
+    "type": "link out",
+    "z": "77c01f18.55ba",
+    "g": "51fcd714.99f798",
+    "name": "LINK_FROM_BOILER",
+    "links": [
+      "7aceb02d.3c6a8"
+    ],
+    "x": 775,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "c6361c1b.c5f5c",
+    "type": "inject",
+    "z": "77c01f18.55ba",
+    "g": "51fcd714.99f798",
+    "name": "PresetActivateTimer",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "0.2",
+    "topic": "",
+    "payload": "constants.ACTIVATE_BOILER_AUTO",
+    "payloadType": "global",
+    "x": 400,
+    "y": 120,
+    "wires": [
+      [
+        "ebed91c4.eae14"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+<style>
+.se-state{padding:10px 12px;border-radius:8px;margin-bottom:8px;font-family:Roboto,Arial,sans-serif}
+.se-state.online{background:#e8f5e9;border:1px solid #66bb6a;color:#1b5e20}
+.se-state.recovering{background:#fff8e1;border:1px solid #ffb300;color:#7a4f00}
+.se-state.offline{background:#ffebee;border:1px solid #ef5350;color:#b71c1c}
+.se-state-title{font-weight:700;font-size:16px}.se-state-reason{font-size:12px;margin-top:4px;overflow-wrap:anywhere}
+</style>
+<div class="se-state" data-updated-at="{{msg.payload.UpdatedAt}}" ng-class="msg.payload.State === 'RECOVERING' ? 'recovering' : (msg.payload.OfflineFlag ? 'offline' : 'online')">
+  <div class="se-state-title">SolarEdge · {{msg.payload.State === 'RECOVERING' ? 'VERBINDE' : (msg.payload.OfflineFlag ? 'OFFLINE' : 'ONLINE')}}</div>
+  <div class="se-state-reason" ng-if="msg.payload.OfflineReason">{{msg.payload.OfflineReason}}</div>
+  <div class="se-state-reason">Stand: {{msg.payload.UpdatedAt | date:'dd.MM.yyyy HH:mm:ss'}}</div>
+</div>

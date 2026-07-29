@@ -1,0 +1,133 @@
+[
+  {
+    "id": "6e130f3.368a6f",
+    "type": "group",
+    "z": "1f4c4ae3.09c2f5",
+    "name": "LIGHTCONTROL_ANTEROOM",
+    "style": {
+      "fill": "#ffefbf",
+      "label": true
+    },
+    "nodes": [
+      "12adb9bc.a841b6",
+      "bb065406.f04828",
+      "f74a32bd.cbcdc",
+      "cab34a8f.35c668",
+      "d12deac3.fec6f8",
+      "a56d14db.ae8e98",
+      "39b8623a.a0dfae"
+    ],
+    "x": 234,
+    "y": 79,
+    "w": 702,
+    "h": 302
+  },
+  {
+    "id": "12adb9bc.a841b6",
+    "type": "subflow:398e4654.d2a5ea",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "",
+    "x": 600,
+    "y": 120,
+    "wires": [
+      [
+        "d12deac3.fec6f8"
+      ]
+    ]
+  },
+  {
+    "id": "bb065406.f04828",
+    "type": "subflow:f6dd1fca.6c306",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "ANTEROOM_MAIN_LIGHT",
+    "env": [],
+    "x": 602.4659423828125,
+    "y": 191.87314891815186,
+    "wires": [
+      [
+        "d12deac3.fec6f8"
+      ]
+    ]
+  },
+  {
+    "id": "f74a32bd.cbcdc",
+    "type": "subflow:732a823b.6349dc",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "",
+    "env": [],
+    "x": 600,
+    "y": 260,
+    "wires": [
+      [
+        "d12deac3.fec6f8"
+      ]
+    ]
+  },
+  {
+    "id": "cab34a8f.35c668",
+    "type": "link in",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "LINK_CONTROL_TO_FLOWS_ANTEROOM_IN",
+    "links": [
+      "7a79026c.f00c8c"
+    ],
+    "x": 275,
+    "y": 180,
+    "wires": [
+      [
+        "12adb9bc.a841b6",
+        "bb065406.f04828",
+        "f74a32bd.cbcdc"
+      ]
+    ]
+  },
+  {
+    "id": "d12deac3.fec6f8",
+    "type": "link out",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "LINK_TOSEND_ANTEROOM_OUT",
+    "links": [
+      "c1487bb5.ec6388"
+    ],
+    "x": 895,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "a56d14db.ae8e98",
+    "type": "link in",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "LINK_FROM_ALL_LIGHTS_IN",
+    "links": [
+      "71ee541a.3a062c"
+    ],
+    "x": 275,
+    "y": 340,
+    "wires": [
+      [
+        "39b8623a.a0dfae"
+      ]
+    ]
+  },
+  {
+    "id": "39b8623a.a0dfae",
+    "type": "subflow:53cbac0a.2b67f4",
+    "z": "1f4c4ae3.09c2f5",
+    "g": "6e130f3.368a6f",
+    "name": "",
+    "env": [],
+    "x": 580,
+    "y": 340,
+    "wires": [
+      [
+        "d12deac3.fec6f8"
+      ]
+    ]
+  }
+]

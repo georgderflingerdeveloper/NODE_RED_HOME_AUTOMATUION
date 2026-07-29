@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1bf9a73c.5a3da9",
+    "type": "ui_switch",
+    "z": "1f41fee.aca6501",
+    "name": "HEATER BATH",
+    "label": "Heizkörper Badezimmer",
+    "group": "ef7f35ee.d69248",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 580,
+    "y": 120,
+    "wires": [
+      [
+        "3b3917c4.ca56a8"
+      ]
+    ]
+  },
+  {
+    "id": "3b3917c4.ca56a8",
+    "type": "function",
+    "z": "1f41fee.aca6501",
+    "name": "HEATER BATH ",
+    "func": {
+      "$flowSource": "flows/sub-heater-bathroom--1f41fee.aca6501/functions/heater-bath--3b3917c4.ca56a8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 784.4282112121582,
+    "y": 121.28568363189697,
+    "wires": [
+      []
+    ]
+  }
+]

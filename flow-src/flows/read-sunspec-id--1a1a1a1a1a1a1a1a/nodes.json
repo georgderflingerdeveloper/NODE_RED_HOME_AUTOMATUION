@@ -1,0 +1,89 @@
+[
+  {
+    "id": "a2d4b9e3f41d6f07",
+    "type": "inject",
+    "z": "1a1a1a1a1a1a1a1a",
+    "name": "Trigger",
+    "props": [],
+    "repeat": "10",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "2",
+    "topic": "",
+    "x": 130,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "9b76a15cb9a90aa7",
+    "type": "modbus-read",
+    "z": "1a1a1a1a1a1a1a1a",
+    "name": "Read C_SunSpec_ID",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "0",
+    "quantity": "2",
+    "rate": "60",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 340,
+    "y": 100,
+    "wires": [
+      [
+        "ce5d4697c4a4a6b5"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "ce5d4697c4a4a6b5",
+    "type": "function",
+    "z": "1a1a1a1a1a1a1a1a",
+    "name": "Decode ASCII 'SunS'",
+    "func": {
+      "$flowSource": "flows/read-sunspec-id--1a1a1a1a1a1a1a1a/functions/decode-ascii-suns--ce5d4697c4a4a6b5.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 570,
+    "y": 100,
+    "wires": [
+      [
+        "c8e71ad99857a5a6"
+      ]
+    ]
+  },
+  {
+    "id": "c8e71ad99857a5a6",
+    "type": "debug",
+    "z": "1a1a1a1a1a1a1a1a",
+    "name": "C_SunSpec_ID",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 770,
+    "y": 100,
+    "wires": []
+  }
+]

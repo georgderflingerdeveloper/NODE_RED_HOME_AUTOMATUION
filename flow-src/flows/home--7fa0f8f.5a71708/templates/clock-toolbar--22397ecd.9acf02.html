@@ -1,0 +1,166 @@
+<script id="titleScript" type="text/javascript">
+
+$(function() {
+    if($('.md-toolbar-tools').length != 0){
+        loadClock();
+    }else setTimeout(loadClock, 500)
+});
+
+function loadClock(){
+    $('#clock').remove();
+    var toolbar = $('.md-toolbar-tools');
+    
+    var div = $('<div/>');
+    var p = $('<p/ id="clock">');
+    
+    div.append(p);
+    div[0].style.margin = '5px 5px 5px auto';
+    toolbar.append(div);
+
+    function displayTitle(lh) {
+        p.text(lh); 
+    }
+    
+    function upTime() {
+        var d = new Date();
+        p.text(d.toLocaleString());
+    }
+
+    if(document.clockInterval){ 
+            clearInterval(document.clockInterval);
+            document.clockInterval = null;
+    }
+        
+    document.clockInterval = setInterval(upTime,1000);
+}
+
+</script>
+<script id="global-dashboard-reconnect" type="text/javascript">
+(function() {
+    if (document.dashboardReconnectInterval) {
+        clearInterval(document.dashboardReconnectInterval);
+    }
+
+    var routeKey = 'nodeRedDashboardLastRoute';
+    var lostSinceMs = 0;
+
+    function cleanRoute() {
+        var route = (window.location.hash || '').split('?')[0];
+        return /^#!\/\d+$/.test(route) ? route : '';
+    }
+
+    function rememberRoute() {
+        var route = cleanRoute();
+        if (route) sessionStorage.setItem(routeKey, route);
+    }
+
+    function connectionIsLost() {
+        var toast = document.querySelector('.md-toast-error');
+        return !!toast && (toast.textContent || '').indexOf('Connection lost') >= 0;
+    }
+
+    function reconnectDashboard(force) {
+        var now = Date.now();
+        var lastReloadMs = Number(sessionStorage.getItem('nodeRedDashboardLastReloadMs')) || 0;
+        if (!force && (!navigator.onLine || now - lastReloadMs < 10000)) return;
+
+        sessionStorage.setItem('nodeRedDashboardLastReloadMs', String(now));
+        var route = sessionStorage.getItem(routeKey) || cleanRoute() || '#!/0';
+        var target = window.location.origin + window.location.pathname +
+            '?reconnect=' + now + route;
+        window.location.replace(target);
+    }
+
+    function installReconnectButton() {
+        if (document.getElementById('dashboard-reconnect-button')) return;
+        var toolbar = document.querySelector('.md-toolbar-tools');
+        if (!toolbar) {
+            setTimeout(installReconnectButton, 500);
+            return;
+        }
+        var button = document.createElement('button');
+        button.id = 'dashboard-reconnect-button';
+        button.type = 'button';
+        button.className = 'md-button';
+        button.title = 'Dashboard-Verbindung neu aufbauen';
+        button.setAttribute('aria-label', 'Neu verbinden');
+        button.textContent = '↻ DASHBOARD NEU VERBINDEN';
+        button.style.marginLeft = '8px';
+        button.addEventListener('click', function() {
+            reconnectDashboard(true);
+        });
+        toolbar.appendChild(button);
+    }
+
+    function compareWithBackendHeartbeat() {
+        var marker = document.querySelector('.se-state[data-updated-at]');
+        if (!marker || !navigator.onLine) return;
+        var displayedMs = Date.parse(marker.getAttribute('data-updated-at') || '');
+        fetch(window.location.origin + '/context/global/SolarEdgeData?_=' + Date.now(), {
+            cache: 'no-store'
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(envelope) {
+            var data = typeof envelope.msg === 'string' ? JSON.parse(envelope.msg) : envelope.msg;
+            var backendMs = Date.parse(data && data.UpdatedAt || '');
+            if (Number.isFinite(displayedMs) && Number.isFinite(backendMs) &&
+                backendMs - displayedMs > 8000) {
+                reconnectDashboard(false);
+            }
+        })
+        .catch(function() {});
+    }
+
+    function checkConnection() {
+        rememberRoute();
+        installReconnectButton();
+        compareWithBackendHeartbeat();
+        if (!connectionIsLost()) {
+            lostSinceMs = 0;
+            return;
+        }
+        if (!lostSinceMs) lostSinceMs = Date.now();
+        if (Date.now() - lostSinceMs >= 3000) reconnectDashboard(false);
+    }
+
+    window.addEventListener('hashchange', rememberRoute);
+    window.addEventListener('online', function() {
+        setTimeout(checkConnection, 1200);
+    });
+    rememberRoute();
+    installReconnectButton();
+    document.dashboardReconnectInterval = setInterval(checkConnection, 2000);
+})();
+</script>
+<style id="solar-power-row-styles">
+.se-power-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 76px;
+  align-items:center;
+  width:100%;
+  min-height:36px;
+  line-height:22px;
+  box-sizing:border-box;
+  color:#8a8a8a;
+  font-weight:400;
+  font-size:14px;
+  transition:none !important;
+}
+.se-power-label{
+  min-width:0;
+  white-space:nowrap;
+  overflow:visible;
+}
+.se-power-value{
+  min-width:76px;
+  text-align:right;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum";
+}
+.se-power-row.is-active{font-weight:700}
+.se-power-row.se-power-solar.is-active{color:#f9a825}
+.se-power-row.se-power-import.is-active{color:#1565c0}
+.se-power-row.se-power-feed.is-active{color:#795548}
+.se-power-row.se-power-excess.is-active{color:#2e7d32}
+</style>

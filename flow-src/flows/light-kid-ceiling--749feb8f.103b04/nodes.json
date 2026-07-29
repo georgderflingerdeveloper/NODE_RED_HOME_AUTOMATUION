@@ -1,0 +1,49 @@
+[
+  {
+    "id": "c3771cc1.4c77d",
+    "type": "function",
+    "z": "749feb8f.103b04",
+    "name": "LIGHT COMMAND KID CEILING",
+    "func": {
+      "$flowSource": "flows/light-kid-ceiling--749feb8f.103b04/functions/light-command-kid-ceiling--c3771cc1.4c77d.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 700,
+    "y": 140,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "6e8e5be3.73c834",
+    "type": "ui_switch",
+    "z": "749feb8f.103b04",
+    "name": "LIGHT CEILING",
+    "label": "DECKE",
+    "tooltip": "",
+    "group": "9f9a8a62.d54b98",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "fa-3x fa-lightbulb-o",
+    "oncolor": "yellow",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "fa-3x fa-lightbulb-o",
+    "offcolor": "gray",
+    "x": 317.99995040893555,
+    "y": 139.9999442100525,
+    "wires": [
+      [
+        "c3771cc1.4c77d"
+      ]
+    ]
+  }
+]

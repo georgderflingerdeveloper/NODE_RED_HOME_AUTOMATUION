@@ -1,0 +1,48 @@
+[
+  {
+    "id": "f72af37e.0c69a",
+    "type": "function",
+    "z": "8f298b26.b15d28",
+    "name": "FRONT LIGHT COMMAND",
+    "func": {
+      "$flowSource": "flows/frontlights-kitchen--8f298b26.b15d28/functions/front-light-command--f72af37e.0c69a.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 580,
+    "y": 40,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "e026d406.fb2f88",
+    "type": "ui_switch",
+    "z": "8f298b26.b15d28",
+    "name": "FRONTLIGHTS KITCHEN",
+    "label": "VORDERLICHTER KÜCHE",
+    "group": "3dbc8c98.083aa4",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 300,
+    "y": 40,
+    "wires": [
+      [
+        "f72af37e.0c69a"
+      ]
+    ]
+  }
+]

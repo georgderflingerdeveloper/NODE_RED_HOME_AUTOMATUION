@@ -1,0 +1,169 @@
+[
+  {
+    "id": "e8552233.d4d87",
+    "type": "group",
+    "z": "c28cf7ba.34de98",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "8616432a.605b1",
+      "ba1c15b5.fe9038",
+      "a56095e6.72c498",
+      "36494773.294568",
+      "fd30c31e.bb36e",
+      "37283ba1.3eff64",
+      "13bbf6ae.e581a9",
+      "c2a31090.8735d",
+      "ba9c0e3a.9d4bd"
+    ],
+    "x": 394,
+    "y": 19
+  },
+  {
+    "id": "8616432a.605b1",
+    "type": "subflow:749feb8f.103b04",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "",
+    "env": [],
+    "x": 680,
+    "y": 60,
+    "wires": [
+      [
+        "a56095e6.72c498"
+      ]
+    ]
+  },
+  {
+    "id": "ba1c15b5.fe9038",
+    "type": "link in",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "LINK_FROM_KIDROOM_IN",
+    "links": [
+      "2e6ea3e2.15e3bc"
+    ],
+    "x": 435,
+    "y": 180,
+    "wires": [
+      [
+        "8616432a.605b1",
+        "36494773.294568",
+        "fd30c31e.bb36e",
+        "37283ba1.3eff64",
+        "13bbf6ae.e581a9"
+      ]
+    ]
+  },
+  {
+    "id": "a56095e6.72c498",
+    "type": "link out",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "LINK_FROM_KIDROOM_OUT",
+    "links": [
+      "880ac662.010978"
+    ],
+    "x": 955,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "36494773.294568",
+    "type": "subflow:673e6c8d.6d6944",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "",
+    "x": 670,
+    "y": 124,
+    "wires": [
+      [
+        "a56095e6.72c498"
+      ]
+    ]
+  },
+  {
+    "id": "fd30c31e.bb36e",
+    "type": "subflow:acf40cda.989ad",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "",
+    "env": [],
+    "x": 660,
+    "y": 180,
+    "wires": [
+      [
+        "a56095e6.72c498"
+      ]
+    ]
+  },
+  {
+    "id": "37283ba1.3eff64",
+    "type": "subflow:4a0d4570.92dcfc",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "",
+    "env": [],
+    "x": 660,
+    "y": 240,
+    "wires": [
+      [
+        "a56095e6.72c498"
+      ]
+    ]
+  },
+  {
+    "id": "13bbf6ae.e581a9",
+    "type": "subflow:5841569b.a2c378",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "",
+    "env": [],
+    "x": 660,
+    "y": 300,
+    "wires": [
+      [
+        "a56095e6.72c498"
+      ]
+    ]
+  },
+  {
+    "id": "c2a31090.8735d",
+    "type": "subflow:909c3dae.8a8b",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "",
+    "env": [],
+    "x": 680,
+    "y": 360,
+    "wires": [
+      [
+        "a56095e6.72c498"
+      ]
+    ]
+  },
+  {
+    "id": "ba9c0e3a.9d4bd",
+    "type": "link in",
+    "z": "c28cf7ba.34de98",
+    "g": "e8552233.d4d87",
+    "name": "FROM_LINK_HEATERS",
+    "links": [
+      "b83e37c3.585798"
+    ],
+    "x": 435,
+    "y": 360,
+    "wires": [
+      [
+        "c2a31090.8735d"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "c_hint",
+    "type": "comment",
+    "z": "tab-fixsf",
+    "name": "WICHTIG: adr = (PowerAdr - 2), quantity = 16",
+    "x": 250,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "read_win",
+    "type": "modbus-read",
+    "z": "tab-fixsf",
+    "name": "Read Window um Power",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "205",
+    "quantity": "2",
+    "rate": "2",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": true,
+    "x": 240,
+    "y": 120,
+    "wires": [
+      [
+        "fn_autosf",
+        "dbg_raw"
+      ],
+      [
+        "dbg_err"
+      ]
+    ]
+  },
+  {
+    "id": "fn_autosf",
+    "type": "function",
+    "z": "tab-fixsf",
+    "name": "Auto-SF + skalieren → HouseConsumptionWatt",
+    "func": {
+      "$flowSource": "flows/se-house-consumption-auto-sf--tab-fixsf/functions/auto-sf-skalieren-houseconsumptionwatt--fn_autosf.js"
+    },
+    "outputs": 1,
+    "timeout": "",
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 590,
+    "y": 120,
+    "wires": [
+      [
+        "dbg_out"
+      ]
+    ]
+  },
+  {
+    "id": "dbg_raw",
+    "type": "debug",
+    "z": "tab-fixsf",
+    "name": "RAW regs (unsigned)",
+    "active": true,
+    "tosidebar": true,
+    "tostatus": false,
+    "complete": "payload",
+    "x": 530,
+    "y": 70,
+    "wires": []
+  },
+  {
+    "id": "dbg_out",
+    "type": "debug",
+    "z": "tab-fixsf",
+    "name": "HouseConsumption (W)",
+    "active": false,
+    "tosidebar": true,
+    "tostatus": true,
+    "complete": "payload",
+    "statusVal": "payload.HouseConsumptionWatt & ' W'",
+    "statusType": "jsonata",
+    "x": 910,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "dbg_err",
+    "type": "debug",
+    "z": "tab-fixsf",
+    "name": "Modbus Error",
+    "active": false,
+    "tosidebar": true,
+    "tostatus": true,
+    "complete": "true",
+    "targetType": "full",
+    "x": 530,
+    "y": 170,
+    "wires": []
+  }
+]

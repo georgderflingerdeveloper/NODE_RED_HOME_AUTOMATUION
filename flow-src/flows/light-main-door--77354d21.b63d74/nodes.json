@@ -1,0 +1,48 @@
+[
+  {
+    "id": "683bb31d.76cd8c",
+    "type": "ui_switch",
+    "z": "77354d21.b63d74",
+    "name": "LIGHTBAR MAIN DOOR",
+    "label": "LICHT ÜBER TÜR",
+    "group": "dddbf4a9.de6238",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2575.0078125,
+    "y": 1738.9999046325684,
+    "wires": [
+      [
+        "e8dd3419.8cde48"
+      ]
+    ]
+  },
+  {
+    "id": "e8dd3419.8cde48",
+    "type": "function",
+    "z": "77354d21.b63d74",
+    "name": "LIGHT COMMAND DOOR LIGHT",
+    "func": {
+      "$flowSource": "flows/light-main-door--77354d21.b63d74/functions/light-command-door-light--e8dd3419.8cde48.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 2983.007568359375,
+    "y": 1736.9997825622559,
+    "wires": [
+      []
+    ]
+  }
+]

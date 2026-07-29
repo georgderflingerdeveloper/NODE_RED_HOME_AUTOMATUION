@@ -1,0 +1,48 @@
+[
+  {
+    "id": "e8b24c7b.b1669",
+    "type": "ui_switch",
+    "z": "5adde79.cef0318",
+    "name": "GALLERY DOWN 3",
+    "label": "LEUCHTEN UNTEN 3",
+    "group": "59870186.4c225",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2430.333251953125,
+    "y": 2000.8097190856934,
+    "wires": [
+      [
+        "bed70e4.0186af"
+      ]
+    ]
+  },
+  {
+    "id": "bed70e4.0186af",
+    "type": "function",
+    "z": "5adde79.cef0318",
+    "name": "LIGHT COMMAND GALLERY DOWN 3",
+    "func": {
+      "$flowSource": "flows/light-gallery-down-3--5adde79.cef0318/functions/light-command-gallery-down-3--bed70e4.0186af.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3043.333251953125,
+    "y": 1995.8097190856934,
+    "wires": [
+      []
+    ]
+  }
+]

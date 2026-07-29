@@ -1,0 +1,156 @@
+[
+  {
+    "id": "b917fb18.e70048",
+    "type": "ui_switch",
+    "z": "5cf46a6e.756414",
+    "name": "PLUG-IR",
+    "label": "STECKDOSE-IRHEIZUNG",
+    "tooltip": "",
+    "group": "f082d23.5870f3",
+    "order": 4,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "decouple": "false",
+    "topic": "PLUG-IR",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 190,
+    "y": 80,
+    "wires": [
+      [
+        "f968c49c.09d3b8",
+        "c1b5ab76.9fea58"
+      ]
+    ]
+  },
+  {
+    "id": "f968c49c.09d3b8",
+    "type": "function",
+    "z": "5cf46a6e.756414",
+    "name": "PLUG-IR",
+    "func": {
+      "$flowSource": "flows/flow-plug-ir--5cf46a6e.756414/functions/plug-ir--f968c49c.09d3b8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 440,
+    "y": 80,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "17a97e5f.fe2282",
+    "type": "ui_switch",
+    "z": "5cf46a6e.756414",
+    "name": "PLUG-IR-AUTO",
+    "label": "STECKDOSE-IRHEIZUNG-AUTO-AUS",
+    "tooltip": "",
+    "group": "f082d23.5870f3",
+    "order": 4,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "PLUG-IR-AUTO",
+    "style": "",
+    "onvalue": "constants.ACTIVATE_POWER_PLUG_INFRA_RED_AUTO",
+    "onvalueType": "global",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 460,
+    "y": 180,
+    "wires": [
+      [
+        "567336af.028f88"
+      ]
+    ]
+  },
+  {
+    "id": "c1b5ab76.9fea58",
+    "type": "change",
+    "z": "5cf46a6e.756414",
+    "name": "OFF",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "false",
+        "tot": "bool"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 230,
+    "y": 180,
+    "wires": [
+      [
+        "17a97e5f.fe2282"
+      ]
+    ]
+  },
+  {
+    "id": "567336af.028f88",
+    "type": "switch",
+    "z": "5cf46a6e.756414",
+    "name": "ACTIVATE_ONLY",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "constants.ACTIVATE_POWER_PLUG_INFRA_RED_AUTO",
+        "vt": "global"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 670,
+    "y": 180,
+    "wires": [
+      [
+        "e25f2ac1.227ac8"
+      ]
+    ]
+  },
+  {
+    "id": "e25f2ac1.227ac8",
+    "type": "switch",
+    "z": "5cf46a6e.756414",
+    "name": "ISNOTNULL",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "nnull"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 910,
+    "y": 180,
+    "wires": [
+      []
+    ]
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "9b7fb993.cf8aa8",
+    "type": "ui_switch",
+    "z": "fb9db58e.530998",
+    "name": "GALLERY UP 8",
+    "label": "LEUCHTEN OBEN 8",
+    "group": "ee7391e3.0774",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 1196.015640258789,
+    "y": 2363.726781845093,
+    "wires": [
+      [
+        "5d8ab761.552368"
+      ]
+    ]
+  },
+  {
+    "id": "5d8ab761.552368",
+    "type": "function",
+    "z": "fb9db58e.530998",
+    "name": "LIGHT COMMAND GALLERY UP 8",
+    "func": {
+      "$flowSource": "flows/light-gallery-up-8--fb9db58e.530998/functions/light-command-gallery-up-8--5d8ab761.552368.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3463.0155181884766,
+    "y": 2411.7264137268066,
+    "wires": [
+      []
+    ]
+  }
+]

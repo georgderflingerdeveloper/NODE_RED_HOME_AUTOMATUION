@@ -1,0 +1,48 @@
+[
+  {
+    "id": "d3bc916.9bdf47",
+    "type": "ui_switch",
+    "z": "fbecec3.074551",
+    "name": "GALLERY UP 10",
+    "label": "LEUCHTEN OBEN 10",
+    "group": "ee7391e3.0774",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 953.0157699584961,
+    "y": 2487.7266550064087,
+    "wires": [
+      [
+        "3851963e.783a1a"
+      ]
+    ]
+  },
+  {
+    "id": "3851963e.783a1a",
+    "type": "function",
+    "z": "fbecec3.074551",
+    "name": "LIGHT COMMAND GALLERY UP 10",
+    "func": {
+      "$flowSource": "flows/light-gallery-up-10--fbecec3.074551/functions/light-command-gallery-up-10--3851963e.783a1a.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3547.015579223633,
+    "y": 2495.72647857666,
+    "wires": [
+      []
+    ]
+  }
+]

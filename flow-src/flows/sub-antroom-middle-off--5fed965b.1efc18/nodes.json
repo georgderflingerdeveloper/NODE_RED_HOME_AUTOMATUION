@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cc05f2fc.0e355",
+    "type": "ui_button",
+    "z": "5fed965b.1efc18",
+    "name": "ANTEROOM_MIDDLE_OFF",
+    "group": "fd93ca25.397518",
+    "order": 4,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "label": "Vorhaus Licht Mitte AUS",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "TURN-LIGHT-ANTEROOM-MIDDLE-OFF",
+    "payloadType": "str",
+    "topic": "ANTEROOM_MIDDLE_OFF",
+    "x": 200,
+    "y": 80,
+    "wires": [
+      []
+    ]
+  }
+]

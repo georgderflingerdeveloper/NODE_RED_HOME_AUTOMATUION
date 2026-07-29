@@ -1,0 +1,48 @@
+[
+  {
+    "id": "b9f3a229.09629",
+    "type": "function",
+    "z": "2e8f2f3a.4b7f9",
+    "name": "LIGHT OUTSIDE COMMAND",
+    "func": {
+      "$flowSource": "flows/light-outside--2e8f2f3a.4b7f9/functions/light-outside-command--b9f3a229.09629.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 2876.6509590148926,
+    "y": 373.0055351257324,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "85d91908.2b8968",
+    "type": "ui_switch",
+    "z": "2e8f2f3a.4b7f9",
+    "name": "LIGHT OUTSIDE",
+    "label": "AUSSENLICHT",
+    "group": "f082d23.5870f3",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2551.650947570801,
+    "y": 375.00568771362305,
+    "wires": [
+      [
+        "b9f3a229.09629"
+      ]
+    ]
+  }
+]

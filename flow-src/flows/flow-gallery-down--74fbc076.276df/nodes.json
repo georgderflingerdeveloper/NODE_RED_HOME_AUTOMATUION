@@ -1,0 +1,133 @@
+[
+  {
+    "id": "238a9b61.2e5ee4",
+    "type": "group",
+    "z": "74fbc076.276df",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "56651b0c.ffcc54",
+      "c0e29fe.b1b256",
+      "b70853db.0f8fe",
+      "59a1e3c5.f5e6ac",
+      "f486a434.6a4028",
+      "246b7513.745d1a",
+      "9f75869f.9109f8"
+    ],
+    "x": 454,
+    "y": 19,
+    "w": 607,
+    "h": 322
+  },
+  {
+    "id": "56651b0c.ffcc54",
+    "type": "subflow:1976d7f.0dd9028",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "",
+    "x": 720,
+    "y": 60,
+    "wires": [
+      [
+        "9f75869f.9109f8"
+      ]
+    ]
+  },
+  {
+    "id": "c0e29fe.b1b256",
+    "type": "subflow:59dc7866.dede98",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "",
+    "x": 720,
+    "y": 120,
+    "wires": [
+      [
+        "9f75869f.9109f8"
+      ]
+    ]
+  },
+  {
+    "id": "b70853db.0f8fe",
+    "type": "subflow:71195148.90b36",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "",
+    "x": 720,
+    "y": 180,
+    "wires": [
+      [
+        "9f75869f.9109f8"
+      ]
+    ]
+  },
+  {
+    "id": "59a1e3c5.f5e6ac",
+    "type": "subflow:5adde79.cef0318",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "",
+    "x": 720,
+    "y": 240,
+    "wires": [
+      [
+        "9f75869f.9109f8"
+      ]
+    ]
+  },
+  {
+    "id": "f486a434.6a4028",
+    "type": "subflow:f1f09036.8e6a5",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "",
+    "x": 720,
+    "y": 300,
+    "wires": [
+      [
+        "9f75869f.9109f8"
+      ]
+    ]
+  },
+  {
+    "id": "246b7513.745d1a",
+    "type": "link in",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "LINK_GALLYERY_DOWN_IN",
+    "links": [
+      "8902ca66.b29778"
+    ],
+    "x": 495,
+    "y": 180,
+    "wires": [
+      [
+        "56651b0c.ffcc54",
+        "c0e29fe.b1b256",
+        "b70853db.0f8fe",
+        "59a1e3c5.f5e6ac",
+        "f486a434.6a4028"
+      ]
+    ]
+  },
+  {
+    "id": "9f75869f.9109f8",
+    "type": "link out",
+    "z": "74fbc076.276df",
+    "g": "238a9b61.2e5ee4",
+    "name": "LINK_GALLERY_DOWN_OUT",
+    "links": [
+      "84544b60.cc31d8"
+    ],
+    "x": 1020,
+    "y": 200,
+    "wires": []
+  }
+]

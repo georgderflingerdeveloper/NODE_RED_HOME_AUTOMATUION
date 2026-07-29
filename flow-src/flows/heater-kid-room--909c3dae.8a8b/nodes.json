@@ -1,0 +1,49 @@
+[
+  {
+    "id": "a05e9613.6b2f98",
+    "type": "function",
+    "z": "909c3dae.8a8b",
+    "name": "Heater KID",
+    "func": {
+      "$flowSource": "flows/heater-kid-room--909c3dae.8a8b/functions/heater-kid--a05e9613.6b2f98.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 430,
+    "y": 40,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "7db1089b.69c5c8",
+    "type": "ui_switch",
+    "z": "909c3dae.8a8b",
+    "name": "Heater",
+    "label": "HEIZUNG",
+    "tooltip": "",
+    "group": "c9ad1603.380408",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "fa-3x fa-thermometer-full",
+    "oncolor": "orange",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "fa-3x fa-thermometer-empty",
+    "offcolor": "white",
+    "x": 210,
+    "y": 40,
+    "wires": [
+      [
+        "a05e9613.6b2f98"
+      ]
+    ]
+  }
+]

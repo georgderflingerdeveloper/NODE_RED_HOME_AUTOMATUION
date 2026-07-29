@@ -1,0 +1,50 @@
+[
+  {
+    "id": "22b82a20.270176",
+    "type": "ui_switch",
+    "z": "14763e8a.16f4e1",
+    "name": "GALLERY UP 2",
+    "label": "LEUCHTEN OBEN 2",
+    "group": "ee7391e3.0774",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 220,
+    "y": 100,
+    "wires": [
+      [
+        "44b81f44.a5266"
+      ]
+    ]
+  },
+  {
+    "id": "44b81f44.a5266",
+    "type": "function",
+    "z": "14763e8a.16f4e1",
+    "name": "LIGHT COMMAND GALLERY UP 2",
+    "func": {
+      "$flowSource": "flows/light-gallery-up-2--14763e8a.16f4e1/functions/light-command-gallery-up-2--44b81f44.a5266.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 480,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  }
+]

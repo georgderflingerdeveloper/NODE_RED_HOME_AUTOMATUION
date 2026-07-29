@@ -1,0 +1,48 @@
+[
+  {
+    "id": "d4205800.eafa98",
+    "type": "ui_switch",
+    "z": "24a391fc.9c0f9e",
+    "name": "GALLERY UP",
+    "label": "LEUCHTEN NACH OBEN",
+    "group": "468e6c40.6e8c54",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2662.028564453125,
+    "y": 1624.0112571716309,
+    "wires": [
+      [
+        "919e20c8.c749a"
+      ]
+    ]
+  },
+  {
+    "id": "919e20c8.c749a",
+    "type": "function",
+    "z": "24a391fc.9c0f9e",
+    "name": "LIGHT_ COMMAND_GALLERY_UP",
+    "func": {
+      "$flowSource": "flows/light-gallery-up--24a391fc.9c0f9e/functions/light-command-gallery-up--919e20c8.c749a.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3008.028564453125,
+    "y": 1622.0112571716309,
+    "wires": [
+      []
+    ]
+  }
+]

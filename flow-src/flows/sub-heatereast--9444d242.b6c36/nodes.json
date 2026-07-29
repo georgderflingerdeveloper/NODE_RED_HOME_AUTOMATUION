@@ -1,0 +1,48 @@
+[
+  {
+    "id": "659aa27.c12095c",
+    "type": "ui_switch",
+    "z": "9444d242.b6c36",
+    "name": "HEATER EAST",
+    "label": "Heizkörper Osten",
+    "group": "848f3969.ede7f8",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 344,
+    "y": 105,
+    "wires": [
+      [
+        "a7144b0b.29a108"
+      ]
+    ]
+  },
+  {
+    "id": "a7144b0b.29a108",
+    "type": "function",
+    "z": "9444d242.b6c36",
+    "name": "HEATER EAST COMMAND",
+    "func": {
+      "$flowSource": "flows/sub-heatereast--9444d242.b6c36/functions/heater-east-command--a7144b0b.29a108.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 708.4282112121582,
+    "y": 106.28568363189697,
+    "wires": [
+      []
+    ]
+  }
+]

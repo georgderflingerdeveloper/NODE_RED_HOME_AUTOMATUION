@@ -1,0 +1,48 @@
+[
+  {
+    "id": "589874b4.69d95c",
+    "type": "ui_switch",
+    "z": "58c186d2.cc7718",
+    "name": "LIGHT DOOR ENTRY LEFT",
+    "label": "BALKEN TÜR LINKS",
+    "group": "dddbf4a9.de6238",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2782.0143394470215,
+    "y": 1410.8237144947052,
+    "wires": [
+      [
+        "7d276b21.d1de14"
+      ]
+    ]
+  },
+  {
+    "id": "7d276b21.d1de14",
+    "type": "function",
+    "z": "58c186d2.cc7718",
+    "name": "LIGHT DOOR ENTRY LEFT",
+    "func": {
+      "$flowSource": "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left--7d276b21.d1de14.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3115.0143432617188,
+    "y": 1413.8236029148102,
+    "wires": [
+      []
+    ]
+  }
+]

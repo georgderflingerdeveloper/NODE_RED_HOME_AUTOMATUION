@@ -1,0 +1,2380 @@
+[
+  {
+    "id": "7fa0f8f.5a71708",
+    "type": "tab",
+    "label": "HOME",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "751908ce.1d1d68",
+    "type": "tab",
+    "label": "FLOW_EXTENDED_ELEMENTS",
+    "disabled": false,
+    "info": " - Erweiterung galleriesteuerung\n - Erweiterung zentrale Heizkörpersteuerung"
+  },
+  {
+    "id": "7098ba05.866f94",
+    "type": "tab",
+    "label": "FLOW_POWER",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "947efd24.6a1b6",
+    "type": "tab",
+    "label": "FLOW_HEATERS",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "2110ff8c.cc84f",
+    "type": "tab",
+    "label": "FLOW_GALLERY_UP",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "4f4805f4.fd73bc",
+    "type": "tab",
+    "label": "FLOW_DOOR_WINDOWS_SOUTHSIDE",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "1f4c4ae3.09c2f5",
+    "type": "tab",
+    "label": "FLOW_ANTEROOM",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "27c430f0.58ebc",
+    "type": "tab",
+    "label": "FLOW_WESTSIDE",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "3428a01a.0d641",
+    "type": "tab",
+    "label": "FLOW_KITCHEN",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "c28cf7ba.34de98",
+    "type": "tab",
+    "label": "FLOW_KIDROOM",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "74fbc076.276df",
+    "type": "tab",
+    "label": "FLOW_GALLERY_DOWN",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "3a481bd8.00eb44",
+    "type": "tab",
+    "label": "UNIT_TESTS",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "77c01f18.55ba",
+    "type": "tab",
+    "label": "FLOW_BOILER",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "fe7ff20.d2e8f1",
+    "type": "tab",
+    "label": "GLOBAL",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "d10e2758.4eed68",
+    "type": "tab",
+    "label": "TEMPLATES",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "1a1a1a1a1a1a1a1a",
+    "type": "tab",
+    "label": "Read SunSpec ID",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "79160448dc533f1d",
+    "type": "tab",
+    "label": "SOLAR_POWER",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "b86cb602995b0261",
+    "type": "tab",
+    "label": "SOLAR_DASHBOARD",
+    "disabled": false,
+    "info": "Solar-Dashboard mit klar getrennten Leistungswerten: Solarleistung, Netzbezug ins Haus, Einspeisung ins Stromnetz und verfügbarer Solarüberschuss. Alle Anzeigen verwenden Watt [W].",
+    "env": []
+  },
+  {
+    "id": "tab_read_feedin",
+    "type": "tab",
+    "label": "SE · GRID POWER",
+    "disabled": false,
+    "info": "SolarEdge-Meterleistung lesen und nach gemessener Geräte-Konvention trennen: positiv = Einspeisung, negativ = Netzbezug. Ausgang 1: FeedInW. Ausgang 2: GridImportWatt."
+  },
+  {
+    "id": "tab-fixsf",
+    "type": "tab",
+    "label": "SE • House Consumption (Auto-SF)"
+  },
+  {
+    "id": "weather_flow",
+    "type": "tab",
+    "label": "WETTER",
+    "disabled": false,
+    "info": "Eigenständiger Wetter-Flow für Reindlmühl bei Altmünster am Traunsee mit Open-Meteo. Stündliche Aktualisierung, sicherer Ausfallzustand und strukturierte Payload für spätere Gerätesteuerungen."
+  },
+  {
+    "id": "f6dd1fca.6c306",
+    "type": "subflow",
+    "name": "SUB_ANTEROOM_MAIN_LIGHT",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 40,
+        "y": 60,
+        "wires": [
+          {
+            "id": "a952ee58.75f5b"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 760,
+        "y": 60,
+        "wires": [
+          {
+            "id": "56b8eb53.8f1a84",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 760,
+      "y": 120,
+      "wires": [
+        {
+          "id": "56b8eb53.8f1a84",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "15e47868.0e5ea8",
+    "type": "subflow",
+    "name": "BOILER",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 40,
+        "y": 40,
+        "wires": [
+          {
+            "id": "5e8c7091.07116"
+          },
+          {
+            "id": "67cd68b1.d4a278"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 800,
+        "y": 160,
+        "wires": [
+          {
+            "id": "583ee5d6.cac97c",
+            "port": 0
+          },
+          {
+            "id": "33b1d6bd.67ac9a",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 800,
+      "y": 40,
+      "wires": [
+        {
+          "id": "583ee5d6.cac97c",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "8f298b26.b15d28",
+    "type": "subflow",
+    "name": "FRONTLIGHTS_KITCHEN",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 120,
+        "y": 40,
+        "wires": [
+          {
+            "id": "e026d406.fb2f88"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 780,
+        "y": 40,
+        "wires": [
+          {
+            "id": "f72af37e.0c69a",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fd0015a.609c3e8",
+    "type": "subflow",
+    "name": "LIGHT_WINDOW_LEDGE_EAST",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2261.6509552001953,
+        "y": 245.00547122955322,
+        "wires": [
+          {
+            "id": "e6277f7f.fe238"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3097.650718688965,
+        "y": 253.00562381744385,
+        "wires": [
+          {
+            "id": "5ab8ac96.b9b9a4",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2e8f2f3a.4b7f9",
+    "type": "subflow",
+    "name": "LIGHT_OUTSIDE",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2381.650947570801,
+        "y": 375.00568771362305,
+        "wires": [
+          {
+            "id": "85d91908.2b8968"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3086.6509590148926,
+        "y": 373.0055351257324,
+        "wires": [
+          {
+            "id": "b9f3a229.09629",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "e1423e4a.93e71",
+    "type": "subflow",
+    "name": "LIGHT_WINDOW_LEDGE_WEST",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2647.0143699645996,
+        "y": 1225.7326710224152,
+        "wires": [
+          {
+            "id": "b3f809ba.1aafc8"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3444.014190673828,
+        "y": 1225.7325947284698,
+        "wires": [
+          {
+            "id": "bcb0c415.ab2f18",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5a45fc24.e52174",
+    "type": "subflow",
+    "name": "LIGHT_KITCHENBOARD_DOWN",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2600.0142936706543,
+        "y": 1286.6415932178497,
+        "wires": [
+          {
+            "id": "42cce5fc.704eac"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3442.0143432617188,
+        "y": 1286.6416490077972,
+        "wires": [
+          {
+            "id": "ced3e08.3efb02",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": []
+  },
+  {
+    "id": "1df46f96.bc77b",
+    "type": "subflow",
+    "name": "LIGHT_WALL_WEST",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2588.014331817627,
+        "y": 1342.8234837055206,
+        "wires": [
+          {
+            "id": "e96e682.5f9e098"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3363.014217376709,
+        "y": 1345.8236410617828,
+        "wires": [
+          {
+            "id": "db8f3b2f.ceadb8",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "6246a200.ac18dc",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_11",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 630.0158004760742,
+        "y": 2542.7267780303955,
+        "wires": [
+          {
+            "id": "d3c59bcd.8bf718"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1460,
+        "y": 2560,
+        "wires": [
+          {
+            "id": "5698937a.c33e4c",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fbecec3.074551",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_10",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 783.0157699584961,
+        "y": 2487.7266550064087,
+        "wires": [
+          {
+            "id": "d3bc916.9bdf47"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3777.015579223633,
+        "y": 2495.72647857666,
+        "wires": [
+          {
+            "id": "3851963e.783a1a",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "58c186d2.cc7718",
+    "type": "subflow",
+    "name": "LIGHT_DOOR_ENTRY_LEFT",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2582.0143394470215,
+        "y": 1410.8237144947052,
+        "wires": [
+          {
+            "id": "589874b4.69d95c"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3315.0143432617188,
+        "y": 1413.8236029148102,
+        "wires": [
+          {
+            "id": "7d276b21.d1de14",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "9e792846.0d4958",
+    "type": "subflow",
+    "name": "LIGHT_TRIANGLE_WEST",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2548.014301300049,
+        "y": 1479.7328798770905,
+        "wires": [
+          {
+            "id": "61b0ce88.bdd6e"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3298.5597534179688,
+        "y": 1480.7328989505768,
+        "wires": [
+          {
+            "id": "db3b4d8f.7e919",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1976d7f.0dd9028",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_DOWN",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2554.014404296875,
+        "y": 1559.7328147888184,
+        "wires": [
+          {
+            "id": "f5edce8d.7058b"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3275.44287109375,
+        "y": 1545.5899925231934,
+        "wires": [
+          {
+            "id": "219271c2.3aeb5e",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "be228d90.8caef",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_9",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 906.0157165527344,
+        "y": 2425.726776123047,
+        "wires": [
+          {
+            "id": "ac5d0ed5.a4698"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3719.015579223633,
+        "y": 2452.726414680481,
+        "wires": [
+          {
+            "id": "2bb209b5.9fdf76",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fb9db58e.530998",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_8",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 1036.015640258789,
+        "y": 2363.726781845093,
+        "wires": [
+          {
+            "id": "9b7fb993.cf8aa8"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3683.0155181884766,
+        "y": 2411.7264137268066,
+        "wires": [
+          {
+            "id": "5d8ab761.552368",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "24a391fc.9c0f9e",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2502.028564453125,
+        "y": 1624.0112571716309,
+        "wires": [
+          {
+            "id": "d4205800.eafa98"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3238.028564453125,
+        "y": 1622.0112571716309,
+        "wires": [
+          {
+            "id": "919e20c8.c749a",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c08a9f29.c0364",
+    "type": "subflow",
+    "name": "LIGHT_TRIANGLE_UP",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2477.265625,
+        "y": 1679.2264671325684,
+        "wires": [
+          {
+            "id": "6a086c60.026464"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3213.265625,
+        "y": 1674.2264671325684,
+        "wires": [
+          {
+            "id": "8c5c28f0.07d728",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "6dbd2357.9181cc",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_7",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 1138.0157012939453,
+        "y": 2322.7264976501465,
+        "wires": [
+          {
+            "id": "24663af3.ee3a36"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3632.0155334472656,
+        "y": 2368.726643562317,
+        "wires": [
+          {
+            "id": "76ac2f2a.44c4a",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "77354d21.b63d74",
+    "type": "subflow",
+    "name": "LIGHT_MAIN_DOOR",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2385.0078125,
+        "y": 1738.9999046325684,
+        "wires": [
+          {
+            "id": "683bb31d.76cd8c"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3203.007568359375,
+        "y": 1736.9997825622559,
+        "wires": [
+          {
+            "id": "e8dd3419.8cde48",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8e0df9ea.dc6d98",
+    "type": "subflow",
+    "name": "LIGHT_WINDOW_UP_EAST",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2348.229248046875,
+        "y": 1798.6986351013184,
+        "wires": [
+          {
+            "id": "4bb22b97.5e2784"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3134.229248046875,
+        "y": 1801.6986351013184,
+        "wires": [
+          {
+            "id": "d17830e4.5d856",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "17252e85.f4c3c1",
+    "type": "subflow",
+    "name": "LIGHT_RIGHT_NEXT_DOOR",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2317.015625,
+        "y": 1839.2264671325684,
+        "wires": [
+          {
+            "id": "ea3f3594.237fc8"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3245.015625,
+        "y": 1842.2264671325684,
+        "wires": [
+          {
+            "id": "457726bc.ce31c8",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "59dc7866.dede98",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_DOWN_1",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2242.765625,
+        "y": 1892.2264671325684,
+        "wires": [
+          {
+            "id": "d8bcccf0.10541"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3245.765625,
+        "y": 1889.2264671325684,
+        "wires": [
+          {
+            "id": "17f40115.67571f",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ea250672.3772b8",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_6",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 1232.0158157348633,
+        "y": 2286.7265281677246,
+        "wires": [
+          {
+            "id": "9bf8988d.9fd508"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3577.0157775878906,
+        "y": 2329.726408958435,
+        "wires": [
+          {
+            "id": "c617dc83.01e63",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bbbc4d26.67bb6",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_5",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 1354.0156478881836,
+        "y": 2242.726587295532,
+        "wires": [
+          {
+            "id": "c1e9e872.58a348"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3519.0155181884766,
+        "y": 2289.7265911102295,
+        "wires": [
+          {
+            "id": "1c8cf8a0.b34597",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "71195148.90b36",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_DOWN_2",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2245,
+        "y": 1951.4764671325684,
+        "wires": [
+          {
+            "id": "47a69112.94d"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3282,
+        "y": 1939.4764671325684,
+        "wires": [
+          {
+            "id": "92d9bb85.832db8",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5adde79.cef0318",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_DOWN_3",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2250.333251953125,
+        "y": 2000.8097190856934,
+        "wires": [
+          {
+            "id": "e8b24c7b.b1669"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3283.333251953125,
+        "y": 1995.8097190856934,
+        "wires": [
+          {
+            "id": "bed70e4.0186af",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "f1f09036.8e6a5",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_DOWN_4",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 2255.333251953125,
+        "y": 2048.8097190856934,
+        "wires": [
+          {
+            "id": "fdd8d83d.115138"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3294.333251953125,
+        "y": 2045.8097190856934,
+        "wires": [
+          {
+            "id": "76dfd902.5d3618",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "920f6b4f.48eac8",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_1",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 80,
+        "y": 80,
+        "wires": [
+          {
+            "id": "eae848c3.f33078"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 700,
+        "y": 40,
+        "wires": [
+          {
+            "id": "c7f4a8b7.bef9f8",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 700,
+      "y": 140,
+      "wires": [
+        {
+          "id": "c7f4a8b7.bef9f8",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "14763e8a.16f4e1",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_2",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 60,
+        "y": 100,
+        "wires": [
+          {
+            "id": "22b82a20.270176"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 700,
+        "y": 100,
+        "wires": [
+          {
+            "id": "44b81f44.a5266",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 700,
+      "y": 160,
+      "wires": [
+        {
+          "id": "44b81f44.a5266",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "6f1a9f64.905d8",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_3",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 1733.015712738037,
+        "y": 2164.726493835449,
+        "wires": [
+          {
+            "id": "cde32557.f86308"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3466.0155334472656,
+        "y": 2189.726873397827,
+        "wires": [
+          {
+            "id": "eb8c74c5.c28818",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "9fee7c36.f7377",
+    "type": "subflow",
+    "name": "LIGHT_GALLERY_UP_4",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 1568.0158309936523,
+        "y": 2202.726583480835,
+        "wires": [
+          {
+            "id": "6a660298.a819fc"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 3478.0155181884766,
+        "y": 2241.726589202881,
+        "wires": [
+          {
+            "id": "9282d027.3f4a5",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "77dda60a.d7efe8",
+    "type": "subflow",
+    "name": "SCENARIOS",
+    "info": "",
+    "category": "",
+    "in": [],
+    "out": [
+      {
+        "x": 740,
+        "y": 100,
+        "wires": [
+          {
+            "id": "878f556e.dc77d8",
+            "port": 0
+          }
+        ]
+      },
+      {
+        "x": 740,
+        "y": 220,
+        "wires": [
+          {
+            "id": "34d1e102.250d5e",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 740,
+      "y": 160,
+      "wires": [
+        {
+          "id": "33f201d7.d8ec1e",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "732a823b.6349dc",
+    "type": "subflow",
+    "name": "ANTEROOM_GALLERY_UP",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 169.9999942779541,
+        "y": 128.9999942779541,
+        "wires": [
+          {
+            "id": "956c65fc.759a28"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1076.9999828338623,
+        "y": 128.00001049041748,
+        "wires": [
+          {
+            "id": "f4f718ca.73ad78",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 1080,
+      "y": 40,
+      "wires": [
+        {
+          "id": "f4f718ca.73ad78",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "3486c1a7.a51b3e",
+    "type": "subflow",
+    "name": "LIGHT_BATH_ALL",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 202.9999942779541,
+        "y": 149.9999942779541,
+        "wires": [
+          {
+            "id": "5138ce61.f5ce7"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1123.999984741211,
+        "y": 265.9999942779541,
+        "wires": [
+          {
+            "id": "8f311a56.6e0af8",
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "e05aa54.b29db58",
+    "type": "subflow",
+    "name": "LIGHT WC",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 226.9999942779541,
+        "y": 147.9999942779541,
+        "wires": [
+          {
+            "id": "c959c02a.01119"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1033.999984741211,
+        "y": 259.9999942779541,
+        "wires": [
+          {
+            "id": "2de0416d.3ababe",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "status": {
+      "x": 1040,
+      "y": 150,
+      "wires": [
+        {
+          "id": "2de0416d.3ababe",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "398e4654.d2a5ea",
+    "type": "subflow",
+    "name": "LIGHT_ANTEROOM_BACK",
+    "info": "Vorhaus Lichter LEDs hinten",
+    "category": "",
+    "in": [
+      {
+        "x": 246.9999942779541,
+        "y": 193.9999942779541,
+        "wires": [
+          {
+            "id": "ed728d49.43d96"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1135.999984741211,
+        "y": 299.9999942779541,
+        "wires": [
+          {
+            "id": "4bc9db11.460844",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 1138.7500038146973,
+      "y": 215,
+      "wires": [
+        {
+          "id": "4bc9db11.460844",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "a96c7925.d9b518",
+    "type": "subflow",
+    "name": "SUB_HEATERWEST",
+    "info": "Heizkörper im Westen - Ansteuerung",
+    "category": "",
+    "in": [
+      {
+        "x": 70,
+        "y": 117,
+        "wires": [
+          {
+            "id": "311fb730.1844b8"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 913,
+        "y": 111,
+        "wires": [
+          {
+            "id": "2425aabe.c3d216",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 796,
+      "y": 25,
+      "wires": [
+        {
+          "id": "2425aabe.c3d216",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "9444d242.b6c36",
+    "type": "subflow",
+    "name": "SUB_HEATEREAST",
+    "info": "Heizkörper osten",
+    "category": "",
+    "in": [
+      {
+        "x": 168,
+        "y": 89,
+        "wires": [
+          {
+            "id": "659aa27.c12095c"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 945,
+        "y": 101,
+        "wires": [
+          {
+            "id": "a7144b0b.29a108",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 933,
+      "y": 35,
+      "wires": [
+        {
+          "id": "a7144b0b.29a108",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "658af8e2.d21c88",
+    "type": "subflow",
+    "name": "SUB_LIGHT_ANTEROOM_MIDDLE",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 10,
+        "y": 80,
+        "wires": [
+          {
+            "id": "c2c21b85.dd8198"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 783.0002517700195,
+        "y": 80,
+        "wires": [
+          {
+            "id": "4480e402.3d37fc",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 792.9999980926514,
+      "y": 154.99999809265137,
+      "wires": [
+        {
+          "id": "4480e402.3d37fc",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "1f41fee.aca6501",
+    "type": "subflow",
+    "name": "SUB_HEATER_BATHROOM",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 420,
+        "y": 120,
+        "wires": [
+          {
+            "id": "1bf9a73c.5a3da9"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 920,
+        "y": 160,
+        "wires": [
+          {
+            "id": "3b3917c4.ca56a8",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 920,
+      "y": 80,
+      "wires": [
+        {
+          "id": "3b3917c4.ca56a8",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "54f401c5.36b84",
+    "type": "subflow",
+    "name": "SUB_FLOW_BOILER",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 320,
+        "y": 100,
+        "wires": [
+          {
+            "id": "873c10f2.25982"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 640,
+        "y": 60,
+        "wires": [
+          {
+            "id": "873c10f2.25982",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "color": "#DDAA99",
+    "status": {
+      "x": 640,
+      "y": 140,
+      "wires": [
+        {
+          "id": "873c10f2.25982",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "5cf46a6e.756414",
+    "type": "subflow",
+    "name": "FLOW_PLUG_IR",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 100,
+        "y": 280,
+        "wires": [
+          {
+            "id": "17a97e5f.fe2282"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1040,
+        "y": 140,
+        "wires": [
+          {
+            "id": "f968c49c.09d3b8",
+            "port": 0
+          },
+          {
+            "id": "e25f2ac1.227ac8",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "color": "#DDAA99",
+    "status": {
+      "x": 1040,
+      "y": 60,
+      "wires": [
+        {
+          "id": "f968c49c.09d3b8",
+          "port": 0
+        },
+        {
+          "id": "567336af.028f88",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "749feb8f.103b04",
+    "type": "subflow",
+    "name": "LIGHT_KID_CEILING",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 180,
+        "y": 140,
+        "wires": [
+          {
+            "id": "6e8e5be3.73c834"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 900,
+        "y": 140,
+        "wires": [
+          {
+            "id": "c3771cc1.4c77d",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 900,
+      "y": 200,
+      "wires": [
+        {
+          "id": "c3771cc1.4c77d",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "673e6c8d.6d6944",
+    "type": "subflow",
+    "name": "LIGHT_KID_RIGHT",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 180,
+        "y": 60,
+        "wires": [
+          {
+            "id": "70497155.174b5"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 920,
+        "y": 60,
+        "wires": [
+          {
+            "id": "faf302ed.83b2b",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 920,
+      "y": 120,
+      "wires": [
+        {
+          "id": "faf302ed.83b2b",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "acf40cda.989ad",
+    "type": "subflow",
+    "name": "LIGHT_KID_3",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 100,
+        "y": 60,
+        "wires": [
+          {
+            "id": "f4f25e75.df19f"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 840,
+        "y": 60,
+        "wires": [
+          {
+            "id": "62ec3391.b3b57c",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 840,
+      "y": 120,
+      "wires": [
+        {
+          "id": "62ec3391.b3b57c",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "4a0d4570.92dcfc",
+    "type": "subflow",
+    "name": "LIGHT_KID_4",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 40,
+        "y": 40,
+        "wires": [
+          {
+            "id": "e2a9708e.bc9c8"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 720,
+        "y": 40,
+        "wires": [
+          {
+            "id": "efebc5d2.62f878",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 720,
+      "y": 100,
+      "wires": [
+        {
+          "id": "efebc5d2.62f878",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "5841569b.a2c378",
+    "type": "subflow",
+    "name": "LIGHT_KID_5",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 100,
+        "y": 60,
+        "wires": [
+          {
+            "id": "cf228ba3.464208"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 760,
+        "y": 60,
+        "wires": [
+          {
+            "id": "46e96038.8662a",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 760,
+      "y": 120,
+      "wires": [
+        {
+          "id": "46e96038.8662a",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "909c3dae.8a8b",
+    "type": "subflow",
+    "name": "HEATER_KID_ROOM",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 120,
+        "y": 40,
+        "wires": [
+          {
+            "id": "7db1089b.69c5c8"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 640,
+        "y": 40,
+        "wires": [
+          {
+            "id": "a05e9613.6b2f98",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "status": {
+      "x": 640,
+      "y": 100,
+      "wires": [
+        {
+          "id": "a05e9613.6b2f98",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "5fed965b.1efc18",
+    "type": "subflow",
+    "name": "SUB_ANTROOM_MIDDLE_OFF",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 0,
+        "y": 80,
+        "wires": [
+          {
+            "id": "cc05f2fc.0e355"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 400,
+        "y": 80,
+        "wires": [
+          {
+            "id": "cc05f2fc.0e355",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "color": "#DDAA99",
+    "status": {
+      "x": 400,
+      "y": 140,
+      "wires": [
+        {
+          "id": "cc05f2fc.0e355",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "b6e6fa.8bfd1908",
+    "type": "subflow",
+    "name": "SUB_ANTEROOM_MIDDLE_ON",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 0,
+        "y": 80,
+        "wires": [
+          {
+            "id": "9accca19.dead38"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 440,
+        "y": 80,
+        "wires": [
+          {
+            "id": "9accca19.dead38",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "color": "#DDAA99",
+    "status": {
+      "x": 440,
+      "y": 140,
+      "wires": [
+        {
+          "id": "9accca19.dead38",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "53cbac0a.2b67f4",
+    "type": "subflow",
+    "name": "SUB_LIGHT_MIDDLE",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 40,
+        "y": 100,
+        "wires": [
+          {
+            "id": "1bffffd9.4080c"
+          },
+          {
+            "id": "dee88283.1e36c"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 420,
+        "y": 100,
+        "wires": [
+          {
+            "id": "1bffffd9.4080c",
+            "port": 0
+          },
+          {
+            "id": "dee88283.1e36c",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "color": "#DDAA99",
+    "status": {
+      "x": 400,
+      "y": 160,
+      "wires": [
+        {
+          "id": "1bffffd9.4080c",
+          "port": 0
+        },
+        {
+          "id": "dee88283.1e36c",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "32ef0b5e.c7e3c4",
+    "type": "subflow",
+    "name": "SUB_CMD",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 20,
+        "y": 80,
+        "wires": [
+          {
+            "id": "5dbfb429.000f8c"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 340,
+        "y": 80,
+        "wires": [
+          {
+            "id": "5dbfb429.000f8c",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [
+      {
+        "name": "CMD_ON",
+        "type": "str",
+        "value": ""
+      },
+      {
+        "name": "CMD_OFF",
+        "type": "str",
+        "value": ""
+      }
+    ],
+    "color": "#DDAA99",
+    "status": {
+      "x": 340,
+      "y": 140,
+      "wires": [
+        {
+          "id": "5dbfb429.000f8c",
+          "port": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "79166127.536b1",
+    "type": "ui_base",
+    "theme": {
+      "name": "theme-dark",
+      "lightTheme": {
+        "default": "#0094CE",
+        "baseColor": "#0094CE",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+        "edited": true,
+        "reset": false
+      },
+      "darkTheme": {
+        "default": "#097479",
+        "baseColor": "#097479",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+        "edited": true,
+        "reset": false
+      },
+      "customTheme": {
+        "name": "Untitled Theme 1",
+        "default": "#4B7930",
+        "baseColor": "#4B7930",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+      },
+      "themeState": {
+        "base-color": {
+          "default": "#097479",
+          "value": "#097479",
+          "edited": false
+        },
+        "page-titlebar-backgroundColor": {
+          "value": "#097479",
+          "edited": false
+        },
+        "page-backgroundColor": {
+          "value": "#111111",
+          "edited": false
+        },
+        "page-sidebar-backgroundColor": {
+          "value": "#333333",
+          "edited": false
+        },
+        "group-textColor": {
+          "value": "#0eb8c0",
+          "edited": false
+        },
+        "group-borderColor": {
+          "value": "#555555",
+          "edited": false
+        },
+        "group-backgroundColor": {
+          "value": "#333333",
+          "edited": false
+        },
+        "widget-textColor": {
+          "value": "#eeeeee",
+          "edited": false
+        },
+        "widget-backgroundColor": {
+          "value": "#097479",
+          "edited": false
+        },
+        "widget-borderColor": {
+          "value": "#333333",
+          "edited": false
+        },
+        "base-font": {
+          "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+        }
+      },
+      "angularTheme": {
+        "primary": "indigo",
+        "accents": "blue",
+        "warn": "red",
+        "background": "grey"
+      }
+    },
+    "site": {
+      "name": "Node-RED Dashboard",
+      "hideToolbar": "false",
+      "allowSwipe": "false",
+      "allowTempTheme": "true",
+      "dateFormat": "DD/MM/YYYY",
+      "sizes": {
+        "sx": 48,
+        "sy": 48,
+        "gx": 6,
+        "gy": 6,
+        "cx": 6,
+        "cy": 6,
+        "px": 0,
+        "py": 0
+      }
+    }
+  },
+  {
+    "id": "1ec83753.5b31a9",
+    "type": "ui_tab",
+    "name": "HAUS",
+    "icon": "dashboard"
+  },
+  {
+    "id": "35aaad8a.ed3c12",
+    "type": "ui_tab",
+    "name": "KÜCHE",
+    "icon": "dashboard",
+    "order": 3
+  },
+  {
+    "id": "52acc5d.8b5ba3c",
+    "type": "ui_tab",
+    "name": "WOHNZIMMER",
+    "icon": "dashboard",
+    "order": 2
+  },
+  {
+    "id": "ea22f5b5.5af548",
+    "type": "ui_tab",
+    "name": "VORHAUS",
+    "icon": "dashboard",
+    "order": 4
+  },
+  {
+    "id": "fd93ca25.397518",
+    "type": "ui_group",
+    "name": "VORHAUS",
+    "tab": "ea22f5b5.5af548",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "56be4a6.19911b4",
+    "type": "ui_tab",
+    "name": "OBEN",
+    "icon": "dashboard",
+    "order": 5
+  },
+  {
+    "id": "b210f56e.db6368",
+    "type": "ui_group",
+    "name": "BODEN",
+    "tab": "56be4a6.19911b4",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "c1a8c6ed.e57098",
+    "type": "ui_tab",
+    "name": "BAD",
+    "icon": "dashboard",
+    "order": 6
+  },
+  {
+    "id": "83673fe2.3b03d",
+    "type": "ui_group",
+    "name": "LICHTER",
+    "tab": "c1a8c6ed.e57098",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "60261446.7371fc",
+    "type": "ui_tab",
+    "name": "WC",
+    "icon": "dashboard",
+    "order": 7
+  },
+  {
+    "id": "f055e626.392288",
+    "type": "ui_group",
+    "name": "LICHTER",
+    "tab": "60261446.7371fc",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "ef7f35ee.d69248",
+    "type": "ui_group",
+    "name": "Heizung",
+    "tab": "c1a8c6ed.e57098",
+    "order": 2,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "17e38b6a.856c95",
+    "type": "ui_tab",
+    "name": "KINDERZIMMER",
+    "icon": "dashboard",
+    "order": 10,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "9f9a8a62.d54b98",
+    "type": "ui_group",
+    "name": "LICHTER",
+    "tab": "17e38b6a.856c95",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "c9ad1603.380408",
+    "type": "ui_group",
+    "name": "HEIZUNG",
+    "tab": "17e38b6a.856c95",
+    "order": 2,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "f082d23.5870f3",
+    "type": "ui_group",
+    "name": "HAUPTSTEUERUNG",
+    "tab": "1ec83753.5b31a9",
+    "order": 1,
+    "disp": true,
+    "width": "6"
+  },
+  {
+    "id": "3dbc8c98.083aa4",
+    "type": "ui_group",
+    "name": "KÜCHE",
+    "tab": "35aaad8a.ed3c12",
+    "order": 1,
+    "disp": true,
+    "width": "6"
+  },
+  {
+    "id": "d8a967f.6ed2998",
+    "type": "ui_group",
+    "name": "FENSTERBANK",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 6,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "848f3969.ede7f8",
+    "type": "ui_group",
+    "name": "WOHNZIMMER",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "dddbf4a9.de6238",
+    "type": "ui_group",
+    "name": "HAUPTEINGANG VORNE",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 2,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "468e6c40.6e8c54",
+    "type": "ui_group",
+    "name": "GALLERIE",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 3,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "59870186.4c225",
+    "type": "ui_group",
+    "name": "GALLERIE UNTEN",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 5,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "ee7391e3.0774",
+    "type": "ui_group",
+    "name": "GALLERIE OBEN",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 4,
+    "disp": true,
+    "width": "6",
+    "collapse": true
+  },
+  {
+    "id": "befceeb9cba11998",
+    "type": "modbus-client",
+    "name": "",
+    "clienttype": "tcp",
+    "bufferCommands": true,
+    "stateLogEnabled": false,
+    "queueLogEnabled": false,
+    "failureLogEnabled": true,
+    "tcpHost": "192.168.0.128",
+    "tcpPort": "502",
+    "tcpType": "DEFAULT",
+    "serialPort": "/dev/ttyUSB",
+    "serialType": "RTU-BUFFERD",
+    "serialBaudrate": 9600,
+    "serialDatabits": 8,
+    "serialStopbits": 1,
+    "serialParity": "none",
+    "serialConnectionDelay": 100,
+    "serialAsciiResponseStartDelimiter": "0x3A",
+    "unit_id": 1,
+    "commandDelay": 1,
+    "clientTimeout": 1000,
+    "reconnectOnTimeout": true,
+    "reconnectTimeout": 2000,
+    "parallelUnitIdsAllowed": true,
+    "showErrors": false,
+    "showWarnings": true,
+    "showLogs": true
+  },
+  {
+    "id": "1132541c42ce2a8d",
+    "type": "ui_tab",
+    "name": "SOLAR",
+    "icon": "wi-wu-sunny",
+    "order": 13,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "24a6bcc7d3d966ac",
+    "type": "ui_group",
+    "name": "SUNPOWER",
+    "tab": "1132541c42ce2a8d",
+    "order": 1,
+    "disp": true,
+    "width": 6,
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "weather_dashboard_tab",
+    "type": "ui_tab",
+    "name": "WETTER",
+    "icon": "dashboard",
+    "order": 11,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "weather_dashboard_group",
+    "type": "ui_group",
+    "name": "WETTERÜBERSICHT",
+    "tab": "weather_dashboard_tab",
+    "order": 1,
+    "disp": true,
+    "width": "18",
+    "collapse": false,
+    "className": ""
+  }
+]

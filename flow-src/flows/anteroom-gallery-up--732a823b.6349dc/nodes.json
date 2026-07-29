@@ -1,0 +1,48 @@
+[
+  {
+    "id": "956c65fc.759a28",
+    "type": "ui_switch",
+    "z": "732a823b.6349dc",
+    "name": "VORHAUS  GALLERIE BODEN",
+    "label": "SPOTS BODEN",
+    "group": "b210f56e.db6368",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "GALLERIE BODEN",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 378.0173645019531,
+    "y": 129.01040649414062,
+    "wires": [
+      [
+        "f4f718ca.73ad78"
+      ]
+    ]
+  },
+  {
+    "id": "f4f718ca.73ad78",
+    "type": "function",
+    "z": "732a823b.6349dc",
+    "name": "LIGHT COMMAND ANTEROOM GALLERY UP",
+    "func": {
+      "$flowSource": "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up--f4f718ca.73ad78.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 808.1461334228516,
+    "y": 50.909400939941406,
+    "wires": [
+      []
+    ]
+  }
+]

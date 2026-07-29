@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1bffffd9.4080c",
+    "type": "subflow:5fed965b.1efc18",
+    "z": "53cbac0a.2b67f4",
+    "name": "ANTROOM_MIDDLE_OFF",
+    "env": [],
+    "x": 200,
+    "y": 80,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "dee88283.1e36c",
+    "type": "subflow:b6e6fa.8bfd1908",
+    "z": "53cbac0a.2b67f4",
+    "name": "ANTEROOM_MIDDLE_ON",
+    "env": [],
+    "x": 200,
+    "y": 140,
+    "wires": [
+      []
+    ]
+  }
+]

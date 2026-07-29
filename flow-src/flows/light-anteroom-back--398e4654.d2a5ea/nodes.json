@@ -1,0 +1,48 @@
+[
+  {
+    "id": "ed728d49.43d96",
+    "type": "ui_switch",
+    "z": "398e4654.d2a5ea",
+    "name": "VORHAUS  LICHT HINTEN",
+    "label": "Licht Hinten",
+    "group": "fd93ca25.397518",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "LICHT HINTEN",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 471.0173645019531,
+    "y": 194.01040649414062,
+    "wires": [
+      [
+        "4bc9db11.460844"
+      ]
+    ]
+  },
+  {
+    "id": "4bc9db11.460844",
+    "type": "function",
+    "z": "398e4654.d2a5ea",
+    "name": "LIGHT COMMAND ANTEROOM BACK",
+    "func": {
+      "$flowSource": "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back--4bc9db11.460844.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 915.1462059020996,
+    "y": 300.9093933105469,
+    "wires": [
+      []
+    ]
+  }
+]

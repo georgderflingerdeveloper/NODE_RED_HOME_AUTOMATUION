@@ -8638,7 +8638,7 @@
         "topic": "weather/update",
         "payload": "",
         "payloadType": "date",
-        "x": 260,
+        "x": 240,
         "y": 80,
         "wires": [
             [
@@ -8724,7 +8724,7 @@
         ],
         "uncaught": false,
         "x": 360,
-        "y": 260,
+        "y": 300,
         "wires": [
             [
                 "weather_fallback"
@@ -8828,8 +8828,8 @@
         "z": "weather_flow",
         "name": "Dashboard-Verbindung überwachen",
         "events": "all",
-        "x": 290,
-        "y": 400,
+        "x": 430,
+        "y": 460,
         "wires": [
             [
                 "weather_dashboard_refresh"
@@ -8848,8 +8848,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 400,
+        "x": 860,
+        "y": 460,
         "wires": [
             [
                 "weather_ui_overview_table"

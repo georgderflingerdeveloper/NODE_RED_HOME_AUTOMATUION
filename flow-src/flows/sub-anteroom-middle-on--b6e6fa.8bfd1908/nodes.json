@@ -1,0 +1,26 @@
+[
+  {
+    "id": "9accca19.dead38",
+    "type": "ui_button",
+    "z": "b6e6fa.8bfd1908",
+    "name": "ANTEROOM_MIDDLE_ON",
+    "group": "fd93ca25.397518",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "label": "Vorhaus Licht Mitte EIN",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "TURN-LIGHT-ANTEROOM-MIDDLE-ON",
+    "payloadType": "str",
+    "topic": "ANTEROOM_MIDDLE_ON",
+    "x": 180,
+    "y": 80,
+    "wires": [
+      []
+    ]
+  }
+]

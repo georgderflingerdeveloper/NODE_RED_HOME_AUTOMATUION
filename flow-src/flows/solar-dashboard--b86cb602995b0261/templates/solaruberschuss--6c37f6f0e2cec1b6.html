@@ -1,0 +1,4 @@
+<div class="se-power-row se-power-excess" ng-class="{'is-active': (msg.payload * 1) > 0}">
+  <span class="se-power-label">Verfügbarer Solarüberschuss [W]</span>
+  <span class="se-power-value">{{msg.payload === undefined ? 0 : msg.payload}}</span>
+</div>

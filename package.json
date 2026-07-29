@@ -3,6 +3,19 @@
     "description": "A Node-RED Project",
     "version": "0.0.1",
     "private": true,
+    "scripts": {
+        "flow:export": "node tools/flow-source/export.mjs",
+        "flow:import": "node tools/flow-source/import.mjs --write",
+        "flow:import:check": "node tools/flow-source/import.mjs",
+        "flow:check": "node tools/flow-source/validate.mjs",
+        "flow:roundtrip": "node tools/flow-source/roundtrip.mjs",
+        "library:install": "node tools/flow-source/install-library.mjs",
+        "flow:deploy": "npm run library:install && node tools/flow-source/deploy.mjs",
+        "test": "node --test test/*.test.mjs"
+    },
+    "engines": {
+        "node": ">=20"
+    },
     "dependencies": {
         "@redplc/node-red-redplc": "^2.0.1",
         "node-red-contrib-actionflows": "~2.0.3",

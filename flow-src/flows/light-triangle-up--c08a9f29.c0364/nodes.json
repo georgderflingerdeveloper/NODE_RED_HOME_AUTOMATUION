@@ -1,0 +1,48 @@
+[
+  {
+    "id": "6a086c60.026464",
+    "type": "ui_switch",
+    "z": "c08a9f29.c0364",
+    "name": "TRIANGLE UP",
+    "label": "LICHT DREIECK OBEN",
+    "group": "468e6c40.6e8c54",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2637.265625,
+    "y": 1679.2264671325684,
+    "wires": [
+      [
+        "8c5c28f0.07d728"
+      ]
+    ]
+  },
+  {
+    "id": "8c5c28f0.07d728",
+    "type": "function",
+    "z": "c08a9f29.c0364",
+    "name": "LIGHT COMMAND TRIANGLE UP",
+    "func": {
+      "$flowSource": "flows/light-triangle-up--c08a9f29.c0364/functions/light-command-triangle-up--8c5c28f0.07d728.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 2993.265625,
+    "y": 1674.2264671325684,
+    "wires": [
+      []
+    ]
+  }
+]

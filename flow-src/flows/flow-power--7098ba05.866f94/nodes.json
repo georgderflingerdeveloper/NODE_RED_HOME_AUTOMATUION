@@ -1,0 +1,76 @@
+[
+  {
+    "id": "dbcb4b90.cdfce8",
+    "type": "group",
+    "z": "7098ba05.866f94",
+    "name": "PLUGCONTROL_INFRAREDHEATER",
+    "style": {
+      "fill": "#ffbfbf",
+      "fill-opacity": "0.5",
+      "label": true
+    },
+    "nodes": [
+      "549bb42a.74bb9c",
+      "1be1736d.08c8ed",
+      "845cb910.0d57d8"
+    ],
+    "x": 134,
+    "y": 119,
+    "w": 727,
+    "h": 82
+  },
+  {
+    "id": "549bb42a.74bb9c",
+    "type": "subflow:5cf46a6e.756414",
+    "z": "7098ba05.866f94",
+    "g": "dbcb4b90.cdfce8",
+    "name": "SUB_PLUG_IR",
+    "env": [],
+    "x": 600,
+    "y": 160,
+    "wires": [
+      [
+        "1be1736d.08c8ed"
+      ]
+    ]
+  },
+  {
+    "id": "1be1736d.08c8ed",
+    "type": "link out",
+    "z": "7098ba05.866f94",
+    "g": "dbcb4b90.cdfce8",
+    "name": "LINK_POWER_OUT",
+    "links": [
+      "86c3cf93.eb9b"
+    ],
+    "x": 820,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "845cb910.0d57d8",
+    "type": "inject",
+    "z": "7098ba05.866f94",
+    "g": "dbcb4b90.cdfce8",
+    "name": "INITIAL_AUTO_OFF_ACTIVATED",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "constants.ACTIVATE_POWER_PLUG_INFRA_RED_AUTO",
+    "payloadType": "global",
+    "x": 320,
+    "y": 160,
+    "wires": [
+      [
+        "549bb42a.74bb9c"
+      ]
+    ]
+  }
+]

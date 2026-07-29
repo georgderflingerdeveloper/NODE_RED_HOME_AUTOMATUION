@@ -1,0 +1,3 @@
+# Generierte Spiegeldateien müssen vorhandene Leerzeichen aus flows.json bytegenau bewahren.
+flow-src/** whitespace=-trailing-space
+lib/functions/generated/** whitespace=-trailing-space

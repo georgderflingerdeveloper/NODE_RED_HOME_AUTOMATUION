@@ -1,0 +1,48 @@
+[
+  {
+    "id": "4bb22b97.5e2784",
+    "type": "ui_switch",
+    "z": "8e0df9ea.dc6d98",
+    "name": "LIGHT WINDOW UP EAST",
+    "label": "LICHT FENSTER OBEN OSTEN",
+    "group": "848f3969.ede7f8",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2548.229248046875,
+    "y": 1798.6986351013184,
+    "wires": [
+      [
+        "d17830e4.5d856"
+      ]
+    ]
+  },
+  {
+    "id": "d17830e4.5d856",
+    "type": "function",
+    "z": "8e0df9ea.dc6d98",
+    "name": "LIGHT_WINDOW_UP_EAST",
+    "func": {
+      "$flowSource": "flows/light-window-up-east--8e0df9ea.dc6d98/functions/light-window-up-east--d17830e4.5d856.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 2934.229248046875,
+    "y": 1801.6986351013184,
+    "wires": [
+      []
+    ]
+  }
+]

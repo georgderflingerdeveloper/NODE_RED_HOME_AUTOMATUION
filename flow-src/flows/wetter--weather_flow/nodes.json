@@ -1,0 +1,263 @@
+[
+  {
+    "id": "weather_comment",
+    "type": "comment",
+    "z": "weather_flow",
+    "name": "WETTERDIENST · OPEN-METEO · REINDLMÜHL · STÜNDLICH",
+    "info": "Standort: Reindlmühl bei Altmünster am Traunsee, Oberösterreich. Koordinaten 47.89464 / 13.7163, Höhe 596 m, Europe/Vienna. Kostenlos und ohne API-Schlüssel. Bestehende Flows bleiben unverändert.",
+    "x": 460,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "weather_hourly_reindlmuehl",
+    "type": "inject",
+    "z": "weather_flow",
+    "name": "JEDE STUNDE + BEIM START · REINDLMÜHL",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "3600",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "2",
+    "topic": "weather/update",
+    "payload": "",
+    "payloadType": "date",
+    "x": 240,
+    "y": 80,
+    "wires": [
+      [
+        "weather_build_request"
+      ]
+    ]
+  },
+  {
+    "id": "weather_build_request",
+    "type": "function",
+    "z": "weather_flow",
+    "name": "WETTER KONFIGURATION · Reindlmühl",
+    "func": {
+      "$flowSource": "flows/wetter--weather_flow/functions/wetter-konfiguration-reindlmuhl--weather_build_request.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 500,
+    "y": 160,
+    "wires": [
+      [
+        "weather_http"
+      ]
+    ]
+  },
+  {
+    "id": "weather_http",
+    "type": "http request",
+    "z": "weather_flow",
+    "name": "Open-Meteo Wetterdaten abrufen",
+    "method": "use",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 800,
+    "y": 100,
+    "wires": [
+      [
+        "weather_parse"
+      ]
+    ]
+  },
+  {
+    "id": "weather_parse",
+    "type": "function",
+    "z": "weather_flow",
+    "name": "Wetterdaten prüfen und Payload aufbauen",
+    "func": {
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen--weather_parse.js"
+    },
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1170,
+    "y": 80,
+    "wires": [
+      [
+        "weather_publish"
+      ],
+      [
+        "weather_fallback"
+      ]
+    ]
+  },
+  {
+    "id": "weather_catch",
+    "type": "catch",
+    "z": "weather_flow",
+    "name": "Fehler Wetterabfrage",
+    "scope": [
+      "weather_http",
+      "weather_parse"
+    ],
+    "uncaught": false,
+    "x": 360,
+    "y": 300,
+    "wires": [
+      [
+        "weather_fallback"
+      ]
+    ]
+  },
+  {
+    "id": "weather_fallback",
+    "type": "function",
+    "z": "weather_flow",
+    "name": "SICHERER AUSFALL · Wetterwerte auf 0",
+    "func": {
+      "$flowSource": "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0--weather_fallback.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 740,
+    "y": 300,
+    "wires": [
+      [
+        "weather_publish"
+      ]
+    ]
+  },
+  {
+    "id": "weather_publish",
+    "type": "function",
+    "z": "weather_flow",
+    "name": "Wetterdaten veröffentlichen",
+    "func": {
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen--weather_publish.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1100,
+    "y": 280,
+    "wires": [
+      [
+        "weather_debug",
+        "weather_link_out",
+        "weather_ui_overview_table"
+      ]
+    ]
+  },
+  {
+    "id": "weather_debug",
+    "type": "debug",
+    "z": "weather_flow",
+    "name": "WETTER PAYLOAD · VOLLSTÄNDIG",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.WeatherServiceStatusText",
+    "statusType": "jsonata",
+    "x": 1430,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "weather_link_out",
+    "type": "link out",
+    "z": "weather_flow",
+    "name": "LINK_WETTERDATEN_OUT",
+    "mode": "link",
+    "links": [],
+    "x": 1305,
+    "y": 320,
+    "wires": []
+  },
+  {
+    "id": "weather_ui_overview_table",
+    "type": "ui_template",
+    "z": "weather_flow",
+    "group": "weather_dashboard_group",
+    "name": "Wettertabelle & Sonnenampel",
+    "order": 1,
+    "width": "0",
+    "height": 9,
+    "format": {
+      "$flowSource": "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel--weather_ui_overview_table.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 1410,
+    "y": 460,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "weather_dashboard_ui_control",
+    "type": "ui_ui_control",
+    "z": "weather_flow",
+    "name": "Dashboard-Verbindung überwachen",
+    "events": "all",
+    "x": 430,
+    "y": 460,
+    "wires": [
+      [
+        "weather_dashboard_refresh"
+      ]
+    ]
+  },
+  {
+    "id": "weather_dashboard_refresh",
+    "type": "function",
+    "z": "weather_flow",
+    "name": "Wetterübersicht nach Verbindung aktualisieren",
+    "func": {
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren--weather_dashboard_refresh.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 860,
+    "y": 460,
+    "wires": [
+      [
+        "weather_ui_overview_table"
+      ]
+    ]
+  }
+]

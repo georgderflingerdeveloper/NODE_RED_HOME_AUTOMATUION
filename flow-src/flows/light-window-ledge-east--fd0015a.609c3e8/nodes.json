@@ -1,0 +1,48 @@
+[
+  {
+    "id": "5ab8ac96.b9b9a4",
+    "type": "function",
+    "z": "fd0015a.609c3e8",
+    "name": "WINDOW LEDGE EAST COMMAND",
+    "func": {
+      "$flowSource": "flows/light-window-ledge-east--fd0015a.609c3e8/functions/window-ledge-east-command--5ab8ac96.b9b9a4.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 2867.650718688965,
+    "y": 253.00562381744385,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "e6277f7f.fe238",
+    "type": "ui_switch",
+    "z": "fd0015a.609c3e8",
+    "name": "WINDOW LEDGE EAST",
+    "label": "FENSTERBANK OSTEN",
+    "group": "d8a967f.6ed2998",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2451.6509552001953,
+    "y": 245.00547122955322,
+    "wires": [
+      [
+        "5ab8ac96.b9b9a4"
+      ]
+    ]
+  }
+]

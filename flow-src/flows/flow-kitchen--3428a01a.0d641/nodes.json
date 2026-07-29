@@ -1,0 +1,84 @@
+[
+  {
+    "id": "587a9021.5adbf",
+    "type": "group",
+    "z": "3428a01a.0d641",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "25c0e3c3.9c37ac",
+      "573539e9.5b4038",
+      "9ea353d9.0ebde",
+      "48611f94.4d494"
+    ],
+    "x": 339,
+    "y": 19
+  },
+  {
+    "id": "25c0e3c3.9c37ac",
+    "type": "subflow:5a45fc24.e52174",
+    "z": "3428a01a.0d641",
+    "g": "587a9021.5adbf",
+    "name": "LIGHT_KITCHENBOARD_DOWN",
+    "x": 620,
+    "y": 200,
+    "wires": [
+      [
+        "48611f94.4d494"
+      ]
+    ]
+  },
+  {
+    "id": "573539e9.5b4038",
+    "type": "subflow:8f298b26.b15d28",
+    "z": "3428a01a.0d641",
+    "g": "587a9021.5adbf",
+    "name": "FRONTLIGHTS_KITCHEN",
+    "env": [],
+    "x": 620,
+    "y": 60,
+    "wires": [
+      [
+        "48611f94.4d494"
+      ]
+    ]
+  },
+  {
+    "id": "9ea353d9.0ebde",
+    "type": "link in",
+    "z": "3428a01a.0d641",
+    "g": "587a9021.5adbf",
+    "name": "LINK_CONTROL_TO_KITCHEN_IN",
+    "links": [
+      "1f08d9ae.1ea606"
+    ],
+    "x": 380,
+    "y": 120,
+    "wires": [
+      [
+        "573539e9.5b4038",
+        "25c0e3c3.9c37ac"
+      ]
+    ]
+  },
+  {
+    "id": "48611f94.4d494",
+    "type": "link out",
+    "z": "3428a01a.0d641",
+    "g": "587a9021.5adbf",
+    "name": "LINK_SEND_TO_KITCHEN_OUT",
+    "links": [
+      "4875aa3e.f01994"
+    ],
+    "x": 875,
+    "y": 120,
+    "wires": []
+  }
+]

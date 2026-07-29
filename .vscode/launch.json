@@ -13,6 +13,30 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\lib\\functions\\INIT_PHIDGETS_DIGITAL_OUTPUT_INLINE.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Unit-Tests (alle)",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeArgs": [
+                "--test"
+            ],
+            "program": "${workspaceFolder}/test/*.test.mjs"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Aktuelle JavaScript-Testdatei",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeArgs": [
+                "--test"
+            ],
+            "program": "${file}"
         }
     ]
 }

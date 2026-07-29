@@ -1,0 +1,48 @@
+[
+  {
+    "id": "bcb0c415.ab2f18",
+    "type": "function",
+    "z": "e1423e4a.93e71",
+    "name": "LIGHT COMMAND WINDOW LEDGE WEST",
+    "func": {
+      "$flowSource": "flows/light-window-ledge-west--e1423e4a.93e71/functions/light-command-window-ledge-west--bcb0c415.ab2f18.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3194.014190673828,
+    "y": 1225.7325947284698,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "b3f809ba.1aafc8",
+    "type": "ui_switch",
+    "z": "e1423e4a.93e71",
+    "name": "WINDOW LEDGE WEST",
+    "label": "FENSTERBANK WESTEN",
+    "group": "d8a967f.6ed2998",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2837.0143699645996,
+    "y": 1225.7326710224152,
+    "wires": [
+      [
+        "bcb0c415.ab2f18"
+      ]
+    ]
+  }
+]

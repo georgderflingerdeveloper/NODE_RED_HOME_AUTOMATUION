@@ -1,0 +1,106 @@
+[
+  {
+    "id": "b461a748.541ac8",
+    "type": "function",
+    "z": "27c430f0.58ebc",
+    "name": "LIGHT COMMAND ALL LIGHTS WEST",
+    "func": {
+      "$flowSource": "flows/flow-westside--27c430f0.58ebc/functions/light-command-all-lights-west--b461a748.541ac8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 820,
+    "y": 120,
+    "wires": [
+      [
+        "85ffe774.57d6e8"
+      ]
+    ]
+  },
+  {
+    "id": "b518eb80.ad0298",
+    "type": "subflow:e1423e4a.93e71",
+    "z": "27c430f0.58ebc",
+    "name": "LIGHT_WINDOW_LEDGE_WEST",
+    "x": 800,
+    "y": 80,
+    "wires": [
+      [
+        "85ffe774.57d6e8"
+      ]
+    ]
+  },
+  {
+    "id": "732c79a1.5df9c8",
+    "type": "subflow:1df46f96.bc77b",
+    "z": "27c430f0.58ebc",
+    "name": "LIGHT_WALL_WEST",
+    "x": 760,
+    "y": 160,
+    "wires": [
+      [
+        "85ffe774.57d6e8"
+      ]
+    ]
+  },
+  {
+    "id": "8a6c9274.5e31d",
+    "type": "subflow:9e792846.0d4958",
+    "z": "27c430f0.58ebc",
+    "name": "LIGHT_TRIANGLE_WEST",
+    "x": 780,
+    "y": 200,
+    "wires": [
+      [
+        "85ffe774.57d6e8"
+      ]
+    ]
+  },
+  {
+    "id": "7d8ed4fd.6c780c",
+    "type": "link in",
+    "z": "27c430f0.58ebc",
+    "name": "LINK_CONTROL_TO_FLOWS_WESTSIDE_IN",
+    "links": [
+      "419fc6fa.d20eb8"
+    ],
+    "x": 500,
+    "y": 140,
+    "wires": [
+      [
+        "b518eb80.ad0298",
+        "b461a748.541ac8",
+        "732c79a1.5df9c8",
+        "8a6c9274.5e31d"
+      ]
+    ]
+  },
+  {
+    "id": "85ffe774.57d6e8",
+    "type": "link out",
+    "z": "27c430f0.58ebc",
+    "name": "LINK_TO_SEND_WESTSIDE_OUT",
+    "links": [
+      "4118db13.ed27a4"
+    ],
+    "x": 1120,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "5389fb5b.5a0244",
+    "type": "link in",
+    "z": "27c430f0.58ebc",
+    "name": "LINK_FROM_SCENARIO_WESTSIDE1",
+    "links": [
+      "7b20a57f.06ad1c"
+    ],
+    "x": 495,
+    "y": 80,
+    "wires": [
+      [
+        "b518eb80.ad0298"
+      ]
+    ]
+  }
+]

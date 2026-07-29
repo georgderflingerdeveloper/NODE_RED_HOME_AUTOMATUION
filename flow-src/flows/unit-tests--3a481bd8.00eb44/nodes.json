@@ -1,0 +1,79 @@
+[
+  {
+    "id": "78be8f10.9c6a",
+    "type": "group",
+    "z": "3a481bd8.00eb44",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "2183351f.2e2b0a",
+      "e761c1d4.6ca24",
+      "7211dc16.1b3594"
+    ],
+    "x": 274,
+    "y": 19,
+    "w": 812,
+    "h": 82
+  },
+  {
+    "id": "2183351f.2e2b0a",
+    "type": "assert",
+    "z": "3a481bd8.00eb44",
+    "g": "78be8f10.9c6a",
+    "name": "CHECK_AUTO",
+    "x": 980,
+    "y": 60,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "e761c1d4.6ca24",
+    "type": "subflow:5cf46a6e.756414",
+    "z": "3a481bd8.00eb44",
+    "d": true,
+    "g": "78be8f10.9c6a",
+    "name": "SUB_PLUG_IR",
+    "env": [],
+    "x": 740,
+    "y": 60,
+    "wires": [
+      [
+        "2183351f.2e2b0a"
+      ]
+    ]
+  },
+  {
+    "id": "7211dc16.1b3594",
+    "type": "inject",
+    "z": "3a481bd8.00eb44",
+    "g": "78be8f10.9c6a",
+    "name": "INITIAL_AUTO_OFF_ACTIVATED",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "ACTIVATE-POWER-PLUG-INFRA-RED-AUTO",
+    "payloadType": "str",
+    "x": 460,
+    "y": 60,
+    "wires": [
+      [
+        "e761c1d4.6ca24"
+      ]
+    ]
+  }
+]

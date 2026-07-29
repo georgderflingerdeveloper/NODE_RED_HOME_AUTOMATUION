@@ -1,0 +1,197 @@
+[
+  {
+    "id": "c44e116a.cb695",
+    "type": "inject",
+    "z": "fe7ff20.d2e8f1",
+    "name": "Initial",
+    "props": [
+      {
+        "p": "constants",
+        "v": "{\"ACTIVATE_POWER_PLUG_INFRA_RED_AUTO\":\"ACTIVATE-POWER-PLUG-INFRA-RED-AUTO\",\"ACTIVATE_BOILER_AUTO\":\"ACTIVATE-BOILER-AUTO\"}",
+        "vt": "json"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 170,
+    "y": 100,
+    "wires": [
+      [
+        "659fa532.98cc7c",
+        "839bdbf3.308d88"
+      ]
+    ]
+  },
+  {
+    "id": "659fa532.98cc7c",
+    "type": "function",
+    "z": "fe7ff20.d2e8f1",
+    "name": "",
+    "func": {
+      "$flowSource": "flows/global--fe7ff20.d2e8f1/functions/function--659fa532.98cc7c.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 460,
+    "y": 100,
+    "wires": [
+      [
+        "df58aa40.4a83c8"
+      ]
+    ]
+  },
+  {
+    "id": "df58aa40.4a83c8",
+    "type": "debug",
+    "z": "fe7ff20.d2e8f1",
+    "name": "",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "constants.ACTIVATE_POWER_PLUG_INFRA_RED_AUTO",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 870,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "839bdbf3.308d88",
+    "type": "change",
+    "z": "fe7ff20.d2e8f1",
+    "name": "",
+    "rules": [
+      {
+        "t": "move",
+        "p": "constants",
+        "pt": "msg",
+        "to": "constants",
+        "tot": "global"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 500,
+    "y": 160,
+    "wires": [
+      [
+        "fe8edb24.5a8e08"
+      ]
+    ]
+  },
+  {
+    "id": "fe8edb24.5a8e08",
+    "type": "debug",
+    "z": "fe7ff20.d2e8f1",
+    "name": "",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 690,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "c3940c47.5e272",
+    "type": "switch",
+    "z": "fe7ff20.d2e8f1",
+    "name": "TEST_CONSTANTS",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "constants.ACTIVATE_POWER_PLUG_INFRA_RED_AUTO",
+        "vt": "global"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 640,
+    "y": 280,
+    "wires": [
+      [
+        "2fb69576.d5b82a"
+      ]
+    ]
+  },
+  {
+    "id": "1d233c55.5e48a4",
+    "type": "change",
+    "z": "fe7ff20.d2e8f1",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "ACTIVATE-POWER-PLUG-INFRA-RED-AUTO",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 390,
+    "y": 280,
+    "wires": [
+      [
+        "c3940c47.5e272"
+      ]
+    ]
+  },
+  {
+    "id": "f4c6d319.af2f5",
+    "type": "inject",
+    "z": "fe7ff20.d2e8f1",
+    "name": "Initial",
+    "props": [],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 190,
+    "y": 280,
+    "wires": [
+      [
+        "1d233c55.5e48a4"
+      ]
+    ]
+  },
+  {
+    "id": "2fb69576.d5b82a",
+    "type": "debug",
+    "z": "fe7ff20.d2e8f1",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 850,
+    "y": 280,
+    "wires": []
+  }
+]

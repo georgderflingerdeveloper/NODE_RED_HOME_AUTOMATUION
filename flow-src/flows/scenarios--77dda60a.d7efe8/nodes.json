@@ -1,0 +1,75 @@
+[
+  {
+    "id": "33f201d7.d8ec1e",
+    "type": "ui_dropdown",
+    "z": "77dda60a.d7efe8",
+    "name": "SCENARIOS",
+    "label": "SCENARIOS",
+    "tooltip": "",
+    "place": "Select option",
+    "group": "f082d23.5870f3",
+    "order": 5,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "options": [
+      {
+        "label": "NONE",
+        "value": "NONE",
+        "type": "str"
+      },
+      {
+        "label": "DIMM",
+        "value": "DIMM",
+        "type": "str"
+      },
+      {
+        "label": "ADVENTURE",
+        "value": "ADVENTURE",
+        "type": "str"
+      }
+    ],
+    "payload": "",
+    "topic": "",
+    "x": 210,
+    "y": 160,
+    "wires": [
+      [
+        "878f556e.dc77d8",
+        "34d1e102.250d5e"
+      ]
+    ]
+  },
+  {
+    "id": "878f556e.dc77d8",
+    "type": "function",
+    "z": "77dda60a.d7efe8",
+    "name": "MAKE_DIMM",
+    "func": {
+      "$flowSource": "flows/scenarios--77dda60a.d7efe8/functions/make-dimm--878f556e.dc77d8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 440,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "34d1e102.250d5e",
+    "type": "function",
+    "z": "77dda60a.d7efe8",
+    "name": "MAKE_ADVENTURE",
+    "func": {
+      "$flowSource": "flows/scenarios--77dda60a.d7efe8/functions/make-adventure--34d1e102.250d5e.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 460,
+    "y": 220,
+    "wires": [
+      []
+    ]
+  }
+]

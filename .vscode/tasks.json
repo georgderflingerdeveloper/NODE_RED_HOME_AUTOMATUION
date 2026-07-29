@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flow: vollständig prüfen",
+            "type": "npm",
+            "script": "flow:check",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tests: JavaScript Unit Tests",
+            "type": "npm",
+            "script": "test",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flow: bytegenauer Round-Trip",
+            "type": "npm",
+            "script": "flow:roundtrip",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flow: Node-RED nach VS Code exportieren",
+            "type": "npm",
+            "script": "flow:export",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flow: VS Code nach flows.json importieren",
+            "type": "npm",
+            "script": "flow:import",
+            "problemMatcher": []
+        },
+        {
+            "label": "Bibliothek: Function-Nodes in Node-RED installieren",
+            "type": "npm",
+            "script": "library:install",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flow: lokal zu Node-RED deployen",
+            "type": "npm",
+            "script": "flow:deploy",
+            "problemMatcher": []
+        }
+    ]
+}

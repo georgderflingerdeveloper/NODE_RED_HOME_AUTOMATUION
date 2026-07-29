@@ -1,0 +1,150 @@
+[
+  {
+    "id": "f9ff8461.417b58",
+    "type": "group",
+    "z": "4f4805f4.fd73bc",
+    "name": "LIGHTGROUP NEAR DOOR",
+    "style": {
+      "fill": "#ffffbf",
+      "label": true
+    },
+    "nodes": [
+      "2a0fb1c8.57c7ae",
+      "5b139a3c.b77794",
+      "1c1d56da.e66e19",
+      "45579c05.6d8f24",
+      "935a3994.8e65b8",
+      "c7dc9b5.d390368",
+      "aafe16d6.baf1b8",
+      "8d7eff1b.47165"
+    ],
+    "x": 434,
+    "y": 119,
+    "w": 702,
+    "h": 402
+  },
+  {
+    "id": "2a0fb1c8.57c7ae",
+    "type": "subflow:58c186d2.cc7718",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "LIGHT_DOOR_ENTRY_LEFT",
+    "env": [],
+    "x": 810,
+    "y": 480,
+    "wires": [
+      [
+        "c7dc9b5.d390368"
+      ]
+    ]
+  },
+  {
+    "id": "5b139a3c.b77794",
+    "type": "subflow:77354d21.b63d74",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "LIGHT_MAIN_DOOR",
+    "x": 780,
+    "y": 160,
+    "wires": [
+      [
+        "c7dc9b5.d390368"
+      ]
+    ]
+  },
+  {
+    "id": "1c1d56da.e66e19",
+    "type": "subflow:8e0df9ea.dc6d98",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "LIGHT_WINDOW_UP_EAST",
+    "x": 800,
+    "y": 260,
+    "wires": [
+      [
+        "c7dc9b5.d390368"
+      ]
+    ]
+  },
+  {
+    "id": "45579c05.6d8f24",
+    "type": "subflow:17252e85.f4c3c1",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "LIGHT_RIGHT_NEXT_DOOR",
+    "x": 810,
+    "y": 360,
+    "wires": [
+      [
+        "c7dc9b5.d390368"
+      ]
+    ]
+  },
+  {
+    "id": "935a3994.8e65b8",
+    "type": "link in",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "LINK_CONTROL_SOUTH_IN",
+    "links": [
+      "a030b27e.8deae"
+    ],
+    "x": 475,
+    "y": 300,
+    "wires": [
+      [
+        "5b139a3c.b77794",
+        "1c1d56da.e66e19",
+        "45579c05.6d8f24",
+        "2a0fb1c8.57c7ae"
+      ]
+    ]
+  },
+  {
+    "id": "c7dc9b5.d390368",
+    "type": "link out",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "LINK_CONTROL_TOSEND_SOUTH_OUT",
+    "links": [
+      "87280057.43332"
+    ],
+    "x": 1095,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "aafe16d6.baf1b8",
+    "type": "link in",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "FROM_SCENARIO",
+    "links": [
+      "658ebf41.b879"
+    ],
+    "x": 475,
+    "y": 440,
+    "wires": [
+      [
+        "2a0fb1c8.57c7ae"
+      ]
+    ]
+  },
+  {
+    "id": "8d7eff1b.47165",
+    "type": "link in",
+    "z": "4f4805f4.fd73bc",
+    "g": "f9ff8461.417b58",
+    "name": "SCENARIO_ADVENTURE_IN",
+    "links": [
+      "42e30d78.045134"
+    ],
+    "x": 695,
+    "y": 320,
+    "wires": [
+      [
+        "1c1d56da.e66e19"
+      ]
+    ]
+  }
+]

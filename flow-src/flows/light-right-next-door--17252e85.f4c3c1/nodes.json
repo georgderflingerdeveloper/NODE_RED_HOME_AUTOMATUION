@@ -1,0 +1,48 @@
+[
+  {
+    "id": "ea3f3594.237fc8",
+    "type": "ui_switch",
+    "z": "17252e85.f4c3c1",
+    "name": "LIGHT WINDOW BESIDE DOOR RIGHT",
+    "label": "LICHT FENSTER NEBEN TÜRE RECHTS",
+    "group": "dddbf4a9.de6238",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2557.015625,
+    "y": 1839.2264671325684,
+    "wires": [
+      [
+        "457726bc.ce31c8"
+      ]
+    ]
+  },
+  {
+    "id": "457726bc.ce31c8",
+    "type": "function",
+    "z": "17252e85.f4c3c1",
+    "name": "LIGHT COMMAND INDOW BESIDE DOOR LIGHT",
+    "func": {
+      "$flowSource": "flows/light-right-next-door--17252e85.f4c3c1/functions/light-command-indow-beside-door-light--457726bc.ce31c8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 2975.015625,
+    "y": 1842.2264671325684,
+    "wires": [
+      []
+    ]
+  }
+]

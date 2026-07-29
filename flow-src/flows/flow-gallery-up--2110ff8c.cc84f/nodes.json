@@ -1,0 +1,302 @@
+[
+  {
+    "id": "22191ac0.b45bd6",
+    "type": "group",
+    "z": "2110ff8c.cc84f",
+    "name": "GALLERY",
+    "style": {
+      "fill": "#ffff7f",
+      "label": true
+    },
+    "nodes": [
+      "b8e7cd07.7fb1c",
+      "5a0a6783.e7d0e8",
+      "59d70f77.1bd21",
+      "53b3b2a1.8a039c",
+      "c4d1fd9d.a5b8d",
+      "c07acaae.712158",
+      "61a732ca.b667fc",
+      "b3f8fb06.edebd8",
+      "7d63c6.15177c3c",
+      "2a345534.38f40a",
+      "bb8b0123.c8baf",
+      "a6da726f.2402a",
+      "6143e08d.553e3",
+      "a4423e84.af18a",
+      "62800ed8.362fc"
+    ],
+    "x": 194,
+    "y": 39,
+    "w": 822,
+    "h": 862
+  },
+  {
+    "id": "b8e7cd07.7fb1c",
+    "type": "subflow:6246a200.ac18dc",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_11",
+    "env": [],
+    "x": 630,
+    "y": 700,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "5a0a6783.e7d0e8",
+    "type": "subflow:fbecec3.074551",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_10",
+    "x": 640,
+    "y": 620,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "59d70f77.1bd21",
+    "type": "subflow:be228d90.8caef",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_9",
+    "x": 630,
+    "y": 560,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "53b3b2a1.8a039c",
+    "type": "subflow:fb9db58e.530998",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_8",
+    "x": 630,
+    "y": 500,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "c4d1fd9d.a5b8d",
+    "type": "subflow:6dbd2357.9181cc",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_7",
+    "x": 630,
+    "y": 440,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "c07acaae.712158",
+    "type": "subflow:ea250672.3772b8",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_6",
+    "x": 630,
+    "y": 380,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "61a732ca.b667fc",
+    "type": "subflow:bbbc4d26.67bb6",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_5",
+    "x": 630,
+    "y": 340,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "b3f8fb06.edebd8",
+    "type": "subflow:14763e8a.16f4e1",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_2",
+    "env": [],
+    "x": 630,
+    "y": 140,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "7d63c6.15177c3c",
+    "type": "subflow:6f1a9f64.905d8",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_3",
+    "x": 630,
+    "y": 220,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "2a345534.38f40a",
+    "type": "subflow:9fee7c36.f7377",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP_4",
+    "x": 630,
+    "y": 280,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "bb8b0123.c8baf",
+    "type": "link in",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LINK_CONTROL_GALLERY_UP_IN",
+    "links": [
+      "234d0ad4.aa5936"
+    ],
+    "x": 235,
+    "y": 420,
+    "wires": [
+      [
+        "b3f8fb06.edebd8",
+        "7d63c6.15177c3c",
+        "2a345534.38f40a",
+        "61a732ca.b667fc",
+        "c07acaae.712158",
+        "c4d1fd9d.a5b8d",
+        "53b3b2a1.8a039c",
+        "59d70f77.1bd21",
+        "5a0a6783.e7d0e8",
+        "b8e7cd07.7fb1c",
+        "6143e08d.553e3",
+        "a4423e84.af18a",
+        "62800ed8.362fc"
+      ]
+    ]
+  },
+  {
+    "id": "a6da726f.2402a",
+    "type": "link out",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LINK_CONTROL_GALLERY_UP_TOSEND_OUT",
+    "links": [
+      "6f154ce5.194d04"
+    ],
+    "x": 975,
+    "y": 420,
+    "wires": []
+  },
+  {
+    "id": "6143e08d.553e3",
+    "type": "subflow:24a391fc.9c0f9e",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_GALLERY_UP",
+    "env": [],
+    "x": 620,
+    "y": 780,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "a4423e84.af18a",
+    "type": "subflow:c08a9f29.c0364",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "LIGHT_TRIANGLE_UP",
+    "x": 630,
+    "y": 860,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "62800ed8.362fc",
+    "type": "ui_switch",
+    "z": "2110ff8c.cc84f",
+    "g": "22191ac0.b45bd6",
+    "name": "GALLERY UP 1",
+    "label": "LEUCHTEN OBEN 1",
+    "tooltip": "",
+    "group": "ee7391e3.0774",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "G1ON",
+    "onvalueType": "global",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "G1OFF",
+    "offvalueType": "global",
+    "officon": "",
+    "offcolor": "",
+    "x": 600,
+    "y": 80,
+    "wires": [
+      [
+        "a6da726f.2402a"
+      ]
+    ]
+  },
+  {
+    "id": "3039a9ef.dca166",
+    "type": "config",
+    "z": "2110ff8c.cc84f",
+    "name": "CONFIG_GALLERY_COMMANDOS",
+    "properties": [
+      {
+        "p": "G1ON",
+        "pt": "global",
+        "to": "TURN-GALLERY-UP1-ON",
+        "tot": "str"
+      },
+      {
+        "p": "G1OFF",
+        "pt": "global",
+        "to": "TURN-GALLERY-UP1-OFF",
+        "tot": "str"
+      }
+    ],
+    "active": true,
+    "x": 1360,
+    "y": 60,
+    "wires": []
+  }
+]

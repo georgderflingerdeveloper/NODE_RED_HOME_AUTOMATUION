@@ -1,0 +1,49 @@
+[
+  {
+    "id": "efebc5d2.62f878",
+    "type": "function",
+    "z": "4a0d4570.92dcfc",
+    "name": "LIGHT COMMAND KID 4",
+    "func": {
+      "$flowSource": "flows/light-kid-4--4a0d4570.92dcfc/functions/light-command-kid-4--efebc5d2.62f878.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 530,
+    "y": 40,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "e2a9708e.bc9c8",
+    "type": "ui_switch",
+    "z": "4a0d4570.92dcfc",
+    "name": "Light4",
+    "label": "MANSARDE2",
+    "tooltip": "",
+    "group": "9f9a8a62.d54b98",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "fa-3x fa-lightbulb-o",
+    "oncolor": "yellow",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "fa-3x fa-lightbulb-o",
+    "offcolor": "gray",
+    "x": 147.99995040893555,
+    "y": 39.99994421005249,
+    "wires": [
+      [
+        "efebc5d2.62f878"
+      ]
+    ]
+  }
+]

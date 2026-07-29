@@ -1,0 +1,121 @@
+[
+  {
+    "id": "5a7f9765.d3d118",
+    "type": "group",
+    "z": "947efd24.6a1b6",
+    "name": "HEATERCONTROL BATHROOM",
+    "style": {
+      "fill": "#ffdf7f",
+      "fill-opacity": "0.3",
+      "label": true
+    },
+    "nodes": [
+      "81ecc549.f8c448",
+      "4aa8e6e4.d07c48",
+      "1ffc57aa.502708",
+      "529d6a10.414664",
+      "b83e37c3.585798"
+    ],
+    "x": 34,
+    "y": 39,
+    "w": 787,
+    "h": 202
+  },
+  {
+    "id": "81ecc549.f8c448",
+    "type": "ui_button",
+    "z": "947efd24.6a1b6",
+    "g": "5a7f9765.d3d118",
+    "name": "HEATERSOFF",
+    "group": "f082d23.5870f3",
+    "order": 6,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "Alle Heizkörper aus",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "false",
+    "payloadType": "bool",
+    "topic": "Alle Heizkörper aus",
+    "x": 140,
+    "y": 80,
+    "wires": [
+      [
+        "1ffc57aa.502708",
+        "b83e37c3.585798"
+      ]
+    ]
+  },
+  {
+    "id": "4aa8e6e4.d07c48",
+    "type": "ui_button",
+    "z": "947efd24.6a1b6",
+    "g": "5a7f9765.d3d118",
+    "name": "HEATERSON",
+    "group": "f082d23.5870f3",
+    "order": 7,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "Alle Heizkörper ein",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "true",
+    "payloadType": "bool",
+    "topic": "Alle Heizkörper ein",
+    "x": 140,
+    "y": 140,
+    "wires": [
+      [
+        "1ffc57aa.502708",
+        "b83e37c3.585798"
+      ]
+    ]
+  },
+  {
+    "id": "1ffc57aa.502708",
+    "type": "subflow:1f41fee.aca6501",
+    "z": "947efd24.6a1b6",
+    "g": "5a7f9765.d3d118",
+    "name": "",
+    "env": [],
+    "x": 520,
+    "y": 140,
+    "wires": [
+      [
+        "529d6a10.414664"
+      ]
+    ]
+  },
+  {
+    "id": "529d6a10.414664",
+    "type": "link out",
+    "z": "947efd24.6a1b6",
+    "g": "5a7f9765.d3d118",
+    "name": "LINK_HEATERS_OUT",
+    "links": [
+      "183696ab.96e4b9"
+    ],
+    "x": 780,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "b83e37c3.585798",
+    "type": "link out",
+    "z": "947efd24.6a1b6",
+    "g": "5a7f9765.d3d118",
+    "name": "TO_LINK_HEATER_KIDROOM",
+    "links": [
+      "ba9c0e3a.9d4bd"
+    ],
+    "x": 335,
+    "y": 200,
+    "wires": []
+  }
+]

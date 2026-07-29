@@ -1,0 +1,48 @@
+[
+  {
+    "id": "5138ce61.f5ce7",
+    "type": "ui_switch",
+    "z": "3486c1a7.a51b3e",
+    "name": "BAD ALLE LICHTER",
+    "label": "Alle Lichter",
+    "group": "83673fe2.3b03d",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "BAD",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 444.0173645019531,
+    "y": 170.01040649414062,
+    "wires": [
+      [
+        "8f311a56.6e0af8"
+      ]
+    ]
+  },
+  {
+    "id": "8f311a56.6e0af8",
+    "type": "function",
+    "z": "3486c1a7.a51b3e",
+    "name": "LIGHT COMMAND BATHROOM ALL",
+    "func": {
+      "$flowSource": "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all--8f311a56.6e0af8.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 898.1462059020996,
+    "y": 276.9093933105469,
+    "wires": [
+      []
+    ]
+  }
+]

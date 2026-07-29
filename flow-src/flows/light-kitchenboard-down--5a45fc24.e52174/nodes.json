@@ -1,0 +1,48 @@
+[
+  {
+    "id": "ced3e08.3efb02",
+    "type": "function",
+    "z": "5a45fc24.e52174",
+    "name": "LIGHT COMMAND KITCHEN BOARD DOWN",
+    "func": {
+      "$flowSource": "flows/light-kitchenboard-down--5a45fc24.e52174/functions/light-command-kitchen-board-down--ced3e08.3efb02.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3182.0143432617188,
+    "y": 1286.6416490077972,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "42cce5fc.704eac",
+    "type": "ui_switch",
+    "z": "5a45fc24.e52174",
+    "name": "LIGHT KITCHENBOARD DOWN",
+    "label": "ARBEITSPLATTE KÜCHE UNTEN",
+    "group": "3dbc8c98.083aa4",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2820.0142936706543,
+    "y": 1286.6415932178497,
+    "wires": [
+      [
+        "ced3e08.3efb02"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,49 @@
+[
+  {
+    "id": "faf302ed.83b2b",
+    "type": "function",
+    "z": "673e6c8d.6d6944",
+    "name": "LIGHT COMMAND KID RIGHT",
+    "func": {
+      "$flowSource": "flows/light-kid-right--673e6c8d.6d6944/functions/light-command-kid-right--faf302ed.83b2b.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 710,
+    "y": 60,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "70497155.174b5",
+    "type": "ui_switch",
+    "z": "673e6c8d.6d6944",
+    "name": "LIGHT RIGHT",
+    "label": "RECHTS",
+    "tooltip": "",
+    "group": "9f9a8a62.d54b98",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "fa-3x fa-lightbulb-o ",
+    "oncolor": "yellow",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "fa-3x fa-lightbulb-o ",
+    "offcolor": "gray",
+    "x": 337.99995040893555,
+    "y": 59.99994421005249,
+    "wires": [
+      [
+        "faf302ed.83b2b"
+      ]
+    ]
+  }
+]

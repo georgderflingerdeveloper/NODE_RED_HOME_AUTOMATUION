@@ -1,0 +1,205 @@
+[
+  {
+    "id": "se_read_power",
+    "type": "modbus-read",
+    "z": "tab_read_feedin",
+    "name": "READ: Meter M_AC_Power (+SF)",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "206",
+    "quantity": "5",
+    "rate": "2",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 220,
+    "y": 140,
+    "wires": [
+      [
+        "calc_feedin"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "calc_feedin",
+    "type": "function",
+    "z": "tab_read_feedin",
+    "name": "Netzleistung aufteilen · Import / Einspeisung",
+    "func": {
+      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung--calc_feedin.js"
+    },
+    "outputs": 2,
+    "timeout": "",
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 350,
+    "y": 220,
+    "wires": [
+      [
+        "dbg_feedin",
+        "357ea9edd14fe171"
+      ],
+      [
+        "dbg_grid_import",
+        "link_grid_import_out"
+      ]
+    ]
+  },
+  {
+    "id": "dbg_feedin",
+    "type": "debug",
+    "z": "tab_read_feedin",
+    "name": "Einspeiseleistung (W)",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "payload",
+    "statusType": "auto",
+    "x": 720,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "357ea9edd14fe171",
+    "type": "link out",
+    "z": "tab_read_feedin",
+    "name": "LINK_NETZEINSPEISUNG_DASHBOARD_OUT",
+    "mode": "link",
+    "links": [
+      "34ed305c9274a3c8"
+    ],
+    "x": 820,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "dbg_grid_import",
+    "type": "debug",
+    "z": "tab_read_feedin",
+    "name": "NETZBEZUG INS HAUS (W)",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload",
+    "statusType": "auto",
+    "x": 720,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "comment_grid_direction",
+    "type": "comment",
+    "z": "tab_read_feedin",
+    "name": "NETZFLUSS · IMPORT (+) UND EINSPEISUNG (-) SAUBER TRENNEN",
+    "info": "M_AC_Power wird einmal gelesen. Die Function erzeugt zwei ausschließlich positive Werte: FeedInW und GridImportWatt. GridImportWatt ist zunächst nur mit einem Debug-Node verbunden und kann später direkt ans Dashboard geführt werden.",
+    "x": 410,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "link_grid_import_out",
+    "type": "link out",
+    "z": "tab_read_feedin",
+    "name": "LINK_NETZBEZUG_DASHBOARD_OUT",
+    "mode": "link",
+    "links": [
+      "link_grid_import_in"
+    ],
+    "x": 815,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "se_grid_offline_handler",
+    "type": "function",
+    "z": "tab_read_feedin",
+    "name": "SolarEdge Meter OFFLINE · sichere Nullwerte",
+    "func": {
+      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/solaredge-meter-offline-sichere-nullwerte--se_grid_offline_handler.js"
+    },
+    "outputs": 4,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 390,
+    "y": 320,
+    "wires": [
+      [
+        "se_grid_solar_zero_out"
+      ],
+      [
+        "357ea9edd14fe171"
+      ],
+      [
+        "link_grid_import_out"
+      ],
+      [
+        "se_grid_status_out"
+      ]
+    ]
+  },
+  {
+    "id": "se_grid_solar_zero_out",
+    "type": "link out",
+    "z": "tab_read_feedin",
+    "name": "OFFLINE · Solarleistung 0",
+    "mode": "link",
+    "links": [
+      "214546f88e881fdd"
+    ],
+    "x": 695,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "se_grid_status_out",
+    "type": "link out",
+    "z": "tab_read_feedin",
+    "name": "SolarEdge Meter Status OUT",
+    "mode": "link",
+    "links": [
+      "se_status_dashboard_in"
+    ],
+    "x": 715,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "se_grid_modbus_catch",
+    "type": "catch",
+    "z": "tab_read_feedin",
+    "name": "SolarEdge Meter · Kommunikationsfehler",
+    "scope": [
+      "se_read_power"
+    ],
+    "uncaught": false,
+    "x": 220,
+    "y": 440,
+    "wires": [
+      [
+        "se_grid_offline_handler"
+      ]
+    ]
+  }
+]

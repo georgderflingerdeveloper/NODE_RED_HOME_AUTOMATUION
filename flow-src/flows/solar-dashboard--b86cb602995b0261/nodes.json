@@ -1,0 +1,450 @@
+[
+  {
+    "id": "214546f88e881fdd",
+    "type": "link in",
+    "z": "b86cb602995b0261",
+    "name": "LINK_SOLARLEISTUNG_DASHBOARD_IN",
+    "links": [
+      "5a499b5d44485fa5",
+      "se_grid_solar_zero_out"
+    ],
+    "x": 225,
+    "y": 100,
+    "wires": [
+      [
+        "8ed0b94af7bbae46",
+        "e385800dda10cc2a"
+      ]
+    ]
+  },
+  {
+    "id": "8ed0b94af7bbae46",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "Solarleistung",
+    "order": 2,
+    "width": 0,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solarleistung--8ed0b94af7bbae46.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 520,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "88d6339b4262d430",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "Netzeinspeisung",
+    "order": 4,
+    "width": 0,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung--88d6339b4262d430.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 520,
+    "y": 220,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "34ed305c9274a3c8",
+    "type": "link in",
+    "z": "b86cb602995b0261",
+    "name": "LINK_NETZEINSPEISUNG_DASHBOARD_IN",
+    "links": [
+      "357ea9edd14fe171",
+      "se_feed_offline_out"
+    ],
+    "x": 225,
+    "y": 220,
+    "wires": [
+      [
+        "88d6339b4262d430",
+        "3909f886b0c9d4d6"
+      ]
+    ]
+  },
+  {
+    "id": "join-pv-grid",
+    "type": "join",
+    "z": "b86cb602995b0261",
+    "name": "Join Pv + Grid",
+    "mode": "custom",
+    "build": "object",
+    "property": "payload",
+    "propertyType": "msg",
+    "key": "topic",
+    "joiner": "\\n",
+    "joinerType": "str",
+    "useparts": true,
+    "accumulate": false,
+    "timeout": "",
+    "count": 2,
+    "reduceRight": false,
+    "reduceExp": "",
+    "reduceInit": "",
+    "reduceInitType": "",
+    "reduceFixup": "",
+    "x": 660,
+    "y": 500,
+    "wires": [
+      [
+        "d22dd481e7e81932"
+      ]
+    ]
+  },
+  {
+    "id": "debug-out",
+    "type": "debug",
+    "z": "b86cb602995b0261",
+    "name": "Payload kombiniert",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 430,
+    "y": 620,
+    "wires": []
+  },
+  {
+    "id": "e385800dda10cc2a",
+    "type": "change",
+    "z": "b86cb602995b0261",
+    "name": "PvPowerWatt",
+    "rules": [
+      {
+        "t": "set",
+        "p": "topic",
+        "pt": "msg",
+        "to": "PvPowerWatt",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 500,
+    "y": 280,
+    "wires": [
+      [
+        "join-pv-grid"
+      ]
+    ]
+  },
+  {
+    "id": "3909f886b0c9d4d6",
+    "type": "change",
+    "z": "b86cb602995b0261",
+    "name": "Vorzeichenbehaftete Netzleistung",
+    "rules": [
+      {
+        "t": "set",
+        "p": "topic",
+        "pt": "msg",
+        "to": "GridPowerWatt",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "gridPowerWatt",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 340,
+    "y": 540,
+    "wires": [
+      [
+        "join-pv-grid",
+        "debug-out"
+      ]
+    ]
+  },
+  {
+    "id": "d22dd481e7e81932",
+    "type": "function",
+    "z": "b86cb602995b0261",
+    "name": "GetExcessPower",
+    "func": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower--d22dd481e7e81932.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 650,
+    "y": 620,
+    "wires": [
+      [
+        "e93f57326a18d2d1"
+      ]
+    ]
+  },
+  {
+    "id": "361eb71ca0080e07",
+    "type": "debug",
+    "z": "b86cb602995b0261",
+    "name": "ExcessPower",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 820,
+    "y": 700,
+    "wires": []
+  },
+  {
+    "id": "6c37f6f0e2cec1b6",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "Solarüberschuss",
+    "order": 5,
+    "width": 0,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaruberschuss--6c37f6f0e2cec1b6.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 810,
+    "y": 760,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "e93f57326a18d2d1",
+    "type": "function",
+    "z": "b86cb602995b0261",
+    "name": "MAKE_EXCESSPOWER_TO_PAYLOAD",
+    "func": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload--e93f57326a18d2d1.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 500,
+    "y": 700,
+    "wires": [
+      [
+        "361eb71ca0080e07",
+        "6c37f6f0e2cec1b6"
+      ]
+    ]
+  },
+  {
+    "id": "link_grid_import_in",
+    "type": "link in",
+    "z": "b86cb602995b0261",
+    "name": "LINK_NETZBEZUG_DASHBOARD_IN",
+    "links": [
+      "link_grid_import_out",
+      "se_import_offline_out"
+    ],
+    "x": 225,
+    "y": 160,
+    "wires": [
+      [
+        "ui_grid_import"
+      ]
+    ]
+  },
+  {
+    "id": "ui_grid_import",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "Netzbezug",
+    "order": 3,
+    "width": 0,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug--ui_grid_import.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 520,
+    "y": 160,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "comment_dashboard_power",
+    "type": "comment",
+    "z": "b86cb602995b0261",
+    "name": "LEISTUNGSFLÜSSE · DEUTSCHE, EINDEUTIGE ANZEIGEN",
+    "info": "Solarleistung = aktuell erzeugte Leistung. Netzbezug = Leistung, die aus dem öffentlichen Stromnetz ins Haus fließt. Einspeisung = Leistung, die das Haus ins öffentliche Stromnetz abgibt. Solarüberschuss = aktuell verfügbare überschüssige Solarleistung.",
+    "x": 920,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "se_status_dashboard_in",
+    "type": "link in",
+    "z": "b86cb602995b0261",
+    "name": "SolarEdge Status IN",
+    "links": [
+      "se_status_out",
+      "se_grid_status_out"
+    ],
+    "x": 225,
+    "y": 40,
+    "wires": [
+      [
+        "se_status_dashboard"
+      ]
+    ]
+  },
+  {
+    "id": "se_status_dashboard",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "SolarEdge Verbindungsstatus",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus--se_status_dashboard.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 500,
+    "y": 40,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "se_control_buttons",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "SolarEdge und Node-RED Steuerung",
+    "order": 6,
+    "width": 0,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung--se_control_buttons.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 490,
+    "y": 840,
+    "wires": [
+      [
+        "se_control_router"
+      ]
+    ]
+  },
+  {
+    "id": "se_control_router",
+    "type": "function",
+    "z": "b86cb602995b0261",
+    "name": "Reconnect / Serverneustart absichern",
+    "func": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern--se_control_router.js"
+    },
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 770,
+    "y": 940,
+    "wires": [
+      [
+        "se_manual_modbus_link_out"
+      ],
+      [
+        "se_node_red_restart_exec"
+      ]
+    ]
+  },
+  {
+    "id": "se_manual_modbus_link_out",
+    "type": "link out",
+    "z": "b86cb602995b0261",
+    "name": "SolarEdge manueller Reconnect OUT",
+    "mode": "link",
+    "links": [
+      "se_manual_modbus_link_in"
+    ],
+    "x": 1015,
+    "y": 820,
+    "wires": []
+  },
+  {
+    "id": "se_node_red_restart_exec",
+    "type": "exec",
+    "z": "b86cb602995b0261",
+    "command": "/bin/launchctl kickstart -k gui/503/com.georg.node-red",
+    "addpay": false,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "10",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Node-RED über launchd neu starten",
+    "x": 1150,
+    "y": 980,
+    "wires": [
+      [],
+      [],
+      []
+    ]
+  }
+]

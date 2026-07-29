@@ -1,0 +1,44 @@
+[
+  {
+    "id": "4480e402.3d37fc",
+    "type": "function",
+    "z": "658af8e2.d21c88",
+    "name": "LIGHT COMMAND ANTEROOM MIDDLE",
+    "func": {
+      "$flowSource": "flows/sub-light-anteroom-middle--658af8e2.d21c88/functions/light-command-anteroom-middle--4480e402.3d37fc.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 543.0002517700195,
+    "y": 80,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "c2c21b85.dd8198",
+    "type": "ui_button",
+    "z": "658af8e2.d21c88",
+    "name": "ANTEROOM_MIDDLE_OFF",
+    "group": "fd93ca25.397518",
+    "order": 4,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "Vorhaus Licht Mitte AUS",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "false",
+    "payloadType": "bool",
+    "topic": "ANTEROOM_MIDDLE_OFF",
+    "x": 210,
+    "y": 80,
+    "wires": [
+      [
+        "4480e402.3d37fc"
+      ]
+    ]
+  }
+]

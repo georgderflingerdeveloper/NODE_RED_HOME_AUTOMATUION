@@ -1,0 +1,477 @@
+[
+  {
+    "id": "8908334401038236",
+    "type": "modbus-read",
+    "z": "79160448dc533f1d",
+    "name": "Read I_AC_Power + SF (40083..40084)",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "40083",
+    "quantity": "2",
+    "rate": "1000",
+    "rateUnit": "ms",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 210,
+    "y": 100,
+    "wires": [
+      [
+        "33d7fc2ec0eeb8d5"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "7db9c065c104320e",
+    "type": "debug",
+    "z": "79160448dc533f1d",
+    "name": "RAW POWER",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 820,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "5a499b5d44485fa5",
+    "type": "link out",
+    "z": "79160448dc533f1d",
+    "name": "LINK_SOLAR_POWER_OUT",
+    "mode": "link",
+    "links": [
+      "214546f88e881fdd"
+    ],
+    "x": 775,
+    "y": 280,
+    "wires": []
+  },
+  {
+    "id": "33d7fc2ec0eeb8d5",
+    "type": "change",
+    "z": "79160448dc533f1d",
+    "name": "",
+    "rules": [
+      {
+        "t": "move",
+        "p": "payload[0]",
+        "pt": "msg",
+        "to": "payload",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 470,
+    "y": 40,
+    "wires": [
+      [
+        "f3d67b639657a483"
+      ]
+    ]
+  },
+  {
+    "id": "6daa8027d6a447e1",
+    "type": "debug",
+    "z": "79160448dc533f1d",
+    "name": "SCALING_FACTOR",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 710,
+    "y": 640,
+    "wires": []
+  },
+  {
+    "id": "read_power_sf",
+    "type": "modbus-read",
+    "z": "79160448dc533f1d",
+    "name": "I_AC_Power_SF",
+    "topic": "I_AC_Power_SF",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": false,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "40084",
+    "quantity": "1",
+    "rate": "500",
+    "rateUnit": "ms",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 140,
+    "y": 220,
+    "wires": [
+      [
+        "fff48bd538f411b2"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "f3d67b639657a483",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "GetActualSolarPower",
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/getactualsolarpower--f3d67b639657a483.js"
+    },
+    "outputs": 3,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 580,
+    "y": 160,
+    "wires": [
+      [
+        "5a499b5d44485fa5",
+        "7db9c065c104320e"
+      ],
+      [],
+      [
+        "se_pv_offline_handler"
+      ]
+    ]
+  },
+  {
+    "id": "b16c65d737f41486",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "GET_SCALING_FACTOR",
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/get-scaling-factor--b16c65d737f41486.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 370,
+    "y": 660,
+    "wires": [
+      [
+        "6daa8027d6a447e1"
+      ]
+    ]
+  },
+  {
+    "id": "178f178e886e61be",
+    "type": "inject",
+    "z": "79160448dc533f1d",
+    "name": "",
+    "props": [],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 130,
+    "y": 660,
+    "wires": [
+      [
+        "b16c65d737f41486"
+      ]
+    ]
+  },
+  {
+    "id": "a76994740dc9a8d9",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "SET_SCALING_FACTOR",
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/set-scaling-factor--a76994740dc9a8d9.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 370,
+    "y": 700,
+    "wires": [
+      [
+        "d0344a70fcecb32c"
+      ]
+    ]
+  },
+  {
+    "id": "ccf9512db4ad1494",
+    "type": "inject",
+    "z": "79160448dc533f1d",
+    "name": "",
+    "props": [
+      {
+        "p": "payload[0]",
+        "v": "999",
+        "vt": "num"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 130,
+    "y": 700,
+    "wires": [
+      [
+        "a76994740dc9a8d9"
+      ]
+    ]
+  },
+  {
+    "id": "d0344a70fcecb32c",
+    "type": "debug",
+    "z": "79160448dc533f1d",
+    "name": "SCALING_FACTOR",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 710,
+    "y": 700,
+    "wires": []
+  },
+  {
+    "id": "fff48bd538f411b2",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "SET_SCALING_FACTOR",
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/set-scaling-factor--fff48bd538f411b2.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 390,
+    "y": 220,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "se_pv_offline_handler",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge OFFLINE · sichere Nullwerte",
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/solaredge-offline-sichere-nullwerte--se_pv_offline_handler.js"
+    },
+    "outputs": 4,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 560,
+    "y": 380,
+    "wires": [
+      [
+        "5a499b5d44485fa5"
+      ],
+      [
+        "se_feed_offline_out"
+      ],
+      [
+        "se_import_offline_out"
+      ],
+      [
+        "se_status_out"
+      ]
+    ]
+  },
+  {
+    "id": "se_feed_offline_out",
+    "type": "link out",
+    "z": "79160448dc533f1d",
+    "name": "OFFLINE · Netzeinspeisung 0",
+    "mode": "link",
+    "links": [
+      "34ed305c9274a3c8"
+    ],
+    "x": 1075,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "se_import_offline_out",
+    "type": "link out",
+    "z": "79160448dc533f1d",
+    "name": "OFFLINE · Netzbezug 0",
+    "mode": "link",
+    "links": [
+      "link_grid_import_in"
+    ],
+    "x": 1085,
+    "y": 500,
+    "wires": []
+  },
+  {
+    "id": "se_status_out",
+    "type": "link out",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge Status OUT",
+    "mode": "link",
+    "links": [
+      "se_status_dashboard_in"
+    ],
+    "x": 1095,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "se_pv_modbus_catch",
+    "type": "catch",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge PV · Kommunikationsfehler",
+    "scope": [
+      "8908334401038236",
+      "read_power_sf"
+    ],
+    "uncaught": false,
+    "x": 190,
+    "y": 380,
+    "wires": [
+      [
+        "se_pv_offline_handler"
+      ]
+    ]
+  },
+  {
+    "id": "se_watchdog_tick",
+    "type": "inject",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge Watchdog · alle 2 s",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "2",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "1",
+    "topic": "SolarEdgeWatchdog",
+    "payload": "",
+    "payloadType": "date",
+    "x": 210,
+    "y": 500,
+    "wires": [
+      [
+        "se_connection_watchdog"
+      ]
+    ]
+  },
+  {
+    "id": "se_connection_watchdog",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge Verbindung überwachen",
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/solaredge-verbindung-uberwachen--se_connection_watchdog.js"
+    },
+    "outputs": 5,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 520,
+    "y": 500,
+    "wires": [
+      [
+        "5a499b5d44485fa5"
+      ],
+      [
+        "se_feed_offline_out"
+      ],
+      [
+        "se_import_offline_out"
+      ],
+      [
+        "se_status_out"
+      ],
+      [
+        "se_modbus_reconnector"
+      ]
+    ]
+  },
+  {
+    "id": "se_modbus_reconnector",
+    "type": "modbus-flex-connector",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge Modbus · Verbindung neu aufbauen",
+    "maxReconnectsPerMinute": 4,
+    "emptyQueue": true,
+    "showStatusActivities": true,
+    "showErrors": true,
+    "server": "befceeb9cba11998",
+    "emptyMsgOnFail": false,
+    "configMsgOnChange": false,
+    "x": 1180,
+    "y": 700,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "se_manual_modbus_link_in",
+    "type": "link in",
+    "z": "79160448dc533f1d",
+    "name": "SolarEdge manueller Reconnect IN",
+    "links": [
+      "se_manual_modbus_link_out"
+    ],
+    "x": 815,
+    "y": 820,
+    "wires": [
+      [
+        "se_modbus_reconnector"
+      ]
+    ]
+  }
+]

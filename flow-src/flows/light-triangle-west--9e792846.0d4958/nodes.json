@@ -1,0 +1,48 @@
+[
+  {
+    "id": "61b0ce88.bdd6e",
+    "type": "ui_switch",
+    "z": "9e792846.0d4958",
+    "name": "WINDOW TRIANGLE WEST",
+    "label": "DREIECKFENSTER OBEN WEST",
+    "group": "dddbf4a9.de6238",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 2748.014301300049,
+    "y": 1479.7328798770905,
+    "wires": [
+      [
+        "db3b4d8f.7e919"
+      ]
+    ]
+  },
+  {
+    "id": "db3b4d8f.7e919",
+    "type": "function",
+    "z": "9e792846.0d4958",
+    "name": "LIGHT TRIANGLE WEST",
+    "func": {
+      "$flowSource": "flows/light-triangle-west--9e792846.0d4958/functions/light-triangle-west--db3b4d8f.7e919.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3108.5597534179688,
+    "y": 1480.7328989505768,
+    "wires": [
+      []
+    ]
+  }
+]

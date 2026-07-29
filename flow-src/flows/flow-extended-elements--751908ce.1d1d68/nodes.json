@@ -1,0 +1,87 @@
+[
+  {
+    "id": "9001a100.f2e51",
+    "type": "group",
+    "z": "751908ce.1d1d68",
+    "name": "GALLERYCONTROL",
+    "style": {
+      "fill": "#ffffbf",
+      "fill-opacity": "0.5",
+      "label": true
+    },
+    "nodes": [
+      "6626f78f.706558",
+      "d2c402.64870c",
+      "4492de44.c8d9a"
+    ],
+    "x": 374,
+    "y": 39,
+    "w": 382,
+    "h": 262
+  },
+  {
+    "id": "6626f78f.706558",
+    "type": "ui_button",
+    "z": "751908ce.1d1d68",
+    "g": "9001a100.f2e51",
+    "name": "GallerieOben_Ein",
+    "group": "ee7391e3.0774",
+    "order": 0,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "ALLE EIN",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "true",
+    "payloadType": "bool",
+    "topic": "",
+    "x": 490,
+    "y": 80,
+    "wires": [
+      [
+        "d2c402.64870c"
+      ]
+    ]
+  },
+  {
+    "id": "d2c402.64870c",
+    "type": "link out",
+    "z": "751908ce.1d1d68",
+    "g": "9001a100.f2e51",
+    "name": "",
+    "links": [
+      "66469f4f.823ff"
+    ],
+    "x": 715,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "4492de44.c8d9a",
+    "type": "ui_button",
+    "z": "751908ce.1d1d68",
+    "g": "9001a100.f2e51",
+    "name": "GallerieOben_Aus",
+    "group": "ee7391e3.0774",
+    "order": 0,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "ALLE AUS",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "false",
+    "payloadType": "bool",
+    "topic": "",
+    "x": 490,
+    "y": 260,
+    "wires": [
+      [
+        "d2c402.64870c"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "a952ee58.75f5b",
+    "type": "ui_switch",
+    "z": "f6dd1fca.6c306",
+    "name": "VORHAUS  HAUPTLICHT",
+    "label": "Haupt Licht",
+    "group": "fd93ca25.397518",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "HAUPTLICHT",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 230,
+    "y": 60,
+    "wires": [
+      [
+        "56b8eb53.8f1a84"
+      ]
+    ]
+  },
+  {
+    "id": "56b8eb53.8f1a84",
+    "type": "function",
+    "z": "f6dd1fca.6c306",
+    "name": "LIGHT COMMAND ANTEROOM MAIN",
+    "func": {
+      "$flowSource": "flows/sub-anteroom-main-light--f6dd1fca.6c306/functions/light-command-anteroom-main--56b8eb53.8f1a84.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 510,
+    "y": 60,
+    "wires": [
+      []
+    ]
+  }
+]

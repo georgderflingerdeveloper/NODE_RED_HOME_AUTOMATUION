@@ -1,0 +1,48 @@
+[
+  {
+    "id": "c959c02a.01119",
+    "type": "ui_switch",
+    "z": "e05aa54.b29db58",
+    "name": "WC  ALLE LICHTER",
+    "label": "Alle Lichter",
+    "group": "f055e626.392288",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "WC",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 415.0173645019531,
+    "y": 155.01040649414062,
+    "wires": [
+      [
+        "2de0416d.3ababe"
+      ]
+    ]
+  },
+  {
+    "id": "2de0416d.3ababe",
+    "type": "function",
+    "z": "e05aa54.b29db58",
+    "name": "LIGHT COMMAND WC ALL",
+    "func": {
+      "$flowSource": "flows/light-wc--e05aa54.b29db58/functions/light-command-wc-all--2de0416d.3ababe.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 839.1462059020996,
+    "y": 261.9093933105469,
+    "wires": [
+      []
+    ]
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "9bf8988d.9fd508",
+    "type": "ui_switch",
+    "z": "ea250672.3772b8",
+    "name": "GALLERY UP 6",
+    "label": "LEUCHTEN OBEN 6",
+    "group": "ee7391e3.0774",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "style": "",
+    "onvalue": "true",
+    "onvalueType": "bool",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "bool",
+    "officon": "",
+    "offcolor": "",
+    "x": 1392.0158157348633,
+    "y": 2286.7265281677246,
+    "wires": [
+      [
+        "c617dc83.01e63"
+      ]
+    ]
+  },
+  {
+    "id": "c617dc83.01e63",
+    "type": "function",
+    "z": "ea250672.3772b8",
+    "name": "LIGHT COMMAND GALLERY UP 6",
+    "func": {
+      "$flowSource": "flows/light-gallery-up-6--ea250672.3772b8/functions/light-command-gallery-up-6--c617dc83.01e63.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "x": 3357.0157775878906,
+    "y": 2329.726408958435,
+    "wires": [
+      []
+    ]
+  }
+]
