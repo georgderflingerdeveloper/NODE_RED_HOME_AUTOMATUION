@@ -144,6 +144,20 @@
     ]
   },
   {
+    "id": "kosten_dashboard_ui_control",
+    "type": "ui_ui_control",
+    "z": "kosten_flow",
+    "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
+    "events": "all",
+    "x": 465,
+    "y": 360,
+    "wires": [
+      [
+        "kosten_dashboard_template"
+      ]
+    ]
+  },
+  {
     "id": "kosten_history_initial",
     "type": "inject",
     "z": "kosten_flow",

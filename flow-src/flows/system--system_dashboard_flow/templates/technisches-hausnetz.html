@@ -1,0 +1,81 @@
+<style>
+  .sys-card{width:100%;max-width:none;box-sizing:border-box;color:#eaf5f6;font-family:Roboto,Arial,sans-serif}
+  .sys-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .sys-header h2{margin:0;color:#fff;font-size:24px}.sys-subtitle{margin-top:5px;color:#a9c4c6;font-size:12px}
+  .sys-overview{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #405b5f;border-radius:12px;background:#1d2d2f;font-size:12px}
+  .sys-dot{width:10px;height:10px;border-radius:50%;background:#7f9295;box-shadow:0 0 0 4px rgba(127,146,149,.13)}
+  .sys-dot.online{background:#4bd88a;box-shadow:0 0 0 4px rgba(75,216,138,.13)}.sys-dot.offline{background:#ff826d;box-shadow:0 0 0 4px rgba(255,130,109,.13)}
+  .sys-summary{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .sys-kpi{padding:14px 15px;border-radius:13px;background:linear-gradient(135deg,#1d3c41,#244d52);box-shadow:0 5px 14px rgba(0,0,0,.2)}
+  .sys-kpi-label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#b7ced0}.sys-kpi-value{margin-top:6px;color:#fff;font-size:23px;font-weight:700}.sys-kpi-note{margin-top:4px;color:#a9c4c6;font-size:11px}
+  .sys-section-title{margin:22px 0 9px;color:#fff;font-size:16px}.sys-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .sys-panel{border:1px solid #405b5f;border-radius:13px;background:#1d2d2f;overflow:hidden}.sys-panel-head{padding:13px 15px;border-bottom:1px solid #395357;background:#20383b;color:#fff;font-weight:700;font-size:14px}
+  .sys-panel-body{padding:13px 15px}.sys-service{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #395357}.sys-service:last-child{border-bottom:0;padding-bottom:0}.sys-service:first-child{padding-top:0}
+  .sys-service-name{color:#fff;font-size:13px;font-weight:700}.sys-service-detail{margin-top:3px;color:#9bb5b8;font-size:11px}.sys-badge{padding:4px 8px;border-radius:999px;background:#405055;color:#d3e1e2;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.sys-badge.online{background:#14613f;color:#b9ffdc}.sys-badge.offline{background:#71342d;color:#ffd1c7}
+  .sys-table-wrap{width:100%;overflow-x:auto;border:1px solid #456367;border-radius:13px;background:#1d2d2f}.sys-table{width:100%;min-width:760px;border-collapse:collapse}.sys-table th{padding:11px 12px;background:#0b5960;color:#fff;text-align:left;font-size:12px}.sys-table td{padding:11px 12px;border-top:1px solid #395357;font-size:12px}.sys-device-name{color:#fff;font-weight:700}.sys-muted{color:#9bb5b8}.sys-empty{padding:25px;color:#9bb5b8;text-align:center}
+  .sys-footnote{margin-top:14px;padding:11px 13px;border-left:3px solid #61d6dd;border-radius:8px;background:#162b2e;color:#b7ced0;font-size:12px;line-height:1.45}
+  @media(max-width:900px){.sys-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sys-grid{grid-template-columns:1fr}}@media(max-width:520px){.sys-summary{grid-template-columns:1fr}.sys-header h2{font-size:21px}}
+</style>
+
+<script>
+(function(scope){
+  var placeholder={
+    network:{state:"waiting",label:"Monitoring wird vorbereitet",updatedAt:null},
+    summary:{devices:null,online:null,offline:null,updatedAt:null},
+    services:[
+      {name:"Node-RED",detail:"Zentrale Hausautomation",state:"waiting"},
+      {name:"Phidget-Anwendersoftware",detail:"Statusquelle noch nicht verbunden",state:"waiting"},
+      {name:"Phidget-Steuerung",detail:"Treiber- und Geräteprüfung folgt",state:"waiting"}
+    ],
+    devices:[]
+  };
+  scope.systemView=angular.copy(placeholder);
+
+  function normalize(payload){
+    if(!payload||typeof payload!=="object"||Array.isArray(payload))return angular.copy(placeholder);
+    var incoming=payload.system||payload;
+    return {
+      network:angular.extend({},placeholder.network,incoming.network||{}),
+      summary:angular.extend({},placeholder.summary,incoming.summary||{}),
+      services:Array.isArray(incoming.services)?incoming.services:placeholder.services,
+      devices:Array.isArray(incoming.devices)?incoming.devices:[]
+    };
+  }
+  function stateClass(state){return state==="online"?"online":(state==="offline"?"offline":"waiting");}
+  scope.systemStateClass=stateClass;
+  scope.systemStateLabel=function(state){return state==="online"?"online":(state==="offline"?"offline":(state==="scanning"?"Scan läuft":"ausstehend"));};
+  scope.$watch("msg",function(msg){if(msg&&msg.payload)scope.systemView=normalize(msg.payload);});
+})(scope);
+</script>
+
+<div class="sys-card">
+  <div class="sys-header">
+    <div><h2>SYSTEM · Technisches Hausnetz</h2><div class="sys-subtitle">Raspberry Pi, Dienste, Phidget-Anbindung und technische Zustände</div></div>
+    <div class="sys-overview"><span class="sys-dot" ng-class="systemStateClass(systemView.network.state)"></span><span>{{systemView.network.label}}</span></div>
+  </div>
+
+  <div class="sys-summary">
+    <div class="sys-kpi"><div class="sys-kpi-label">Erfasste Geräte</div><div class="sys-kpi-value">{{systemView.summary.devices === null ? '—' : systemView.summary.devices}}</div><div class="sys-kpi-note">Raspberry Pi und Netzwerktechnik</div></div>
+    <div class="sys-kpi"><div class="sys-kpi-label">Online</div><div class="sys-kpi-value">{{systemView.summary.online === null ? '—' : systemView.summary.online}}</div><div class="sys-kpi-note">aktuell erreichbar</div></div>
+    <div class="sys-kpi"><div class="sys-kpi-label">Offline</div><div class="sys-kpi-value">{{systemView.summary.offline === null ? '—' : systemView.summary.offline}}</div><div class="sys-kpi-note">benötigt Aufmerksamkeit</div></div>
+    <div class="sys-kpi"><div class="sys-kpi-label">Letzte Aktualisierung</div><div class="sys-kpi-value">{{systemView.summary.updatedAt ? (systemView.summary.updatedAt | date:'HH:mm:ss') : '—'}}</div><div class="sys-kpi-note">Zeitpunkt der Systemprüfung</div></div>
+  </div>
+
+  <div class="sys-grid">
+    <div class="sys-panel"><div class="sys-panel-head">Anwendersoftware &amp; Schnittstellen</div><div class="sys-panel-body">
+      <div class="sys-service" ng-repeat="service in systemView.services"><div><div class="sys-service-name">{{service.name}}</div><div class="sys-service-detail">{{service.detail}}</div></div><span class="sys-badge" ng-class="systemStateClass(service.state)">{{systemStateLabel(service.state)}}</span></div>
+    </div></div>
+    <div class="sys-panel"><div class="sys-panel-head">Geplante Live-Kennzahlen</div><div class="sys-panel-body">
+      <div class="sys-service"><div><div class="sys-service-name">Systemtemperatur</div><div class="sys-service-detail">CPU- und Gehäusetemperatur je Raspberry Pi</div></div><span class="sys-badge">ausstehend</span></div>
+      <div class="sys-service"><div><div class="sys-service-name">Auslastung &amp; Speicher</div><div class="sys-service-detail">CPU, RAM, Datenträger und Betriebszeit</div></div><span class="sys-badge">ausstehend</span></div>
+      <div class="sys-service"><div><div class="sys-service-name">Netzwerkqualität</div><div class="sys-service-detail">IP-Adresse, Verbindung und letzte Antwort</div></div><span class="sys-badge">ausstehend</span></div>
+    </div></div>
+  </div>
+
+  <h3 class="sys-section-title">Angeschlossene Systeme</h3>
+  <div class="sys-table-wrap" ng-if="systemView.devices.length"><table class="sys-table"><thead><tr><th>Hostname</th><th>Netzwerk</th><th>System</th><th>Temperatur</th><th>Letzte Antwort</th><th>Status</th></tr></thead><tbody>
+    <tr ng-repeat="device in systemView.devices"><td class="sys-device-name">{{device.name}}<br><span class="sys-muted">{{device.hostname || 'kein Hostname gemeldet'}}</span></td><td>{{device.ip || '—'}}</td><td><span ng-if="device.model">{{device.model}}<br><span class="sys-muted">{{device.operatingSystem}}<span ng-if="device.services"><br>{{device.services}}</span><span ng-if="device.memoryUsedPercent !== null"><br>RAM {{device.memoryUsedPercent | number:0}} % · Disk {{device.diskUsedPercent | number:0}} % · Load {{device.loadAverage | number:2}}</span></span></span><span ng-if="!device.model">—</span></td><td>{{device.temperatureC === undefined || device.temperatureC === null ? '—' : (device.temperatureC | number:1) + ' °C'}}<br><span class="sys-muted" ng-if="device.temperatureSource === 'live'">live</span><span class="sys-muted" ng-if="device.temperatureSource !== 'live' && device.inventoryObservedAt">Inventar {{device.inventoryObservedAt | date:'dd.MM.yy'}}</span></td><td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td><td><span class="sys-badge" ng-class="systemStateClass(device.state)">{{systemStateLabel(device.state)}}</span></td></tr>
+  </tbody></table></div>
+  <div class="sys-panel sys-empty" ng-if="!systemView.devices.length">Noch keine Gerätequelle verbunden. Sobald die Systemabfrage ergänzt ist, erscheinen hier automatisch alle erfassten Raspberry Pis und Netzwerkgeräte.</div>
+  <div class="sys-footnote">Diese Ansicht ist bewusst nur die Dashboard-Vorlage. Sie zeigt keine erfundenen Zustände an; Online-/Offline-Informationen, Temperaturen, Systemdaten und der Status der Phidget-Anwendersoftware werden erst mit der nächsten Ausbaustufe aus echten Datenquellen gefüllt.</div>
+</div>

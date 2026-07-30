@@ -1,5 +1,5 @@
 <style>
-  .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
+  .cost-card { width:100%; max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
   .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
   .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }
   .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }
@@ -14,7 +14,7 @@
   .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
   .cost-info b { color:#fff; }
   .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }
-  .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
+  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
   .cost-table { width:100%; min-width:760px; border-collapse:collapse; }
   .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }
   .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }
@@ -46,27 +46,56 @@
 <script>
 (function(scope) {
   scope.view = scope.view || { period: "month", tariff: null, history: null };
+  var layoutTimers = [];
+
+  function refreshCostLayout() {
+    if (!window || !window.dispatchEvent) return;
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  function scheduleCostLayoutRefresh() {
+    layoutTimers.forEach(clearTimeout);
+    layoutTimers = [0, 100, 350, 800].map(function(delay) {
+      return setTimeout(refreshCostLayout, delay);
+    });
+  }
 
   scope.selectCostPeriod = function(period) {
     scope.view.period = period;
     scope.send({ topic: "history/dashboard", payload: { period: period } });
+    scheduleCostLayoutRefresh();
   };
 
   scope.$watch("msg", function(msg) {
     if (!msg || !msg.payload) return;
+    if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
+      scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+      scheduleCostLayoutRefresh();
+      return;
+    }
     if (msg.topic === "aWATTar/tariff/current") {
       scope.view.tariff = msg.payload;
     }
     if (msg.topic === "history/dashboard/result") {
       scope.view.history = msg.payload;
       scope.view.period = msg.payload.period || scope.view.period;
+      scheduleCostLayoutRefresh();
     }
   });
+
+  window.addEventListener("orientationchange", scheduleCostLayoutRefresh);
+  document.addEventListener("visibilitychange", scheduleCostLayoutRefresh);
+  scheduleCostLayoutRefresh();
 
   var refreshTimer = setInterval(function() {
     scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
   }, 60000);
-  scope.$on("$destroy", function() { clearInterval(refreshTimer); });
+  scope.$on("$destroy", function() {
+    clearInterval(refreshTimer);
+    layoutTimers.forEach(clearTimeout);
+    window.removeEventListener("orientationchange", scheduleCostLayoutRefresh);
+    document.removeEventListener("visibilitychange", scheduleCostLayoutRefresh);
+  });
 })(scope);
 </script>
 

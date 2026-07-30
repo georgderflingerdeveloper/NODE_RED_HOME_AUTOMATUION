@@ -2406,11 +2406,39 @@
     "className": ""
   },
   {
+    "id": "system_dashboard_tab",
+    "type": "ui_tab",
+    "name": "SYSTEM",
+    "icon": "dns",
+    "order": 15,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "system_dashboard_group",
+    "type": "ui_group",
+    "name": "TECHNISCHE ÜBERSICHT",
+    "tab": "system_dashboard_tab",
+    "order": 1,
+    "disp": true,
+    "width": "18",
+    "collapse": false,
+    "className": ""
+  },
+  {
     "id": "kosten_flow",
     "type": "tab",
     "label": "KOSTEN",
     "disabled": false,
     "info": "Schritt 1: aWATTar-Börsenpreise abrufen. Der aktuelle Preis wird als aWATTarCurrentTariff im Flow- und Global-Context gespeichert.",
+    "env": []
+  },
+  {
+    "id": "system_dashboard_flow",
+    "type": "tab",
+    "label": "SYSTEM",
+    "disabled": false,
+    "info": "Dashboard-Vorlage für Netzwerk-, Raspberry-Pi- und Phidget-Status. Die technische Erfassung wird in einem separaten Schritt ergänzt.",
     "env": []
   }
 ]

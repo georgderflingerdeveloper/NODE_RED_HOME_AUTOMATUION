@@ -8992,7 +8992,7 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "format": "<style>\n  .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }\n  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }\n  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }\n  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }\n  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }\n  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }\n  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }\n  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }\n  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }\n  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }\n  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }\n  .cost-info b { color:#fff; }\n  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }\n  .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-offline { color:#ffad99; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }\n  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }\n  .cost-hour b { color:#fff; }\n  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }\n  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }\n  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }\n  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }\n  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }\n  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }\n  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }\n  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }\n  .cost-badge.online { color:#b9ffdc; background:#14613f; }\n  .cost-badge.offline { color:#ffd1c7; background:#71342d; }\n  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }\n  @media(max-width:900px) { .cost-head { grid-template-columns:repeat(2,1fr); } .cost-diagnostics { grid-template-columns:1fr; } }\n  @media(max-width:520px) { .cost-head { grid-template-columns:1fr; } .cost-kpi-value { font-size:23px; } }\n</style>\n\n<script>\n(function(scope) {\n  scope.view = scope.view || { period: \"month\", tariff: null, history: null };\n\n  scope.selectCostPeriod = function(period) {\n    scope.view.period = period;\n    scope.send({ topic: \"history/dashboard\", payload: { period: period } });\n  };\n\n  scope.$watch(\"msg\", function(msg) {\n    if (!msg || !msg.payload) return;\n    if (msg.topic === \"aWATTar/tariff/current\") {\n      scope.view.tariff = msg.payload;\n    }\n    if (msg.topic === \"history/dashboard/result\") {\n      scope.view.history = msg.payload;\n      scope.view.period = msg.payload.period || scope.view.period;\n    }\n  });\n\n  var refreshTimer = setInterval(function() {\n    scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n  }, 60000);\n  scope.$on(\"$destroy\", function() { clearInterval(refreshTimer); });\n})(scope);\n</script>\n\n<div class=\"cost-card\">\n  <div class=\"cost-toolbar\">\n    <h2>KOSTEN · Energiehistorie</h2>\n    <div class=\"cost-periods\">\n      <button ng-class=\"{active:view.period==='day'}\" ng-click=\"selectCostPeriod('day')\">Tag</button>\n      <button ng-class=\"{active:view.period==='month'}\" ng-click=\"selectCostPeriod('month')\">Monat</button>\n      <button ng-class=\"{active:view.period==='year'}\" ng-click=\"selectCostPeriod('year')\">Jahr</button>\n    </div>\n  </div>\n\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar-Preis</div>\n      <div class=\"cost-kpi-value\">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">reiner Börsenpreis, ohne Gebühren</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Netzbezug jetzt</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.gridImportWatt | number:0}} W</div>\n      <div class=\"cost-kpi-note\">Momentanleistung aus dem Stromnetz</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Kosten bei aktueller Leistung</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.costPerHourEur | currency:'€':4}} / h</div>\n      <div class=\"cost-kpi-note\">wenn der Netzbezug eine Stunde gleich bleibt</div>\n    </div>\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Verbrauchswert im Zeitraum</div>\n      <div class=\"cost-kpi-value\">{{view.history.totals.energyCostEur | currency:'€':2}}</div>\n      <div class=\"cost-kpi-note\">\n        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·\n        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie\n      </div>\n    </div>\n  </div>\n\n  <div class=\"cost-info\">\n    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen\n    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen\n    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.\n    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.\n  </div>\n\n  <h3 class=\"cost-section-title\">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>\n  <div class=\"cost-table-wrap\" ng-if=\"view.history.rows.length\">\n    <table class=\"cost-table\">\n      <thead>\n        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>\n      </thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"row in view.history.rows\" ng-click=\"row.expanded=!row.expanded\">\n          <td><span class=\"cost-expand\">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>\n          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>\n          <td>{{row.gridImportKWh | number:3}} kWh</td>\n          <td>{{row.pvEnergyKWh | number:3}} kWh</td>\n          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class=\"cost-muted\">{{row.energyCostEur * 100 | number:2}} ct</span></td>\n          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class=\"cost-muted\">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>\n          <td>\n            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}\n            <br><span ng-class=\"{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}\">\n              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}\n            </span>\n          </td>\n          <td ng-class=\"{'cost-offline':row.recordedHourCount && row.offlineCount>0}\">\n            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}\n          </td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"row.expanded\">\n          <td colspan=\"8\"><div class=\"cost-hours-inner\">\n            <div class=\"cost-hour-grid\">\n              <div class=\"cost-hour\" ng-repeat=\"hour in row.hours\">\n                <b>{{hour.time}} Uhr</b><br>\n                <span ng-if=\"hour.recorded\">\n                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh\n                  <div class=\"cost-hour-price\">\n                    {{hour.energyCostEur | currency:'€':4}}\n                    <span class=\"cost-hour-cents\">· {{hour.energyCostEur * 100 | number:2}} ct</span>\n                  </div>\n                  <span class=\"cost-muted\">\n                    Netz {{hour.gridImportKWh | number:3}} kWh ·\n                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct\n                  </span><br>\n                </span>\n                <span ng-if=\"!hour.recorded\">\n                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>\n                  <span class=\"cost-muted\">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>\n                </span>\n                <span ng-if=\"hour.recorded\">\n                  Energie: <span ng-class=\"{'cost-offline':hour.energyStatus!=='online'}\">{{hour.energyStatus}}</span> ·\n                  Wetter: <span ng-class=\"{'cost-offline':hour.weatherStatus!=='online'}\">{{hour.weatherStatus}}</span> ·\n                  Tarif: <span ng-class=\"{'cost-offline':hour.tariffStatus!=='online'}\">{{hour.tariffStatus}}</span>\n                </span>\n                <span ng-if=\"!hour.recorded\">{{hour.status}}</span>\n              </div>\n            </div>\n          </div></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"cost-empty\" ng-if=\"view.history && !view.history.rows.length\">\n    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.\n  </div>\n\n  <h3 class=\"cost-section-title\">Service- und Fehlerdiagnose</h3>\n  <div class=\"cost-diagnostics\">\n    <div class=\"cost-source\" ng-repeat=\"source in view.history.diagnostics\">\n      <div class=\"cost-source-head\">\n        <span class=\"cost-source-name\">{{source.source}}</span>\n        <span class=\"cost-badge\" ng-class=\"source.status\">{{source.status}}</span>\n      </div>\n      <div class=\"cost-source-detail\">\n        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>\n        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}\n        <span ng-if=\"source.error\"><br>Hinweis: {{source.error}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n",
+        "format": "<style>\n  .cost-card { width:100%; max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }\n  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }\n  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }\n  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }\n  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }\n  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }\n  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }\n  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }\n  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }\n  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }\n  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }\n  .cost-info b { color:#fff; }\n  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }\n  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-offline { color:#ffad99; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }\n  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }\n  .cost-hour b { color:#fff; }\n  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }\n  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }\n  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }\n  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }\n  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }\n  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }\n  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }\n  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }\n  .cost-badge.online { color:#b9ffdc; background:#14613f; }\n  .cost-badge.offline { color:#ffd1c7; background:#71342d; }\n  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }\n  @media(max-width:900px) { .cost-head { grid-template-columns:repeat(2,1fr); } .cost-diagnostics { grid-template-columns:1fr; } }\n  @media(max-width:520px) { .cost-head { grid-template-columns:1fr; } .cost-kpi-value { font-size:23px; } }\n</style>\n\n<script>\n(function(scope) {\n  scope.view = scope.view || { period: \"month\", tariff: null, history: null };\n  var layoutTimers = [];\n\n  function refreshCostLayout() {\n    if (!window || !window.dispatchEvent) return;\n    window.dispatchEvent(new Event(\"resize\"));\n  }\n\n  function scheduleCostLayoutRefresh() {\n    layoutTimers.forEach(clearTimeout);\n    layoutTimers = [0, 100, 350, 800].map(function(delay) {\n      return setTimeout(refreshCostLayout, delay);\n    });\n  }\n\n  scope.selectCostPeriod = function(period) {\n    scope.view.period = period;\n    scope.send({ topic: \"history/dashboard\", payload: { period: period } });\n    scheduleCostLayoutRefresh();\n  };\n\n  scope.$watch(\"msg\", function(msg) {\n    if (!msg || !msg.payload) return;\n    if (msg.payload === \"connect\" || (msg.payload === \"change\" && msg.name === \"KOSTEN\")) {\n      scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n      scheduleCostLayoutRefresh();\n      return;\n    }\n    if (msg.topic === \"aWATTar/tariff/current\") {\n      scope.view.tariff = msg.payload;\n    }\n    if (msg.topic === \"history/dashboard/result\") {\n      scope.view.history = msg.payload;\n      scope.view.period = msg.payload.period || scope.view.period;\n      scheduleCostLayoutRefresh();\n    }\n  });\n\n  window.addEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n  document.addEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  scheduleCostLayoutRefresh();\n\n  var refreshTimer = setInterval(function() {\n    scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n  }, 60000);\n  scope.$on(\"$destroy\", function() {\n    clearInterval(refreshTimer);\n    layoutTimers.forEach(clearTimeout);\n    window.removeEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n    document.removeEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  });\n})(scope);\n</script>\n\n<div class=\"cost-card\">\n  <div class=\"cost-toolbar\">\n    <h2>KOSTEN · Energiehistorie</h2>\n    <div class=\"cost-periods\">\n      <button ng-class=\"{active:view.period==='day'}\" ng-click=\"selectCostPeriod('day')\">Tag</button>\n      <button ng-class=\"{active:view.period==='month'}\" ng-click=\"selectCostPeriod('month')\">Monat</button>\n      <button ng-class=\"{active:view.period==='year'}\" ng-click=\"selectCostPeriod('year')\">Jahr</button>\n    </div>\n  </div>\n\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar-Preis</div>\n      <div class=\"cost-kpi-value\">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">reiner Börsenpreis, ohne Gebühren</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Netzbezug jetzt</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.gridImportWatt | number:0}} W</div>\n      <div class=\"cost-kpi-note\">Momentanleistung aus dem Stromnetz</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Kosten bei aktueller Leistung</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.costPerHourEur | currency:'€':4}} / h</div>\n      <div class=\"cost-kpi-note\">wenn der Netzbezug eine Stunde gleich bleibt</div>\n    </div>\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Verbrauchswert im Zeitraum</div>\n      <div class=\"cost-kpi-value\">{{view.history.totals.energyCostEur | currency:'€':2}}</div>\n      <div class=\"cost-kpi-note\">\n        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·\n        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie\n      </div>\n    </div>\n  </div>\n\n  <div class=\"cost-info\">\n    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen\n    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen\n    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.\n    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.\n  </div>\n\n  <h3 class=\"cost-section-title\">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>\n  <div class=\"cost-table-wrap\" ng-if=\"view.history.rows.length\">\n    <table class=\"cost-table\">\n      <thead>\n        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>\n      </thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"row in view.history.rows\" ng-click=\"row.expanded=!row.expanded\">\n          <td><span class=\"cost-expand\">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>\n          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>\n          <td>{{row.gridImportKWh | number:3}} kWh</td>\n          <td>{{row.pvEnergyKWh | number:3}} kWh</td>\n          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class=\"cost-muted\">{{row.energyCostEur * 100 | number:2}} ct</span></td>\n          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class=\"cost-muted\">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>\n          <td>\n            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}\n            <br><span ng-class=\"{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}\">\n              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}\n            </span>\n          </td>\n          <td ng-class=\"{'cost-offline':row.recordedHourCount && row.offlineCount>0}\">\n            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}\n          </td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"row.expanded\">\n          <td colspan=\"8\"><div class=\"cost-hours-inner\">\n            <div class=\"cost-hour-grid\">\n              <div class=\"cost-hour\" ng-repeat=\"hour in row.hours\">\n                <b>{{hour.time}} Uhr</b><br>\n                <span ng-if=\"hour.recorded\">\n                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh\n                  <div class=\"cost-hour-price\">\n                    {{hour.energyCostEur | currency:'€':4}}\n                    <span class=\"cost-hour-cents\">· {{hour.energyCostEur * 100 | number:2}} ct</span>\n                  </div>\n                  <span class=\"cost-muted\">\n                    Netz {{hour.gridImportKWh | number:3}} kWh ·\n                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct\n                  </span><br>\n                </span>\n                <span ng-if=\"!hour.recorded\">\n                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>\n                  <span class=\"cost-muted\">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>\n                </span>\n                <span ng-if=\"hour.recorded\">\n                  Energie: <span ng-class=\"{'cost-offline':hour.energyStatus!=='online'}\">{{hour.energyStatus}}</span> ·\n                  Wetter: <span ng-class=\"{'cost-offline':hour.weatherStatus!=='online'}\">{{hour.weatherStatus}}</span> ·\n                  Tarif: <span ng-class=\"{'cost-offline':hour.tariffStatus!=='online'}\">{{hour.tariffStatus}}</span>\n                </span>\n                <span ng-if=\"!hour.recorded\">{{hour.status}}</span>\n              </div>\n            </div>\n          </div></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"cost-empty\" ng-if=\"view.history && !view.history.rows.length\">\n    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.\n  </div>\n\n  <h3 class=\"cost-section-title\">Service- und Fehlerdiagnose</h3>\n  <div class=\"cost-diagnostics\">\n    <div class=\"cost-source\" ng-repeat=\"source in view.history.diagnostics\">\n      <div class=\"cost-source-head\">\n        <span class=\"cost-source-name\">{{source.source}}</span>\n        <span class=\"cost-badge\" ng-class=\"source.status\">{{source.status}}</span>\n      </div>\n      <div class=\"cost-source-detail\">\n        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>\n        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}\n        <span ng-if=\"source.error\"><br>Hinweis: {{source.error}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n",
         "storeOutMessages": true,
         "fwdInMessages": false,
         "resendOnRefresh": true,
@@ -9446,6 +9446,442 @@
         "wires": [
             [
                 "weather_build_request"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_dashboard_ui_control",
+        "type": "ui_ui_control",
+        "z": "kosten_flow",
+        "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
+        "events": "all",
+        "x": 465,
+        "y": 360,
+        "wires": [
+            [
+                "kosten_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "system_dashboard_tab",
+        "type": "ui_tab",
+        "name": "SYSTEM",
+        "icon": "dns",
+        "order": 15,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "system_dashboard_group",
+        "type": "ui_group",
+        "name": "TECHNISCHE ÜBERSICHT",
+        "tab": "system_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "system_dashboard_flow",
+        "type": "tab",
+        "label": "SYSTEM",
+        "disabled": false,
+        "info": "Dashboard-Vorlage für Netzwerk-, Raspberry-Pi- und Phidget-Status. Die technische Erfassung wird in einem separaten Schritt ergänzt.",
+        "env": []
+    },
+    {
+        "id": "system_dashboard_template",
+        "type": "ui_template",
+        "z": "system_dashboard_flow",
+        "group": "system_dashboard_group",
+        "name": "Technisches Hausnetz",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .sys-card{width:100%;max-width:none;box-sizing:border-box;color:#eaf5f6;font-family:Roboto,Arial,sans-serif}\n  .sys-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}\n  .sys-header h2{margin:0;color:#fff;font-size:24px}.sys-subtitle{margin-top:5px;color:#a9c4c6;font-size:12px}\n  .sys-overview{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #405b5f;border-radius:12px;background:#1d2d2f;font-size:12px}\n  .sys-dot{width:10px;height:10px;border-radius:50%;background:#7f9295;box-shadow:0 0 0 4px rgba(127,146,149,.13)}\n  .sys-dot.online{background:#4bd88a;box-shadow:0 0 0 4px rgba(75,216,138,.13)}.sys-dot.offline{background:#ff826d;box-shadow:0 0 0 4px rgba(255,130,109,.13)}\n  .sys-summary{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;margin-bottom:16px}\n  .sys-kpi{padding:14px 15px;border-radius:13px;background:linear-gradient(135deg,#1d3c41,#244d52);box-shadow:0 5px 14px rgba(0,0,0,.2)}\n  .sys-kpi-label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#b7ced0}.sys-kpi-value{margin-top:6px;color:#fff;font-size:23px;font-weight:700}.sys-kpi-note{margin-top:4px;color:#a9c4c6;font-size:11px}\n  .sys-section-title{margin:22px 0 9px;color:#fff;font-size:16px}.sys-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}\n  .sys-panel{border:1px solid #405b5f;border-radius:13px;background:#1d2d2f;overflow:hidden}.sys-panel-head{padding:13px 15px;border-bottom:1px solid #395357;background:#20383b;color:#fff;font-weight:700;font-size:14px}\n  .sys-panel-body{padding:13px 15px}.sys-service{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #395357}.sys-service:last-child{border-bottom:0;padding-bottom:0}.sys-service:first-child{padding-top:0}\n  .sys-service-name{color:#fff;font-size:13px;font-weight:700}.sys-service-detail{margin-top:3px;color:#9bb5b8;font-size:11px}.sys-badge{padding:4px 8px;border-radius:999px;background:#405055;color:#d3e1e2;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.sys-badge.online{background:#14613f;color:#b9ffdc}.sys-badge.offline{background:#71342d;color:#ffd1c7}\n  .sys-table-wrap{width:100%;overflow-x:auto;border:1px solid #456367;border-radius:13px;background:#1d2d2f}.sys-table{width:100%;min-width:760px;border-collapse:collapse}.sys-table th{padding:11px 12px;background:#0b5960;color:#fff;text-align:left;font-size:12px}.sys-table td{padding:11px 12px;border-top:1px solid #395357;font-size:12px}.sys-device-name{color:#fff;font-weight:700}.sys-muted{color:#9bb5b8}.sys-empty{padding:25px;color:#9bb5b8;text-align:center}\n  .sys-footnote{margin-top:14px;padding:11px 13px;border-left:3px solid #61d6dd;border-radius:8px;background:#162b2e;color:#b7ced0;font-size:12px;line-height:1.45}\n  @media(max-width:900px){.sys-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sys-grid{grid-template-columns:1fr}}@media(max-width:520px){.sys-summary{grid-template-columns:1fr}.sys-header h2{font-size:21px}}\n</style>\n\n<script>\n(function(scope){\n  var placeholder={\n    network:{state:\"waiting\",label:\"Monitoring wird vorbereitet\",updatedAt:null},\n    summary:{devices:null,online:null,offline:null,updatedAt:null},\n    services:[\n      {name:\"Node-RED\",detail:\"Zentrale Hausautomation\",state:\"waiting\"},\n      {name:\"Phidget-Anwendersoftware\",detail:\"Statusquelle noch nicht verbunden\",state:\"waiting\"},\n      {name:\"Phidget-Steuerung\",detail:\"Treiber- und Geräteprüfung folgt\",state:\"waiting\"}\n    ],\n    devices:[]\n  };\n  scope.systemView=angular.copy(placeholder);\n\n  function normalize(payload){\n    if(!payload||typeof payload!==\"object\"||Array.isArray(payload))return angular.copy(placeholder);\n    var incoming=payload.system||payload;\n    return {\n      network:angular.extend({},placeholder.network,incoming.network||{}),\n      summary:angular.extend({},placeholder.summary,incoming.summary||{}),\n      services:Array.isArray(incoming.services)?incoming.services:placeholder.services,\n      devices:Array.isArray(incoming.devices)?incoming.devices:[]\n    };\n  }\n  function stateClass(state){return state===\"online\"?\"online\":(state===\"offline\"?\"offline\":\"waiting\");}\n  scope.systemStateClass=stateClass;\n  scope.systemStateLabel=function(state){return state===\"online\"?\"online\":(state===\"offline\"?\"offline\":(state===\"scanning\"?\"Scan läuft\":\"ausstehend\"));};\n  scope.$watch(\"msg\",function(msg){if(msg&&msg.payload)scope.systemView=normalize(msg.payload);});\n})(scope);\n</script>\n\n<div class=\"sys-card\">\n  <div class=\"sys-header\">\n    <div><h2>SYSTEM · Technisches Hausnetz</h2><div class=\"sys-subtitle\">Raspberry Pi, Dienste, Phidget-Anbindung und technische Zustände</div></div>\n    <div class=\"sys-overview\"><span class=\"sys-dot\" ng-class=\"systemStateClass(systemView.network.state)\"></span><span>{{systemView.network.label}}</span></div>\n  </div>\n\n  <div class=\"sys-summary\">\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Erfasste Geräte</div><div class=\"sys-kpi-value\">{{systemView.summary.devices === null ? '—' : systemView.summary.devices}}</div><div class=\"sys-kpi-note\">Raspberry Pi und Netzwerktechnik</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Online</div><div class=\"sys-kpi-value\">{{systemView.summary.online === null ? '—' : systemView.summary.online}}</div><div class=\"sys-kpi-note\">aktuell erreichbar</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Offline</div><div class=\"sys-kpi-value\">{{systemView.summary.offline === null ? '—' : systemView.summary.offline}}</div><div class=\"sys-kpi-note\">benötigt Aufmerksamkeit</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Letzte Aktualisierung</div><div class=\"sys-kpi-value\">{{systemView.summary.updatedAt ? (systemView.summary.updatedAt | date:'HH:mm:ss') : '—'}}</div><div class=\"sys-kpi-note\">Zeitpunkt der Systemprüfung</div></div>\n  </div>\n\n  <div class=\"sys-grid\">\n    <div class=\"sys-panel\"><div class=\"sys-panel-head\">Anwendersoftware &amp; Schnittstellen</div><div class=\"sys-panel-body\">\n      <div class=\"sys-service\" ng-repeat=\"service in systemView.services\"><div><div class=\"sys-service-name\">{{service.name}}</div><div class=\"sys-service-detail\">{{service.detail}}</div></div><span class=\"sys-badge\" ng-class=\"systemStateClass(service.state)\">{{systemStateLabel(service.state)}}</span></div>\n    </div></div>\n    <div class=\"sys-panel\"><div class=\"sys-panel-head\">Geplante Live-Kennzahlen</div><div class=\"sys-panel-body\">\n      <div class=\"sys-service\"><div><div class=\"sys-service-name\">Systemtemperatur</div><div class=\"sys-service-detail\">CPU- und Gehäusetemperatur je Raspberry Pi</div></div><span class=\"sys-badge\">ausstehend</span></div>\n      <div class=\"sys-service\"><div><div class=\"sys-service-name\">Auslastung &amp; Speicher</div><div class=\"sys-service-detail\">CPU, RAM, Datenträger und Betriebszeit</div></div><span class=\"sys-badge\">ausstehend</span></div>\n      <div class=\"sys-service\"><div><div class=\"sys-service-name\">Netzwerkqualität</div><div class=\"sys-service-detail\">IP-Adresse, Verbindung und letzte Antwort</div></div><span class=\"sys-badge\">ausstehend</span></div>\n    </div></div>\n  </div>\n\n  <h3 class=\"sys-section-title\">Angeschlossene Systeme</h3>\n  <div class=\"sys-table-wrap\" ng-if=\"systemView.devices.length\"><table class=\"sys-table\"><thead><tr><th>Hostname</th><th>Netzwerk</th><th>System</th><th>Temperatur</th><th>Letzte Antwort</th><th>Status</th></tr></thead><tbody>\n    <tr ng-repeat=\"device in systemView.devices\"><td class=\"sys-device-name\">{{device.name}}<br><span class=\"sys-muted\">{{device.hostname || 'kein Hostname gemeldet'}}</span></td><td>{{device.ip || '—'}}</td><td><span ng-if=\"device.model\">{{device.model}}<br><span class=\"sys-muted\">{{device.operatingSystem}}<span ng-if=\"device.services\"><br>{{device.services}}</span><span ng-if=\"device.memoryUsedPercent !== null\"><br>RAM {{device.memoryUsedPercent | number:0}} % · Disk {{device.diskUsedPercent | number:0}} % · Load {{device.loadAverage | number:2}}</span></span></span><span ng-if=\"!device.model\">—</span></td><td>{{device.temperatureC === undefined || device.temperatureC === null ? '—' : (device.temperatureC | number:1) + ' °C'}}<br><span class=\"sys-muted\" ng-if=\"device.temperatureSource === 'live'\">live</span><span class=\"sys-muted\" ng-if=\"device.temperatureSource !== 'live' && device.inventoryObservedAt\">Inventar {{device.inventoryObservedAt | date:'dd.MM.yy'}}</span></td><td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td><td><span class=\"sys-badge\" ng-class=\"systemStateClass(device.state)\">{{systemStateLabel(device.state)}}</span></td></tr>\n  </tbody></table></div>\n  <div class=\"sys-panel sys-empty\" ng-if=\"!systemView.devices.length\">Noch keine Gerätequelle verbunden. Sobald die Systemabfrage ergänzt ist, erscheinen hier automatisch alle erfassten Raspberry Pis und Netzwerkgeräte.</div>\n  <div class=\"sys-footnote\">Diese Ansicht ist bewusst nur die Dashboard-Vorlage. Sie zeigt keine erfundenen Zustände an; Online-/Offline-Informationen, Temperaturen, Systemdaten und der Status der Phidget-Anwendersoftware werden erst mit der nächsten Ausbaustufe aus echten Datenquellen gefüllt.</div>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 535,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "system_dashboard_data_in",
+        "type": "link in",
+        "z": "system_dashboard_flow",
+        "name": "Live-Geräteliste vom System-Scan",
+        "links": [
+            "system_dashboard_data_out"
+        ],
+        "x": 265,
+        "y": 180,
+        "wires": [
+            [
+                "system_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "system_network_flow",
+        "type": "tab",
+        "label": "System · Netzwerk-Scan",
+        "disabled": false,
+        "info": "Eigenständiger, gedrosselter ICMP-Scan des lokalen /24-Heimnetzes. Es werden nur erreichbare Geräte an das SYSTEM-Dashboard gemeldet; nicht antwortende IP-Adressen werden nicht als Geräte interpretiert.",
+        "env": []
+    },
+    {
+        "id": "system_scan_schedule",
+        "type": "inject",
+        "z": "system_network_flow",
+        "name": "Systemnetz beim Start und alle 5 Minuten scannen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/network/scan",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "8",
+        "topic": "system/network/scan",
+        "payload": "",
+        "payloadType": "date",
+        "x": 245,
+        "y": 120,
+        "wires": [
+            [
+                "system_local_ip_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_local_ip_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/usr/sbin/ipconfig getifaddr en0",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "5",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Lokale IPv4-Adresse ermitteln",
+        "x": 525,
+        "y": 120,
+        "wires": [
+            [
+                "system_scan_targets"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_scan_targets",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Lokales /24-Scan-Netz sicher ableiten",
+        "func": "// nodeId: system_scan_targets\nconst value = String(msg.payload || \"\").trim();\nconst match = value.match(/\\b(\\d{1,3}(?:\\.\\d{1,3}){3})\\b/);\n\nif (!match) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Lokale IPv4-Adresse nicht erkannt\" });\n    node.warn(\"Systemnetz-Scan übersprungen: keine private lokale IPv4-Adresse erhalten.\");\n    return null;\n}\n\nconst ip = match[1];\nconst parts = ip.split(\".\").map(Number);\nif (parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Ungültige lokale IPv4-Adresse\" });\n    return null;\n}\n\nconst privateNetwork = parts[0] === 10\n    || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31)\n    || (parts[0] === 192 && parts[1] === 168);\nif (!privateNetwork) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Keine private lokale IPv4-Adresse\" });\n    node.warn(\"Systemnetz-Scan übersprungen: Adresse liegt nicht im privaten Heimnetzbereich.\");\n    return null;\n}\n\nconst subnet = parts.slice(0, 3).join(\".\");\nconst scanId = `${subnet}-${Date.now()}`;\nconst targets = [];\nfor (let host = 1; host <= 254; host += 1) {\n    const target = `${subnet}.${host}`;\n    if (target !== ip) targets.push(target);\n}\n\nflow.set(\"systemNetworkScan\", {\n    scanId,\n    subnet,\n    localIp: ip,\n    startedAt: new Date().toISOString(),\n    expected: targets.length,\n    completed: 0,\n    results: {}\n});\n\nmsg.topic = \"system/network/scan/target\";\nmsg.scanId = scanId;\nmsg.scanSubnet = subnet;\nmsg.payload = targets;\nnode.status({ fill: \"blue\", shape: \"dot\", text: `${subnet}.0/24 · ${targets.length} Ziele` });\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 120,
+        "wires": [
+            [
+                "system_scan_split"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_split",
+        "type": "split",
+        "z": "system_network_flow",
+        "name": "Ein Ping je Netzadresse",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1030,
+        "y": 120,
+        "wires": [
+            [
+                "system_scan_target_property"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_target_property",
+        "type": "change",
+        "z": "system_network_flow",
+        "name": "Ziel-IP für Auswertung merken",
+        "rules": [
+            {
+                "t": "set",
+                "p": "targetIp",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1265,
+        "y": 120,
+        "wires": [
+            [
+                "system_scan_rate_limit"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_rate_limit",
+        "type": "delay",
+        "z": "system_network_flow",
+        "name": "Gedrosselt · maximal 8 Prüfungen/Sekunde",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "8",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 240,
+        "y": 220,
+        "wires": [
+            [
+                "system_ping_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_ping_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/sbin/ping -c 1 -W 1 -o",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "2",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Erreichbarkeit prüfen (ICMP)",
+        "x": 510,
+        "y": 220,
+        "wires": [
+            [],
+            [],
+            [
+                "system_ping_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Online-Liste mit Hostnamen bilden",
+        "func": "// nodeId: system_scan_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst liveMetricsUpdate = msg.liveMetricsUpdate === true;\nconst raspberryInventory = {\n    \"192.168.0.104\": { hostname: \"pieast\", model: \"Frühes Raspberry-Pi-Modell\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 55 },\n    \"192.168.0.105\": { hostname: \"piwest\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 54 },\n    \"192.168.0.125\": { hostname: \"PIANTE_\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 9 Stretch\", services: \"SSH 22 · SMB 445\", temperatureC: 52 },\n    \"192.168.0.150\": { hostname: \"PICENTER2\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 11 Bullseye\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 45 },\n    \"192.168.0.190\": { hostname: \"pientry\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 13 Trixie\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 48 }\n};\n\nif (!scan || (!liveMetricsUpdate && (msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || typeof msg.online !== \"boolean\"))) {\n    return null;\n}\n\nif (!liveMetricsUpdate) {\n    scan.completed += 1;\n    scan.results[targetIp] = {\n        ip: targetIp,\n        hostname: msg.online && msg.hostname ? String(msg.hostname) : null,\n        state: msg.online ? \"online\" : \"offline\",\n        observedAt: new Date().toISOString()\n    };\n    flow.set(\"systemNetworkScan\", scan);\n}\n\nconst liveMetrics = flow.get(\"systemLiveMetrics\") || {};\nconst entries = Object.values(scan.results);\nconst onlineDevices = entries\n    .filter((entry) => entry.state === \"online\")\n    .sort((left, right) => left.ip.localeCompare(right.ip, undefined, { numeric: true }))\n    .map((entry) => {\n        const inventory = raspberryInventory[entry.ip] || null;\n        const live = liveMetrics[entry.ip] || null;\n        return {\n            name: live?.hostname || inventory?.hostname || entry.hostname || \"Netzwerkgerät\",\n            hostname: live?.hostname || inventory?.hostname || entry.hostname || null,\n            model: inventory?.model || null,\n            operatingSystem: inventory?.operatingSystem || null,\n            services: inventory?.services || null,\n            temperatureC: live?.temperatureC ?? inventory?.temperatureC ?? null,\n            temperatureSource: live?.temperatureC !== null && live?.temperatureC !== undefined ? \"live\" : (inventory ? \"inventory\" : null),\n            memoryUsedPercent: live?.memoryUsedPercent ?? null,\n            diskUsedPercent: live?.diskUsedPercent ?? null,\n            uptimeSeconds: live?.uptimeSeconds ?? null,\n            loadAverage: live?.loadAverage ?? null,\n            inventoryObservedAt: inventory ? \"2026-07-26\" : null,\n            ip: entry.ip,\n            lastSeen: entry.observedAt,\n            state: \"online\"\n        };\n    });\nconst finished = scan.completed >= scan.expected;\n\nif (!liveMetricsUpdate && !finished && scan.completed % 5 !== 0) return null;\n\nmsg.topic = \"system/network/overview\";\nmsg.payload = {\n    system: {\n        network: {\n            state: finished ? \"online\" : \"scanning\",\n            label: liveMetricsUpdate\n                ? `Live-Systemwerte aktualisiert · ${Object.keys(liveMetrics).length} Raspberry Pis erreichbar`\n                : (finished\n                ? `Netzscan abgeschlossen · ${onlineDevices.length} Geräte erreichbar`\n                : `Netzscan läuft · ${scan.completed}/${scan.expected} Adressen geprüft`),\n            updatedAt: new Date().toISOString()\n        },\n        summary: {\n            devices: onlineDevices.length,\n            online: onlineDevices.length,\n            offline: null,\n            updatedAt: new Date().toISOString()\n        },\n        devices: onlineDevices\n    }\n};\nnode.status({\n    fill: finished || liveMetricsUpdate ? \"green\" : \"blue\",\n    shape: \"dot\",\n    text: liveMetricsUpdate ? `${Object.keys(liveMetrics).length} Live-Systeme` : (finished ? `${onlineDevices.length} Geräte online` : `${scan.completed}/${scan.expected} geprüft`)\n});\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 535,
+        "y": 300,
+        "wires": [
+            [
+                "system_dashboard_data_out",
+                "system_scan_debug"
+            ]
+        ]
+    },
+    {
+        "id": "system_dashboard_data_out",
+        "type": "link out",
+        "z": "system_network_flow",
+        "name": "Online-Geräteliste an SYSTEM-Dashboard",
+        "mode": "link",
+        "links": [
+            "system_dashboard_data_in"
+        ],
+        "x": 1095,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "system_scan_debug",
+        "type": "debug",
+        "z": "system_network_flow",
+        "name": "Systemnetz · geprüfte Online-Liste",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1105,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "system_ping_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Ping-Ergebnis sicher auswerten",
+        "func": "// nodeId: system_ping_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst result = msg.payload;\nconst code = typeof result === \"object\" && result !== null ? Number(result.code) : Number(result);\n\nif (!scan || msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || !Number.isFinite(code)) {\n    return [null, null];\n}\n\nmsg.online = code === 0;\nmsg.payload = targetIp;\nreturn msg.online ? [msg, null] : [null, msg];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 765,
+        "y": 220,
+        "wires": [
+            [
+                "system_hostname_exec"
+            ],
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_hostname_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/sh -c 'name=$(/usr/bin/dig +time=1 +tries=1 -x \"$1\" +short | /usr/bin/head -n 1 | /usr/bin/tr -d \"\\n\"); printf \"__SYSTEM_HOSTNAME__%s\\n\" \"$name\"' system-hostname",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "3",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Hostname für Online-Gerät auflösen",
+        "x": 1035,
+        "y": 180,
+        "wires": [
+            [
+                "system_hostname_result"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_hostname_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Hostname sicher übernehmen",
+        "func": "// nodeId: system_hostname_result\nconst marker = \"__SYSTEM_HOSTNAME__\";\nconst raw = String(msg.payload || \"\").trim();\nlet hostname = raw.startsWith(marker) ? raw.slice(marker.length).trim() : \"\";\n\nif (hostname.endsWith(\".\")) hostname = hostname.slice(0, -1);\nif (!/^[A-Za-z0-9][A-Za-z0-9.-]{0,251}$/.test(hostname)) hostname = \"\";\n\nmsg.hostname = hostname || null;\nmsg.online = true;\nmsg.payload = msg.targetIp;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1260,
+        "y": 180,
+        "wires": [
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_live_metrics_schedule",
+        "type": "inject",
+        "z": "system_network_flow",
+        "name": "Raspberry-Pi-Livewerte jede Minute abrufen",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "15",
+        "topic": "system/live/metrics",
+        "payload": "",
+        "payloadType": "date",
+        "x": 270,
+        "y": 420,
+        "wires": [
+            [
+                "system_live_metrics_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_live_metrics_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "node /Users/papa/Documents/HOME_AUTOMATION_SOLAR/tools/system-live-metrics.mjs",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "45",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Livewerte per SSH lesen (ohne Passwort im Flow)",
+        "x": 570,
+        "y": 420,
+        "wires": [
+            [
+                "system_live_metrics_result"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_live_metrics_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Livewerte prüfen und Dashboard aktualisieren",
+        "func": "// nodeId: system_live_metrics_result\nlet payload = msg.payload;\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n    } catch {\n        node.status({ fill: \"red\", shape: \"ring\", text: \"Livewerte nicht lesbar\" });\n        return null;\n    }\n}\n\nconst devices = Array.isArray(payload?.devices) ? payload.devices : [];\nconst metrics = {};\nfor (const device of devices) {\n    if (!device?.online || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(String(device.ip || \"\"))) continue;\n    metrics[device.ip] = device;\n}\n\nflow.set(\"systemLiveMetrics\", metrics);\nmsg.liveMetricsUpdate = true;\nmsg.topic = \"system/live/metrics\";\nmsg.payload = null;\nnode.status({ fill: \"green\", shape: \"dot\", text: `${Object.keys(metrics).length} Live-Systeme erreichbar` });\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 885,
+        "y": 420,
+        "wires": [
+            [
+                "system_scan_result"
             ]
         ]
     }

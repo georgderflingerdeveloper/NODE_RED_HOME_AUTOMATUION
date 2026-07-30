@@ -1,0 +1,41 @@
+[
+  {
+    "id": "system_dashboard_data_in",
+    "type": "link in",
+    "z": "system_dashboard_flow",
+    "name": "Live-Geräteliste vom System-Scan",
+    "links": [
+      "system_dashboard_data_out"
+    ],
+    "x": 265,
+    "y": 180,
+    "wires": [
+      [
+        "system_dashboard_template"
+      ]
+    ]
+  },
+  {
+    "id": "system_dashboard_template",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "system_dashboard_group",
+    "name": "Technisches Hausnetz",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 535,
+    "y": 180,
+    "wires": [
+      []
+    ]
+  }
+]
