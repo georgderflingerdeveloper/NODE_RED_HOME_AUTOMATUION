@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "0d5b6788f7f28a7c64ebec8f27e64973f898c508e34dcd438ef84a4eb108879c",
+  "flowSha256": "b68043c10347b20efc0d8151252e0ded4b2855b7b4429685c7da1e9fe1dd527e",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -434,7 +434,12 @@
     "weather_link_out",
     "weather_ui_overview_table",
     "weather_dashboard_ui_control",
-    "weather_dashboard_refresh"
+    "weather_dashboard_refresh",
+    "kosten_flow",
+    "kosten_tarif_zeitplan",
+    "kosten_awattar_api",
+    "kosten_aktuellen_tarif_aufbereiten",
+    "kosten_tarif_debug"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -864,7 +869,12 @@
     "weather_link_out": "flows/wetter--weather_flow/nodes.json",
     "weather_ui_overview_table": "flows/wetter--weather_flow/nodes.json",
     "weather_dashboard_ui_control": "flows/wetter--weather_flow/nodes.json",
-    "weather_dashboard_refresh": "flows/wetter--weather_flow/nodes.json"
+    "weather_dashboard_refresh": "flows/wetter--weather_flow/nodes.json",
+    "kosten_flow": "configuration/nodes.json",
+    "kosten_tarif_zeitplan": "flows/kosten--kosten_flow/nodes.json",
+    "kosten_awattar_api": "flows/kosten--kosten_flow/nodes.json",
+    "kosten_aktuellen_tarif_aufbereiten": "flows/kosten--kosten_flow/nodes.json",
+    "kosten_tarif_debug": "flows/kosten--kosten_flow/nodes.json"
   },
   "functionLibraryRoot": "lib/functions/generated",
   "functionLibraryFiles": {
@@ -876,6 +886,7 @@
     "global/function.js": "d026bba53afcdec70a5b8ff3c7fa908747b2a26096a82c78d87227b562d2ae74",
     "heater-kid-room/heater-kid.js": "76288c5bdfa2fc79cef2709f49365bd056d5fd078c9895cf2cc8155c13e01b15",
     "home/command-all.js": "ca9a3fc0569c7ee069f9aa664c41f1209a3c4809352a751f7a4723e3023e8e45",
+    "kosten/aktuellen-awattar-tarif-aufbereiten.js": "d73a4bcf9e2cfa2619e22b4121d80204234a2ea5b01bf106370a9fb84a1d87b2",
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
     "light-bath-all/light-command-bathroom-all.js": "9e29a2a2c99c414cbe6f7e65ecbd8af29381e849a14b5e5b67960fc35c7a26a5",
     "light-door-entry-left/light-door-entry-left.js": "f07f19c6e2298302ccbbbebca9f92d354f78ec6d793c1f3750e7c8c80513dd34",
@@ -940,7 +951,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "5060459568ec43edc89ee77f6bdc90aa4353c1c70c4cd7f538d93c9d71407354",
+    "configuration/nodes.json": "543907acadc12631cc34b2c0fa1bc806d3cc3df8fab8bf39314734a413d5a8dd",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -968,6 +979,8 @@
     "flows/home--7fa0f8f.5a71708/functions/command-all.js": "663d6e9773279c8ac283507d8805d7a3c4eeb917c578e7d1a00f2e8b1c28b768",
     "flows/home--7fa0f8f.5a71708/nodes.json": "8bc71de1759e6bb0c9e0205fc78d4f3866eda7f77956634f42de74f39ce8d73f",
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
+    "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "11a420dd1b1dec0de6d3fb33ecef87452c44937bcac47c6479ef412600ee208b",
+    "flows/kosten--kosten_flow/nodes.json": "60cc049ded0e8537f6ff7174f3d92de122c02024c5bb660bda4dfa3731574a87",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",

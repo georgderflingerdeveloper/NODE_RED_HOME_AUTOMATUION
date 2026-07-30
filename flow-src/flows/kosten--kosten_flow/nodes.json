@@ -1,0 +1,94 @@
+[
+  {
+    "id": "kosten_tarif_zeitplan",
+    "type": "inject",
+    "z": "kosten_flow",
+    "name": "aWATTar Tarif alle 5 Minuten abrufen",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "300",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "2",
+    "topic": "aWATTar/tariff/request",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 120,
+    "wires": [
+      [
+        "kosten_awattar_api"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_awattar_api",
+    "type": "http request",
+    "z": "kosten_flow",
+    "name": "aWATTar Marktpreise (AT)",
+    "method": "GET",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "https://api.awattar.at/v1/marketdata",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": true,
+    "headers": [],
+    "x": 440,
+    "y": 120,
+    "wires": [
+      [
+        "kosten_aktuellen_tarif_aufbereiten"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_aktuellen_tarif_aufbereiten",
+    "type": "function",
+    "z": "kosten_flow",
+    "name": "Aktuellen aWATTar-Tarif aufbereiten",
+    "func": {
+      "$flowSource": "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 720,
+    "y": 120,
+    "wires": [
+      [
+        "kosten_tarif_debug"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_tarif_debug",
+    "type": "debug",
+    "z": "kosten_flow",
+    "name": "Aktueller aWATTar-Tarif",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 980,
+    "y": 120,
+    "wires": []
+  }
+]

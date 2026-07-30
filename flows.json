@@ -8855,5 +8855,103 @@
                 "weather_ui_overview_table"
             ]
         ]
+    },
+    {
+        "id": "kosten_flow",
+        "type": "tab",
+        "label": "KOSTEN",
+        "disabled": false,
+        "info": "Schritt 1: aWATTar-Börsenpreise abrufen. Der aktuelle Preis wird als aWATTarCurrentTariff im Flow- und Global-Context gespeichert.",
+        "env": []
+    },
+    {
+        "id": "kosten_tarif_zeitplan",
+        "type": "inject",
+        "z": "kosten_flow",
+        "name": "aWATTar Tarif alle 5 Minuten abrufen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "aWATTar/tariff/request",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 120,
+        "wires": [
+            [
+                "kosten_awattar_api"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_awattar_api",
+        "type": "http request",
+        "z": "kosten_flow",
+        "name": "aWATTar Marktpreise (AT)",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.awattar.at/v1/marketdata",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": true,
+        "headers": [],
+        "x": 440,
+        "y": 120,
+        "wires": [
+            [
+                "kosten_aktuellen_tarif_aufbereiten"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_aktuellen_tarif_aufbereiten",
+        "type": "function",
+        "z": "kosten_flow",
+        "name": "Aktuellen aWATTar-Tarif aufbereiten",
+        "func": "const priceSlots = Array.isArray(msg.payload?.data) ? msg.payload.data : [];\nconst now = Date.now();\nconst currentSlot = priceSlots.find((slot) =>\n    Number(slot.start_timestamp) <= now && now < Number(slot.end_timestamp)\n);\n\nif (!currentSlot || !Number.isFinite(Number(currentSlot.marketprice))) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"kein aktueller Tarif\" });\n    node.error(\"aWATTar lieferte keinen gültigen aktuellen Marktpreis\", msg);\n    return null;\n}\n\n// aWATTar liefert Eur/MWh. Für Cent/kWh wird durch 10 geteilt.\nconst priceCtPerKWh = Number(currentSlot.marketprice) / 10;\nconst tariff = {\n    provider: \"aWATTar\",\n    tariffType: \"Börsenpreis (ohne Netzentgelte, Abgaben und individuelle Aufschläge)\",\n    priceCtPerKWh,\n    priceEurPerKWh: priceCtPerKWh / 100,\n    marketPriceEurPerMWh: Number(currentSlot.marketprice),\n    validFrom: new Date(Number(currentSlot.start_timestamp)).toISOString(),\n    validUntil: new Date(Number(currentSlot.end_timestamp)).toISOString(),\n    fetchedAt: new Date(now).toISOString()\n};\n\nflow.set(\"aWATTarCurrentTariff\", tariff);\nglobal.set(\"aWATTarCurrentTariff\", tariff);\nnode.status({ fill: \"green\", shape: \"dot\", text: priceCtPerKWh.toFixed(3) + \" ct/kWh\" });\n\nmsg.topic = \"aWATTar/tariff/current\";\nmsg.payload = tariff;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 120,
+        "wires": [
+            [
+                "kosten_tarif_debug"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_tarif_debug",
+        "type": "debug",
+        "z": "kosten_flow",
+        "name": "Aktueller aWATTar-Tarif",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 120,
+        "wires": []
     }
 ]
