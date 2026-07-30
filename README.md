@@ -129,3 +129,13 @@ npm run library:install
 - `npm run flow:deploy` synchronisiert die Bibliothek und verändert anschließend den laufenden Flow.
 - Node-RED-Editor und VS Code nie gleichzeitig am selben Flow ändern; erst eine Richtung
   vollständig abschließen.
+# Node-RED Home Automation Solar
+
+## Dashboard-Starter (macOS)
+
+Installiert einen Desktop-Starter mit Home-Automation-Symbol. Ein Doppelklick
+startet Node-RED bei Bedarf und öffnet anschließend das Dashboard:
+
+```bash
+npm run desktop:install
+```
