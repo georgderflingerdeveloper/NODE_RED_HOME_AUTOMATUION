@@ -71,9 +71,23 @@
     "wires": [
       [
         "kosten_tarif_debug",
-        "kosten_dashboard_template"
+        "kosten_dashboard_template",
+        "kosten_history_out"
       ]
     ]
+  },
+  {
+    "id": "kosten_history_out",
+    "type": "link out",
+    "z": "kosten_flow",
+    "name": "Tarif an Datenbank speichern",
+    "mode": "link",
+    "links": [
+      "datenbank_telemetry_in"
+    ],
+    "x": 945,
+    "y": 240,
+    "wires": []
   },
   {
     "id": "kosten_dashboard_template",
@@ -95,7 +109,70 @@
     "x": 990,
     "y": 180,
     "wires": [
-      []
+      [
+        "kosten_history_query_out"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_history_query_out",
+    "type": "link out",
+    "z": "kosten_flow",
+    "name": "TAG/MONAT/JAHR VON DATENBANK",
+    "mode": "link",
+    "links": [
+      "datenbank_query_in"
+    ],
+    "x": 1245,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "kosten_history_result_in",
+    "type": "link in",
+    "z": "kosten_flow",
+    "name": "DATENBANKAUSWERTUNG AN DASHBOARD",
+    "links": [
+      "datenbank_dashboard_out"
+    ],
+    "x": 745,
+    "y": 300,
+    "wires": [
+      [
+        "kosten_dashboard_template"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_history_initial",
+    "type": "inject",
+    "z": "kosten_flow",
+    "name": "Monatsansicht beim Start laden",
+    "props": [
+      {
+        "p": "payload",
+        "v": "{\"period\":\"month\"}",
+        "vt": "json"
+      },
+      {
+        "p": "topic",
+        "v": "history/dashboard",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "6",
+    "topic": "history/dashboard",
+    "payload": "{\"period\":\"month\"}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 300,
+    "wires": [
+      [
+        "kosten_history_query_out"
+      ]
     ]
   },
   {

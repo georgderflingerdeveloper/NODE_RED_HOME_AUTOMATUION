@@ -196,7 +196,9 @@
     "z": "weather_flow",
     "name": "LINK_WETTERDATEN_OUT",
     "mode": "link",
-    "links": [],
+    "links": [
+      "datenbank_weather_in"
+    ],
     "x": 1305,
     "y": 320,
     "wires": []

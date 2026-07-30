@@ -139,3 +139,35 @@ startet Node-RED bei Bedarf und öffnet anschließend das Dashboard:
 ```bash
 npm run desktop:install
 ```
+
+## Historische Daten und Backups
+
+Die laufende SQLite-Datenbank liegt lokal unter `data/home-automation.sqlite`;
+automatische tägliche Backups liegen unter `data/backups/` und werden 31 Tage
+aufbewahrt. Beide Verzeichnisse sind bewusst nicht Teil von Git.
+
+Der Node-RED-Flow `DATENBANK` ist die sichtbare Service-Zentrale:
+
+- `ENERGIE · Payload empfangen` übernimmt PV-Leistung, Hausverbrauch,
+  Netzbezug, Einspeisung und SolarEdge-Status.
+- `WETTER · Payload empfangen` übernimmt die strukturierte Open-Meteo-Payload.
+- `Telemetrie speichern` übernimmt den jeweils gültigen aWATTar-Tarif.
+- `STUNDENSTAND · jede Stunde + Start` schreibt den aktuellen Stundenstand.
+- `DASHBOARD · Zeitraum abfragen` liefert Tag-, Monat- und Jahresauswertungen
+  an den Reiter `KOSTEN`.
+
+Die gemessenen Leistungen werden per Trapezregel zu kWh integriert. Kosten
+entstehen ausschließlich aus dem integrierten Netzbezug und dem für das
+Messintervall gültigen Börsenpreis. Fehlende oder veraltete Quellen werden als
+`offline` gespeichert und im Dashboard unter `Service- und Fehlerdiagnose`
+angezeigt. Die Tabellen `source_state` und `hourly_snapshots` sind für eine
+direkte technische Prüfung mit jedem SQLite-Werkzeug lesbar.
+
+Vor einer Wiederherstellung Node-RED beenden und den Vorgang zunächst prüfen:
+
+```bash
+npm run history:restore -- --from /Pfad/zum/Backup.sqlite --dry-run
+```
+
+Danach denselben Befehl ohne `--dry-run` ausführen. Die vorherige Datenbank wird
+automatisch als zusätzliche Sicherheitskopie behalten.

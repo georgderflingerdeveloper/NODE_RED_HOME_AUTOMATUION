@@ -11,7 +11,10 @@
         "flow:roundtrip": "node tools/flow-source/roundtrip.mjs",
         "library:install": "node tools/flow-source/install-library.mjs",
         "desktop:install": "node tools/install-desktop-dashboard.mjs",
-        "flow:deploy": "npm run library:install && node tools/flow-source/deploy.mjs",
+        "database:check": "node tools/database-check.mjs",
+        "history:install": "node tools/install-history-node.mjs",
+        "history:restore": "node tools/restore-history-db.mjs",
+        "flow:deploy": "npm run history:install && npm run library:install && node tools/flow-source/deploy.mjs",
         "test": "node --test test/*.test.mjs"
     },
     "engines": {
@@ -38,6 +41,9 @@
         "node-red-contrib-telegrambot": "~7.1.1"
     },
     "node-red": {
+        "nodes": {
+            "home-automation-history": "nodes/home-automation-history.js"
+        },
         "settings": {
             "flowFile": "flows.json",
             "credentialsFile": "flows_cred.json"

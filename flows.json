@@ -8063,7 +8063,7 @@
         "type": "function",
         "z": "b86cb602995b0261",
         "name": "GetExcessPower",
-        "func": "// === Konfiguration ===\n// Am installierten SolarEdge-Meter: Export positiv, Import negativ\nconst IMPORT_POS_EXPORT_NEG = false;\n\n// Eingänge prüfen\nconst PvPowerWatt = Number(msg.payload?.PvPowerWatt);\nconst GridPowerWatt = Number(msg.payload?.GridPowerWatt);\nif (!Number.isFinite(PvPowerWatt) || !Number.isFinite(GridPowerWatt)) { return null; }\n\n// Hauslast & Überschuss\nconst HouseConsumptionWatt = PvPowerWatt - GridPowerWatt;\n\nlet ExcessPowerWatt;\nif (IMPORT_POS_EXPORT_NEG) {\n    // Export ist negativ → Überschuss ist der negative Anteil\n    ExcessPowerWatt = Math.max(0, -GridPowerWatt);\n} else {\n    // Export ist positiv → Überschuss ist der positive Anteil\n    ExcessPowerWatt = Math.max(0, GridPowerWatt);\n}\n\n// Energieintegration (Wh)\nconst nowMs = Date.now();\nconst lastMs = context.get('lastMs') || nowMs;\nconst dt_h = (nowMs - lastMs) / 3600000; // Stunden\n\nconst lastExcessPowerWatt = context.get('lastExcessPowerWatt');\nlet ExcessEnergyWhTotal = context.get('ExcessEnergyWhTotal') || 0;\n\n// Tagesreset\nconst lastDay = context.get('lastDay') || new Date(nowMs).toDateString();\nconst today = new Date(nowMs).toDateString();\nlet ExcessEnergyWhToday = context.get('ExcessEnergyWhToday') || 0;\nif (today !== lastDay) {\n    ExcessEnergyWhToday = 0;\n}\n\n// Integration per Trapezregel\nif (Number.isFinite(lastExcessPowerWatt)) {\n    const dWh = ((lastExcessPowerWatt + ExcessPowerWatt) / 2) * dt_h;\n    ExcessEnergyWhTotal += dWh;\n    ExcessEnergyWhToday += dWh;\n}\n\n// Zustände speichern\ncontext.set('lastMs', nowMs);\ncontext.set('lastExcessPowerWatt', ExcessPowerWatt);\ncontext.set('ExcessEnergyWhTotal', ExcessEnergyWhTotal);\ncontext.set('ExcessEnergyWhToday', ExcessEnergyWhToday);\ncontext.set('lastDay', today);\n\n// Ausgabe\nmsg.payload = {\n    PvPowerWatt,\n    GridPowerWatt,\n    HouseConsumptionWatt,\n    ExcessPowerWatt,\n    ExcessEnergyWhTotal,\n    ExcessEnergyKWhTotal: ExcessEnergyWhTotal / 1000,\n    ExcessEnergyWhToday,\n    ExcessEnergyKWhToday: ExcessEnergyWhToday / 1000,\n    timestamp: nowMs\n};\nreturn msg;\n",
+        "func": "// === Konfiguration ===\n// Am installierten SolarEdge-Meter: Export positiv, Import negativ\nconst IMPORT_POS_EXPORT_NEG = false;\n\n// Eingänge prüfen\nconst PvPowerWatt = Number(msg.payload?.PvPowerWatt);\nconst GridPowerWatt = Number(msg.payload?.GridPowerWatt);\nif (!Number.isFinite(PvPowerWatt) || !Number.isFinite(GridPowerWatt)) { return null; }\n\n// Hauslast & Überschuss\nconst HouseConsumptionWatt = PvPowerWatt - GridPowerWatt;\nconst solarEdgeStatus = global.get(\"SolarEdgeData\") || {};\n\nlet ExcessPowerWatt;\nif (IMPORT_POS_EXPORT_NEG) {\n    // Export ist negativ → Überschuss ist der negative Anteil\n    ExcessPowerWatt = Math.max(0, -GridPowerWatt);\n} else {\n    // Export ist positiv → Überschuss ist der positive Anteil\n    ExcessPowerWatt = Math.max(0, GridPowerWatt);\n}\n\n// Energieintegration (Wh)\nconst nowMs = Date.now();\nconst lastMs = context.get('lastMs') || nowMs;\nconst dt_h = (nowMs - lastMs) / 3600000; // Stunden\n\nconst lastExcessPowerWatt = context.get('lastExcessPowerWatt');\nlet ExcessEnergyWhTotal = context.get('ExcessEnergyWhTotal') || 0;\n\n// Tagesreset\nconst lastDay = context.get('lastDay') || new Date(nowMs).toDateString();\nconst today = new Date(nowMs).toDateString();\nlet ExcessEnergyWhToday = context.get('ExcessEnergyWhToday') || 0;\nif (today !== lastDay) {\n    ExcessEnergyWhToday = 0;\n}\n\n// Integration per Trapezregel\nif (Number.isFinite(lastExcessPowerWatt)) {\n    const dWh = ((lastExcessPowerWatt + ExcessPowerWatt) / 2) * dt_h;\n    ExcessEnergyWhTotal += dWh;\n    ExcessEnergyWhToday += dWh;\n}\n\n// Zustände speichern\ncontext.set('lastMs', nowMs);\ncontext.set('lastExcessPowerWatt', ExcessPowerWatt);\ncontext.set('ExcessEnergyWhTotal', ExcessEnergyWhTotal);\ncontext.set('ExcessEnergyWhToday', ExcessEnergyWhToday);\ncontext.set('lastDay', today);\n\n// Ausgabe\nmsg.payload = {\n    PvPowerWatt,\n    GridPowerWatt,\n    HouseConsumptionWatt,\n    GridImportWatt: Math.max(0, -GridPowerWatt),\n    FeedInWatt: Math.max(0, GridPowerWatt),\n    ExcessPowerWatt,\n    ExcessEnergyWhTotal,\n    ExcessEnergyKWhTotal: ExcessEnergyWhTotal / 1000,\n    ExcessEnergyWhToday,\n    ExcessEnergyKWhToday: ExcessEnergyWhToday / 1000,\n    timestamp: nowMs,\n    OnlineFlag: solarEdgeStatus.OnlineFlag === true,\n    OfflineFlag: solarEdgeStatus.OnlineFlag !== true,\n    OfflineReason: solarEdgeStatus.OfflineReason || \"\",\n    Source: solarEdgeStatus.Source || \"SolarEdge Modbus/TCP\"\n};\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -8074,7 +8074,8 @@
         "y": 620,
         "wires": [
             [
-                "e93f57326a18d2d1"
+                "e93f57326a18d2d1",
+                "datenbank_energy_out"
             ]
         ]
     },
@@ -8796,7 +8797,9 @@
         "z": "weather_flow",
         "name": "LINK_WETTERDATEN_OUT",
         "mode": "link",
-        "links": [],
+        "links": [
+            "datenbank_weather_in"
+        ],
         "x": 1305,
         "y": 320,
         "wires": []
@@ -8934,7 +8937,8 @@
         "wires": [
             [
                 "kosten_tarif_debug",
-                "kosten_dashboard_template"
+                "kosten_dashboard_template",
+                "kosten_history_out"
             ]
         ]
     },
@@ -8984,7 +8988,7 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "format": "<style>\n  .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-head { display:flex; gap:16px; align-items:stretch; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-kpi { flex:1 1 220px; padding:16px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.25); }\n  .cost-kpi-label { font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.8; }\n  .cost-kpi-value { margin-top:5px; font-size:30px; font-weight:700; }\n  .cost-kpi-note { margin-top:5px; font-size:12px; opacity:.82; }\n  .cost-info { flex:2 1 300px; padding:16px; border:1px solid #42676b; border-radius:14px; background:#24383a; }\n  .cost-info h3 { margin:0 0 5px; color:#fff; font-size:19px; }\n  .cost-info p { margin:0; color:#bad0d2; font-size:13px; }\n  .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:620px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:13px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-row.today td { background:#173f43; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hours-title { color:#bfe4e6; font-size:12px; font-weight:700; margin-bottom:8px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:7px; }\n  .cost-hour { padding:8px 10px; border-radius:8px; background:#223b3e; font-size:12px; }\n  .cost-hour b { color:#fff; }\n  .cost-empty { padding:4px 0; color:#9bb5b8; font-size:12px; }\n  @media(max-width:600px) { .cost-kpi-value { font-size:26px; } .cost-table { min-width:520px; } }\n</style>\n<div class=\"cost-card\" ng-if=\"msg.payload\">\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar Börsenpreis</div>\n      <div class=\"cost-kpi-value\">{{msg.payload.priceCtPerKWh | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">gültig bis {{msg.payload.validUntil | date:'HH:mm'}} Uhr</div>\n    </div>\n    <div class=\"cost-info\">\n      <h3>Kostenübersicht · {{msg.payload.dashboard.monthLabel}}</h3>\n      <p>{{msg.payload.dashboard.dataStatus}}</p>\n      <p style=\"margin-top:6px\">Börsenpreis ohne Netzentgelte, Abgaben und individuellen Tarifaufschlag.</p>\n    </div>\n  </div>\n  <div class=\"cost-table-wrap\">\n    <table class=\"cost-table\">\n      <thead><tr><th>Tag</th><th>Verbrauch</th><th>Tageskosten</th><th>Details</th></tr></thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"day in msg.payload.dashboard.days\" ng-class=\"{today:day.isToday}\" ng-click=\"day.expanded=!day.expanded\">\n          <td><span class=\"cost-expand\">{{day.expanded ? '⌄' : '›'}}</span><b>{{day.label}}</b><span ng-if=\"day.isToday\"> · heute</span></td>\n          <td class=\"cost-muted\">{{day.dailyConsumptionKWh === null ? '—' : (day.dailyConsumptionKWh | number:2) + ' kWh'}}</td>\n          <td class=\"cost-muted\">{{day.dailyCostEur === null ? '—' : (day.dailyCostEur | currency:'€':2)}}</td>\n          <td class=\"cost-muted\">{{day.expanded ? 'Stunden ausblenden' : 'Stunden anzeigen'}}</td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"day.expanded\"><td colspan=\"4\"><div class=\"cost-hours-inner\">\n          <div class=\"cost-hours-title\">Stündliche Kosten · {{day.label}}</div>\n          <div class=\"cost-hour-grid\" ng-if=\"day.hours.length\">\n            <div class=\"cost-hour\" ng-repeat=\"hour in day.hours\"><b>{{hour.time}}</b> · {{hour.marketPriceCtPerKWh | number:3}} ct/kWh<br><span class=\"cost-muted\">Kosten: —</span></div>\n          </div>\n          <div class=\"cost-empty\" ng-if=\"!day.hours.length\">Für diesen Tag liegen noch keine Stundenpreise vor.</div>\n        </div></td></tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n",
+        "format": "<style>\n  .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }\n  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }\n  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }\n  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }\n  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }\n  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }\n  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }\n  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }\n  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }\n  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }\n  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }\n  .cost-info b { color:#fff; }\n  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }\n  .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-offline { color:#ffad99; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }\n  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }\n  .cost-hour b { color:#fff; }\n  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }\n  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }\n  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }\n  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }\n  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }\n  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }\n  .cost-badge.online { color:#b9ffdc; background:#14613f; }\n  .cost-badge.offline { color:#ffd1c7; background:#71342d; }\n  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }\n  @media(max-width:900px) { .cost-head { grid-template-columns:repeat(2,1fr); } .cost-diagnostics { grid-template-columns:1fr; } }\n  @media(max-width:520px) { .cost-head { grid-template-columns:1fr; } .cost-kpi-value { font-size:23px; } }\n</style>\n\n<script>\n(function(scope) {\n  scope.view = scope.view || { period: \"month\", tariff: null, history: null };\n\n  scope.selectCostPeriod = function(period) {\n    scope.view.period = period;\n    scope.send({ topic: \"history/dashboard\", payload: { period: period } });\n  };\n\n  scope.$watch(\"msg\", function(msg) {\n    if (!msg || !msg.payload) return;\n    if (msg.topic === \"aWATTar/tariff/current\") {\n      scope.view.tariff = msg.payload;\n    }\n    if (msg.topic === \"history/dashboard/result\") {\n      scope.view.history = msg.payload;\n      scope.view.period = msg.payload.period || scope.view.period;\n    }\n  });\n\n  var refreshTimer = setInterval(function() {\n    scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n  }, 60000);\n  scope.$on(\"$destroy\", function() { clearInterval(refreshTimer); });\n})(scope);\n</script>\n\n<div class=\"cost-card\">\n  <div class=\"cost-toolbar\">\n    <h2>KOSTEN · Energiehistorie</h2>\n    <div class=\"cost-periods\">\n      <button ng-class=\"{active:view.period==='day'}\" ng-click=\"selectCostPeriod('day')\">Tag</button>\n      <button ng-class=\"{active:view.period==='month'}\" ng-click=\"selectCostPeriod('month')\">Monat</button>\n      <button ng-class=\"{active:view.period==='year'}\" ng-click=\"selectCostPeriod('year')\">Jahr</button>\n    </div>\n  </div>\n\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar-Preis</div>\n      <div class=\"cost-kpi-value\">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">reiner Börsenpreis, ohne Gebühren</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Netzbezug jetzt</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.gridImportWatt | number:0}} W</div>\n      <div class=\"cost-kpi-note\">Momentanleistung aus dem Stromnetz</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Kosten bei aktueller Leistung</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.costPerHourEur | currency:'€':4}} / h</div>\n      <div class=\"cost-kpi-note\">wenn der Netzbezug eine Stunde gleich bleibt</div>\n    </div>\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Kosten im gewählten Zeitraum</div>\n      <div class=\"cost-kpi-value\">{{view.history.totals.energyCostEur | currency:'€':2}}</div>\n      <div class=\"cost-kpi-note\">{{view.history.totals.gridImportKWh | number:3}} kWh Netzbezug</div>\n    </div>\n  </div>\n\n  <div class=\"cost-info\">\n    <b>Berechnung:</b> Die gemessene Netzbezugsleistung wird laufend zu kWh integriert und mit dem jeweils gültigen\n    aWATTar-Börsenpreis verrechnet. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind noch nicht enthalten.\n    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.\n  </div>\n\n  <h3 class=\"cost-section-title\">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>\n  <div class=\"cost-table-wrap\" ng-if=\"view.history.rows.length\">\n    <table class=\"cost-table\">\n      <thead>\n        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Kosten</th><th>Wetter</th><th>Daten</th></tr>\n      </thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"row in view.history.rows\" ng-click=\"row.expanded=!row.expanded\">\n          <td><span class=\"cost-expand\">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>\n          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>\n          <td>{{row.gridImportKWh | number:3}} kWh</td>\n          <td>{{row.pvEnergyKWh | number:3}} kWh</td>\n          <td><b>{{row.energyCostEur | currency:'€':3}}</b></td>\n          <td>{{row.averageTemperatureC === null ? 'offline' : (row.averageTemperatureC | number:1) + ' °C'}}</td>\n          <td ng-class=\"{'cost-offline':row.offlineCount>0}\">{{row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig'}}</td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"row.expanded\">\n          <td colspan=\"7\"><div class=\"cost-hours-inner\">\n            <div class=\"cost-hour-grid\">\n              <div class=\"cost-hour\" ng-repeat=\"hour in row.hours\">\n                <b>{{hour.time}} Uhr</b><br>\n                Netz {{hour.gridImportKWh | number:3}} kWh · Haus {{hour.houseConsumptionKWh | number:3}} kWh<br>\n                {{hour.energyCostEur | currency:'€':4}} · {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>\n                <span ng-class=\"{'cost-offline':hour.status!=='complete'}\">{{hour.status}}</span>\n              </div>\n            </div>\n          </div></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"cost-empty\" ng-if=\"view.history && !view.history.rows.length\">\n    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.\n  </div>\n\n  <h3 class=\"cost-section-title\">Service- und Fehlerdiagnose</h3>\n  <div class=\"cost-diagnostics\">\n    <div class=\"cost-source\" ng-repeat=\"source in view.history.diagnostics\">\n      <div class=\"cost-source-head\">\n        <span class=\"cost-source-name\">{{source.source}}</span>\n        <span class=\"cost-badge\" ng-class=\"source.status\">{{source.status}}</span>\n      </div>\n      <div class=\"cost-source-detail\">\n        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>\n        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}\n        <span ng-if=\"source.error\"><br>Hinweis: {{source.error}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n",
         "storeOutMessages": true,
         "fwdInMessages": false,
         "resendOnRefresh": true,
@@ -8993,7 +8997,406 @@
         "x": 990,
         "y": 180,
         "wires": [
-            []
+            [
+                "kosten_history_query_out"
+            ]
         ]
+    },
+    {
+        "id": "datenbank_flow",
+        "type": "tab",
+        "label": "DATENBANK",
+        "disabled": false,
+        "info": "Projektlokale SQLite-Historie für fachliche Telemetrie, Tarife und Kosten. Datenbankdatei und Backups sind von Git ausgeschlossen.",
+        "env": []
+    },
+    {
+        "id": "datenbank_telemetry_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "Telemetrie speichern",
+        "links": [
+            "kosten_history_out"
+        ],
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_backup_schedule",
+        "type": "inject",
+        "z": "datenbank_flow",
+        "name": "SQLite-Backup täglich 02:15",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "history/backup",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "15 2 * * *",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "history/backup",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 440,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_history_store",
+        "type": "home-automation-history",
+        "z": "datenbank_flow",
+        "name": "Home Automation Historie",
+        "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+        "backupRetention": 31,
+        "x": 690,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_result_router"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_history_debug",
+        "type": "debug",
+        "z": "datenbank_flow",
+        "name": "Datenbankstatus",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "history",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_out",
+        "type": "link out",
+        "z": "kosten_flow",
+        "name": "Tarif an Datenbank speichern",
+        "mode": "link",
+        "links": [
+            "datenbank_telemetry_in"
+        ],
+        "x": 945,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "datenbank_energy_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "ENERGIE · Payload empfangen",
+        "links": [
+            "datenbank_energy_out"
+        ],
+        "x": 155,
+        "y": 180,
+        "wires": [
+            [
+                "datenbank_energy_topic"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_energy_topic",
+        "type": "change",
+        "z": "datenbank_flow",
+        "name": "Quelle Energie kennzeichnen",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "history/source/energy",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "source",
+                "pt": "msg",
+                "to": "SolarEdge",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_weather_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "WETTER · Payload empfangen",
+        "links": [
+            "weather_link_out"
+        ],
+        "x": 155,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_weather_topic"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_weather_topic",
+        "type": "change",
+        "z": "datenbank_flow",
+        "name": "Quelle Wetter kennzeichnen",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "history/source/weather",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "source",
+                "pt": "msg",
+                "to": "Open-Meteo",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_query_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "DASHBOARD · Zeitraum abfragen",
+        "links": [
+            "kosten_history_query_out"
+        ],
+        "x": 155,
+        "y": 300,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_hourly_schedule",
+        "type": "inject",
+        "z": "datenbank_flow",
+        "name": "STUNDENSTAND · jede Stunde + Start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "history/hourly-snapshot",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "history/hourly-snapshot",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 380,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_result_router",
+        "type": "switch",
+        "z": "datenbank_flow",
+        "name": "Antworten sauber verteilen",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "history/dashboard/result",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 950,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_dashboard_out"
+            ],
+            [
+                "datenbank_history_debug"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_dashboard_out",
+        "type": "link out",
+        "z": "datenbank_flow",
+        "name": "TAG/MONAT/JAHR AN KOSTEN",
+        "mode": "link",
+        "links": [
+            "kosten_history_result_in"
+        ],
+        "x": 1195,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "datenbank_error_catch",
+        "type": "catch",
+        "z": "datenbank_flow",
+        "name": "DATENBANK · Fehler sichtbar machen",
+        "scope": [
+            "datenbank_history_store"
+        ],
+        "uncaught": false,
+        "x": 720,
+        "y": 520,
+        "wires": [
+            [
+                "datenbank_error_debug"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_error_debug",
+        "type": "debug",
+        "z": "datenbank_flow",
+        "name": "DATENBANKFEHLER · vollständig",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "error.message",
+        "statusType": "msg",
+        "x": 1010,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_query_out",
+        "type": "link out",
+        "z": "kosten_flow",
+        "name": "TAG/MONAT/JAHR VON DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_query_in"
+        ],
+        "x": 1245,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_result_in",
+        "type": "link in",
+        "z": "kosten_flow",
+        "name": "DATENBANKAUSWERTUNG AN DASHBOARD",
+        "links": [
+            "datenbank_dashboard_out"
+        ],
+        "x": 745,
+        "y": 300,
+        "wires": [
+            [
+                "kosten_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_history_initial",
+        "type": "inject",
+        "z": "kosten_flow",
+        "name": "Monatsansicht beim Start laden",
+        "props": [
+            {
+                "p": "payload",
+                "v": "{\"period\":\"month\"}",
+                "vt": "json"
+            },
+            {
+                "p": "topic",
+                "v": "history/dashboard",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "6",
+        "topic": "history/dashboard",
+        "payload": "{\"period\":\"month\"}",
+        "payloadType": "json",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "kosten_history_query_out"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_energy_out",
+        "type": "link out",
+        "z": "b86cb602995b0261",
+        "name": "ENERGIEDATEN AN DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_energy_in"
+        ],
+        "x": 915,
+        "y": 620,
+        "wires": []
     }
 ]

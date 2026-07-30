@@ -1,0 +1,24 @@
+<script type="text/javascript">
+RED.nodes.registerType('home-automation-history', {
+  category: 'storage', color: '#4d7c0f',
+  defaults: {
+    name: { value: '' },
+    databasePath: { value: 'projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite', required: true },
+    backupRetention: { value: 31, validate: RED.validators.number() }
+  },
+  inputs: 1, outputs: 1, icon: 'db.svg', label: function() { return this.name || 'Home Automation Historie'; }
+});
+</script>
+<script type="text/x-red" data-template-name="home-automation-history">
+  <div class="form-row"><label for="node-input-name"><i class="fa fa-tag"></i> Name</label><input type="text" id="node-input-name"></div>
+  <div class="form-row"><label for="node-input-databasePath"><i class="fa fa-database"></i> Datenbank</label><input type="text" id="node-input-databasePath"></div>
+  <div class="form-row"><label for="node-input-backupRetention"><i class="fa fa-history"></i> Backup-Tage</label><input type="number" id="node-input-backupRetention"></div>
+</script>
+<script type="text/x-red" data-help-name="home-automation-history">
+  <p>Speichert fachliche Telemetrie sicher in einer projektlokalen SQLite-Datenbank.</p>
+  <p><code>history/source/energy</code>, <code>history/source/weather</code> und
+    <code>aWATTar/tariff/current</code> aktualisieren die Datenquellen.</p>
+  <p><code>history/hourly-snapshot</code> schreibt den aktuellen Stundenstand,
+    <code>history/dashboard</code> liefert Tag/Monat/Jahr und
+    <code>history/backup</code> erstellt ein SQLite-konsistentes Backup.</p>
+</script>

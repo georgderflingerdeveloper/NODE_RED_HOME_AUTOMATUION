@@ -1,62 +1,159 @@
 <style>
   .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
-  .cost-head { display:flex; gap:16px; align-items:stretch; flex-wrap:wrap; margin-bottom:14px; }
-  .cost-kpi { flex:1 1 220px; padding:16px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.25); }
-  .cost-kpi-label { font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.8; }
-  .cost-kpi-value { margin-top:5px; font-size:30px; font-weight:700; }
-  .cost-kpi-note { margin-top:5px; font-size:12px; opacity:.82; }
-  .cost-info { flex:2 1 300px; padding:16px; border:1px solid #42676b; border-radius:14px; background:#24383a; }
-  .cost-info h3 { margin:0 0 5px; color:#fff; font-size:19px; }
-  .cost-info p { margin:0; color:#bad0d2; font-size:13px; }
+  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }
+  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }
+  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }
+  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }
+  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }
+  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }
+  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }
+  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }
+  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }
+  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
+  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
+  .cost-info b { color:#fff; }
+  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }
   .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
-  .cost-table { width:100%; min-width:620px; border-collapse:collapse; }
+  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }
   .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }
-  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:13px; }
+  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }
   .cost-row { cursor:pointer; transition:background .15s; }
   .cost-row:hover td { background:#294347; }
-  .cost-row.today td { background:#173f43; }
   .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }
   .cost-muted { color:#9bb5b8; }
+  .cost-offline { color:#ffad99; }
   .cost-hours td { padding:0; background:#132426; }
   .cost-hours-inner { padding:12px 18px 14px 42px; }
-  .cost-hours-title { color:#bfe4e6; font-size:12px; font-weight:700; margin-bottom:8px; }
-  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:7px; }
-  .cost-hour { padding:8px 10px; border-radius:8px; background:#223b3e; font-size:12px; }
+  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }
+  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }
   .cost-hour b { color:#fff; }
-  .cost-empty { padding:4px 0; color:#9bb5b8; font-size:12px; }
-  @media(max-width:600px) { .cost-kpi-value { font-size:26px; } .cost-table { min-width:520px; } }
+  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }
+  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }
+  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }
+  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }
+  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }
+  .cost-badge.online { color:#b9ffdc; background:#14613f; }
+  .cost-badge.offline { color:#ffd1c7; background:#71342d; }
+  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }
+  @media(max-width:900px) { .cost-head { grid-template-columns:repeat(2,1fr); } .cost-diagnostics { grid-template-columns:1fr; } }
+  @media(max-width:520px) { .cost-head { grid-template-columns:1fr; } .cost-kpi-value { font-size:23px; } }
 </style>
-<div class="cost-card" ng-if="msg.payload">
-  <div class="cost-head">
-    <div class="cost-kpi">
-      <div class="cost-kpi-label">Aktueller aWATTar Börsenpreis</div>
-      <div class="cost-kpi-value">{{msg.payload.priceCtPerKWh | number:3}} ct/kWh</div>
-      <div class="cost-kpi-note">gültig bis {{msg.payload.validUntil | date:'HH:mm'}} Uhr</div>
-    </div>
-    <div class="cost-info">
-      <h3>Kostenübersicht · {{msg.payload.dashboard.monthLabel}}</h3>
-      <p>{{msg.payload.dashboard.dataStatus}}</p>
-      <p style="margin-top:6px">Börsenpreis ohne Netzentgelte, Abgaben und individuellen Tarifaufschlag.</p>
+
+<script>
+(function(scope) {
+  scope.view = scope.view || { period: "month", tariff: null, history: null };
+
+  scope.selectCostPeriod = function(period) {
+    scope.view.period = period;
+    scope.send({ topic: "history/dashboard", payload: { period: period } });
+  };
+
+  scope.$watch("msg", function(msg) {
+    if (!msg || !msg.payload) return;
+    if (msg.topic === "aWATTar/tariff/current") {
+      scope.view.tariff = msg.payload;
+    }
+    if (msg.topic === "history/dashboard/result") {
+      scope.view.history = msg.payload;
+      scope.view.period = msg.payload.period || scope.view.period;
+    }
+  });
+
+  var refreshTimer = setInterval(function() {
+    scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+  }, 60000);
+  scope.$on("$destroy", function() { clearInterval(refreshTimer); });
+})(scope);
+</script>
+
+<div class="cost-card">
+  <div class="cost-toolbar">
+    <h2>KOSTEN · Energiehistorie</h2>
+    <div class="cost-periods">
+      <button ng-class="{active:view.period==='day'}" ng-click="selectCostPeriod('day')">Tag</button>
+      <button ng-class="{active:view.period==='month'}" ng-click="selectCostPeriod('month')">Monat</button>
+      <button ng-class="{active:view.period==='year'}" ng-click="selectCostPeriod('year')">Jahr</button>
     </div>
   </div>
-  <div class="cost-table-wrap">
+
+  <div class="cost-head">
+    <div class="cost-kpi">
+      <div class="cost-kpi-label">Aktueller aWATTar-Preis</div>
+      <div class="cost-kpi-value">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>
+      <div class="cost-kpi-note">reiner Börsenpreis, ohne Gebühren</div>
+    </div>
+    <div class="cost-kpi secondary">
+      <div class="cost-kpi-label">Netzbezug jetzt</div>
+      <div class="cost-kpi-value">{{view.history.live.gridImportWatt | number:0}} W</div>
+      <div class="cost-kpi-note">Momentanleistung aus dem Stromnetz</div>
+    </div>
+    <div class="cost-kpi secondary">
+      <div class="cost-kpi-label">Kosten bei aktueller Leistung</div>
+      <div class="cost-kpi-value">{{view.history.live.costPerHourEur | currency:'€':4}} / h</div>
+      <div class="cost-kpi-note">wenn der Netzbezug eine Stunde gleich bleibt</div>
+    </div>
+    <div class="cost-kpi">
+      <div class="cost-kpi-label">Kosten im gewählten Zeitraum</div>
+      <div class="cost-kpi-value">{{view.history.totals.energyCostEur | currency:'€':2}}</div>
+      <div class="cost-kpi-note">{{view.history.totals.gridImportKWh | number:3}} kWh Netzbezug</div>
+    </div>
+  </div>
+
+  <div class="cost-info">
+    <b>Berechnung:</b> Die gemessene Netzbezugsleistung wird laufend zu kWh integriert und mit dem jeweils gültigen
+    aWATTar-Börsenpreis verrechnet. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind noch nicht enthalten.
+    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.
+  </div>
+
+  <h3 class="cost-section-title">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>
+  <div class="cost-table-wrap" ng-if="view.history.rows.length">
     <table class="cost-table">
-      <thead><tr><th>Tag</th><th>Verbrauch</th><th>Tageskosten</th><th>Details</th></tr></thead>
+      <thead>
+        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Kosten</th><th>Wetter</th><th>Daten</th></tr>
+      </thead>
       <tbody>
-        <tr class="cost-row" ng-repeat-start="day in msg.payload.dashboard.days" ng-class="{today:day.isToday}" ng-click="day.expanded=!day.expanded">
-          <td><span class="cost-expand">{{day.expanded ? '⌄' : '›'}}</span><b>{{day.label}}</b><span ng-if="day.isToday"> · heute</span></td>
-          <td class="cost-muted">{{day.dailyConsumptionKWh === null ? '—' : (day.dailyConsumptionKWh | number:2) + ' kWh'}}</td>
-          <td class="cost-muted">{{day.dailyCostEur === null ? '—' : (day.dailyCostEur | currency:'€':2)}}</td>
-          <td class="cost-muted">{{day.expanded ? 'Stunden ausblenden' : 'Stunden anzeigen'}}</td>
+        <tr class="cost-row" ng-repeat-start="row in view.history.rows" ng-click="row.expanded=!row.expanded">
+          <td><span class="cost-expand">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>
+          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
+          <td>{{row.gridImportKWh | number:3}} kWh</td>
+          <td>{{row.pvEnergyKWh | number:3}} kWh</td>
+          <td><b>{{row.energyCostEur | currency:'€':3}}</b></td>
+          <td>{{row.averageTemperatureC === null ? 'offline' : (row.averageTemperatureC | number:1) + ' °C'}}</td>
+          <td ng-class="{'cost-offline':row.offlineCount>0}">{{row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig'}}</td>
         </tr>
-        <tr class="cost-hours" ng-repeat-end ng-if="day.expanded"><td colspan="4"><div class="cost-hours-inner">
-          <div class="cost-hours-title">Stündliche Kosten · {{day.label}}</div>
-          <div class="cost-hour-grid" ng-if="day.hours.length">
-            <div class="cost-hour" ng-repeat="hour in day.hours"><b>{{hour.time}}</b> · {{hour.marketPriceCtPerKWh | number:3}} ct/kWh<br><span class="cost-muted">Kosten: —</span></div>
-          </div>
-          <div class="cost-empty" ng-if="!day.hours.length">Für diesen Tag liegen noch keine Stundenpreise vor.</div>
-        </div></td></tr>
+        <tr class="cost-hours" ng-repeat-end ng-if="row.expanded">
+          <td colspan="7"><div class="cost-hours-inner">
+            <div class="cost-hour-grid">
+              <div class="cost-hour" ng-repeat="hour in row.hours">
+                <b>{{hour.time}} Uhr</b><br>
+                Netz {{hour.gridImportKWh | number:3}} kWh · Haus {{hour.houseConsumptionKWh | number:3}} kWh<br>
+                {{hour.energyCostEur | currency:'€':4}} · {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>
+                <span ng-class="{'cost-offline':hour.status!=='complete'}">{{hour.status}}</span>
+              </div>
+            </div>
+          </div></td>
+        </tr>
       </tbody>
     </table>
+  </div>
+  <div class="cost-empty" ng-if="view.history && !view.history.rows.length">
+    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.
+  </div>
+
+  <h3 class="cost-section-title">Service- und Fehlerdiagnose</h3>
+  <div class="cost-diagnostics">
+    <div class="cost-source" ng-repeat="source in view.history.diagnostics">
+      <div class="cost-source-head">
+        <span class="cost-source-name">{{source.source}}</span>
+        <span class="cost-badge" ng-class="source.status">{{source.status}}</span>
+      </div>
+      <div class="cost-source-detail">
+        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>
+        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}
+        <span ng-if="source.error"><br>Hinweis: {{source.error}}</span>
+      </div>
+    </div>
   </div>
 </div>

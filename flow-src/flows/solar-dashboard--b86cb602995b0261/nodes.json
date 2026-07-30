@@ -207,9 +207,23 @@
     "y": 620,
     "wires": [
       [
-        "e93f57326a18d2d1"
+        "e93f57326a18d2d1",
+        "datenbank_energy_out"
       ]
     ]
+  },
+  {
+    "id": "datenbank_energy_out",
+    "type": "link out",
+    "z": "b86cb602995b0261",
+    "name": "ENERGIEDATEN AN DATENBANK",
+    "mode": "link",
+    "links": [
+      "datenbank_energy_in"
+    ],
+    "x": 915,
+    "y": 620,
+    "wires": []
   },
   {
     "id": "361eb71ca0080e07",

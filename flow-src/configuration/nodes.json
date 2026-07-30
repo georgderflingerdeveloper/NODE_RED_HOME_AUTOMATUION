@@ -2378,6 +2378,14 @@
     "className": ""
   },
   {
+    "id": "datenbank_flow",
+    "type": "tab",
+    "label": "DATENBANK",
+    "disabled": false,
+    "info": "Projektlokale SQLite-Historie für fachliche Telemetrie, Tarife und Kosten. Datenbankdatei und Backups sind von Git ausgeschlossen.",
+    "env": []
+  },
+  {
     "id": "kosten_dashboard_tab",
     "type": "ui_tab",
     "name": "KOSTEN",
