@@ -2378,6 +2378,26 @@
     "className": ""
   },
   {
+    "id": "kosten_dashboard_tab",
+    "type": "ui_tab",
+    "name": "KOSTEN",
+    "icon": "euro_symbol",
+    "order": 14,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "kosten_dashboard_group",
+    "type": "ui_group",
+    "name": "STROMKOSTEN",
+    "tab": "kosten_dashboard_tab",
+    "order": 1,
+    "disp": true,
+    "width": "18",
+    "collapse": false,
+    "className": ""
+  },
+  {
     "id": "kosten_flow",
     "type": "tab",
     "label": "KOSTEN",

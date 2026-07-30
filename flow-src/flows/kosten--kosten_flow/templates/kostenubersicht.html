@@ -1,0 +1,62 @@
+<style>
+  .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
+  .cost-head { display:flex; gap:16px; align-items:stretch; flex-wrap:wrap; margin-bottom:14px; }
+  .cost-kpi { flex:1 1 220px; padding:16px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.25); }
+  .cost-kpi-label { font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.8; }
+  .cost-kpi-value { margin-top:5px; font-size:30px; font-weight:700; }
+  .cost-kpi-note { margin-top:5px; font-size:12px; opacity:.82; }
+  .cost-info { flex:2 1 300px; padding:16px; border:1px solid #42676b; border-radius:14px; background:#24383a; }
+  .cost-info h3 { margin:0 0 5px; color:#fff; font-size:19px; }
+  .cost-info p { margin:0; color:#bad0d2; font-size:13px; }
+  .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
+  .cost-table { width:100%; min-width:620px; border-collapse:collapse; }
+  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }
+  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:13px; }
+  .cost-row { cursor:pointer; transition:background .15s; }
+  .cost-row:hover td { background:#294347; }
+  .cost-row.today td { background:#173f43; }
+  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }
+  .cost-muted { color:#9bb5b8; }
+  .cost-hours td { padding:0; background:#132426; }
+  .cost-hours-inner { padding:12px 18px 14px 42px; }
+  .cost-hours-title { color:#bfe4e6; font-size:12px; font-weight:700; margin-bottom:8px; }
+  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:7px; }
+  .cost-hour { padding:8px 10px; border-radius:8px; background:#223b3e; font-size:12px; }
+  .cost-hour b { color:#fff; }
+  .cost-empty { padding:4px 0; color:#9bb5b8; font-size:12px; }
+  @media(max-width:600px) { .cost-kpi-value { font-size:26px; } .cost-table { min-width:520px; } }
+</style>
+<div class="cost-card" ng-if="msg.payload">
+  <div class="cost-head">
+    <div class="cost-kpi">
+      <div class="cost-kpi-label">Aktueller aWATTar Börsenpreis</div>
+      <div class="cost-kpi-value">{{msg.payload.priceCtPerKWh | number:3}} ct/kWh</div>
+      <div class="cost-kpi-note">gültig bis {{msg.payload.validUntil | date:'HH:mm'}} Uhr</div>
+    </div>
+    <div class="cost-info">
+      <h3>Kostenübersicht · {{msg.payload.dashboard.monthLabel}}</h3>
+      <p>{{msg.payload.dashboard.dataStatus}}</p>
+      <p style="margin-top:6px">Börsenpreis ohne Netzentgelte, Abgaben und individuellen Tarifaufschlag.</p>
+    </div>
+  </div>
+  <div class="cost-table-wrap">
+    <table class="cost-table">
+      <thead><tr><th>Tag</th><th>Verbrauch</th><th>Tageskosten</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr class="cost-row" ng-repeat-start="day in msg.payload.dashboard.days" ng-class="{today:day.isToday}" ng-click="day.expanded=!day.expanded">
+          <td><span class="cost-expand">{{day.expanded ? '⌄' : '›'}}</span><b>{{day.label}}</b><span ng-if="day.isToday"> · heute</span></td>
+          <td class="cost-muted">{{day.dailyConsumptionKWh === null ? '—' : (day.dailyConsumptionKWh | number:2) + ' kWh'}}</td>
+          <td class="cost-muted">{{day.dailyCostEur === null ? '—' : (day.dailyCostEur | currency:'€':2)}}</td>
+          <td class="cost-muted">{{day.expanded ? 'Stunden ausblenden' : 'Stunden anzeigen'}}</td>
+        </tr>
+        <tr class="cost-hours" ng-repeat-end ng-if="day.expanded"><td colspan="4"><div class="cost-hours-inner">
+          <div class="cost-hours-title">Stündliche Kosten · {{day.label}}</div>
+          <div class="cost-hour-grid" ng-if="day.hours.length">
+            <div class="cost-hour" ng-repeat="hour in day.hours"><b>{{hour.time}}</b> · {{hour.marketPriceCtPerKWh | number:3}} ct/kWh<br><span class="cost-muted">Kosten: —</span></div>
+          </div>
+          <div class="cost-empty" ng-if="!day.hours.length">Für diesen Tag liegen noch keine Stundenpreise vor.</div>
+        </div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

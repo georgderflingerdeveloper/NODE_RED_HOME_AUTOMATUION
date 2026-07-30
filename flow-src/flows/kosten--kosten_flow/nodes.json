@@ -70,8 +70,32 @@
     "y": 120,
     "wires": [
       [
-        "kosten_tarif_debug"
+        "kosten_tarif_debug",
+        "kosten_dashboard_template"
       ]
+    ]
+  },
+  {
+    "id": "kosten_dashboard_template",
+    "type": "ui_template",
+    "z": "kosten_flow",
+    "group": "kosten_dashboard_group",
+    "name": "Kostenübersicht",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/kosten--kosten_flow/templates/kostenubersicht.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 990,
+    "y": 180,
+    "wires": [
+      []
     ]
   },
   {

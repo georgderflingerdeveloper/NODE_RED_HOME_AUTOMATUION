@@ -8922,7 +8922,7 @@
         "type": "function",
         "z": "kosten_flow",
         "name": "Aktuellen aWATTar-Tarif aufbereiten",
-        "func": "const priceSlots = Array.isArray(msg.payload?.data) ? msg.payload.data : [];\nconst now = Date.now();\nconst currentSlot = priceSlots.find((slot) =>\n    Number(slot.start_timestamp) <= now && now < Number(slot.end_timestamp)\n);\n\nif (!currentSlot || !Number.isFinite(Number(currentSlot.marketprice))) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"kein aktueller Tarif\" });\n    node.error(\"aWATTar lieferte keinen gültigen aktuellen Marktpreis\", msg);\n    return null;\n}\n\n// aWATTar liefert Eur/MWh. Für Cent/kWh wird durch 10 geteilt.\nconst priceCtPerKWh = Number(currentSlot.marketprice) / 10;\nconst tariff = {\n    provider: \"aWATTar\",\n    tariffType: \"Börsenpreis (ohne Netzentgelte, Abgaben und individuelle Aufschläge)\",\n    priceCtPerKWh,\n    priceEurPerKWh: priceCtPerKWh / 100,\n    marketPriceEurPerMWh: Number(currentSlot.marketprice),\n    validFrom: new Date(Number(currentSlot.start_timestamp)).toISOString(),\n    validUntil: new Date(Number(currentSlot.end_timestamp)).toISOString(),\n    fetchedAt: new Date(now).toISOString()\n};\n\nflow.set(\"aWATTarCurrentTariff\", tariff);\nglobal.set(\"aWATTarCurrentTariff\", tariff);\nnode.status({ fill: \"green\", shape: \"dot\", text: priceCtPerKWh.toFixed(3) + \" ct/kWh\" });\n\nmsg.topic = \"aWATTar/tariff/current\";\nmsg.payload = tariff;\nreturn msg;",
+        "func": "const priceSlots = Array.isArray(msg.payload?.data) ? msg.payload.data : [];\nconst now = Date.now();\nconst currentSlot = priceSlots.find((slot) =>\n    Number(slot.start_timestamp) <= now && now < Number(slot.end_timestamp)\n);\n\nif (!currentSlot || !Number.isFinite(Number(currentSlot.marketprice))) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"kein aktueller Tarif\" });\n    node.error(\"aWATTar lieferte keinen gültigen aktuellen Marktpreis\", msg);\n    return null;\n}\n\n// aWATTar liefert Eur/MWh. Für Cent/kWh wird durch 10 geteilt.\nconst priceCtPerKWh = Number(currentSlot.marketprice) / 10;\nconst tariff = {\n    provider: \"aWATTar\",\n    tariffType: \"Börsenpreis (ohne Netzentgelte, Abgaben und individuelle Aufschläge)\",\n    priceCtPerKWh,\n    priceEurPerKWh: priceCtPerKWh / 100,\n    marketPriceEurPerMWh: Number(currentSlot.marketprice),\n    validFrom: new Date(Number(currentSlot.start_timestamp)).toISOString(),\n    validUntil: new Date(Number(currentSlot.end_timestamp)).toISOString(),\n    fetchedAt: new Date(now).toISOString()\n};\n\nconst viennaDate = new Intl.DateTimeFormat(\"en-CA\", {\n    timeZone: \"Europe/Vienna\", year: \"numeric\", month: \"2-digit\", day: \"2-digit\"\n});\nconst viennaTime = new Intl.DateTimeFormat(\"de-AT\", {\n    timeZone: \"Europe/Vienna\", hour: \"2-digit\", minute: \"2-digit\"\n});\nconst viennaDayLabel = new Intl.DateTimeFormat(\"de-AT\", {\n    timeZone: \"Europe/Vienna\", weekday: \"short\", day: \"2-digit\", month: \"2-digit\"\n});\nconst todayKey = viennaDate.format(new Date(now));\nconst [year, month] = todayKey.split(\"-\").map(Number);\nconst daysInMonth = new Date(year, month, 0).getDate();\nconst hourlyPricesByDay = new Map();\n\nfor (const slot of priceSlots) {\n    const start = new Date(Number(slot.start_timestamp));\n    const dayKey = viennaDate.format(start);\n    const hours = hourlyPricesByDay.get(dayKey) || [];\n    hours.push({\n        time: viennaTime.format(start),\n        marketPriceCtPerKWh: Number(slot.marketprice) / 10,\n        hourlyCostEur: null\n    });\n    hourlyPricesByDay.set(dayKey, hours);\n}\n\nconst days = Array.from({ length: daysInMonth }, (_, index) => {\n    const dayKey = `${year}-${String(month).padStart(2, \"0\")}-${String(index + 1).padStart(2, \"0\")}`;\n    const date = new Date(Date.UTC(year, month - 1, index + 1, 12));\n    return {\n        dayKey,\n        label: viennaDayLabel.format(date),\n        isToday: dayKey === todayKey,\n        dailyConsumptionKWh: null,\n        dailyCostEur: null,\n        hours: hourlyPricesByDay.get(dayKey) || []\n    };\n});\n\ntariff.dashboard = {\n    monthLabel: new Intl.DateTimeFormat(\"de-AT\", { timeZone: \"Europe/Vienna\", month: \"long\", year: \"numeric\" }).format(new Date(now)),\n    days,\n    dataStatus: \"Vorlage – Verbrauchsdaten werden im nächsten Schritt ergänzt\"\n};\n\nflow.set(\"aWATTarCurrentTariff\", tariff);\nglobal.set(\"aWATTarCurrentTariff\", tariff);\nnode.status({ fill: \"green\", shape: \"dot\", text: priceCtPerKWh.toFixed(3) + \" ct/kWh\" });\n\nmsg.topic = \"aWATTar/tariff/current\";\nmsg.payload = tariff;\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -8933,7 +8933,8 @@
         "y": 120,
         "wires": [
             [
-                "kosten_tarif_debug"
+                "kosten_tarif_debug",
+                "kosten_dashboard_template"
             ]
         ]
     },
@@ -8953,5 +8954,46 @@
         "x": 980,
         "y": 120,
         "wires": []
+    },
+    {
+        "id": "kosten_dashboard_tab",
+        "type": "ui_tab",
+        "name": "KOSTEN",
+        "icon": "euro_symbol",
+        "order": 14,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "kosten_dashboard_group",
+        "type": "ui_group",
+        "name": "STROMKOSTEN",
+        "tab": "kosten_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "kosten_dashboard_template",
+        "type": "ui_template",
+        "z": "kosten_flow",
+        "group": "kosten_dashboard_group",
+        "name": "Kostenübersicht",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .cost-card { color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-head { display:flex; gap:16px; align-items:stretch; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-kpi { flex:1 1 220px; padding:16px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.25); }\n  .cost-kpi-label { font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.8; }\n  .cost-kpi-value { margin-top:5px; font-size:30px; font-weight:700; }\n  .cost-kpi-note { margin-top:5px; font-size:12px; opacity:.82; }\n  .cost-info { flex:2 1 300px; padding:16px; border:1px solid #42676b; border-radius:14px; background:#24383a; }\n  .cost-info h3 { margin:0 0 5px; color:#fff; font-size:19px; }\n  .cost-info p { margin:0; color:#bad0d2; font-size:13px; }\n  .cost-table-wrap { overflow-x:auto; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:620px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:13px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-row.today td { background:#173f43; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hours-title { color:#bfe4e6; font-size:12px; font-weight:700; margin-bottom:8px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:7px; }\n  .cost-hour { padding:8px 10px; border-radius:8px; background:#223b3e; font-size:12px; }\n  .cost-hour b { color:#fff; }\n  .cost-empty { padding:4px 0; color:#9bb5b8; font-size:12px; }\n  @media(max-width:600px) { .cost-kpi-value { font-size:26px; } .cost-table { min-width:520px; } }\n</style>\n<div class=\"cost-card\" ng-if=\"msg.payload\">\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar Börsenpreis</div>\n      <div class=\"cost-kpi-value\">{{msg.payload.priceCtPerKWh | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">gültig bis {{msg.payload.validUntil | date:'HH:mm'}} Uhr</div>\n    </div>\n    <div class=\"cost-info\">\n      <h3>Kostenübersicht · {{msg.payload.dashboard.monthLabel}}</h3>\n      <p>{{msg.payload.dashboard.dataStatus}}</p>\n      <p style=\"margin-top:6px\">Börsenpreis ohne Netzentgelte, Abgaben und individuellen Tarifaufschlag.</p>\n    </div>\n  </div>\n  <div class=\"cost-table-wrap\">\n    <table class=\"cost-table\">\n      <thead><tr><th>Tag</th><th>Verbrauch</th><th>Tageskosten</th><th>Details</th></tr></thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"day in msg.payload.dashboard.days\" ng-class=\"{today:day.isToday}\" ng-click=\"day.expanded=!day.expanded\">\n          <td><span class=\"cost-expand\">{{day.expanded ? '⌄' : '›'}}</span><b>{{day.label}}</b><span ng-if=\"day.isToday\"> · heute</span></td>\n          <td class=\"cost-muted\">{{day.dailyConsumptionKWh === null ? '—' : (day.dailyConsumptionKWh | number:2) + ' kWh'}}</td>\n          <td class=\"cost-muted\">{{day.dailyCostEur === null ? '—' : (day.dailyCostEur | currency:'€':2)}}</td>\n          <td class=\"cost-muted\">{{day.expanded ? 'Stunden ausblenden' : 'Stunden anzeigen'}}</td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"day.expanded\"><td colspan=\"4\"><div class=\"cost-hours-inner\">\n          <div class=\"cost-hours-title\">Stündliche Kosten · {{day.label}}</div>\n          <div class=\"cost-hour-grid\" ng-if=\"day.hours.length\">\n            <div class=\"cost-hour\" ng-repeat=\"hour in day.hours\"><b>{{hour.time}}</b> · {{hour.marketPriceCtPerKWh | number:3}} ct/kWh<br><span class=\"cost-muted\">Kosten: —</span></div>\n          </div>\n          <div class=\"cost-empty\" ng-if=\"!day.hours.length\">Für diesen Tag liegen noch keine Stundenpreise vor.</div>\n        </div></td></tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 990,
+        "y": 180,
+        "wires": [
+            []
+        ]
     }
 ]
