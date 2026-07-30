@@ -31,6 +31,10 @@
     background: #94a3b8
   }
 
+  .weather-light.offline {
+    background: #ef5350
+  }
+
   .weather-title {
     font-size: 20px;
     font-weight: 700;
@@ -134,6 +138,16 @@
     color: #607d8b
   }
 
+  .weather-offline-note {
+    margin: 0 0 12px;
+    padding: 9px 11px;
+    border: 1px solid #ef9a9a;
+    border-radius: 8px;
+    background: #ffebee;
+    color: #b71c1c;
+    font-size: 12px
+  }
+
   .weather-table tr.night-row td {
     background: #eceff1;
     color: #78909c
@@ -157,25 +171,30 @@
 </style>
 <div class="weather-card">
   <div class="weather-head">
-    <div class="weather-light" ng-class="msg.payload.SunPowerExpected ? 'sun' : 'low'"></div>
+    <div class="weather-light" ng-class="msg.payload.DataStaleFlag ? 'offline' : (msg.payload.SunPowerExpected ? 'sun' : 'low')"></div>
     <div>
       <div class="weather-title">Sonnenprognose Reindlmühl</div>
-      <div class="weather-status">{{msg.payload.SunPowerExpected ? 'Sonnenstunden vorhanden' : 'Wenig bis keine Sonne
+      <div class="weather-status" ng-if="!msg.payload.DataStaleFlag">{{msg.payload.SunPowerExpected ? 'Sonnenstunden vorhanden' : 'Wenig bis keine Sonne
         erwartet'}}</div>
-      <div class="weather-suntimes">Sonnenaufgang {{msg.payload.SunriseToday.substring(11,16)}} · Sonnenuntergang
+      <div class="weather-status" ng-if="msg.payload.DataStaleFlag">Wetterdienst offline · {{msg.payload.HasLastKnownValues ? 'letzte gültige Werte' : 'keine gültigen Werte vorhanden'}}</div>
+      <div class="weather-suntimes" ng-if="msg.payload.SunriseToday && msg.payload.SunsetToday">Sonnenaufgang {{msg.payload.SunriseToday.substring(11,16)}} · Sonnenuntergang
         {{msg.payload.SunsetToday.substring(11,16)}}</div>
     </div>
   </div>
+  <div class="weather-offline-note" ng-if="msg.payload.DataStaleFlag">
+    {{msg.payload.HasLastKnownValues ? ('Stand der angezeigten Wetterwerte: ' + (msg.payload.LastValidAt | date:'dd.MM.yyyy HH:mm:ss')) : 'Wetterwerte werden nicht als 0 interpretiert.'}}
+    · {{msg.payload.ErrorReason}}
+  </div>
   <div class="weather-kpis">
-    <div class="weather-kpi"><b>{{msg.payload.ActualSunshineLastHour}} %</b><span>Sonne letzte Stunde</span></div>
-    <div class="weather-kpi"><b>{{msg.payload.ExpectedPercentSunshineNextHour}} %</b><span>Sonne nächste Stunde</span>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ActualSunshineLastHour + ' %' : '—'}}</b><span>Sonne letzte Stunde</span></div>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNextHour + ' %' : '—'}}</b><span>Sonne nächste Stunde</span>
     </div>
-    <div class="weather-kpi"><b>{{msg.payload.ExpectedPercentSunshineNext6Hours}} %</b><span>Ø nächste 6 Stunden</span>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNext6Hours + ' %' : '—'}}</b><span>Ø nächste 6 Stunden</span>
     </div>
-    <div class="weather-kpi"><b>{{msg.payload.Current.TemperatureC | number:1}} °C</b><span>Aktuelle Temperatur</span>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? (msg.payload.Current.TemperatureC | number:1) + ' °C' : '—'}}</b><span>Aktuelle Temperatur</span>
     </div>
   </div>
-  <div class="weather-table-wrap">
+  <div class="weather-table-wrap" ng-if="msg.payload.HasLastKnownValues">
     <table class="weather-table">
       <thead>
         <tr>

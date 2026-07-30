@@ -1,0 +1,39 @@
+<style>
+.se-house-power{
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+  padding:12px 14px;
+  border:1px solid #526b6e;
+  border-left:5px solid #00a6b2;
+  border-radius:9px;
+  background:linear-gradient(135deg,#203739,#29484b);
+  color:#eaf5f6;
+  font-family:Roboto,Arial,sans-serif;
+}
+.se-house-power.offline{border-left-color:#ef5350;opacity:.8}
+.se-house-power-head{display:grid;grid-template-columns:1fr;gap:1px}
+.se-house-power-label{min-width:0;font-size:14px;font-weight:700}
+.se-house-power-value{justify-self:end;min-width:0;font-size:23px;font-weight:800;color:#62dce4;white-space:nowrap;font-variant-numeric:tabular-nums}
+.se-house-power-formula{margin-top:7px;color:#b7ced0;font-size:12px;line-height:1.45}
+.se-house-power-formula b{color:#fff}
+.se-house-power-offline{margin-top:5px;color:#ffb5a8;font-size:11px}
+@media(max-width:520px){
+  .se-house-power-value{font-size:21px}
+}
+</style>
+<div class="se-house-power" ng-class="{'offline':msg.payload.OfflineFlag}">
+  <div class="se-house-power-head">
+    <span class="se-house-power-label">Gesamtleistungsaufnahme Haus</span>
+    <span class="se-house-power-value">{{msg.payload.HouseConsumptionWatt | number:0}} W</span>
+  </div>
+  <div class="se-house-power-formula">
+    <b>{{msg.payload.PvPowerWatt | number:0}} W</b> Solar
+    + <b>{{msg.payload.GridImportWatt | number:0}} W</b> Netzbezug
+    − <b>{{msg.payload.FeedInWatt | number:0}} W</b> Einspeisung
+  </div>
+  <div class="se-house-power-offline" ng-if="msg.payload.OfflineFlag">
+    SolarEdge offline · Anzeige bleibt bis zu gültigen Messwerten auf 0 W.
+  </div>
+</div>

@@ -79,6 +79,7 @@ const expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => s
 const expectedThresholdPercent = 10;
 const sunPowerExpected = expectedNextHour >= expectedThresholdPercent;
 const activeFlag = true;
+flow.set("WeatherRetryCount", 0);
 
 msg.payload = {
     SchemaVersion: 1,
@@ -86,6 +87,8 @@ msg.payload = {
     WeatherServiceStatusText: "AKTIV",
     ActiveFlag: activeFlag,
     ActiveFlagf: activeFlag,
+    DataStaleFlag: false,
+    HasLastKnownValues: true,
     UpdatedAt: new Date().toISOString(),
     UpdatedAtText: new Date().toLocaleString("de-AT"),
     Location: {

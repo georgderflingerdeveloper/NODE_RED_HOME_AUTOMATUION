@@ -75,6 +75,8 @@ test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", ()
   assert.ok(dashboard.payload.totals.gridImportKWh > 0.0002);
   assert.ok(dashboard.payload.totals.gridImportKWh < 0.0003);
   assert.ok(dashboard.payload.totals.energyCostEur > 0.00002);
+  assert.ok(dashboard.payload.totals.energyCostEur > dashboard.payload.totals.gridImportCostEur);
+  assert.ok(dashboard.payload.rows[0].hours[0].recorded);
   assert.equal(dashboard.payload.live.priceCtPerKWh, 10);
 
   node.emit("close");

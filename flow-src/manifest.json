@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "4c8aa093c130b3109637128ed01d62864f49402dd4e1ca8688d8899d5e7203fd",
+  "flowSha256": "65142d3a84a01cdb0004ae88cff4827d4136cea40e5429648dda815c1baefa14",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -462,7 +462,9 @@
     "kosten_history_query_out",
     "kosten_history_result_in",
     "kosten_history_initial",
-    "datenbank_energy_out"
+    "datenbank_energy_out",
+    "ui_house_total_power",
+    "weather_retry_delay"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -853,6 +855,7 @@
     "3909f886b0c9d4d6": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "d22dd481e7e81932": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "datenbank_energy_out": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
+    "ui_house_total_power": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "361eb71ca0080e07": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "6c37f6f0e2cec1b6": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "e93f57326a18d2d1": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
@@ -915,6 +918,7 @@
     "weather_parse": "flows/wetter--weather_flow/nodes.json",
     "weather_catch": "flows/wetter--weather_flow/nodes.json",
     "weather_fallback": "flows/wetter--weather_flow/nodes.json",
+    "weather_retry_delay": "flows/wetter--weather_flow/nodes.json",
     "weather_publish": "flows/wetter--weather_flow/nodes.json",
     "weather_debug": "flows/wetter--weather_flow/nodes.json",
     "weather_link_out": "flows/wetter--weather_flow/nodes.json",
@@ -932,7 +936,7 @@
     "global/function.js": "d026bba53afcdec70a5b8ff3c7fa908747b2a26096a82c78d87227b562d2ae74",
     "heater-kid-room/heater-kid.js": "76288c5bdfa2fc79cef2709f49365bd056d5fd078c9895cf2cc8155c13e01b15",
     "home/command-all.js": "ca9a3fc0569c7ee069f9aa664c41f1209a3c4809352a751f7a4723e3023e8e45",
-    "kosten/aktuellen-awattar-tarif-aufbereiten.js": "2ffc65f25021c47a9229b3c0db45723dd07dae1b8cd9a39d76f9e97a0c927cab",
+    "kosten/aktuellen-awattar-tarif-aufbereiten.js": "8c0949490f0e5780976c6828295b1ef3cba5ec2b3171a19a1a46c5f1156b8eba",
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
     "light-bath-all/light-command-bathroom-all.js": "9e29a2a2c99c414cbe6f7e65ecbd8af29381e849a14b5e5b67960fc35c7a26a5",
     "light-door-entry-left/light-door-entry-left.js": "f07f19c6e2298302ccbbbebca9f92d354f78ec6d793c1f3750e7c8c80513dd34",
@@ -975,7 +979,7 @@
     "se-grid-power/netzleistung-aufteilen-import-einspeisung.js": "00d93bb391cd7f08c1c302ab360c63fbe179a54833b2edd2296a8daae0b961f3",
     "se-grid-power/solaredge-meter-offline-sichere-nullwerte.js": "f9014f2d1a63ed9194484f08383aa53bb49931c43726e99906b116de668c8baf",
     "se-house-consumption-auto-sf/auto-sf-skalieren-houseconsumptionwatt.js": "dde45051937036a87df6094273cf2fd20c7d0f4a0ea88cf3fe913f43211fdde8",
-    "solar-dashboard/getexcesspower.js": "0e4e286fcacb675a2b8bb219dd10a8b8aba0b68c28d562550987dd332a26eb52",
+    "solar-dashboard/getexcesspower.js": "8d31c0c7ef0ecc93723b7dd4e20bb06c93c1767cb97cef4dfcaba236f329753d",
     "solar-dashboard/make-excesspower-to-payload.js": "6059ed5a65f942cd02f808a15fcedee6137279bfbdb6f275e7ca7323e4dab4f6",
     "solar-dashboard/reconnect-serverneustart-absichern.js": "5623a6b030f8956e5da062d5929ed108b4ea033b50dc94806022870e0f55fa1c",
     "solar-power/get-scaling-factor.js": "5405b4b6c739a50a0b0d7956f3ecda3ea4e85a3c06d244c5f3d45e8d89e46898",
@@ -990,10 +994,10 @@
     "sub-heatereast/heater-east-command.js": "7ae07cb12a4493f33b7f47739ec90337f703f1cfcdc35b5f16dc216955756f01",
     "sub-heaterwest/heater-west-command.js": "fea749e3be65b04a2f12bc79987a992ceb55675440ef7bd3f2ce1e405d839439",
     "sub-light-anteroom-middle/light-command-anteroom-middle.js": "14a357d72db48eb52a150f8cc1a940054471af579eda55655d9ac6634f194263",
-    "wetter/sicherer-ausfall-wetterwerte-auf-0.js": "b767d417dbb9d511250c2fd70096badae3c22392b2e80e5588137ef6b704ab71",
+    "wetter/sicherer-ausfall-wetterwerte-auf-0.js": "f88b550a99104d84e9bce8b89e8a853463d56236420fcc2a01b420d40a8b50d8",
     "wetter/wetter-konfiguration-reindlmuhl.js": "68eb3d5e9164f9be4b98f9f8f2624fba0eabc2b1fb6110d830d8b7f699fbce92",
-    "wetter/wetterdaten-prufen-und-payload-aufbauen.js": "029dca1eaa34a76d77a93f7332f6ce1c3d389a25e28ea96333422a572c33501d",
-    "wetter/wetterdaten-veroffentlichen.js": "98b9f60825ae78c8bf8fec12d233968ef4011e01ced9953772fced0ec23052fa",
+    "wetter/wetterdaten-prufen-und-payload-aufbauen.js": "e4d0e1952ccc13f53232d62a26348d03a57f3a40ca8e21f420ec1de44e1bbdf9",
+    "wetter/wetterdaten-veroffentlichen.js": "cd66297f65a7f1a8061402c0b662379927d629eb288c4cb26f3209906cb6520e",
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
@@ -1026,9 +1030,9 @@
     "flows/home--7fa0f8f.5a71708/functions/command-all.js": "663d6e9773279c8ac283507d8805d7a3c4eeb917c578e7d1a00f2e8b1c28b768",
     "flows/home--7fa0f8f.5a71708/nodes.json": "8bc71de1759e6bb0c9e0205fc78d4f3866eda7f77956634f42de74f39ce8d73f",
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
-    "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "a371e5de287ec6e637e1a71632ad3594ac96fb7d036fea7def2c9a1e22f28819",
+    "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "3533971c7dfd0e01b8f0a042cfae91ad789ff3b383217c64dce65610ed8021d7",
     "flows/kosten--kosten_flow/nodes.json": "d48b1c93c2a2c16402960b4bb3ec5c13ac01398c6d9f2d84333d7df2840601c2",
-    "flows/kosten--kosten_flow/templates/kostenubersicht.html": "8aa98a0acd412a699d3c4fb0ef184b90ee59bfb1a13e913b44b2319ce895bf49",
+    "flows/kosten--kosten_flow/templates/kostenubersicht.html": "8d0c7950ec36992610cef718ed59d8e70559b5e5eb1bd25cc3a67e3ef9fa79f2",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",
@@ -1111,10 +1115,11 @@
     "flows/se-grid-power--tab_read_feedin/nodes.json": "656638d0f0d3e6d972a59437499d607643fa6f8db60ead7da0411e5c4682dd62",
     "flows/se-house-consumption-auto-sf--tab-fixsf/functions/auto-sf-skalieren-houseconsumptionwatt.js": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "flows/se-house-consumption-auto-sf--tab-fixsf/nodes.json": "774d2850e64453c6164ab072f6867d2896934ddb3e8faeb9d48f1569c75b2b61",
-    "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower.js": "e2abaabe4d775221210fe7795f67efcb1b99e87557f8c73fb46110f4ffca31a7",
+    "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower.js": "e0d9799a847de68702b4d44da9d284df81bf875a8eb83ad2432be74660680c63",
     "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload.js": "453327609babb6dafce54882848fde736893161bf84c81b50934fde94600074a",
     "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern.js": "03ac2c2f99c5a97ee351490bbf0308383a3a78568e24cb61167c6efde2df161c",
-    "flows/solar-dashboard--b86cb602995b0261/nodes.json": "8034c28cb84ba02cdeb8ced3325aebc8854bfa57c3de98ddaf0dbcbe8a20f952",
+    "flows/solar-dashboard--b86cb602995b0261/nodes.json": "3c72ac2f00f7935cfced6a943b57e1170288d78c68286780a309967b348f417e",
+    "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html": "d8ba2f2b8397c452e46fe47ddcd9b39cfaddbb9654ffe2bd6d3dce1909dbf2db",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html": "1cba15b61038576f82fb648dca88cf916277825a49acd77732d0460723bd0d29",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": "00c583f796a75e72d3d52ef99ebefd69f443d15e167d01e5aeb028d4ed31f3db",
     "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": "69a76071dae8b4b4cccd3b053fd3f07e316986ad16ff66a9058cf13ecfdc9565",
@@ -1146,12 +1151,12 @@
     "flows/sub-light-middle--53cbac0a.2b67f4/nodes.json": "4b9766f58bfd570f7096f7e313ba24487370b570f88b4f0dd42a8ebb4849c5b9",
     "flows/templates--d10e2758.4eed68/nodes.json": "c33b6f252557b7bc949d5488b84f196ec2eb0c53088f68e8b88c9530951428c2",
     "flows/unit-tests--3a481bd8.00eb44/nodes.json": "26c3fe1742fccb8ae51635b777cfe47bab2e537adb09eabc7b28a2ade54d6d71",
-    "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js": "c10a1fb6d2462f0cc6ddb2712cd9e06c3d43fef047b670c73196b9db95a68a31",
+    "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js": "9fbf0f524194d90c025a73cefb0cad7ffc43c7ea3360e66c69e0cf513a2e7d82",
     "flows/wetter--weather_flow/functions/wetter-konfiguration-reindlmuhl.js": "1ec474c33d22700343535c438e3b6ea5aca2638d6dadd4afea691e6f4abdd281",
-    "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js": "7815de6cae4d5182122d8439bbcd8dfb7426582a73f1694656e5729c65b2a41b",
-    "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js": "83a89190f0160879e4d1f6cbe52455012811659e92498fee7e2873be026c16c8",
+    "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js": "4561f772701311e373997df0a617be86169c264e97baabcabf0ff77da839e722",
+    "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js": "40d6f42311f34803356593deb4795ecca26bde3146bdf4b152632c54b46309d1",
     "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren.js": "98bb02159f606f37629187b4ada352c19011e289664abee734e17e64b191978a",
-    "flows/wetter--weather_flow/nodes.json": "4497fa9ec1511652fba57cfe3f2493cf7971f2cea9e6fbc8486914a078f67f8f",
-    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "960aeb99e4c74663b152904f98c1f4d4d5a9a8f6aca2cfddb5be5d6b9e516968"
+    "flows/wetter--weather_flow/nodes.json": "88708b25a247046ced2779c129546d0ccdceca3eccedf00b80002c26f987f4fd",
+    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "d9bd2f7b6e1676cc8bef75747ed390695cfa4f39a8acf607b5ff6b54774e434d"
   }
 }

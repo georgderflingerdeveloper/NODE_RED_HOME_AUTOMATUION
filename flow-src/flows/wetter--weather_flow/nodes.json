@@ -135,7 +135,7 @@
     "func": {
       "$flowSource": "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js"
     },
-    "outputs": 1,
+    "outputs": 2,
     "timeout": 0,
     "noerr": 0,
     "initialize": "",
@@ -146,6 +146,34 @@
     "wires": [
       [
         "weather_publish"
+      ],
+      [
+        "weather_retry_delay"
+      ]
+    ]
+  },
+  {
+    "id": "weather_retry_delay",
+    "type": "delay",
+    "z": "weather_flow",
+    "name": "Wetterfehler · nach 30 Sekunden erneut",
+    "pauseType": "delay",
+    "timeout": "30",
+    "timeoutUnits": "seconds",
+    "rate": "1",
+    "nbRateUnits": "1",
+    "rateUnits": "second",
+    "randomFirst": "1",
+    "randomLast": "5",
+    "randomUnits": "seconds",
+    "drop": false,
+    "allowrate": false,
+    "outputs": 1,
+    "x": 1100,
+    "y": 360,
+    "wires": [
+      [
+        "weather_build_request"
       ]
     ]
   },

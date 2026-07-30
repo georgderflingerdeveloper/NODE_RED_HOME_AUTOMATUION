@@ -28,6 +28,8 @@
   .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }
   .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }
   .cost-hour b { color:#fff; }
+  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }
+  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }
   .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }
   .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }
   .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }
@@ -95,15 +97,19 @@
       <div class="cost-kpi-note">wenn der Netzbezug eine Stunde gleich bleibt</div>
     </div>
     <div class="cost-kpi">
-      <div class="cost-kpi-label">Kosten im gewählten Zeitraum</div>
+      <div class="cost-kpi-label">Verbrauchswert im Zeitraum</div>
       <div class="cost-kpi-value">{{view.history.totals.energyCostEur | currency:'€':2}}</div>
-      <div class="cost-kpi-note">{{view.history.totals.gridImportKWh | number:3}} kWh Netzbezug</div>
+      <div class="cost-kpi-note">
+        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·
+        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie
+      </div>
     </div>
   </div>
 
   <div class="cost-info">
-    <b>Berechnung:</b> Die gemessene Netzbezugsleistung wird laufend zu kWh integriert und mit dem jeweils gültigen
-    aWATTar-Börsenpreis verrechnet. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind noch nicht enthalten.
+    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen
+    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen
+    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.
     Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.
   </div>
 
@@ -111,7 +117,7 @@
   <div class="cost-table-wrap" ng-if="view.history.rows.length">
     <table class="cost-table">
       <thead>
-        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Kosten</th><th>Wetter</th><th>Daten</th></tr>
+        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>
       </thead>
       <tbody>
         <tr class="cost-row" ng-repeat-start="row in view.history.rows" ng-click="row.expanded=!row.expanded">
@@ -119,18 +125,44 @@
           <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
           <td>{{row.gridImportKWh | number:3}} kWh</td>
           <td>{{row.pvEnergyKWh | number:3}} kWh</td>
-          <td><b>{{row.energyCostEur | currency:'€':3}}</b></td>
-          <td>{{row.averageTemperatureC === null ? 'offline' : (row.averageTemperatureC | number:1) + ' °C'}}</td>
-          <td ng-class="{'cost-offline':row.offlineCount>0}">{{row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig'}}</td>
+          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class="cost-muted">{{row.energyCostEur * 100 | number:2}} ct</span></td>
+          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class="cost-muted">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>
+          <td>
+            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}
+            <br><span ng-class="{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}">
+              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}
+            </span>
+          </td>
+          <td ng-class="{'cost-offline':row.recordedHourCount && row.offlineCount>0}">
+            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}
+          </td>
         </tr>
         <tr class="cost-hours" ng-repeat-end ng-if="row.expanded">
-          <td colspan="7"><div class="cost-hours-inner">
+          <td colspan="8"><div class="cost-hours-inner">
             <div class="cost-hour-grid">
               <div class="cost-hour" ng-repeat="hour in row.hours">
                 <b>{{hour.time}} Uhr</b><br>
-                Netz {{hour.gridImportKWh | number:3}} kWh · Haus {{hour.houseConsumptionKWh | number:3}} kWh<br>
-                {{hour.energyCostEur | currency:'€':4}} · {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>
-                <span ng-class="{'cost-offline':hour.status!=='complete'}">{{hour.status}}</span>
+                <span ng-if="hour.recorded">
+                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh
+                  <div class="cost-hour-price">
+                    {{hour.energyCostEur | currency:'€':4}}
+                    <span class="cost-hour-cents">· {{hour.energyCostEur * 100 | number:2}} ct</span>
+                  </div>
+                  <span class="cost-muted">
+                    Netz {{hour.gridImportKWh | number:3}} kWh ·
+                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct
+                  </span><br>
+                </span>
+                <span ng-if="!hour.recorded">
+                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>
+                  <span class="cost-muted">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>
+                </span>
+                <span ng-if="hour.recorded">
+                  Energie: <span ng-class="{'cost-offline':hour.energyStatus!=='online'}">{{hour.energyStatus}}</span> ·
+                  Wetter: <span ng-class="{'cost-offline':hour.weatherStatus!=='online'}">{{hour.weatherStatus}}</span> ·
+                  Tarif: <span ng-class="{'cost-offline':hour.tariffStatus!=='online'}">{{hour.tariffStatus}}</span>
+                </span>
+                <span ng-if="!hour.recorded">{{hour.status}}</span>
               </div>
             </div>
           </div></td>

@@ -133,9 +133,16 @@ module.exports = function registerHistoryStore(RED) {
       WHERE interval_start >= ? AND interval_start < ?
       ORDER BY interval_start
     `);
+    const queryTariffs = database.prepare(`
+      SELECT valid_from, valid_until, provider, market_price_eur_mwh, price_ct_kwh, fetched_at
+      FROM tariff_slots
+      WHERE valid_from >= ? AND valid_from < ?
+      ORDER BY valid_from
+    `);
 
     let energyAccumulator = null;
     let lastEnergySourceWriteMs = 0;
+    let lastEnergyOnlineState = null;
 
     function parsedSource(source) {
       const row = selectSource.get(source);
@@ -282,53 +289,105 @@ module.exports = function registerHistoryStore(RED) {
       const period = ["day", "month", "year"].includes(request.period) ? request.period : "month";
       const range = periodRange(period, request.anchor);
       const snapshots = querySnapshots.all(range.from, range.to);
+      const tariffRows = queryTariffs.all(range.from, range.to);
       const keyFormatter = period === "day"
         ? new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", hour: "2-digit", minute: "2-digit" })
         : period === "year"
           ? new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", month: "long" })
           : new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", weekday: "short", day: "2-digit", month: "2-digit" });
       const groups = new Map();
-      for (const row of snapshots) {
-        const key = period === "day"
-          ? row.interval_start
-          : period === "year"
-            ? row.interval_start.slice(0, 7)
-            : new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(row.interval_start));
+      const groupKey = (intervalStart) => period === "day"
+        ? intervalStart
+        : period === "year"
+          ? new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna", year: "numeric", month: "2-digit" }).format(new Date(intervalStart))
+          : new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(intervalStart));
+      const getGroup = (intervalStart) => {
+        const key = groupKey(intervalStart);
         const group = groups.get(key) || {
           key,
-          label: keyFormatter.format(new Date(row.interval_start)),
+          label: keyFormatter.format(new Date(intervalStart)),
           pvEnergyKWh: 0,
           houseConsumptionKWh: 0,
           gridImportKWh: 0,
           gridExportKWh: 0,
           energyCostEur: 0,
+          gridImportCostEur: 0,
           temperatures: [],
           sunshine: [],
           offlineCount: 0,
+          weatherOfflineCount: 0,
+          energyOfflineCount: 0,
+          tariffOfflineCount: 0,
+          recordedHourCount: 0,
           hours: [],
         };
+        groups.set(key, group);
+        return group;
+      };
+      for (const row of snapshots) {
+        const group = getGroup(row.interval_start);
+        const tariffCtPerKWh = Number(row.market_price_ct_kwh);
+        const houseConsumptionKWh = finite(row.house_consumption_kwh);
+        const consumptionCostEur = Number.isFinite(tariffCtPerKWh)
+          ? houseConsumptionKWh * (tariffCtPerKWh / 100)
+          : null;
         group.pvEnergyKWh += finite(row.pv_energy_kwh);
-        group.houseConsumptionKWh += finite(row.house_consumption_kwh);
+        group.houseConsumptionKWh += houseConsumptionKWh;
         group.gridImportKWh += finite(row.grid_import_kwh);
         group.gridExportKWh += finite(row.grid_export_kwh);
-        group.energyCostEur += finite(row.energy_cost_eur);
+        group.energyCostEur += finite(consumptionCostEur);
+        group.gridImportCostEur += finite(row.energy_cost_eur);
+        group.recordedHourCount += 1;
         if (Number.isFinite(Number(row.temperature_c))) group.temperatures.push(Number(row.temperature_c));
         if (Number.isFinite(Number(row.sunshine_percent))) group.sunshine.push(Number(row.sunshine_percent));
         if (row.data_quality !== "complete") group.offlineCount += 1;
+        if (row.weather_status !== "online") group.weatherOfflineCount += 1;
+        if (row.energy_status !== "online") group.energyOfflineCount += 1;
+        if (row.tariff_status !== "online") group.tariffOfflineCount += 1;
         group.hours.push({
           intervalStart: row.interval_start,
           time: new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", hour: "2-digit", minute: "2-digit" }).format(new Date(row.interval_start)),
           gridImportKWh: finite(row.grid_import_kwh),
-          houseConsumptionKWh: finite(row.house_consumption_kwh),
-          energyCostEur: finite(row.energy_cost_eur),
-          tariffCtPerKWh: row.market_price_ct_kwh,
+          houseConsumptionKWh,
+          energyCostEur: consumptionCostEur,
+          gridImportCostEur: finite(row.energy_cost_eur),
+          tariffCtPerKWh,
           temperatureC: row.temperature_c,
           status: row.data_quality,
+          weatherStatus: row.weather_status,
+          energyStatus: row.energy_status,
+          tariffStatus: row.tariff_status,
+          recorded: true,
         });
-        groups.set(key, group);
+      }
+      for (const tariffRow of tariffRows) {
+        const group = getGroup(tariffRow.valid_from);
+        const existingHour = group.hours.find((hour) => hour.intervalStart === tariffRow.valid_from);
+        if (existingHour) {
+          if (!Number.isFinite(Number(existingHour.tariffCtPerKWh))) {
+            existingHour.tariffCtPerKWh = Number(tariffRow.price_ct_kwh);
+          }
+          continue;
+        }
+        group.hours.push({
+          intervalStart: tariffRow.valid_from,
+          time: new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", hour: "2-digit", minute: "2-digit" }).format(new Date(tariffRow.valid_from)),
+          gridImportKWh: null,
+          houseConsumptionKWh: null,
+          energyCostEur: null,
+          gridImportCostEur: null,
+          tariffCtPerKWh: Number(tariffRow.price_ct_kwh),
+          temperatureC: null,
+          status: new Date(tariffRow.valid_from).getTime() > Date.now() ? "geplant" : "keine Messdaten",
+          weatherStatus: "ausstehend",
+          energyStatus: "ausstehend",
+          tariffStatus: "online",
+          recorded: false,
+        });
       }
       const rows = [...groups.values()].map((group) => ({
         ...group,
+        hours: group.hours.sort((left, right) => left.intervalStart.localeCompare(right.intervalStart)),
         averageTemperatureC: group.temperatures.length
           ? group.temperatures.reduce((sum, value) => sum + value, 0) / group.temperatures.length
           : null,
@@ -354,6 +413,7 @@ module.exports = function registerHistoryStore(RED) {
           gridImportKWh: rows.reduce((sum, row) => sum + row.gridImportKWh, 0),
           gridExportKWh: rows.reduce((sum, row) => sum + row.gridExportKWh, 0),
           energyCostEur: rows.reduce((sum, row) => sum + row.energyCostEur, 0),
+          gridImportCostEur: rows.reduce((sum, row) => sum + row.gridImportCostEur, 0),
         },
         live: {
           priceCtPerKWh,
@@ -429,10 +489,12 @@ module.exports = function registerHistoryStore(RED) {
         if (msg.topic === "history/source/energy") {
           const energyState = integrateEnergy(payload || {});
           const errorText = payload?.OfflineReason || payload?.ErrorReason || "";
-          if (!energyState.online || Date.now() - lastEnergySourceWriteMs >= 60_000) {
+          const stateChanged = lastEnergyOnlineState !== energyState.online;
+          if (stateChanged || Date.now() - lastEnergySourceWriteMs >= 60_000) {
             storeSource("energy", payload, energyState.observedAt, energyState.online, errorText);
             lastEnergySourceWriteMs = Date.now();
           }
+          lastEnergyOnlineState = energyState.online;
           msg.history = { action: "source", source: "energy", status: energyState.online ? "online" : "offline", databasePath };
           node.status({ fill: energyState.online ? "green" : "red", shape: energyState.online ? "dot" : "ring", text: `Energie ${energyState.online ? "online" : "offline"}` });
           send(msg);
@@ -460,7 +522,19 @@ module.exports = function registerHistoryStore(RED) {
         );
 
         if (msg.topic === "aWATTar/tariff/current" && payload?.validFrom && payload?.validUntil) {
-          insertTariff.run(payload.validFrom, payload.validUntil, payload.provider || "aWATTar", payload.marketPriceEurPerMWh, payload.priceCtPerKWh, payload.fetchedAt || receivedAt, JSON.stringify(payload));
+          const slots = Array.isArray(payload.slots) && payload.slots.length ? payload.slots : [payload];
+          for (const slot of slots) {
+            if (!slot?.validFrom || !slot?.validUntil || !Number.isFinite(Number(slot.priceCtPerKWh))) continue;
+            insertTariff.run(
+              slot.validFrom,
+              slot.validUntil,
+              payload.provider || "aWATTar",
+              slot.marketPriceEurPerMWh,
+              slot.priceCtPerKWh,
+              payload.fetchedAt || receivedAt,
+              JSON.stringify(slot)
+            );
+          }
           storeSource("tariff", payload, asIso(payload.fetchedAt || payload.validFrom), true);
         }
 

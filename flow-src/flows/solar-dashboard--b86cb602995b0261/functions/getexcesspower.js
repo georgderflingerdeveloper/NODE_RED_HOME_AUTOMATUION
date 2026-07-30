@@ -7,8 +7,11 @@ const PvPowerWatt = Number(msg.payload?.PvPowerWatt);
 const GridPowerWatt = Number(msg.payload?.GridPowerWatt);
 if (!Number.isFinite(PvPowerWatt) || !Number.isFinite(GridPowerWatt)) { return null; }
 
-// Hauslast & Überschuss
-const HouseConsumptionWatt = PvPowerWatt - GridPowerWatt;
+// Hauslast berücksichtigt beide Netzrichtungen:
+// PV + Netzbezug - Einspeisung = aktuelle Gesamtleistungsaufnahme des Hauses.
+const GridImportWatt = Math.max(0, -GridPowerWatt);
+const FeedInWatt = Math.max(0, GridPowerWatt);
+const HouseConsumptionWatt = Math.max(0, PvPowerWatt + GridImportWatt - FeedInWatt);
 const solarEdgeStatus = global.get("SolarEdgeData") || {};
 
 let ExcessPowerWatt;
@@ -55,8 +58,8 @@ msg.payload = {
     PvPowerWatt,
     GridPowerWatt,
     HouseConsumptionWatt,
-    GridImportWatt: Math.max(0, -GridPowerWatt),
-    FeedInWatt: Math.max(0, GridPowerWatt),
+    GridImportWatt,
+    FeedInWatt,
     ExcessPowerWatt,
     ExcessEnergyWhTotal,
     ExcessEnergyKWhTotal: ExcessEnergyWhTotal / 1000,

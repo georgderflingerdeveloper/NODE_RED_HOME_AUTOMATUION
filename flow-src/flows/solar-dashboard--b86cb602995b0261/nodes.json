@@ -208,7 +208,8 @@
     "wires": [
       [
         "e93f57326a18d2d1",
-        "datenbank_energy_out"
+        "datenbank_energy_out",
+        "ui_house_total_power"
       ]
     ]
   },
@@ -224,6 +225,29 @@
     "x": 915,
     "y": 620,
     "wires": []
+  },
+  {
+    "id": "ui_house_total_power",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "Gesamtleistungsaufnahme Haus",
+    "order": 5,
+    "width": 0,
+    "height": 2,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 990,
+    "y": 680,
+    "wires": [
+      []
+    ]
   },
   {
     "id": "361eb71ca0080e07",
@@ -248,7 +272,7 @@
     "z": "b86cb602995b0261",
     "group": "24a6bcc7d3d966ac",
     "name": "Solarüberschuss",
-    "order": 5,
+    "order": 6,
     "width": 0,
     "height": 1,
     "format": {
@@ -333,7 +357,7 @@
     "type": "comment",
     "z": "b86cb602995b0261",
     "name": "LEISTUNGSFLÜSSE · DEUTSCHE, EINDEUTIGE ANZEIGEN",
-    "info": "Solarleistung = aktuell erzeugte Leistung. Netzbezug = Leistung, die aus dem öffentlichen Stromnetz ins Haus fließt. Einspeisung = Leistung, die das Haus ins öffentliche Stromnetz abgibt. Solarüberschuss = aktuell verfügbare überschüssige Solarleistung.",
+    "info": "Solarleistung = aktuell erzeugte Leistung. Netzbezug = Leistung, die aus dem öffentlichen Stromnetz ins Haus fließt. Einspeisung = Leistung, die das Haus ins öffentliche Stromnetz abgibt. Gesamtleistungsaufnahme Haus = Solarleistung + Netzbezug - Einspeisung. Solarüberschuss = aktuell verfügbare überschüssige Solarleistung.",
     "x": 920,
     "y": 40,
     "wires": []
@@ -384,7 +408,7 @@
     "z": "b86cb602995b0261",
     "group": "24a6bcc7d3d966ac",
     "name": "SolarEdge und Node-RED Steuerung",
-    "order": 6,
+    "order": 7,
     "width": 0,
     "height": 1,
     "format": {

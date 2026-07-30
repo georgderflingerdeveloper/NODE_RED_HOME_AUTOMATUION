@@ -156,12 +156,14 @@ Der Node-RED-Flow `DATENBANK` ist die sichtbare Service-Zentrale:
 - `DASHBOARD · Zeitraum abfragen` liefert Tag-, Monat- und Jahresauswertungen
   an den Reiter `KOSTEN`.
 
-Die gemessenen Leistungen werden per Trapezregel zu kWh integriert. Kosten
-entstehen ausschließlich aus dem integrierten Netzbezug und dem für das
-Messintervall gültigen Börsenpreis. Fehlende oder veraltete Quellen werden als
-`offline` gespeichert und im Dashboard unter `Service- und Fehlerdiagnose`
-angezeigt. Die Tabellen `source_state` und `hourly_snapshots` sind für eine
-direkte technische Prüfung mit jedem SQLite-Werkzeug lesbar.
+Die gemessenen Leistungen werden per Trapezregel zu kWh integriert. Im Dashboard
+werden zwei Werte klar getrennt: Der Verbrauchswert bewertet die gesamte
+Hausenergie mit dem gültigen Stundenpreis; die Netzbezugskosten bewerten nur die
+tatsächlich aus dem Stromnetz bezogene Energie. Beide Kosten werden in Euro und
+Cent dargestellt. Fehlende oder veraltete Quellen werden als `offline`
+gespeichert und im Dashboard unter `Service- und Fehlerdiagnose` angezeigt. Die
+Tabellen `source_state` und `hourly_snapshots` sind für eine direkte technische
+Prüfung mit jedem SQLite-Werkzeug lesbar.
 
 Vor einer Wiederherstellung Node-RED beenden und den Vorgang zunächst prüfen:
 
