@@ -43,7 +43,7 @@
     "storeOutMessages": true,
     "fwdInMessages": false,
     "resendOnRefresh": true,
-    "templateScope": "local",
+    "templateScope": "global",
     "className": "",
     "x": 825,
     "y": 100,

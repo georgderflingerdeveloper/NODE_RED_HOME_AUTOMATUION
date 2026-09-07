@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "b5b94bd6f10fe14e65d413b6f66c23399304db157159dd1db89e30a80395aec5",
+  "flowSha256": "f7f8db76c1e844270d29ab284a4436fd43ee89dc4cd75ee8249c5891332f3ee3",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -1216,9 +1216,9 @@
     "flows/sub-light-anteroom-middle--658af8e2.d21c88/functions/light-command-anteroom-middle.js": "e45d707262ec6cc289a47891ccfee768a87117b24e4ad7185f10776b63fb267c",
     "flows/sub-light-anteroom-middle--658af8e2.d21c88/nodes.json": "f381fd85dfe2c9a0564730cbef5bee0231d642e4087cb8b5ef70dcebdbdeaab5",
     "flows/sub-light-middle--53cbac0a.2b67f4/nodes.json": "4b9766f58bfd570f7096f7e313ba24487370b570f88b4f0dd42a8ebb4849c5b9",
-    "flows/system--system_dashboard_flow/nodes.json": "856afb5d28dca2e085446395504863875bac00877a9676abd00ff1ba39934f52",
+    "flows/system--system_dashboard_flow/nodes.json": "d0e43329cb7dddcdda3615f34bf71f7c80d9a87d46db920a67e5d05da23d727f",
     "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": "94c0ea9a50121b0fd0de291a3cf51a46823964a00816b7ae781e0bed259ea59c",
-    "flows/system--system_dashboard_flow/templates/version-und-kurzinfo.html": "4f8075fc9c21ffa338fe6e82ff84179f9a035a51418fd3489f963caaa618f44e",
+    "flows/system--system_dashboard_flow/templates/version-und-kurzinfo.html": "aa26cd57cdad2de32824f63066782576bfc865074dec144100948b57f39bc6bb",
     "flows/system--system_dashboard_flow/templates/zugangsdaten-tresor.html": "7307c29ef347b7a6ce54a7cbe3da25f549f42770a5b3b446c038a03a46fe0285",
     "flows/system-netzwerk--system_network_flow/functions/hostname-sicher-ubernehmen.js": "958537e2bb109949696e6c31d0f7aa693908bf5b97b14760b4f7359d65e150b7",
     "flows/system-netzwerk--system_network_flow/functions/livewerte-prufen-und-dashboard-aktualisieren.js": "4050addb9dea07be33d1d4d34c8daec5b9242ddeef4b8dd46dbd8c15a33c5bcc",

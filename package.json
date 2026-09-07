@@ -3,6 +3,12 @@
     "description": "GEORGSHOME Home Automation",
     "version": "0.1.0",
     "private": true,
+    "homeAutomation": {
+        "branchPurposes": {
+            "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand für Solar, Wetter, Kosten, Systemüberwachung, Netzwerk-Teilnehmer und verschlüsselte Zugangsdaten.",
+            "SOLAR_clean_start": "Stabiler Ausgangsstand der Solar- und Hausautomations-Flows."
+        }
+    },
     "scripts": {
         "flow:export": "node tools/flow-source/export.mjs",
         "flow:import": "node tools/flow-source/import.mjs --write",

@@ -1,58 +1,126 @@
-<style>
-  .project-info { width: 100%; box-sizing: border-box; margin-bottom: 12px; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; }
-  .project-info-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid #405b5f; border-radius: 11px; background: #182d30; }
-  .project-info-name { margin-right: auto; color: #fff; font-weight: 700; }
-  .project-info-chip { padding: 5px 9px; border-radius: 999px; background: #29464a; color: #c9dfe1; font-size: 11px; }
-  .project-info-chip.branch { background: #0b5960; color: #fff; }
-  .project-info-chip.dirty { background: #75561d; color: #ffe9b6; }
-  .project-info-button { width: 30px; height: 30px; border: 1px solid #61d6dd; border-radius: 50%; background: transparent; color: #73dfe5; font-size: 17px; font-weight: 700; cursor: pointer; }
-  .project-info-panel { margin-top: 8px; padding: 14px; border: 1px solid #456367; border-radius: 11px; background: #1d2d2f; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
-  .project-info-panel h3 { margin: 0 0 10px; color: #fff; font-size: 16px; }
-  .project-info-grid { display: grid; grid-template-columns: repeat(2, minmax(200px,1fr)); gap: 8px 18px; }
-  .project-info-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid #395357; font-size: 12px; }
-  .project-info-label { color: #9bb5b8; }
-  .project-info-value { color: #fff; text-align: right; font-family: monospace; }
-  .project-info-overview { margin: 12px 0 0; padding-left: 20px; color: #c9dfe1; font-size: 12px; line-height: 1.6; }
-  @media (max-width: 700px) { .project-info-grid { grid-template-columns: 1fr; } .project-info-name { width: 100%; } }
+<style id="home-automation-project-info-styles">
+  #home-automation-project-status { display:flex; align-items:center; gap:7px; min-width:0; margin-left:auto; font-family:Roboto,Arial,sans-serif; }
+  #home-automation-project-status .ha-status-name { max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+  #home-automation-project-status .ha-status-chip { padding:4px 8px; border-radius:999px; background:rgba(0,0,0,.18); color:#fff; font-size:11px; line-height:18px; white-space:nowrap; }
+  #home-automation-project-status .ha-status-branch { max-width:260px; overflow:hidden; text-overflow:ellipsis; background:#0b5960; }
+  #home-automation-project-status .ha-status-dirty { background:#75561d; color:#ffe9b6; }
+  #home-automation-project-info-button { min-width:30px; width:30px; height:30px; margin:0 4px 0 0; padding:0; border:1px solid rgba(255,255,255,.8); border-radius:50%; background:transparent; color:#fff; font-size:17px; font-weight:700; cursor:pointer; }
+  #home-automation-project-info-panel { position:fixed; z-index:10000; top:56px; right:12px; width:min(620px,calc(100vw - 24px)); max-height:calc(100vh - 72px); overflow:auto; box-sizing:border-box; padding:16px; border:1px solid #456367; border-radius:11px; background:#1d2d2f; color:#eaf5f6; box-shadow:0 10px 28px rgba(0,0,0,.45); font-family:Roboto,Arial,sans-serif; }
+  #home-automation-project-info-panel[hidden] { display:none; }
+  #home-automation-project-info-panel h3 { margin:0 0 5px; color:#fff; font-size:17px; }
+  #home-automation-project-info-panel .ha-branch-name { margin:0 0 9px; color:#73dfe5; font-family:monospace; overflow-wrap:anywhere; }
+  #home-automation-project-info-panel .ha-branch-purpose { margin:0 0 14px; padding:10px 12px; border-left:3px solid #61d6dd; background:#162729; line-height:1.45; }
+  #home-automation-project-info-panel .ha-info-grid { display:grid; grid-template-columns:repeat(2,minmax(200px,1fr)); gap:0 18px; }
+  #home-automation-project-info-panel .ha-info-row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid #395357; font-size:12px; }
+  #home-automation-project-info-panel .ha-info-label { color:#9bb5b8; }
+  #home-automation-project-info-panel .ha-info-value { color:#fff; text-align:right; font-family:monospace; overflow-wrap:anywhere; }
+  #home-automation-project-info-panel .ha-overview { margin:12px 0 0; padding-left:20px; color:#c9dfe1; font-size:12px; line-height:1.6; }
+  @media (max-width:900px) { #home-automation-project-status .ha-status-name, #home-automation-project-status .ha-status-project, #home-automation-project-status .ha-status-commit { display:none; } #home-automation-project-status .ha-status-branch { max-width:190px; } }
+  @media (max-width:520px) { #home-automation-project-status .ha-status-branch { max-width:125px; } #home-automation-project-info-panel .ha-info-grid { grid-template-columns:1fr; } }
 </style>
 
 <script>
-(function (scope) {
-  scope.projectInfo = {
-    application: {},
-    runtime: {},
-    source: {},
-    overview: []
-  };
-  scope.infoOpen = false;
-  scope.$watch("msg", function (msg) {
-    if (msg && msg.topic === "system/project/info" && msg.payload) scope.projectInfo = msg.payload;
+(function(scope) {
+  var latest = null;
+
+  function element(tag, className) {
+    var item = document.createElement(tag);
+    if (className) item.className = className;
+    return item;
+  }
+
+  function value(parent, selector, text) {
+    var target = parent.querySelector(selector);
+    if (target) target.textContent = text == null || text === "" ? "—" : String(text);
+  }
+
+  function ensurePanel() {
+    var panel = document.getElementById("home-automation-project-info-panel");
+    if (panel) return panel;
+    panel = element("section");
+    panel.id = "home-automation-project-info-panel";
+    panel.hidden = true;
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-label", "Branch-Kurzinfo und technischer Überblick");
+    panel.innerHTML = '<h3>Branch-Kurzinfo</h3><p class="ha-branch-name"></p><p class="ha-branch-purpose"></p>' +
+      '<div class="ha-info-grid">' +
+      '<div class="ha-info-row"><span class="ha-info-label">App-Version</span><span class="ha-info-value ha-version"></span></div>' +
+      '<div class="ha-info-row"><span class="ha-info-label">Aktives Projekt</span><span class="ha-info-value ha-project"></span></div>' +
+      '<div class="ha-info-row"><span class="ha-info-label">Commit</span><span class="ha-info-value ha-commit"></span></div>' +
+      '<div class="ha-info-row"><span class="ha-info-label">Arbeitsbaum</span><span class="ha-info-value ha-working-tree"></span></div>' +
+      '<div class="ha-info-row"><span class="ha-info-label">Node-RED</span><span class="ha-info-value ha-node-red"></span></div>' +
+      '<div class="ha-info-row"><span class="ha-info-label">Node.js</span><span class="ha-info-value ha-node"></span></div>' +
+      '<div class="ha-info-row"><span class="ha-info-label">Plattform</span><span class="ha-info-value ha-platform"></span></div>' +
+      '</div><ul class="ha-overview"></ul>';
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  function ensureStatus() {
+    var toolbar = document.querySelector(".md-toolbar-tools");
+    if (!toolbar) return null;
+    var status = document.getElementById("home-automation-project-status");
+    if (!status) {
+      status = element("div");
+      status.id = "home-automation-project-status";
+      status.innerHTML = '<span class="ha-status-name"></span><span class="ha-status-chip ha-status-version"></span>' +
+        '<span class="ha-status-chip ha-status-project"></span><span class="ha-status-chip ha-status-branch"></span>' +
+        '<span class="ha-status-chip ha-status-commit"></span><button id="home-automation-project-info-button" type="button" title="Was macht dieser Branch?" aria-label="Branch-Kurzinfo öffnen" aria-expanded="false">i</button>';
+      status.querySelector("button").addEventListener("click", function() {
+        var panel = ensurePanel();
+        panel.hidden = !panel.hidden;
+        this.setAttribute("aria-expanded", String(!panel.hidden));
+      });
+    }
+    if (status.parentNode !== toolbar) {
+      var clock = document.getElementById("clock");
+      toolbar.insertBefore(status, clock && clock.parentNode && clock.parentNode.parentNode === toolbar ? clock.parentNode : null);
+    }
+    return status;
+  }
+
+  function render() {
+    var status = ensureStatus();
+    if (!status || !latest) return;
+    var app = latest.application || {};
+    var source = latest.source || {};
+    var runtime = latest.runtime || {};
+    value(status, ".ha-status-name", app.name || "Home Automation");
+    value(status, ".ha-status-version", "v" + (app.version || "—"));
+    value(status, ".ha-status-project", source.project || "—");
+    value(status, ".ha-status-branch", source.branch || "—");
+    var commit = status.querySelector(".ha-status-commit");
+    commit.classList.toggle("ha-status-dirty", !!source.dirty);
+    value(status, ".ha-status-commit", source.dirty ? source.changedFiles + " Änderungen" : source.commit);
+    status.querySelector(".ha-status-branch").title = "Branch: " + (source.branch || "unbekannt");
+
+    var panel = ensurePanel();
+    value(panel, ".ha-branch-name", source.branch);
+    value(panel, ".ha-branch-purpose", source.branchPurpose);
+    value(panel, ".ha-version", app.version);
+    value(panel, ".ha-project", source.project);
+    value(panel, ".ha-commit", source.commit);
+    value(panel, ".ha-working-tree", source.dirty ? source.changedFiles + " nicht committete Dateien" : "sauber");
+    value(panel, ".ha-node-red", runtime.nodeRedVersion);
+    value(panel, ".ha-node", runtime.nodeVersion);
+    value(panel, ".ha-platform", runtime.platform);
+    var overview = panel.querySelector(".ha-overview");
+    overview.textContent = "";
+    (latest.overview || []).forEach(function(text) {
+      var item = element("li");
+      item.textContent = text;
+      overview.appendChild(item);
+    });
+  }
+
+  scope.$watch("msg", function(msg) {
+    if (msg && msg.topic === "system/project/info" && msg.payload) {
+      latest = msg.payload;
+      render();
+    }
   });
+  if (document.homeAutomationProjectInfoInterval) clearInterval(document.homeAutomationProjectInfoInterval);
+  document.homeAutomationProjectInfoInterval = setInterval(render, 2000);
+  setTimeout(render, 250);
 })(scope);
 </script>
-
-<div class="project-info">
-  <div class="project-info-bar">
-    <span class="project-info-name">{{projectInfo.application.name || 'Home Automation'}}</span>
-    <span class="project-info-chip">Version {{projectInfo.application.version || '—'}}</span>
-    <span class="project-info-chip">Projekt {{projectInfo.source.project || '—'}}</span>
-    <span class="project-info-chip branch">Branch {{projectInfo.source.branch || '—'}}</span>
-    <span class="project-info-chip" ng-class="{'dirty': projectInfo.source.dirty}">{{projectInfo.source.dirty ? projectInfo.source.changedFiles + ' Änderungen' : projectInfo.source.commit || '—'}}</span>
-    <button class="project-info-button" title="Kurzinfo und technischer Überblick" aria-label="Kurzinfo öffnen" ng-click="infoOpen = !infoOpen">i</button>
-  </div>
-
-  <div class="project-info-panel" ng-if="infoOpen">
-    <h3>Kurzinfo · Technischer Überblick</h3>
-    <div class="project-info-grid">
-      <div class="project-info-row"><span class="project-info-label">App-Version</span><span class="project-info-value">{{projectInfo.application.version}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Aktives Projekt</span><span class="project-info-value">{{projectInfo.source.project}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Git-Branch</span><span class="project-info-value">{{projectInfo.source.branch}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Commit</span><span class="project-info-value">{{projectInfo.source.commit}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Node-RED</span><span class="project-info-value">{{projectInfo.runtime.nodeRedVersion}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Node.js</span><span class="project-info-value">{{projectInfo.runtime.nodeVersion}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Plattform</span><span class="project-info-value">{{projectInfo.runtime.platform}}</span></div>
-      <div class="project-info-row"><span class="project-info-label">Arbeitsbaum</span><span class="project-info-value">{{projectInfo.source.dirty ? projectInfo.source.changedFiles + ' nicht committete Dateien' : 'sauber'}}</span></div>
-    </div>
-    <ul class="project-info-overview"><li ng-repeat="item in projectInfo.overview">{{item}}</li></ul>
-  </div>
-</div>

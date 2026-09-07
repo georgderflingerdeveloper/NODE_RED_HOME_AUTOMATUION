@@ -46,6 +46,14 @@ function git(projectRoot, args) {
   return result.status === 0 ? result.stdout.trim() : "";
 }
 
+function branchPurpose(packageData, branch) {
+  const purposes = packageData?.homeAutomation?.branchPurposes;
+  if (purposes && typeof purposes[branch] === "string" && purposes[branch].trim()) {
+    return purposes[branch].trim();
+  }
+  return "Arbeitsstand der Hausautomation; Details sind in der Branch-Dokumentation und im Git-Verlauf beschrieben.";
+}
+
 function projectInfo(settings, options = {}) {
   const projectRoot = resolveProjectRoot(settings);
   const packageData = readJson(path.join(projectRoot, "package.json")) || {};
@@ -71,6 +79,7 @@ function projectInfo(settings, options = {}) {
       dirty: statusLines.length > 0,
       changedFiles: statusLines.length,
       flowFile: typeof configured(settings, "flowFile") === "string" ? configured(settings, "flowFile") : "flows.json",
+      branchPurpose: branchPurpose(packageData, branch),
     },
     overview: [
       "Hausautomation und technische Zustände in Node-RED",
@@ -82,4 +91,4 @@ function projectInfo(settings, options = {}) {
   };
 }
 
-module.exports = { activeProjectName, projectInfo, resolveProjectRoot };
+module.exports = { activeProjectName, branchPurpose, projectInfo, resolveProjectRoot };

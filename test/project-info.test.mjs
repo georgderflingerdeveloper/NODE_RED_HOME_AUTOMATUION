@@ -1,20 +1,25 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createRequire } from "node:module";
 import test from "node:test";
 
 const require = createRequire(import.meta.url);
-const { activeProjectName, projectInfo, resolveProjectRoot } = require("../nodes/home-automation-project-info-core.cjs");
+const { activeProjectName, branchPurpose, projectInfo, resolveProjectRoot } = require("../nodes/home-automation-project-info-core.cjs");
 
 function repositoryFixture() {
   const userDir = mkdtempSync(join(tmpdir(), "home-automation-info-"));
   const projectRoot = join(userDir, "projects", "GEORGSHOME");
   mkdirSync(projectRoot, { recursive: true });
   writeFileSync(join(userDir, ".config.projects.json"), JSON.stringify({ active: "GEORGSHOME" }));
-  writeFileSync(join(projectRoot, "package.json"), JSON.stringify({ name: "home-automation", description: "Georgs Home Automation", version: "0.1.0" }));
+  writeFileSync(join(projectRoot, "package.json"), JSON.stringify({
+    name: "home-automation",
+    description: "Georgs Home Automation",
+    version: "0.1.0",
+    homeAutomation: { branchPurposes: { "test-branch": "Testzweck des Branches" } },
+  }));
   writeFileSync(join(projectRoot, "flows.json"), "[]\n");
   execFileSync("git", ["init", "-b", "test-branch"], { cwd: projectRoot });
   execFileSync("git", ["config", "user.name", "Test"], { cwd: projectRoot });
@@ -34,9 +39,24 @@ test("aktive Node-RED-Projektkonfiguration bestimmt das angezeigte Projekt", (t)
   assert.equal(info.application.version, "0.1.0");
   assert.equal(info.source.project, "GEORGSHOME");
   assert.equal(info.source.branch, "test-branch");
+  assert.equal(info.source.branchPurpose, "Testzweck des Branches");
   assert.match(info.source.commit, /^[0-9a-f]{8}$/);
   assert.equal(info.source.dirty, false);
   assert.equal(info.runtime.nodeRedVersion, "5.0.6");
+});
+
+test("unbekannter Branch erhält eine verständliche neutrale Kurzinfo", () => {
+  assert.match(branchPurpose({}, "eigener-branch"), /Arbeitsstand der Hausautomation/);
+});
+
+test("Versionsinfo wird in der obersten Dashboard-Statusleiste installiert", () => {
+  const template = readFileSync(join(
+    process.cwd(),
+    "flow-src/flows/system--system_dashboard_flow/templates/version-und-kurzinfo.html",
+  ), "utf8");
+  assert.match(template, /querySelector\("\.md-toolbar-tools"\)/);
+  assert.match(template, /Was macht dieser Branch\?/);
+  assert.match(template, /source\.branchPurpose/);
 });
 
 test("nicht committete Änderungen werden in der Versionsinfo sichtbar", (t) => {
