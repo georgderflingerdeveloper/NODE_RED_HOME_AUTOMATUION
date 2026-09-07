@@ -1,6 +1,9 @@
 node_modules/
 *.pem
 .env
+system-credentials.vault.json
+*.vault.json
+*.vault.json.key
 .flow-import-backup.json
 data/*.sqlite
 data/*.sqlite-shm

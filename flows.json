@@ -9500,9 +9500,9 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "format": "<style>\n  .sys-card{width:100%;max-width:none;box-sizing:border-box;color:#eaf5f6;font-family:Roboto,Arial,sans-serif}\n  .sys-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}\n  .sys-header h2{margin:0;color:#fff;font-size:24px}.sys-subtitle{margin-top:5px;color:#a9c4c6;font-size:12px}\n  .sys-overview{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #405b5f;border-radius:12px;background:#1d2d2f;font-size:12px}\n  .sys-dot{width:10px;height:10px;border-radius:50%;background:#7f9295;box-shadow:0 0 0 4px rgba(127,146,149,.13)}\n  .sys-dot.online{background:#4bd88a;box-shadow:0 0 0 4px rgba(75,216,138,.13)}.sys-dot.offline{background:#ff826d;box-shadow:0 0 0 4px rgba(255,130,109,.13)}\n  .sys-summary{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;margin-bottom:16px}\n  .sys-kpi{padding:14px 15px;border-radius:13px;background:linear-gradient(135deg,#1d3c41,#244d52);box-shadow:0 5px 14px rgba(0,0,0,.2)}\n  .sys-kpi-label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#b7ced0}.sys-kpi-value{margin-top:6px;color:#fff;font-size:23px;font-weight:700}.sys-kpi-note{margin-top:4px;color:#a9c4c6;font-size:11px}\n  .sys-section-title{margin:22px 0 9px;color:#fff;font-size:16px}.sys-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}\n  .sys-panel{border:1px solid #405b5f;border-radius:13px;background:#1d2d2f;overflow:hidden}.sys-panel-head{padding:13px 15px;border-bottom:1px solid #395357;background:#20383b;color:#fff;font-weight:700;font-size:14px}\n  .sys-panel-body{padding:13px 15px}.sys-service{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #395357}.sys-service:last-child{border-bottom:0;padding-bottom:0}.sys-service:first-child{padding-top:0}\n  .sys-service-name{color:#fff;font-size:13px;font-weight:700}.sys-service-detail{margin-top:3px;color:#9bb5b8;font-size:11px}.sys-badge{padding:4px 8px;border-radius:999px;background:#405055;color:#d3e1e2;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.sys-badge.online{background:#14613f;color:#b9ffdc}.sys-badge.offline{background:#71342d;color:#ffd1c7}\n  .sys-table-wrap{width:100%;overflow-x:auto;border:1px solid #456367;border-radius:13px;background:#1d2d2f}.sys-table{width:100%;min-width:760px;border-collapse:collapse}.sys-table th{padding:11px 12px;background:#0b5960;color:#fff;text-align:left;font-size:12px}.sys-table td{padding:11px 12px;border-top:1px solid #395357;font-size:12px}.sys-device-name{color:#fff;font-weight:700}.sys-muted{color:#9bb5b8}.sys-empty{padding:25px;color:#9bb5b8;text-align:center}\n  .sys-footnote{margin-top:14px;padding:11px 13px;border-left:3px solid #61d6dd;border-radius:8px;background:#162b2e;color:#b7ced0;font-size:12px;line-height:1.45}\n  @media(max-width:900px){.sys-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sys-grid{grid-template-columns:1fr}}@media(max-width:520px){.sys-summary{grid-template-columns:1fr}.sys-header h2{font-size:21px}}\n</style>\n\n<script>\n(function(scope){\n  var placeholder={\n    network:{state:\"waiting\",label:\"Monitoring wird vorbereitet\",updatedAt:null},\n    summary:{devices:null,online:null,offline:null,updatedAt:null},\n    services:[\n      {name:\"Node-RED\",detail:\"Zentrale Hausautomation\",state:\"waiting\"},\n      {name:\"Phidget-Anwendersoftware\",detail:\"Statusquelle noch nicht verbunden\",state:\"waiting\"},\n      {name:\"Phidget-Steuerung\",detail:\"Treiber- und Geräteprüfung folgt\",state:\"waiting\"}\n    ],\n    devices:[]\n  };\n  scope.systemView=angular.copy(placeholder);\n\n  function normalize(payload){\n    if(!payload||typeof payload!==\"object\"||Array.isArray(payload))return angular.copy(placeholder);\n    var incoming=payload.system||payload;\n    return {\n      network:angular.extend({},placeholder.network,incoming.network||{}),\n      summary:angular.extend({},placeholder.summary,incoming.summary||{}),\n      services:Array.isArray(incoming.services)?incoming.services:placeholder.services,\n      devices:Array.isArray(incoming.devices)?incoming.devices:[]\n    };\n  }\n  function stateClass(state){return state===\"online\"?\"online\":(state===\"offline\"?\"offline\":\"waiting\");}\n  scope.systemStateClass=stateClass;\n  scope.systemStateLabel=function(state){return state===\"online\"?\"online\":(state===\"offline\"?\"offline\":(state===\"scanning\"?\"Scan läuft\":\"ausstehend\"));};\n  scope.$watch(\"msg\",function(msg){if(msg&&msg.payload)scope.systemView=normalize(msg.payload);});\n})(scope);\n</script>\n\n<div class=\"sys-card\">\n  <div class=\"sys-header\">\n    <div><h2>SYSTEM · Technisches Hausnetz</h2><div class=\"sys-subtitle\">Raspberry Pi, Dienste, Phidget-Anbindung und technische Zustände</div></div>\n    <div class=\"sys-overview\"><span class=\"sys-dot\" ng-class=\"systemStateClass(systemView.network.state)\"></span><span>{{systemView.network.label}}</span></div>\n  </div>\n\n  <div class=\"sys-summary\">\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Erfasste Geräte</div><div class=\"sys-kpi-value\">{{systemView.summary.devices === null ? '—' : systemView.summary.devices}}</div><div class=\"sys-kpi-note\">Raspberry Pi und Netzwerktechnik</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Online</div><div class=\"sys-kpi-value\">{{systemView.summary.online === null ? '—' : systemView.summary.online}}</div><div class=\"sys-kpi-note\">aktuell erreichbar</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Offline</div><div class=\"sys-kpi-value\">{{systemView.summary.offline === null ? '—' : systemView.summary.offline}}</div><div class=\"sys-kpi-note\">benötigt Aufmerksamkeit</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Letzte Aktualisierung</div><div class=\"sys-kpi-value\">{{systemView.summary.updatedAt ? (systemView.summary.updatedAt | date:'HH:mm:ss') : '—'}}</div><div class=\"sys-kpi-note\">Zeitpunkt der Systemprüfung</div></div>\n  </div>\n\n  <div class=\"sys-grid\">\n    <div class=\"sys-panel\"><div class=\"sys-panel-head\">Anwendersoftware &amp; Schnittstellen</div><div class=\"sys-panel-body\">\n      <div class=\"sys-service\" ng-repeat=\"service in systemView.services\"><div><div class=\"sys-service-name\">{{service.name}}</div><div class=\"sys-service-detail\">{{service.detail}}</div></div><span class=\"sys-badge\" ng-class=\"systemStateClass(service.state)\">{{systemStateLabel(service.state)}}</span></div>\n    </div></div>\n    <div class=\"sys-panel\"><div class=\"sys-panel-head\">Geplante Live-Kennzahlen</div><div class=\"sys-panel-body\">\n      <div class=\"sys-service\"><div><div class=\"sys-service-name\">Systemtemperatur</div><div class=\"sys-service-detail\">CPU- und Gehäusetemperatur je Raspberry Pi</div></div><span class=\"sys-badge\">ausstehend</span></div>\n      <div class=\"sys-service\"><div><div class=\"sys-service-name\">Auslastung &amp; Speicher</div><div class=\"sys-service-detail\">CPU, RAM, Datenträger und Betriebszeit</div></div><span class=\"sys-badge\">ausstehend</span></div>\n      <div class=\"sys-service\"><div><div class=\"sys-service-name\">Netzwerkqualität</div><div class=\"sys-service-detail\">IP-Adresse, Verbindung und letzte Antwort</div></div><span class=\"sys-badge\">ausstehend</span></div>\n    </div></div>\n  </div>\n\n  <h3 class=\"sys-section-title\">Angeschlossene Systeme</h3>\n  <div class=\"sys-table-wrap\" ng-if=\"systemView.devices.length\"><table class=\"sys-table\"><thead><tr><th>Hostname</th><th>Netzwerk</th><th>System</th><th>Temperatur</th><th>Letzte Antwort</th><th>Status</th></tr></thead><tbody>\n    <tr ng-repeat=\"device in systemView.devices\"><td class=\"sys-device-name\">{{device.name}}<br><span class=\"sys-muted\">{{device.hostname || 'kein Hostname gemeldet'}}</span></td><td>{{device.ip || '—'}}</td><td><span ng-if=\"device.model\">{{device.model}}<br><span class=\"sys-muted\">{{device.operatingSystem}}<span ng-if=\"device.services\"><br>{{device.services}}</span><span ng-if=\"device.memoryUsedPercent !== null\"><br>RAM {{device.memoryUsedPercent | number:0}} % · Disk {{device.diskUsedPercent | number:0}} % · Load {{device.loadAverage | number:2}}</span></span></span><span ng-if=\"!device.model\">—</span></td><td>{{device.temperatureC === undefined || device.temperatureC === null ? '—' : (device.temperatureC | number:1) + ' °C'}}<br><span class=\"sys-muted\" ng-if=\"device.temperatureSource === 'live'\">live</span><span class=\"sys-muted\" ng-if=\"device.temperatureSource !== 'live' && device.inventoryObservedAt\">Inventar {{device.inventoryObservedAt | date:'dd.MM.yy'}}</span></td><td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td><td><span class=\"sys-badge\" ng-class=\"systemStateClass(device.state)\">{{systemStateLabel(device.state)}}</span></td></tr>\n  </tbody></table></div>\n  <div class=\"sys-panel sys-empty\" ng-if=\"!systemView.devices.length\">Noch keine Gerätequelle verbunden. Sobald die Systemabfrage ergänzt ist, erscheinen hier automatisch alle erfassten Raspberry Pis und Netzwerkgeräte.</div>\n  <div class=\"sys-footnote\">Diese Ansicht ist bewusst nur die Dashboard-Vorlage. Sie zeigt keine erfundenen Zustände an; Online-/Offline-Informationen, Temperaturen, Systemdaten und der Status der Phidget-Anwendersoftware werden erst mit der nächsten Ausbaustufe aus echten Datenquellen gefüllt.</div>\n</div>\n",
+        "format": "<style>\n  .sys-card { width: 100%; box-sizing: border-box; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; }\n  .sys-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }\n  .sys-header h2 { margin: 0; color: #fff; font-size: 24px; }\n  .sys-subtitle, .sys-muted { color: #a9c4c6; font-size: 12px; }\n  .sys-overview { padding: 10px 13px; border: 1px solid #405b5f; border-radius: 12px; background: #1d2d2f; font-size: 12px; }\n  .sys-dot { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: #7f9295; }\n  .sys-dot.online { background: #4bd88a; }\n  .sys-dot.offline { background: #ff826d; }\n  .sys-summary { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }\n  .sys-kpi { padding: 14px 15px; border-radius: 13px; background: linear-gradient(135deg, #1d3c41, #244d52); }\n  .sys-kpi-label { font-size: 11px; text-transform: uppercase; color: #b7ced0; }\n  .sys-kpi-value { margin-top: 6px; color: #fff; font-size: 23px; font-weight: 700; }\n  .sys-kpi-note { margin-top: 4px; color: #a9c4c6; font-size: 11px; }\n  .sys-title { margin: 22px 0 9px; color: #fff; font-size: 16px; }\n  .sys-panel { border: 1px solid #405b5f; border-radius: 13px; background: #1d2d2f; overflow: hidden; }\n  .sys-table-wrap { width: 100%; overflow-x: auto; }\n  .sys-table { width: 100%; min-width: 700px; border-collapse: collapse; }\n  .sys-table th { padding: 11px 12px; background: #0b5960; color: #fff; text-align: left; font-size: 12px; }\n  .sys-table td { padding: 11px 12px; border-top: 1px solid #395357; font-size: 12px; vertical-align: top; }\n  .sys-device-name { color: #fff; font-weight: 700; }\n  .sys-empty { padding: 25px; color: #9bb5b8; text-align: center; }\n  .sys-badge { padding: 4px 8px; border-radius: 999px; background: #405055; font-size: 10px; font-weight: 700; text-transform: uppercase; }\n  .sys-badge.online { background: #14613f; color: #b9ffdc; }\n  .sys-badge.offline { background: #71342d; color: #ffd1c7; }\n  @media (max-width: 900px) { .sys-summary { grid-template-columns: repeat(2, 1fr); } }\n</style>\n\n<script>\n(function (scope) {\n  var empty = {\n    network: { state: \"waiting\", label: \"Monitoring wird vorbereitet\" },\n    summary: { devices: null, online: null, offline: null, updatedAt: null },\n    devices: []\n  };\n  scope.systemView = angular.copy(empty);\n\n  scope.stateClass = function (state) {\n    return state === \"online\" ? \"online\" : (state === \"offline\" ? \"offline\" : \"waiting\");\n  };\n  scope.stateLabel = function (state) {\n    return state === \"online\" ? \"online\" : (state === \"offline\" ? \"offline\" : (state === \"scanning\" ? \"Scan läuft\" : \"ausstehend\"));\n  };\n  scope.$watch(\"msg\", function (msg) {\n    if (!msg || !msg.payload || typeof msg.payload !== \"object\") return;\n    var incoming = msg.payload.system || msg.payload;\n    scope.systemView = {\n      network: angular.extend({}, empty.network, incoming.network || {}),\n      summary: angular.extend({}, empty.summary, incoming.summary || {}),\n      devices: Array.isArray(incoming.devices) ? incoming.devices : []\n    };\n  });\n})(scope);\n</script>\n\n<div class=\"sys-card\">\n  <div class=\"sys-header\">\n    <div>\n      <h2>SYSTEM · Technisches Hausnetz</h2>\n      <div class=\"sys-subtitle\">Raspberry Pi, Dienste, Phidget-Anbindung und technische Zustände</div>\n    </div>\n    <div class=\"sys-overview\">\n      <span class=\"sys-dot\" ng-class=\"stateClass(systemView.network.state)\"></span>{{systemView.network.label}}\n    </div>\n  </div>\n\n  <div class=\"sys-summary\">\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Erfasste Geräte</div><div class=\"sys-kpi-value\">{{systemView.summary.devices === null ? '—' : systemView.summary.devices}}</div><div class=\"sys-kpi-note\">Raspberry Pi und Netzwerktechnik</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Online</div><div class=\"sys-kpi-value\">{{systemView.summary.online === null ? '—' : systemView.summary.online}}</div><div class=\"sys-kpi-note\">aktuell erreichbar</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Offline</div><div class=\"sys-kpi-value\">{{systemView.summary.offline === null ? '—' : systemView.summary.offline}}</div><div class=\"sys-kpi-note\">benötigt Aufmerksamkeit</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Letzte Aktualisierung</div><div class=\"sys-kpi-value\">{{systemView.summary.updatedAt ? (systemView.summary.updatedAt | date:'HH:mm:ss') : '—'}}</div><div class=\"sys-kpi-note\">Zeitpunkt der Systemprüfung</div></div>\n  </div>\n\n  <h3 class=\"sys-title\">Angeschlossene Systeme</h3>\n  <div class=\"sys-panel sys-table-wrap\" ng-if=\"systemView.devices.length\">\n    <table class=\"sys-table\">\n      <thead><tr><th>Hostname</th><th>IP</th><th>System</th><th>Temperatur</th><th>Letzte Antwort</th><th>Status</th></tr></thead>\n      <tbody><tr ng-repeat=\"device in systemView.devices\">\n        <td class=\"sys-device-name\">{{device.name}}<br><span class=\"sys-muted\">{{device.hostname || 'kein Hostname'}}</span></td>\n        <td>{{device.ip}}</td>\n        <td>{{device.model || '—'}}<br><span class=\"sys-muted\">{{device.operatingSystem}}</span></td>\n        <td>{{device.temperatureC === null || device.temperatureC === undefined ? '—' : (device.temperatureC | number:1) + ' °C'}}</td>\n        <td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td>\n        <td><span class=\"sys-badge\" ng-class=\"stateClass(device.state)\">{{stateLabel(device.state)}}</span></td>\n      </tr></tbody>\n    </table>\n  </div>\n  <div class=\"sys-panel sys-empty\" ng-if=\"!systemView.devices.length\">Noch keine erreichbaren Systeme erfasst.</div>\n</div>\n",
         "storeOutMessages": true,
-        "fwdInMessages": true,
+        "fwdInMessages": false,
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
@@ -9826,43 +9826,26 @@
         "props": [
             {
                 "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/vault/probe",
+                "vt": "str"
             }
         ],
         "repeat": "60",
         "crontab": "",
         "once": true,
         "onceDelay": "15",
-        "topic": "system/live/metrics",
+        "topic": "system/vault/probe",
         "payload": "",
         "payloadType": "date",
         "x": 270,
         "y": 420,
         "wires": [
             [
-                "system_live_metrics_exec"
+                "system_credential_vault"
             ]
-        ]
-    },
-    {
-        "id": "system_live_metrics_exec",
-        "type": "exec",
-        "z": "system_network_flow",
-        "command": "/bin/sh -c '/usr/bin/env node \"$HOME/.node-red/projects/GEORGSHOME/tools/system-live-metrics.mjs\"'",
-        "addpay": false,
-        "append": "",
-        "useSpawn": "false",
-        "timer": "45",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Livewerte per SSH lesen (ohne Passwort im Flow)",
-        "x": 570,
-        "y": 420,
-        "wires": [
-            [
-                "system_live_metrics_result"
-            ],
-            [],
-            []
         ]
     },
     {
@@ -9882,6 +9865,105 @@
         "wires": [
             [
                 "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_command_out",
+        "type": "link out",
+        "z": "system_dashboard_flow",
+        "name": "Tresorbefehl an Systemnetz",
+        "mode": "link",
+        "links": [
+            "system_vault_command_in"
+        ],
+        "x": 795,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "system_vault_response_in",
+        "type": "link in",
+        "z": "system_dashboard_flow",
+        "name": "Tresorstatus vom Systemnetz",
+        "links": [
+            "system_vault_response_out"
+        ],
+        "x": 275,
+        "y": 240,
+        "wires": [
+            [
+                "system_vault_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "system_credential_vault",
+        "type": "home-automation-credential-vault",
+        "z": "system_network_flow",
+        "name": "Verschlüsselter System-Zugangstresor",
+        "vaultPath": "system-credentials.vault.json",
+        "autoLockMinutes": 10,
+        "x": 585,
+        "y": 420,
+        "wires": [
+            [
+                "system_vault_response_out"
+            ],
+            [
+                "system_live_metrics_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_command_in",
+        "type": "link in",
+        "z": "system_network_flow",
+        "name": "Tresorbefehl vom SYSTEM-Dashboard",
+        "links": [
+            "system_vault_command_out"
+        ],
+        "x": 345,
+        "y": 480,
+        "wires": [
+            [
+                "system_credential_vault"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_response_out",
+        "type": "link out",
+        "z": "system_network_flow",
+        "name": "Tresorstatus an SYSTEM-Dashboard",
+        "mode": "link",
+        "links": [
+            "system_vault_response_in"
+        ],
+        "x": 850,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "system_vault_dashboard_template",
+        "type": "ui_template",
+        "z": "system_dashboard_flow",
+        "group": "system_dashboard_group",
+        "name": "Verschlüsselte System-Zugangsdaten",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .vault { width: 100%; box-sizing: border-box; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; border: 1px solid #405b5f; border-radius: 13px; background: #1d2d2f; overflow: hidden; }\n  .vault-head, .vault-actions { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }\n  .vault-head { padding: 13px 15px; border-bottom: 1px solid #395357; background: #20383b; color: #fff; font-weight: 700; font-size: 14px; }\n  .vault-body { padding: 13px 15px; }\n  .vault-status, .vault-muted { color: #a9c4c6; font-size: 12px; }\n  .vault-error { margin: 12px 0; padding: 10px 12px; border-radius: 8px; background: #5a2525; color: #ffd4cf; }\n  .vault-form { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 12px; }\n  .vault-field { display: flex; flex-direction: column; gap: 5px; }\n  .vault-field.wide { grid-column: 1 / -1; }\n  .vault-field label { font-size: 11px; color: #b7ced0; }\n  .vault-field input { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #526d71; border-radius: 7px; background: #132629; color: #fff; }\n  .vault-actions { justify-content: flex-start; margin-top: 12px; }\n  .vault-btn { border: 1px solid #4d7378; border-radius: 7px; padding: 8px 11px; background: #0b5960; color: #fff; cursor: pointer; }\n  .vault-btn.secondary { background: #283f43; }\n  .vault-btn.danger { background: #71342d; }\n  .vault-btn:disabled { opacity: .45; }\n  .vault-link { border: 0; background: none; color: #73dfe5; text-decoration: underline; cursor: pointer; }\n  .vault-subpanel, .vault-note { margin-top: 14px; padding: 13px; border: 1px solid #395357; border-radius: 9px; background: #182d30; }\n  .vault-note { border-left: 3px solid #61d6dd; color: #b7ced0; font-size: 12px; }\n  .vault-table-wrap { width: 100%; margin-top: 14px; overflow-x: auto; border: 1px solid #456367; border-radius: 9px; }\n  .vault-table { width: 100%; min-width: 700px; border-collapse: collapse; }\n  .vault-table th { padding: 11px 12px; background: #0b5960; color: #fff; text-align: left; font-size: 12px; }\n  .vault-table td { padding: 11px 12px; border-top: 1px solid #395357; font-size: 12px; vertical-align: top; }\n  .vault-secret { font-family: monospace; color: #ffe6a8; word-break: break-all; }\n  .vault-empty { padding: 20px; color: #9bb5b8; text-align: center; }\n  @media (max-width: 600px) { .vault-form { grid-template-columns: 1fr; } .vault-field.wide { grid-column: auto; } }\n</style>\n\n<script>\n(function (scope) {\n  scope.vault = { initialized: null, locked: true, entries: [] };\n  scope.vaultInput = {};\n  scope.deviceForm = {};\n  var revealTimer;\n\n  function send(topic, payload) {\n    scope.vault.error = null;\n    scope.send({ topic: topic, payload: payload || {} });\n  }\n  function passwordsMatch(left, right, label) {\n    if (!left || left !== right) {\n      scope.vault.error = label + \" stimmen nicht überein\";\n      return false;\n    }\n    return true;\n  }\n  function hideRevealedPassword() {\n    scope.revealed = null;\n    if (revealTimer) clearTimeout(revealTimer);\n    scope.$applyAsync();\n  }\n\n  scope.setup = function () {\n    if (!passwordsMatch(scope.vaultInput.master, scope.vaultInput.master2, \"Master-Passwörter\")) return;\n    send(\"system/vault/setup\", {\n      masterPassword: scope.vaultInput.master,\n      recoveryQuestion: scope.vaultInput.question,\n      recoveryAnswer: scope.vaultInput.answer\n    });\n  };\n  scope.unlock = function () {\n    send(\"system/vault/unlock\", { masterPassword: scope.vaultInput.master });\n  };\n  scope.lock = function () {\n    hideRevealedPassword();\n    send(\"system/vault/lock\");\n  };\n  scope.recover = function () {\n    if (!passwordsMatch(scope.vaultInput.newMaster, scope.vaultInput.newMaster2, \"Neue Master-Passwörter\")) return;\n    send(\"system/vault/recover\", {\n      recoveryAnswer: scope.vaultInput.answer,\n      newMasterPassword: scope.vaultInput.newMaster\n    });\n  };\n  scope.add = function () {\n    scope.deviceForm = {};\n    scope.showDeviceForm = true;\n  };\n  scope.edit = function (entry) {\n    scope.deviceForm = { id: entry.id, name: entry.name, ip: entry.ip, user: entry.user, password: \"\" };\n    scope.showDeviceForm = true;\n    hideRevealedPassword();\n  };\n  scope.save = function () {\n    send(\"system/vault/save\", { record: angular.copy(scope.deviceForm) });\n  };\n  scope.remove = function (entry) {\n    if (window.confirm(\"Zugangsdaten für \" + entry.name + \" löschen?\")) send(\"system/vault/delete\", { id: entry.id });\n  };\n  scope.reveal = function (entry) {\n    hideRevealedPassword();\n    send(\"system/vault/reveal\", { id: entry.id });\n  };\n  scope.changeMaster = function () {\n    if (!passwordsMatch(scope.vaultInput.newMaster, scope.vaultInput.newMaster2, \"Neue Master-Passwörter\")) return;\n    send(\"system/vault/change-master\", { newMasterPassword: scope.vaultInput.newMaster });\n  };\n  scope.changeRecovery = function () {\n    send(\"system/vault/change-recovery\", {\n      recoveryQuestion: scope.vaultInput.question,\n      recoveryAnswer: scope.vaultInput.answer\n    });\n  };\n  scope.$watch(\"msg\", function (msg) {\n    if (!msg || msg.topic !== \"system/vault/state\" || !msg.payload) return;\n    scope.vault = angular.extend({}, scope.vault, msg.payload);\n    if (msg.payload.revealed) {\n      scope.revealed = msg.payload.revealed;\n      revealTimer = setTimeout(hideRevealedPassword, 15000);\n    }\n    if (!msg.payload.error) {\n      scope.vaultInput.master = \"\";\n      scope.vaultInput.master2 = \"\";\n      scope.vaultInput.answer = \"\";\n      scope.vaultInput.newMaster = \"\";\n      scope.vaultInput.newMaster2 = \"\";\n      scope.showDeviceForm = false;\n      scope.deviceForm = {};\n    }\n  });\n  setTimeout(function () { send(\"system/vault/status\"); }, 250);\n})(scope);\n</script>\n\n<div class=\"vault\">\n  <div class=\"vault-head\">\n    <span>Verschlüsselte System-Zugangsdaten</span>\n    <span class=\"vault-status\" ng-if=\"vault.initialized\">{{vault.locked ? 'GESPERRT' : 'ENTSPERRT · automatische Sperre nach 10 Minuten'}}</span>\n  </div>\n  <div class=\"vault-body\">\n    <div class=\"vault-error\" ng-if=\"vault.error\">{{vault.error}}</div>\n    <div class=\"vault-muted\" ng-if=\"vault.initialized === null\">Tresorstatus wird geladen …</div>\n\n    <div ng-if=\"vault.initialized === false\">\n      <p>Master-Passwort und private Sicherheitsfrage festlegen.</p>\n      <div class=\"vault-form\">\n        <div class=\"vault-field\"><label>Master-Passwort (mindestens 10 Zeichen)</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.master\"></div>\n        <div class=\"vault-field\"><label>Master-Passwort wiederholen</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.master2\"></div>\n        <div class=\"vault-field wide\"><label>Private Sicherheitsfrage</label><input type=\"text\" autocomplete=\"off\" ng-model=\"vaultInput.question\"></div>\n        <div class=\"vault-field wide\"><label>Private Antwort (mindestens 12 Zeichen)</label><input type=\"password\" autocomplete=\"off\" ng-model=\"vaultInput.answer\"></div>\n      </div>\n      <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"setup()\">Tresor einrichten</button></div>\n    </div>\n\n    <div ng-if=\"vault.initialized && vault.locked\">\n      <div class=\"vault-field\"><label>Master-Passwort</label><input type=\"password\" autocomplete=\"current-password\" ng-model=\"vaultInput.master\" ng-keypress=\"$event.which === 13 && unlock()\"></div>\n      <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"unlock()\" ng-disabled=\"vault.retryAfterSeconds > 0\">Entsperren</button><button class=\"vault-link\" ng-click=\"showRecovery = !showRecovery\">Master-Passwort vergessen?</button></div>\n      <div class=\"vault-subpanel\" ng-if=\"showRecovery\">\n        <strong>{{vault.recoveryQuestion || 'Keine Sicherheitsfrage eingerichtet'}}</strong>\n        <div class=\"vault-form\" ng-if=\"vault.recoveryConfigured\">\n          <div class=\"vault-field wide\"><label>Private Antwort</label><input type=\"password\" autocomplete=\"off\" ng-model=\"vaultInput.answer\"></div>\n          <div class=\"vault-field\"><label>Neues Master-Passwort</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster\"></div>\n          <div class=\"vault-field\"><label>Wiederholen</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster2\"></div>\n        </div>\n        <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"recover()\" ng-disabled=\"!vault.recoveryConfigured || vault.retryAfterSeconds > 0\">Wiederherstellen</button></div>\n      </div>\n    </div>\n\n    <div ng-if=\"vault.initialized && !vault.locked\">\n      <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"add()\">System hinzufügen</button><button class=\"vault-btn secondary\" ng-click=\"showMaster = !showMaster\">Master-Passwort ändern</button><button class=\"vault-btn secondary\" ng-click=\"showQuestion = !showQuestion\">Sicherheitsfrage ändern</button><button class=\"vault-btn danger\" ng-click=\"lock()\">Jetzt sperren</button></div>\n      <div class=\"vault-table-wrap\" ng-if=\"vault.entries.length\">\n        <table class=\"vault-table\"><thead><tr><th>System</th><th>IP</th><th>Benutzer</th><th>Passwort</th><th>Aktionen</th></tr></thead><tbody>\n          <tr ng-repeat=\"entry in vault.entries\"><td><strong>{{entry.name}}</strong></td><td>{{entry.ip}}</td><td>{{entry.user}}</td><td><span ng-if=\"!revealed || revealed.id !== entry.id\">••••••••</span><span class=\"vault-secret\" ng-if=\"revealed && revealed.id === entry.id\">{{revealed.password}}</span></td><td><button class=\"vault-btn secondary\" ng-click=\"reveal(entry)\">15 s anzeigen</button> <button class=\"vault-btn secondary\" ng-click=\"edit(entry)\">Bearbeiten</button> <button class=\"vault-btn danger\" ng-click=\"remove(entry)\">Löschen</button></td></tr>\n        </tbody></table>\n      </div>\n      <div class=\"vault-empty\" ng-if=\"!vault.entries.length\">Noch keine Zugangsdaten gespeichert.</div>\n\n      <div class=\"vault-subpanel\" ng-if=\"showDeviceForm\">\n        <strong>{{deviceForm.id ? 'System bearbeiten' : 'System hinzufügen'}}</strong>\n        <div class=\"vault-form\">\n          <div class=\"vault-field\"><label>Name</label><input type=\"text\" ng-model=\"deviceForm.name\"></div>\n          <div class=\"vault-field\"><label>Private IP-Adresse</label><input type=\"text\" placeholder=\"192.168.0.150\" ng-model=\"deviceForm.ip\"></div>\n          <div class=\"vault-field\"><label>SSH-Benutzer</label><input type=\"text\" autocomplete=\"off\" ng-model=\"deviceForm.user\"></div>\n          <div class=\"vault-field\"><label>{{deviceForm.id ? 'Neues Passwort (leer = unverändert)' : 'Passwort'}}</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"deviceForm.password\"></div>\n        </div>\n        <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"save()\">Verschlüsselt speichern</button><button class=\"vault-btn secondary\" ng-click=\"showDeviceForm = false\">Abbrechen</button></div>\n      </div>\n\n      <div class=\"vault-subpanel\" ng-if=\"showMaster\"><div class=\"vault-form\"><div class=\"vault-field\"><label>Neues Master-Passwort</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster\"></div><div class=\"vault-field\"><label>Wiederholen</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster2\"></div></div><div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"changeMaster()\">Master-Passwort ändern</button></div></div>\n      <div class=\"vault-subpanel\" ng-if=\"showQuestion\"><div class=\"vault-form\"><div class=\"vault-field wide\"><label>Neue private Sicherheitsfrage</label><input type=\"text\" ng-model=\"vaultInput.question\"></div><div class=\"vault-field wide\"><label>Neue private Antwort</label><input type=\"password\" autocomplete=\"off\" ng-model=\"vaultInput.answer\"></div></div><div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"changeRecovery()\">Sicherheitsfrage ändern</button></div></div>\n    </div>\n\n    <div class=\"vault-note\">Der Tresor liegt AES-256-GCM-verschlüsselt außerhalb von Git. „Bearbeiten“ ändert den gespeicherten Zugang; das Passwort auf dem Raspberry Pi bleibt unverändert.</div>\n  </div>\n</div>\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 535,
+        "y": 240,
+        "wires": [
+            [
+                "system_vault_command_out"
             ]
         ]
     }

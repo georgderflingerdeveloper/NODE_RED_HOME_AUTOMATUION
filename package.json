@@ -12,9 +12,10 @@
         "library:install": "node tools/flow-source/install-library.mjs",
         "desktop:install": "node tools/install-desktop-dashboard.mjs",
         "database:check": "node tools/database-check.mjs",
-        "history:install": "node tools/install-history-node.mjs",
+        "nodes:install": "node tools/install-storage-nodes.mjs",
+        "history:install": "npm run nodes:install",
         "history:restore": "node tools/restore-history-db.mjs",
-        "flow:deploy": "npm run history:install && npm run library:install && node tools/flow-source/deploy.mjs",
+        "flow:deploy": "npm run nodes:install && npm run library:install && node tools/flow-source/deploy.mjs",
         "test": "node --test test/*.test.mjs"
     },
     "engines": {
@@ -42,7 +43,8 @@
     },
     "node-red": {
         "nodes": {
-            "home-automation-history": "nodes/home-automation-history.js"
+            "home-automation-history": "nodes/home-automation-history.js",
+            "home-automation-credential-vault": "nodes/home-automation-credential-vault.js"
         },
         "settings": {
             "flowFile": "flows.json",

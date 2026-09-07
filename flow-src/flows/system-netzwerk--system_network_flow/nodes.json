@@ -32,33 +32,52 @@
     "type": "inject",
     "z": "system_network_flow",
     "name": "Raspberry-Pi-Livewerte jede Minute abrufen",
-    "props": [{"p": "payload"}],
+    "props": [
+      {"p": "payload"},
+      {"p": "topic", "v": "system/vault/probe", "vt": "str"}
+    ],
     "repeat": "60",
     "crontab": "",
     "once": true,
     "onceDelay": "15",
-    "topic": "system/live/metrics",
+    "topic": "system/vault/probe",
     "payload": "",
     "payloadType": "date",
     "x": 270,
     "y": 420,
-    "wires": [["system_live_metrics_exec"]]
+    "wires": [["system_credential_vault"]]
   },
   {
-    "id": "system_live_metrics_exec",
-    "type": "exec",
+    "id": "system_credential_vault",
+    "type": "home-automation-credential-vault",
     "z": "system_network_flow",
-    "command": "/bin/sh -c '/usr/bin/env node \"$HOME/.node-red/projects/GEORGSHOME/tools/system-live-metrics.mjs\"'",
-    "addpay": false,
-    "append": "",
-    "useSpawn": "false",
-    "timer": "45",
-    "winHide": false,
-    "oldrc": false,
-    "name": "Livewerte per SSH lesen (ohne Passwort im Flow)",
-    "x": 570,
+    "name": "Verschlüsselter System-Zugangstresor",
+    "vaultPath": "system-credentials.vault.json",
+    "autoLockMinutes": 10,
+    "x": 585,
     "y": 420,
-    "wires": [["system_live_metrics_result"], [], []]
+    "wires": [["system_vault_response_out"], ["system_live_metrics_result"]]
+  },
+  {
+    "id": "system_vault_command_in",
+    "type": "link in",
+    "z": "system_network_flow",
+    "name": "Tresorbefehl vom SYSTEM-Dashboard",
+    "links": ["system_vault_command_out"],
+    "x": 345,
+    "y": 480,
+    "wires": [["system_credential_vault"]]
+  },
+  {
+    "id": "system_vault_response_out",
+    "type": "link out",
+    "z": "system_network_flow",
+    "name": "Tresorstatus an SYSTEM-Dashboard",
+    "mode": "link",
+    "links": ["system_vault_response_in"],
+    "x": 850,
+    "y": 480,
+    "wires": []
   },
   {
     "id": "system_live_metrics_result",

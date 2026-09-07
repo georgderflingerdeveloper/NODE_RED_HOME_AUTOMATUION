@@ -68,6 +68,7 @@ der Metadatenzeile `// nodeId:` erhalten.
 | `npm run flow:roundtrip` | isolierten bytegenauen Export/Import prüfen |
 | `npm test` | alle JavaScript-Unit-Tests ausführen |
 | `npm run library:install` | versionierte Functions nach `~/.node-red/lib/functions/HOMEAUTOMATION_NG/` installieren |
+| `npm run nodes:install` | eigene Datenbank- und Tresorknoten nach `~/.node-red/nodes/` installieren |
 | `npm run flow:deploy` | validiertes `flows.json` lokal zu Node-RED deployen |
 
 Die gleichen Befehle sind in VS Code unter **Terminal → Task ausführen** verfügbar.
@@ -136,6 +137,11 @@ Der Import erkennt auch neue oder entfernte Nodes in vorhandenen `nodes.json`-Da
 Für große strukturelle Änderungen ist der grafische Node-RED-Editor weiterhin die
 sicherste Oberfläche.
 
+## System-Zugangstresor
 
+Architektur, Zustände, Nachrichtenschnittstelle und Erweiterungsregeln der
+Passwortverwaltung stehen in [`SYSTEM_CREDENTIAL_VAULT.md`](SYSTEM_CREDENTIAL_VAULT.md).
+Änderungen am Tresor müssen die dort beschriebenen Sicherheitsregeln und die
+Tests in `test/system-credential-vault.test.mjs` einhalten.
 
 

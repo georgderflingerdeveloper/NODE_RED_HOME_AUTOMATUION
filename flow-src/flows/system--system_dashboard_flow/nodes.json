@@ -28,14 +28,54 @@
       "$flowSource": "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html"
     },
     "storeOutMessages": true,
-    "fwdInMessages": true,
+    "fwdInMessages": false,
     "resendOnRefresh": true,
     "templateScope": "local",
     "className": "",
     "x": 535,
     "y": 180,
-    "wires": [
-      []
-    ]
+    "wires": [[]]
+  },
+  {
+    "id": "system_vault_dashboard_template",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "system_dashboard_group",
+    "name": "Verschlüsselte System-Zugangsdaten",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/zugangsdaten-tresor.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 535,
+    "y": 240,
+    "wires": [["system_vault_command_out"]]
+  },
+  {
+    "id": "system_vault_command_out",
+    "type": "link out",
+    "z": "system_dashboard_flow",
+    "name": "Tresorbefehl an Systemnetz",
+    "mode": "link",
+    "links": ["system_vault_command_in"],
+    "x": 795,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "system_vault_response_in",
+    "type": "link in",
+    "z": "system_dashboard_flow",
+    "name": "Tresorstatus vom Systemnetz",
+    "links": ["system_vault_response_out"],
+    "x": 275,
+    "y": 240,
+    "wires": [["system_vault_dashboard_template"]]
   }
 ]

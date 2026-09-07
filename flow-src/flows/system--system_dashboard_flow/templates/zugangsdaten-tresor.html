@@ -1,0 +1,186 @@
+<style>
+  .vault { width: 100%; box-sizing: border-box; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; border: 1px solid #405b5f; border-radius: 13px; background: #1d2d2f; overflow: hidden; }
+  .vault-head, .vault-actions { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .vault-head { padding: 13px 15px; border-bottom: 1px solid #395357; background: #20383b; color: #fff; font-weight: 700; font-size: 14px; }
+  .vault-body { padding: 13px 15px; }
+  .vault-status, .vault-muted { color: #a9c4c6; font-size: 12px; }
+  .vault-error { margin: 12px 0; padding: 10px 12px; border-radius: 8px; background: #5a2525; color: #ffd4cf; }
+  .vault-form { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 12px; }
+  .vault-field { display: flex; flex-direction: column; gap: 5px; }
+  .vault-field.wide { grid-column: 1 / -1; }
+  .vault-field label { font-size: 11px; color: #b7ced0; }
+  .vault-field input { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #526d71; border-radius: 7px; background: #132629; color: #fff; }
+  .vault-actions { justify-content: flex-start; margin-top: 12px; }
+  .vault-btn { border: 1px solid #4d7378; border-radius: 7px; padding: 8px 11px; background: #0b5960; color: #fff; cursor: pointer; }
+  .vault-btn.secondary { background: #283f43; }
+  .vault-btn.danger { background: #71342d; }
+  .vault-btn:disabled { opacity: .45; }
+  .vault-link { border: 0; background: none; color: #73dfe5; text-decoration: underline; cursor: pointer; }
+  .vault-subpanel, .vault-note { margin-top: 14px; padding: 13px; border: 1px solid #395357; border-radius: 9px; background: #182d30; }
+  .vault-note { border-left: 3px solid #61d6dd; color: #b7ced0; font-size: 12px; }
+  .vault-table-wrap { width: 100%; margin-top: 14px; overflow-x: auto; border: 1px solid #456367; border-radius: 9px; }
+  .vault-table { width: 100%; min-width: 700px; border-collapse: collapse; }
+  .vault-table th { padding: 11px 12px; background: #0b5960; color: #fff; text-align: left; font-size: 12px; }
+  .vault-table td { padding: 11px 12px; border-top: 1px solid #395357; font-size: 12px; vertical-align: top; }
+  .vault-secret { font-family: monospace; color: #ffe6a8; word-break: break-all; }
+  .vault-empty { padding: 20px; color: #9bb5b8; text-align: center; }
+  @media (max-width: 600px) { .vault-form { grid-template-columns: 1fr; } .vault-field.wide { grid-column: auto; } }
+</style>
+
+<script>
+(function (scope) {
+  scope.vault = { initialized: null, locked: true, entries: [] };
+  scope.vaultInput = {};
+  scope.deviceForm = {};
+  var revealTimer;
+
+  function send(topic, payload) {
+    scope.vault.error = null;
+    scope.send({ topic: topic, payload: payload || {} });
+  }
+  function passwordsMatch(left, right, label) {
+    if (!left || left !== right) {
+      scope.vault.error = label + " stimmen nicht überein";
+      return false;
+    }
+    return true;
+  }
+  function hideRevealedPassword() {
+    scope.revealed = null;
+    if (revealTimer) clearTimeout(revealTimer);
+    scope.$applyAsync();
+  }
+
+  scope.setup = function () {
+    if (!passwordsMatch(scope.vaultInput.master, scope.vaultInput.master2, "Master-Passwörter")) return;
+    send("system/vault/setup", {
+      masterPassword: scope.vaultInput.master,
+      recoveryQuestion: scope.vaultInput.question,
+      recoveryAnswer: scope.vaultInput.answer
+    });
+  };
+  scope.unlock = function () {
+    send("system/vault/unlock", { masterPassword: scope.vaultInput.master });
+  };
+  scope.lock = function () {
+    hideRevealedPassword();
+    send("system/vault/lock");
+  };
+  scope.recover = function () {
+    if (!passwordsMatch(scope.vaultInput.newMaster, scope.vaultInput.newMaster2, "Neue Master-Passwörter")) return;
+    send("system/vault/recover", {
+      recoveryAnswer: scope.vaultInput.answer,
+      newMasterPassword: scope.vaultInput.newMaster
+    });
+  };
+  scope.add = function () {
+    scope.deviceForm = {};
+    scope.showDeviceForm = true;
+  };
+  scope.edit = function (entry) {
+    scope.deviceForm = { id: entry.id, name: entry.name, ip: entry.ip, user: entry.user, password: "" };
+    scope.showDeviceForm = true;
+    hideRevealedPassword();
+  };
+  scope.save = function () {
+    send("system/vault/save", { record: angular.copy(scope.deviceForm) });
+  };
+  scope.remove = function (entry) {
+    if (window.confirm("Zugangsdaten für " + entry.name + " löschen?")) send("system/vault/delete", { id: entry.id });
+  };
+  scope.reveal = function (entry) {
+    hideRevealedPassword();
+    send("system/vault/reveal", { id: entry.id });
+  };
+  scope.changeMaster = function () {
+    if (!passwordsMatch(scope.vaultInput.newMaster, scope.vaultInput.newMaster2, "Neue Master-Passwörter")) return;
+    send("system/vault/change-master", { newMasterPassword: scope.vaultInput.newMaster });
+  };
+  scope.changeRecovery = function () {
+    send("system/vault/change-recovery", {
+      recoveryQuestion: scope.vaultInput.question,
+      recoveryAnswer: scope.vaultInput.answer
+    });
+  };
+  scope.$watch("msg", function (msg) {
+    if (!msg || msg.topic !== "system/vault/state" || !msg.payload) return;
+    scope.vault = angular.extend({}, scope.vault, msg.payload);
+    if (msg.payload.revealed) {
+      scope.revealed = msg.payload.revealed;
+      revealTimer = setTimeout(hideRevealedPassword, 15000);
+    }
+    if (!msg.payload.error) {
+      scope.vaultInput.master = "";
+      scope.vaultInput.master2 = "";
+      scope.vaultInput.answer = "";
+      scope.vaultInput.newMaster = "";
+      scope.vaultInput.newMaster2 = "";
+      scope.showDeviceForm = false;
+      scope.deviceForm = {};
+    }
+  });
+  setTimeout(function () { send("system/vault/status"); }, 250);
+})(scope);
+</script>
+
+<div class="vault">
+  <div class="vault-head">
+    <span>Verschlüsselte System-Zugangsdaten</span>
+    <span class="vault-status" ng-if="vault.initialized">{{vault.locked ? 'GESPERRT' : 'ENTSPERRT · automatische Sperre nach 10 Minuten'}}</span>
+  </div>
+  <div class="vault-body">
+    <div class="vault-error" ng-if="vault.error">{{vault.error}}</div>
+    <div class="vault-muted" ng-if="vault.initialized === null">Tresorstatus wird geladen …</div>
+
+    <div ng-if="vault.initialized === false">
+      <p>Master-Passwort und private Sicherheitsfrage festlegen.</p>
+      <div class="vault-form">
+        <div class="vault-field"><label>Master-Passwort (mindestens 10 Zeichen)</label><input type="password" autocomplete="new-password" ng-model="vaultInput.master"></div>
+        <div class="vault-field"><label>Master-Passwort wiederholen</label><input type="password" autocomplete="new-password" ng-model="vaultInput.master2"></div>
+        <div class="vault-field wide"><label>Private Sicherheitsfrage</label><input type="text" autocomplete="off" ng-model="vaultInput.question"></div>
+        <div class="vault-field wide"><label>Private Antwort (mindestens 12 Zeichen)</label><input type="password" autocomplete="off" ng-model="vaultInput.answer"></div>
+      </div>
+      <div class="vault-actions"><button class="vault-btn" ng-click="setup()">Tresor einrichten</button></div>
+    </div>
+
+    <div ng-if="vault.initialized && vault.locked">
+      <div class="vault-field"><label>Master-Passwort</label><input type="password" autocomplete="current-password" ng-model="vaultInput.master" ng-keypress="$event.which === 13 && unlock()"></div>
+      <div class="vault-actions"><button class="vault-btn" ng-click="unlock()" ng-disabled="vault.retryAfterSeconds > 0">Entsperren</button><button class="vault-link" ng-click="showRecovery = !showRecovery">Master-Passwort vergessen?</button></div>
+      <div class="vault-subpanel" ng-if="showRecovery">
+        <strong>{{vault.recoveryQuestion || 'Keine Sicherheitsfrage eingerichtet'}}</strong>
+        <div class="vault-form" ng-if="vault.recoveryConfigured">
+          <div class="vault-field wide"><label>Private Antwort</label><input type="password" autocomplete="off" ng-model="vaultInput.answer"></div>
+          <div class="vault-field"><label>Neues Master-Passwort</label><input type="password" autocomplete="new-password" ng-model="vaultInput.newMaster"></div>
+          <div class="vault-field"><label>Wiederholen</label><input type="password" autocomplete="new-password" ng-model="vaultInput.newMaster2"></div>
+        </div>
+        <div class="vault-actions"><button class="vault-btn" ng-click="recover()" ng-disabled="!vault.recoveryConfigured || vault.retryAfterSeconds > 0">Wiederherstellen</button></div>
+      </div>
+    </div>
+
+    <div ng-if="vault.initialized && !vault.locked">
+      <div class="vault-actions"><button class="vault-btn" ng-click="add()">System hinzufügen</button><button class="vault-btn secondary" ng-click="showMaster = !showMaster">Master-Passwort ändern</button><button class="vault-btn secondary" ng-click="showQuestion = !showQuestion">Sicherheitsfrage ändern</button><button class="vault-btn danger" ng-click="lock()">Jetzt sperren</button></div>
+      <div class="vault-table-wrap" ng-if="vault.entries.length">
+        <table class="vault-table"><thead><tr><th>System</th><th>IP</th><th>Benutzer</th><th>Passwort</th><th>Aktionen</th></tr></thead><tbody>
+          <tr ng-repeat="entry in vault.entries"><td><strong>{{entry.name}}</strong></td><td>{{entry.ip}}</td><td>{{entry.user}}</td><td><span ng-if="!revealed || revealed.id !== entry.id">••••••••</span><span class="vault-secret" ng-if="revealed && revealed.id === entry.id">{{revealed.password}}</span></td><td><button class="vault-btn secondary" ng-click="reveal(entry)">15 s anzeigen</button> <button class="vault-btn secondary" ng-click="edit(entry)">Bearbeiten</button> <button class="vault-btn danger" ng-click="remove(entry)">Löschen</button></td></tr>
+        </tbody></table>
+      </div>
+      <div class="vault-empty" ng-if="!vault.entries.length">Noch keine Zugangsdaten gespeichert.</div>
+
+      <div class="vault-subpanel" ng-if="showDeviceForm">
+        <strong>{{deviceForm.id ? 'System bearbeiten' : 'System hinzufügen'}}</strong>
+        <div class="vault-form">
+          <div class="vault-field"><label>Name</label><input type="text" ng-model="deviceForm.name"></div>
+          <div class="vault-field"><label>Private IP-Adresse</label><input type="text" placeholder="192.168.0.150" ng-model="deviceForm.ip"></div>
+          <div class="vault-field"><label>SSH-Benutzer</label><input type="text" autocomplete="off" ng-model="deviceForm.user"></div>
+          <div class="vault-field"><label>{{deviceForm.id ? 'Neues Passwort (leer = unverändert)' : 'Passwort'}}</label><input type="password" autocomplete="new-password" ng-model="deviceForm.password"></div>
+        </div>
+        <div class="vault-actions"><button class="vault-btn" ng-click="save()">Verschlüsselt speichern</button><button class="vault-btn secondary" ng-click="showDeviceForm = false">Abbrechen</button></div>
+      </div>
+
+      <div class="vault-subpanel" ng-if="showMaster"><div class="vault-form"><div class="vault-field"><label>Neues Master-Passwort</label><input type="password" autocomplete="new-password" ng-model="vaultInput.newMaster"></div><div class="vault-field"><label>Wiederholen</label><input type="password" autocomplete="new-password" ng-model="vaultInput.newMaster2"></div></div><div class="vault-actions"><button class="vault-btn" ng-click="changeMaster()">Master-Passwort ändern</button></div></div>
+      <div class="vault-subpanel" ng-if="showQuestion"><div class="vault-form"><div class="vault-field wide"><label>Neue private Sicherheitsfrage</label><input type="text" ng-model="vaultInput.question"></div><div class="vault-field wide"><label>Neue private Antwort</label><input type="password" autocomplete="off" ng-model="vaultInput.answer"></div></div><div class="vault-actions"><button class="vault-btn" ng-click="changeRecovery()">Sicherheitsfrage ändern</button></div></div>
+    </div>
+
+    <div class="vault-note">Der Tresor liegt AES-256-GCM-verschlüsselt außerhalb von Git. „Bearbeiten“ ändert den gespeicherten Zugang; das Passwort auf dem Raspberry Pi bleibt unverändert.</div>
+  </div>
+</div>
