@@ -8,13 +8,19 @@ nicht committete Änderungen ohne Terminal sofort erkennbar.
 
 ## Datenfluss
 
-1. `system_project_info_schedule` fordert die Information beim Start und jede Minute an.
-2. `home-automation-project-info` liest ausschließlich lokale Metadaten.
-3. `version-und-kurzinfo.html` setzt Version, Branch und den Info-Schalter in
-   die oberste Dashboard-Statusleiste und zeigt den aufklappbaren Überblick.
+1. `home-automation-project-info` liest ausschließlich lokale Metadaten.
+2. Der nur lesende Endpunkt `/home-automation/project-info` stellt diese
+   ungefährlichen Versionsdaten dem Dashboard bereit.
+3. `version-und-kurzinfo.html` liest den Endpunkt beim Laden und jede Minute,
+   setzt Version, Branch und den Info-Schalter in die oberste
+   Dashboard-Statusleiste und zeigt den aufklappbaren Überblick.
 
-Der Knoten führt nur lesende Git-Befehle aus und verändert weder Branch noch
-Dateien.
+Der vorhandene Flow-Aufruf bleibt zusätzlich für Node-RED-Diagnose und
+Erweiterungen erhalten. Das globale Dashboard-Template hängt dadurch nicht vom
+Angular-Kontext einer bestimmten Dashboard-Seite ab.
+
+Knoten und Endpunkt führen nur lesende Git-Befehle aus und verändern weder
+Branch noch Dateien. Passwörter und Tresordaten werden nicht ausgeliefert.
 
 ## Angezeigte Werte
 

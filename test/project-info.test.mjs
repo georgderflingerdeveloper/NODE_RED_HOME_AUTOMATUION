@@ -8,6 +8,7 @@ import test from "node:test";
 
 const require = createRequire(import.meta.url);
 const { activeProjectName, branchPurpose, projectInfo, resolveProjectRoot } = require("../nodes/home-automation-project-info-core.cjs");
+const registerProjectInfo = require("../nodes/home-automation-project-info.js");
 
 function repositoryFixture() {
   const userDir = mkdtempSync(join(tmpdir(), "home-automation-info-"));
@@ -56,7 +57,31 @@ test("Versionsinfo wird in der obersten Dashboard-Statusleiste installiert", () 
   ), "utf8");
   assert.match(template, /querySelector\("\.md-toolbar-tools"\)/);
   assert.match(template, /Was macht dieser Branch\?/);
-  assert.match(template, /source\.branchPurpose/);
+  assert.match(template, /fetch\("\/home-automation\/project-info"/);
+});
+
+test("Dashboard kann Projektinformation über einen nur lesenden Endpunkt laden", () => {
+  let route = "";
+  let handler = null;
+  let payload = null;
+  let cacheControl = "";
+  registerProjectInfo({
+    settings: { userDir: process.cwd(), flowFile: join(process.cwd(), "flows.json") },
+    version: () => "5.0.6",
+    httpNode: { get(path, callback) { route = path; handler = callback; } },
+    nodes: { registerType() {} },
+  });
+
+  assert.equal(route, "/home-automation/project-info");
+  assert.equal(typeof handler, "function");
+  handler({}, {
+    set(name, value) { if (name === "Cache-Control") cacheControl = value; },
+    json(value) { payload = value; },
+    status() { throw new Error("Der Endpunkt darf im Test nicht fehlschlagen"); },
+  });
+  assert.equal(cacheControl, "no-store");
+  assert.equal(payload.runtime.nodeRedVersion, "5.0.6");
+  assert.equal(typeof payload.source.branchPurpose, "string");
 });
 
 test("nicht committete Änderungen werden in der Versionsinfo sichtbar", (t) => {

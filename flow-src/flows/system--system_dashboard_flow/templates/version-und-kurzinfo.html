@@ -20,7 +20,7 @@
 </style>
 
 <script>
-(function(scope) {
+(function() {
   var latest = null;
 
   function element(tag, className) {
@@ -113,14 +113,31 @@
     });
   }
 
-  scope.$watch("msg", function(msg) {
-    if (msg && msg.topic === "system/project/info" && msg.payload) {
-      latest = msg.payload;
+  function loadProjectInfo() {
+    ensureStatus();
+    fetch("/home-automation/project-info", {
+      cache: "no-store",
+      credentials: "same-origin"
+    })
+    .then(function(response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.json();
+    })
+    .then(function(payload) {
+      latest = payload;
       render();
-    }
-  });
+    })
+    .catch(function(error) {
+      var status = ensureStatus();
+      if (status) {
+        value(status, ".ha-status-name", "Projektinfo nicht erreichbar");
+        status.title = error.message || String(error);
+      }
+    });
+  }
+
   if (document.homeAutomationProjectInfoInterval) clearInterval(document.homeAutomationProjectInfoInterval);
-  document.homeAutomationProjectInfoInterval = setInterval(render, 2000);
-  setTimeout(render, 250);
-})(scope);
+  document.homeAutomationProjectInfoInterval = setInterval(loadProjectInfo, 60000);
+  setTimeout(loadProjectInfo, 250);
+})();
 </script>
