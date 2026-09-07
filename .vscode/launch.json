@@ -18,13 +18,13 @@
             "type": "node",
             "request": "launch",
             "name": "Unit-Tests (alle)",
+            "cwd": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "runtimeArgs": [
                 "--test"
-            ],
-            "program": "${workspaceFolder}/test/*.test.mjs"
+            ]
         },
         {
             "type": "node",
