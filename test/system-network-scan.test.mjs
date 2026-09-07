@@ -79,3 +79,15 @@ test("Live-Systemwerte werden sicher übernommen und lösen ein Dashboard-Update
   assert.equal(result.liveMetricsUpdate, true);
   assert.equal(flow.get("systemLiveMetrics")["192.168.0.150"].temperatureC, 45.5);
 });
+
+test("Fehler der SSH-Teilnehmerabfrage werden sichtbar statt verschluckt", async () => {
+  const { result, flow, statuses, warnings } = await runFunctionNode("system_live_metrics_result", {
+    msg: { payload: JSON.stringify({ devices: [], error: "Zugangsdaten nicht gefunden" }) },
+  });
+
+  assert.equal(result.liveMetricsUpdate, true);
+  assert.equal(result.liveMetricsError, "Zugangsdaten nicht gefunden");
+  assert.equal(flow.get("systemLiveMetricsError"), "Zugangsdaten nicht gefunden");
+  assert.equal(statuses.at(-1).fill, "red");
+  assert.match(warnings.at(-1), /Zugangsdaten nicht gefunden/);
+});

@@ -1,11 +1,21 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
-const credentialsFile = process.env.SYSTEM_CREDENTIALS_FILE
-  || path.join(homedir(), "Desktop", "Raspberry-Pi-Zugangsdaten.html");
+function findCredentialsFile() {
+  const configured = process.env.SYSTEM_CREDENTIALS_FILE;
+  const candidates = [
+    configured,
+    path.join(homedir(), "Schreibtisch", "Raspberry-Pi-Zugangsdaten.html"),
+    path.join(homedir(), "Desktop", "Raspberry-Pi-Zugangsdaten.html"),
+    path.join(homedir(), "Dokumente", "Raspberry-Pi-Zugangsdaten.html"),
+    path.join(homedir(), "Documents", "Raspberry-Pi-Zugangsdaten.html"),
+  ].filter(Boolean);
+
+  return candidates.find((candidate) => existsSync(candidate)) || null;
+}
 
 function htmlText(value) {
   return value
@@ -34,22 +44,31 @@ expect {
 
 function probe({ ip, user, password }) {
   return new Promise((resolve) => {
+    if (!user || !password) {
+      resolve({ ip, online: false, error: "SSH-Benutzer oder Passwort fehlt" });
+      return;
+    }
+
     const child = spawn("/usr/bin/expect", ["-c", expectScript], {
       env: { ...process.env, SSH_USER: user, SSH_IP: ip, SSH_PASSWORD: password },
-      stdio: ["ignore", "pipe", "ignore"],
+      stdio: ["ignore", "pipe", "pipe"],
     });
     let output = "";
+    let errorOutput = "";
     child.stdout.on("data", (chunk) => { output += chunk; });
-    child.on("error", () => resolve({ ip, online: false }));
+    child.stderr.on("data", (chunk) => { errorOutput += chunk; });
+    child.on("error", (error) => resolve({ ip, online: false, error: error.message }));
     child.on("close", (code) => {
       const value = (key) => (output.match(new RegExp(`${key}=([^\\r\\n]+)`)) || [])[1]?.trim() || null;
       const temperatureText = value("TEMP");
       const temperatureMatch = temperatureText?.match(/(-?\d+(?:\.\d+)?)/);
       const memoryMatch = value("MEM")?.match(/(\d+)\/(\d+)/);
       const diskMatch = value("DISK")?.match(/(\d+)\/(\d+)/);
+      const online = code === 0 && Boolean(value("HOST"));
+      const diagnostic = errorOutput.replace(/\s+/g, " ").trim().slice(0, 240);
       resolve({
         ip,
-        online: code === 0 && Boolean(value("HOST")),
+        online,
         hostname: value("HOST"),
         temperatureC: temperatureMatch ? Number(temperatureMatch[1]) : null,
         memoryUsedPercent: memoryMatch ? (Number(memoryMatch[1]) / Number(memoryMatch[2])) * 100 : null,
@@ -57,15 +76,33 @@ function probe({ ip, user, password }) {
         uptimeSeconds: Number(value("UPTIME")) || null,
         loadAverage: Number(value("LOAD")) || null,
         observedAt: new Date().toISOString(),
+        error: online ? null : (diagnostic || `SSH-Abfrage fehlgeschlagen (Code ${code})`),
       });
     });
   });
 }
 
 try {
+  const credentialsFile = findCredentialsFile();
+  if (!credentialsFile) {
+    throw new Error("Raspberry-Pi-Zugangsdaten.html wurde weder unter Schreibtisch/Desktop noch unter Dokumente/Documents gefunden");
+  }
   const credentials = sshCredentials(readFileSync(credentialsFile, "utf8"));
+  if (!credentials.length) {
+    throw new Error(`Keine SSH-Teilnehmer in ${credentialsFile} gefunden`);
+  }
   const results = await Promise.all(credentials.map(probe));
-  process.stdout.write(JSON.stringify({ source: "ssh", observedAt: new Date().toISOString(), devices: results }));
-} catch {
-  process.stdout.write(JSON.stringify({ source: "ssh", observedAt: new Date().toISOString(), devices: [] }));
+  process.stdout.write(JSON.stringify({
+    source: "ssh",
+    credentialsFile,
+    observedAt: new Date().toISOString(),
+    devices: results,
+  }));
+} catch (error) {
+  process.stdout.write(JSON.stringify({
+    source: "ssh",
+    observedAt: new Date().toISOString(),
+    devices: [],
+    error: error instanceof Error ? error.message : String(error),
+  }));
 }
