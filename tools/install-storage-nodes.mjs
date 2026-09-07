@@ -12,7 +12,10 @@ const files = [
   "home-automation-history.schema.sql",
   "home-automation-credential-vault-core.cjs",
   "home-automation-credential-vault.js",
-  "home-automation-credential-vault.html"
+  "home-automation-credential-vault.html",
+  "home-automation-project-info-core.cjs",
+  "home-automation-project-info.js",
+  "home-automation-project-info.html"
 ];
 
 await mkdir(targetDirectory, { recursive: true });

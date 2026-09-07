@@ -1,7 +1,7 @@
 {
     "name": "node-red-project",
-    "description": "A Node-RED Project",
-    "version": "0.0.1",
+    "description": "GEORGSHOME Home Automation",
+    "version": "0.1.0",
     "private": true,
     "scripts": {
         "flow:export": "node tools/flow-source/export.mjs",
@@ -44,7 +44,8 @@
     "node-red": {
         "nodes": {
             "home-automation-history": "nodes/home-automation-history.js",
-            "home-automation-credential-vault": "nodes/home-automation-credential-vault.js"
+            "home-automation-credential-vault": "nodes/home-automation-credential-vault.js",
+            "home-automation-project-info": "nodes/home-automation-project-info.js"
         },
         "settings": {
             "flowFile": "flows.json",

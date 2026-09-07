@@ -144,4 +144,9 @@ Passwortverwaltung stehen in [`SYSTEM_CREDENTIAL_VAULT.md`](SYSTEM_CREDENTIAL_VA
 Änderungen am Tresor müssen die dort beschriebenen Sicherheitsregeln und die
 Tests in `test/system-credential-vault.test.mjs` einhalten.
 
+## Projekt- und Versionsinformation
+
+Die Herkunft von App-Version, aktivem Projekt, Branch und Commit sowie die
+Regeln zur Erweiterung stehen in
+[`PROJECT_VERSION_INFO.md`](PROJECT_VERSION_INFO.md).
 

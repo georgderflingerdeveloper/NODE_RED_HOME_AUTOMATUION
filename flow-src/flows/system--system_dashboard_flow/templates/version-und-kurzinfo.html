@@ -1,0 +1,58 @@
+<style>
+  .project-info { width: 100%; box-sizing: border-box; margin-bottom: 12px; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; }
+  .project-info-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid #405b5f; border-radius: 11px; background: #182d30; }
+  .project-info-name { margin-right: auto; color: #fff; font-weight: 700; }
+  .project-info-chip { padding: 5px 9px; border-radius: 999px; background: #29464a; color: #c9dfe1; font-size: 11px; }
+  .project-info-chip.branch { background: #0b5960; color: #fff; }
+  .project-info-chip.dirty { background: #75561d; color: #ffe9b6; }
+  .project-info-button { width: 30px; height: 30px; border: 1px solid #61d6dd; border-radius: 50%; background: transparent; color: #73dfe5; font-size: 17px; font-weight: 700; cursor: pointer; }
+  .project-info-panel { margin-top: 8px; padding: 14px; border: 1px solid #456367; border-radius: 11px; background: #1d2d2f; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
+  .project-info-panel h3 { margin: 0 0 10px; color: #fff; font-size: 16px; }
+  .project-info-grid { display: grid; grid-template-columns: repeat(2, minmax(200px,1fr)); gap: 8px 18px; }
+  .project-info-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid #395357; font-size: 12px; }
+  .project-info-label { color: #9bb5b8; }
+  .project-info-value { color: #fff; text-align: right; font-family: monospace; }
+  .project-info-overview { margin: 12px 0 0; padding-left: 20px; color: #c9dfe1; font-size: 12px; line-height: 1.6; }
+  @media (max-width: 700px) { .project-info-grid { grid-template-columns: 1fr; } .project-info-name { width: 100%; } }
+</style>
+
+<script>
+(function (scope) {
+  scope.projectInfo = {
+    application: {},
+    runtime: {},
+    source: {},
+    overview: []
+  };
+  scope.infoOpen = false;
+  scope.$watch("msg", function (msg) {
+    if (msg && msg.topic === "system/project/info" && msg.payload) scope.projectInfo = msg.payload;
+  });
+})(scope);
+</script>
+
+<div class="project-info">
+  <div class="project-info-bar">
+    <span class="project-info-name">{{projectInfo.application.name || 'Home Automation'}}</span>
+    <span class="project-info-chip">Version {{projectInfo.application.version || '—'}}</span>
+    <span class="project-info-chip">Projekt {{projectInfo.source.project || '—'}}</span>
+    <span class="project-info-chip branch">Branch {{projectInfo.source.branch || '—'}}</span>
+    <span class="project-info-chip" ng-class="{'dirty': projectInfo.source.dirty}">{{projectInfo.source.dirty ? projectInfo.source.changedFiles + ' Änderungen' : projectInfo.source.commit || '—'}}</span>
+    <button class="project-info-button" title="Kurzinfo und technischer Überblick" aria-label="Kurzinfo öffnen" ng-click="infoOpen = !infoOpen">i</button>
+  </div>
+
+  <div class="project-info-panel" ng-if="infoOpen">
+    <h3>Kurzinfo · Technischer Überblick</h3>
+    <div class="project-info-grid">
+      <div class="project-info-row"><span class="project-info-label">App-Version</span><span class="project-info-value">{{projectInfo.application.version}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Aktives Projekt</span><span class="project-info-value">{{projectInfo.source.project}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Git-Branch</span><span class="project-info-value">{{projectInfo.source.branch}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Commit</span><span class="project-info-value">{{projectInfo.source.commit}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Node-RED</span><span class="project-info-value">{{projectInfo.runtime.nodeRedVersion}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Node.js</span><span class="project-info-value">{{projectInfo.runtime.nodeVersion}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Plattform</span><span class="project-info-value">{{projectInfo.runtime.platform}}</span></div>
+      <div class="project-info-row"><span class="project-info-label">Arbeitsbaum</span><span class="project-info-value">{{projectInfo.source.dirty ? projectInfo.source.changedFiles + ' nicht committete Dateien' : 'sauber'}}</span></div>
+    </div>
+    <ul class="project-info-overview"><li ng-repeat="item in projectInfo.overview">{{item}}</li></ul>
+  </div>
+</div>
