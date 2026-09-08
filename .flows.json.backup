@@ -146,6 +146,38 @@
         "info": "Eigenständiger Wetter-Flow für Reindlmühl bei Altmünster am Traunsee mit Open-Meteo. Stündliche Aktualisierung, sicherer Ausfallzustand und strukturierte Payload für spätere Gerätesteuerungen."
     },
     {
+        "id": "kosten_flow",
+        "type": "tab",
+        "label": "KOSTEN",
+        "disabled": false,
+        "info": "Schritt 1: aWATTar-Börsenpreise abrufen. Der aktuelle Preis wird als aWATTarCurrentTariff im Flow- und Global-Context gespeichert.",
+        "env": []
+    },
+    {
+        "id": "datenbank_flow",
+        "type": "tab",
+        "label": "DATENBANK",
+        "disabled": false,
+        "info": "Projektlokale SQLite-Historie für fachliche Telemetrie, Tarife und Kosten. Datenbankdatei und Backups sind von Git ausgeschlossen.",
+        "env": []
+    },
+    {
+        "id": "system_dashboard_flow",
+        "type": "tab",
+        "label": "SYSTEM",
+        "disabled": false,
+        "info": "Dashboard-Vorlage für Netzwerk-, Raspberry-Pi- und Phidget-Status. Die technische Erfassung wird in einem separaten Schritt ergänzt.",
+        "env": []
+    },
+    {
+        "id": "system_network_flow",
+        "type": "tab",
+        "label": "System · Netzwerk-Scan",
+        "disabled": false,
+        "info": "Eigenständiger, gedrosselter ICMP-Scan des lokalen /24-Heimnetzes. Es werden nur erreichbare Geräte an das SYSTEM-Dashboard gemeldet; nicht antwortende IP-Adressen werden nicht als Geräte interpretiert.",
+        "env": []
+    },
+    {
         "id": "f6dd1fca.6c306",
         "type": "subflow",
         "name": "SUB_ANTEROOM_MAIN_LIGHT",
@@ -2021,7 +2053,7 @@
         ],
         "x": 2154,
         "y": 39,
-        "w": 362,
+        "w": 352,
         "h": 82
     },
     {
@@ -2364,9 +2396,9 @@
             "65acd935.85f9b8",
             "d3afa9e1.b3b358"
         ],
-        "x": 974,
+        "x": 964,
         "y": 699,
-        "w": 232,
+        "w": 252,
         "h": 242
     },
     {
@@ -2781,6 +2813,46 @@
         "type": "ui_group",
         "name": "WETTERÜBERSICHT",
         "tab": "weather_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "kosten_dashboard_tab",
+        "type": "ui_tab",
+        "name": "KOSTEN",
+        "icon": "euro_symbol",
+        "order": 14,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "kosten_dashboard_group",
+        "type": "ui_group",
+        "name": "STROMKOSTEN",
+        "tab": "kosten_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "system_dashboard_tab",
+        "type": "ui_tab",
+        "name": "SYSTEM",
+        "icon": "dns",
+        "order": 15,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "system_dashboard_group",
+        "type": "ui_group",
+        "name": "TECHNISCHE ÜBERSICHT",
+        "tab": "system_dashboard_tab",
         "order": 1,
         "disp": true,
         "width": "18",
@@ -6371,7 +6443,9 @@
         "active": true,
         "x": 1360,
         "y": 60,
-        "wires": []
+        "wires": [
+            []
+        ]
     },
     {
         "id": "2a0fb1c8.57c7ae",
@@ -8063,7 +8137,7 @@
         "type": "function",
         "z": "b86cb602995b0261",
         "name": "GetExcessPower",
-        "func": "// === Konfiguration ===\n// Am installierten SolarEdge-Meter: Export positiv, Import negativ\nconst IMPORT_POS_EXPORT_NEG = false;\n\n// Eingänge prüfen\nconst PvPowerWatt = Number(msg.payload?.PvPowerWatt);\nconst GridPowerWatt = Number(msg.payload?.GridPowerWatt);\nif (!Number.isFinite(PvPowerWatt) || !Number.isFinite(GridPowerWatt)) { return null; }\n\n// Hauslast & Überschuss\nconst HouseConsumptionWatt = PvPowerWatt - GridPowerWatt;\n\nlet ExcessPowerWatt;\nif (IMPORT_POS_EXPORT_NEG) {\n    // Export ist negativ → Überschuss ist der negative Anteil\n    ExcessPowerWatt = Math.max(0, -GridPowerWatt);\n} else {\n    // Export ist positiv → Überschuss ist der positive Anteil\n    ExcessPowerWatt = Math.max(0, GridPowerWatt);\n}\n\n// Energieintegration (Wh)\nconst nowMs = Date.now();\nconst lastMs = context.get('lastMs') || nowMs;\nconst dt_h = (nowMs - lastMs) / 3600000; // Stunden\n\nconst lastExcessPowerWatt = context.get('lastExcessPowerWatt');\nlet ExcessEnergyWhTotal = context.get('ExcessEnergyWhTotal') || 0;\n\n// Tagesreset\nconst lastDay = context.get('lastDay') || new Date(nowMs).toDateString();\nconst today = new Date(nowMs).toDateString();\nlet ExcessEnergyWhToday = context.get('ExcessEnergyWhToday') || 0;\nif (today !== lastDay) {\n    ExcessEnergyWhToday = 0;\n}\n\n// Integration per Trapezregel\nif (Number.isFinite(lastExcessPowerWatt)) {\n    const dWh = ((lastExcessPowerWatt + ExcessPowerWatt) / 2) * dt_h;\n    ExcessEnergyWhTotal += dWh;\n    ExcessEnergyWhToday += dWh;\n}\n\n// Zustände speichern\ncontext.set('lastMs', nowMs);\ncontext.set('lastExcessPowerWatt', ExcessPowerWatt);\ncontext.set('ExcessEnergyWhTotal', ExcessEnergyWhTotal);\ncontext.set('ExcessEnergyWhToday', ExcessEnergyWhToday);\ncontext.set('lastDay', today);\n\n// Ausgabe\nmsg.payload = {\n    PvPowerWatt,\n    GridPowerWatt,\n    HouseConsumptionWatt,\n    ExcessPowerWatt,\n    ExcessEnergyWhTotal,\n    ExcessEnergyKWhTotal: ExcessEnergyWhTotal / 1000,\n    ExcessEnergyWhToday,\n    ExcessEnergyKWhToday: ExcessEnergyWhToday / 1000,\n    timestamp: nowMs\n};\nreturn msg;\n",
+        "func": "// === Konfiguration ===\n// Am installierten SolarEdge-Meter: Export positiv, Import negativ\nconst IMPORT_POS_EXPORT_NEG = false;\n\n// Eingänge prüfen\nconst PvPowerWatt = Number(msg.payload?.PvPowerWatt);\nconst GridPowerWatt = Number(msg.payload?.GridPowerWatt);\nif (!Number.isFinite(PvPowerWatt) || !Number.isFinite(GridPowerWatt)) { return null; }\n\n// Hauslast berücksichtigt beide Netzrichtungen:\n// PV + Netzbezug - Einspeisung = aktuelle Gesamtleistungsaufnahme des Hauses.\nconst GridImportWatt = Math.max(0, -GridPowerWatt);\nconst FeedInWatt = Math.max(0, GridPowerWatt);\nconst HouseConsumptionWatt = Math.max(0, PvPowerWatt + GridImportWatt - FeedInWatt);\nconst solarEdgeStatus = global.get(\"SolarEdgeData\") || {};\n\nlet ExcessPowerWatt;\nif (IMPORT_POS_EXPORT_NEG) {\n    // Export ist negativ → Überschuss ist der negative Anteil\n    ExcessPowerWatt = Math.max(0, -GridPowerWatt);\n} else {\n    // Export ist positiv → Überschuss ist der positive Anteil\n    ExcessPowerWatt = Math.max(0, GridPowerWatt);\n}\n\n// Energieintegration (Wh)\nconst nowMs = Date.now();\nconst lastMs = context.get('lastMs') || nowMs;\nconst dt_h = (nowMs - lastMs) / 3600000; // Stunden\n\nconst lastExcessPowerWatt = context.get('lastExcessPowerWatt');\nlet ExcessEnergyWhTotal = context.get('ExcessEnergyWhTotal') || 0;\n\n// Tagesreset\nconst lastDay = context.get('lastDay') || new Date(nowMs).toDateString();\nconst today = new Date(nowMs).toDateString();\nlet ExcessEnergyWhToday = context.get('ExcessEnergyWhToday') || 0;\nif (today !== lastDay) {\n    ExcessEnergyWhToday = 0;\n}\n\n// Integration per Trapezregel\nif (Number.isFinite(lastExcessPowerWatt)) {\n    const dWh = ((lastExcessPowerWatt + ExcessPowerWatt) / 2) * dt_h;\n    ExcessEnergyWhTotal += dWh;\n    ExcessEnergyWhToday += dWh;\n}\n\n// Zustände speichern\ncontext.set('lastMs', nowMs);\ncontext.set('lastExcessPowerWatt', ExcessPowerWatt);\ncontext.set('ExcessEnergyWhTotal', ExcessEnergyWhTotal);\ncontext.set('ExcessEnergyWhToday', ExcessEnergyWhToday);\ncontext.set('lastDay', today);\n\n// Ausgabe\nmsg.payload = {\n    PvPowerWatt,\n    GridPowerWatt,\n    HouseConsumptionWatt,\n    GridImportWatt,\n    FeedInWatt,\n    ExcessPowerWatt,\n    ExcessEnergyWhTotal,\n    ExcessEnergyKWhTotal: ExcessEnergyWhTotal / 1000,\n    ExcessEnergyWhToday,\n    ExcessEnergyKWhToday: ExcessEnergyWhToday / 1000,\n    timestamp: nowMs,\n    OnlineFlag: solarEdgeStatus.OnlineFlag === true,\n    OfflineFlag: solarEdgeStatus.OnlineFlag !== true,\n    OfflineReason: solarEdgeStatus.OfflineReason || \"\",\n    Source: solarEdgeStatus.Source || \"SolarEdge Modbus/TCP\"\n};\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -8074,7 +8148,9 @@
         "y": 620,
         "wires": [
             [
-                "e93f57326a18d2d1"
+                "e93f57326a18d2d1",
+                "datenbank_energy_out",
+                "ui_house_total_power"
             ]
         ]
     },
@@ -8101,7 +8177,7 @@
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
         "name": "Solarüberschuss",
-        "order": 5,
+        "order": 6,
         "width": 0,
         "height": 1,
         "format": "<div class=\"se-power-row se-power-excess\" ng-class=\"{'is-active': (msg.payload * 1) > 0}\">\n  <span class=\"se-power-label\">Verfügbarer Solarüberschuss [W]</span>\n  <span class=\"se-power-value\">{{msg.payload === undefined ? 0 : msg.payload}}</span>\n</div>",
@@ -8180,7 +8256,7 @@
         "type": "comment",
         "z": "b86cb602995b0261",
         "name": "LEISTUNGSFLÜSSE · DEUTSCHE, EINDEUTIGE ANZEIGEN",
-        "info": "Solarleistung = aktuell erzeugte Leistung. Netzbezug = Leistung, die aus dem öffentlichen Stromnetz ins Haus fließt. Einspeisung = Leistung, die das Haus ins öffentliche Stromnetz abgibt. Solarüberschuss = aktuell verfügbare überschüssige Solarleistung.",
+        "info": "Solarleistung = aktuell erzeugte Leistung. Netzbezug = Leistung, die aus dem öffentlichen Stromnetz ins Haus fließt. Einspeisung = Leistung, die das Haus ins öffentliche Stromnetz abgibt. Gesamtleistungsaufnahme Haus = Solarleistung + Netzbezug - Einspeisung. Solarüberschuss = aktuell verfügbare überschüssige Solarleistung.",
         "x": 920,
         "y": 40,
         "wires": []
@@ -8229,7 +8305,7 @@
         "z": "b86cb602995b0261",
         "group": "24a6bcc7d3d966ac",
         "name": "SolarEdge und Node-RED Steuerung",
-        "order": 6,
+        "order": 7,
         "width": 0,
         "height": 1,
         "format": "<style>\n.se-control-row{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}\n.se-control-button{border:0;border-radius:6px;padding:9px 13px;font-weight:600;cursor:pointer}\n.se-control-reconnect{background:#1565c0;color:white}\n.se-control-restart{background:#b71c1c;color:white}\n</style>\n<div class=\"se-control-row\">\n  <button class=\"se-control-button se-control-reconnect\" ng-click=\"reconnectSolarEdge()\">↻ SOLAREDGE NEU VERBINDEN</button>\n  <button class=\"se-control-button se-control-restart\" ng-click=\"restartNodeRed()\">⏻ NODE-RED SERVER NEU STARTEN</button>\n</div>\n<script>\n(function(scope) {\n  scope.reconnectSolarEdge = function() {\n    scope.send({topic:\"modbus-reconnect\", payload:true});\n  };\n  scope.restartNodeRed = function() {\n    if (window.confirm(\"Node-RED wirklich neu starten? Alle Automations-Flows sind kurzzeitig unterbrochen.\")) {\n      scope.send({topic:\"node-red-restart\", payload:true});\n    }\n  };\n})(scope);\n</script>",
@@ -8299,6 +8375,40 @@
         "wires": [
             [],
             [],
+            []
+        ]
+    },
+    {
+        "id": "datenbank_energy_out",
+        "type": "link out",
+        "z": "b86cb602995b0261",
+        "name": "ENERGIEDATEN AN DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_energy_in"
+        ],
+        "x": 915,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "ui_house_total_power",
+        "type": "ui_template",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "name": "Gesamtleistungsaufnahme Haus",
+        "order": 5,
+        "width": 0,
+        "height": 2,
+        "format": "<style>\n.se-house-power{\n  box-sizing:border-box;\n  width:100%;\n  max-width:100%;\n  overflow:hidden;\n  padding:12px 14px;\n  border:1px solid #526b6e;\n  border-left:5px solid #00a6b2;\n  border-radius:9px;\n  background:linear-gradient(135deg,#203739,#29484b);\n  color:#eaf5f6;\n  font-family:Roboto,Arial,sans-serif;\n}\n.se-house-power.offline{border-left-color:#ef5350;opacity:.8}\n.se-house-power-head{display:grid;grid-template-columns:1fr;gap:1px}\n.se-house-power-label{min-width:0;font-size:14px;font-weight:700}\n.se-house-power-value{justify-self:end;min-width:0;font-size:23px;font-weight:800;color:#62dce4;white-space:nowrap;font-variant-numeric:tabular-nums}\n.se-house-power-formula{margin-top:7px;color:#b7ced0;font-size:12px;line-height:1.45}\n.se-house-power-formula b{color:#fff}\n.se-house-power-offline{margin-top:5px;color:#ffb5a8;font-size:11px}\n@media(max-width:520px){\n  .se-house-power-value{font-size:21px}\n}\n</style>\n<div class=\"se-house-power\" ng-class=\"{'offline':msg.payload.OfflineFlag}\">\n  <div class=\"se-house-power-head\">\n    <span class=\"se-house-power-label\">Gesamtleistungsaufnahme Haus</span>\n    <span class=\"se-house-power-value\">{{msg.payload.HouseConsumptionWatt | number:0}} W</span>\n  </div>\n  <div class=\"se-house-power-formula\">\n    <b>{{msg.payload.PvPowerWatt | number:0}} W</b> Solar\n    + <b>{{msg.payload.GridImportWatt | number:0}} W</b> Netzbezug\n    − <b>{{msg.payload.FeedInWatt | number:0}} W</b> Einspeisung\n  </div>\n  <div class=\"se-house-power-offline\" ng-if=\"msg.payload.OfflineFlag\">\n    SolarEdge offline · Anzeige bleibt bis zu gültigen Messwerten auf 0 W.\n  </div>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 990,
+        "y": 680,
+        "wires": [
             []
         ]
     },
@@ -8695,7 +8805,7 @@
         "type": "function",
         "z": "weather_flow",
         "name": "Wetterdaten prüfen und Payload aufbauen",
-        "func": "// Open-Meteo-Antwort in eine stabile Steuerungs-Payload umwandeln\nif (Number(msg.statusCode) !== 200 || !msg.payload || !msg.payload.hourly) {\n    return [null, { payload: { reason: \"HTTP- oder Datenfehler\", statusCode: msg.statusCode } }];\n}\n\nconst data = msg.payload;\nconst hourly = data.hourly;\nconst times = Array.isArray(hourly.time) ? hourly.time : [];\nconst sunshine = Array.isArray(hourly.sunshine_duration) ? hourly.sunshine_duration : [];\nconst temperatures = Array.isArray(hourly.temperature_2m) ? hourly.temperature_2m : [];\nconst clouds = Array.isArray(hourly.cloud_cover) ? hourly.cloud_cover : [];\nconst rainProbability = Array.isArray(hourly.precipitation_probability) ? hourly.precipitation_probability : [];\nconst weatherCodes = Array.isArray(hourly.weather_code) ? hourly.weather_code : [];\nconst daily = data.daily || {};\nconst dailyDates = Array.isArray(daily.time) ? daily.time : [];\nconst sunrises = Array.isArray(daily.sunrise) ? daily.sunrise : [];\nconst sunsets = Array.isArray(daily.sunset) ? daily.sunset : [];\n\nif (!times.length || times.length !== sunshine.length || !dailyDates.length || dailyDates.length !== sunrises.length || dailyDates.length !== sunsets.length) {\n    return [null, { payload: { reason: \"Unvollständige Wetterdaten\" } }];\n}\n\nconst clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));\nconst solarTimesForHour = timeValue => {\n    const dateIndex = dailyDates.indexOf(String(timeValue).slice(0, 10));\n    if (dateIndex < 0) return null;\n    return {\n        sunrise: new Date(sunrises[dateIndex]),\n        sunset: new Date(sunsets[dateIndex])\n    };\n};\nconst daylightSecondsForHour = timeValue => {\n    const solarTimes = solarTimesForHour(timeValue);\n    if (!solarTimes) return 0;\n    const hourStart = new Date(timeValue);\n    const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);\n    const overlapStart = Math.max(hourStart.getTime(), solarTimes.sunrise.getTime());\n    const overlapEnd = Math.min(hourEnd.getTime(), solarTimes.sunset.getTime());\n    return Math.max(0, Math.round((overlapEnd - overlapStart) / 1000));\n};\nconst sunshinePercent = (seconds, timeValue) => {\n    const daylightSeconds = daylightSecondsForHour(timeValue);\n    if (daylightSeconds <= 0) return 0;\n    return clampPercent(((Number(seconds) || 0) / daylightSeconds) * 100);\n};\nconst now = new Date(data.current?.time || Date.now());\nconst currentHour = new Date(now);\ncurrentHour.setMinutes(0, 0, 0);\n\nconst parsedTimes = times.map(value => new Date(value));\nlet lastHourIndex = -1;\nfor (let index = 0; index < parsedTimes.length; index += 1) {\n    if (parsedTimes[index] < currentHour) lastHourIndex = index;\n}\nconst futureIndexes = parsedTimes\n    .map((time, index) => ({ time, index }))\n    .filter(item => item.time > currentHour)\n    .slice(0, 6);\n\nif (lastHourIndex < 0 || futureIndexes.length < 1) {\n    return [null, { payload: { reason: \"Keine passende Stundenprognose\" } }];\n}\n\nconst nextHourIndex = futureIndexes[0].index;\nconst actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex], times[lastHourIndex]);\nconst expectedNextHour = sunshinePercent(sunshine[nextHourIndex], times[nextHourIndex]);\nconst forecastNext6Hours = futureIndexes.map(item => ({\n    Time: times[item.index],\n    TimeLabel: times[item.index].slice(11, 16),\n    SunshinePercent: sunshinePercent(sunshine[item.index], times[item.index]),\n    DaylightSeconds: daylightSecondsForHour(times[item.index]),\n    IsDaylight: daylightSecondsForHour(times[item.index]) > 0,\n    TemperatureC: Number(temperatures[item.index]) || 0,\n    CloudCoverPercent: clampPercent(clouds[item.index]),\n    PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),\n    WeatherCode: Number(weatherCodes[item.index]) || 0\n}));\nconst expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => sum + item.SunshinePercent, 0) / forecastNext6Hours.length);\nconst expectedThresholdPercent = 10;\nconst sunPowerExpected = expectedNextHour >= expectedThresholdPercent;\nconst activeFlag = true;\n\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"AKTIV\",\n    ActiveFlag: activeFlag,\n    ActiveFlagf: activeFlag,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    Location: {\n        Name: \"Reindlmühl bei Altmünster am Traunsee\",\n        Latitude: Number(data.latitude),\n        Longitude: Number(data.longitude),\n        Timezone: data.timezone || \"Europe/Vienna\"\n    },\n    Current: {\n        Time: data.current?.time || \"\",\n        TemperatureC: Number(data.current?.temperature_2m) || 0,\n        CloudCoverPercent: clampPercent(data.current?.cloud_cover),\n        WeatherCode: Number(data.current?.weather_code) || 0,\n        IsDay: Number(data.current?.is_day) === 1\n    },\n    ActualSunshineLastHour: actualSunshineLastHour,\n    ActualSunshineLastHourPercent: actualSunshineLastHour,\n    ExpectedPercentSunshineNextHour: expectedNextHour,\n    ExpectetPercentSunshineNextHour: expectedNextHour,\n    ExpectedPercentSunshineNext6Hours: expectedNext6Hours,\n    SunPowerExpected: sunPowerExpected,\n    SunPowerExpectedText: sunPowerExpected ? \"JA · nächste Stunde\" : \"NEIN\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: times[nextHourIndex],\n    ExpectedSunshineThresholdPercent: expectedThresholdPercent,\n    SunriseToday: sunrises[0] || \"\",\n    SunsetToday: sunsets[0] || \"\",\n    ForecastNext6Hours: forecastNext6Hours\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: \" + msg.payload.WeatherServiceStatusText +\n    \" | Temperatur: \" + msg.payload.Current.TemperatureC + \" Grad C\" +\n    \" | Sonne letzte Stunde: \" + msg.payload.ActualSunshineLastHour + \"%\" +\n    \" | Sonne nächste Stunde: \" + msg.payload.ExpectedPercentSunshineNextHour + \"%\" +\n    \" | Sonne nächste 6 Stunden: \" + msg.payload.ExpectedPercentSunshineNext6Hours + \"%\" +\n    \" | Solarleistung erwartet: \" + msg.payload.SunPowerExpectedText +\n    \" | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn [msg, null];",
+        "func": "// Open-Meteo-Antwort in eine stabile Steuerungs-Payload umwandeln\nif (Number(msg.statusCode) !== 200 || !msg.payload || !msg.payload.hourly) {\n    return [null, { payload: { reason: \"HTTP- oder Datenfehler\", statusCode: msg.statusCode } }];\n}\n\nconst data = msg.payload;\nconst hourly = data.hourly;\nconst times = Array.isArray(hourly.time) ? hourly.time : [];\nconst sunshine = Array.isArray(hourly.sunshine_duration) ? hourly.sunshine_duration : [];\nconst temperatures = Array.isArray(hourly.temperature_2m) ? hourly.temperature_2m : [];\nconst clouds = Array.isArray(hourly.cloud_cover) ? hourly.cloud_cover : [];\nconst rainProbability = Array.isArray(hourly.precipitation_probability) ? hourly.precipitation_probability : [];\nconst weatherCodes = Array.isArray(hourly.weather_code) ? hourly.weather_code : [];\nconst daily = data.daily || {};\nconst dailyDates = Array.isArray(daily.time) ? daily.time : [];\nconst sunrises = Array.isArray(daily.sunrise) ? daily.sunrise : [];\nconst sunsets = Array.isArray(daily.sunset) ? daily.sunset : [];\n\nif (!times.length || times.length !== sunshine.length || !dailyDates.length || dailyDates.length !== sunrises.length || dailyDates.length !== sunsets.length) {\n    return [null, { payload: { reason: \"Unvollständige Wetterdaten\" } }];\n}\n\nconst clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));\nconst solarTimesForHour = timeValue => {\n    const dateIndex = dailyDates.indexOf(String(timeValue).slice(0, 10));\n    if (dateIndex < 0) return null;\n    return {\n        sunrise: new Date(sunrises[dateIndex]),\n        sunset: new Date(sunsets[dateIndex])\n    };\n};\nconst daylightSecondsForHour = timeValue => {\n    const solarTimes = solarTimesForHour(timeValue);\n    if (!solarTimes) return 0;\n    const hourStart = new Date(timeValue);\n    const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);\n    const overlapStart = Math.max(hourStart.getTime(), solarTimes.sunrise.getTime());\n    const overlapEnd = Math.min(hourEnd.getTime(), solarTimes.sunset.getTime());\n    return Math.max(0, Math.round((overlapEnd - overlapStart) / 1000));\n};\nconst sunshinePercent = (seconds, timeValue) => {\n    const daylightSeconds = daylightSecondsForHour(timeValue);\n    if (daylightSeconds <= 0) return 0;\n    return clampPercent(((Number(seconds) || 0) / daylightSeconds) * 100);\n};\nconst now = new Date(data.current?.time || Date.now());\nconst currentHour = new Date(now);\ncurrentHour.setMinutes(0, 0, 0);\n\nconst parsedTimes = times.map(value => new Date(value));\nlet lastHourIndex = -1;\nfor (let index = 0; index < parsedTimes.length; index += 1) {\n    if (parsedTimes[index] < currentHour) lastHourIndex = index;\n}\nconst futureIndexes = parsedTimes\n    .map((time, index) => ({ time, index }))\n    .filter(item => item.time > currentHour)\n    .slice(0, 6);\n\nif (lastHourIndex < 0 || futureIndexes.length < 1) {\n    return [null, { payload: { reason: \"Keine passende Stundenprognose\" } }];\n}\n\nconst nextHourIndex = futureIndexes[0].index;\nconst actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex], times[lastHourIndex]);\nconst expectedNextHour = sunshinePercent(sunshine[nextHourIndex], times[nextHourIndex]);\nconst forecastNext6Hours = futureIndexes.map(item => ({\n    Time: times[item.index],\n    TimeLabel: times[item.index].slice(11, 16),\n    SunshinePercent: sunshinePercent(sunshine[item.index], times[item.index]),\n    DaylightSeconds: daylightSecondsForHour(times[item.index]),\n    IsDaylight: daylightSecondsForHour(times[item.index]) > 0,\n    TemperatureC: Number(temperatures[item.index]) || 0,\n    CloudCoverPercent: clampPercent(clouds[item.index]),\n    PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),\n    WeatherCode: Number(weatherCodes[item.index]) || 0\n}));\nconst expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => sum + item.SunshinePercent, 0) / forecastNext6Hours.length);\nconst expectedThresholdPercent = 10;\nconst sunPowerExpected = expectedNextHour >= expectedThresholdPercent;\nconst activeFlag = true;\nflow.set(\"WeatherRetryCount\", 0);\n\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"AKTIV\",\n    ActiveFlag: activeFlag,\n    ActiveFlagf: activeFlag,\n    DataStaleFlag: false,\n    HasLastKnownValues: true,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    Location: {\n        Name: \"Reindlmühl bei Altmünster am Traunsee\",\n        Latitude: Number(data.latitude),\n        Longitude: Number(data.longitude),\n        Timezone: data.timezone || \"Europe/Vienna\"\n    },\n    Current: {\n        Time: data.current?.time || \"\",\n        TemperatureC: Number(data.current?.temperature_2m) || 0,\n        CloudCoverPercent: clampPercent(data.current?.cloud_cover),\n        WeatherCode: Number(data.current?.weather_code) || 0,\n        IsDay: Number(data.current?.is_day) === 1\n    },\n    ActualSunshineLastHour: actualSunshineLastHour,\n    ActualSunshineLastHourPercent: actualSunshineLastHour,\n    ExpectedPercentSunshineNextHour: expectedNextHour,\n    ExpectetPercentSunshineNextHour: expectedNextHour,\n    ExpectedPercentSunshineNext6Hours: expectedNext6Hours,\n    SunPowerExpected: sunPowerExpected,\n    SunPowerExpectedText: sunPowerExpected ? \"JA · nächste Stunde\" : \"NEIN\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: times[nextHourIndex],\n    ExpectedSunshineThresholdPercent: expectedThresholdPercent,\n    SunriseToday: sunrises[0] || \"\",\n    SunsetToday: sunsets[0] || \"\",\n    ForecastNext6Hours: forecastNext6Hours\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: \" + msg.payload.WeatherServiceStatusText +\n    \" | Temperatur: \" + msg.payload.Current.TemperatureC + \" Grad C\" +\n    \" | Sonne letzte Stunde: \" + msg.payload.ActualSunshineLastHour + \"%\" +\n    \" | Sonne nächste Stunde: \" + msg.payload.ExpectedPercentSunshineNextHour + \"%\" +\n    \" | Sonne nächste 6 Stunden: \" + msg.payload.ExpectedPercentSunshineNext6Hours + \"%\" +\n    \" | Solarleistung erwartet: \" + msg.payload.SunPowerExpectedText +\n    \" | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn [msg, null];\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -8736,8 +8846,8 @@
         "type": "function",
         "z": "weather_flow",
         "name": "SICHERER AUSFALL · Wetterwerte auf 0",
-        "func": "// Sicherer Ausfallzustand: keine Prognose darf Verbraucher einschalten\nconst reason = msg.payload?.reason || msg.error?.message || \"Wetterdienst nicht erreichbar\";\nconst emptyForecast = Array.from({ length: 6 }, (_, index) => ({\n    Time: \"\",\n    TimeLabel: \"+\" + (index + 1) + \" h\",\n    SunshinePercent: 0,\n    TemperatureC: 0,\n    CloudCoverPercent: 0,\n    PrecipitationProbabilityPercent: 0,\n    WeatherCode: 0\n}));\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"NICHT AKTIV\",\n    ActiveFlag: false,\n    ActiveFlagf: false,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    ErrorReason: reason,\n    Location: { Name: \"Reindlmühl bei Altmünster am Traunsee\", Latitude: 47.89464, Longitude: 13.7163, Timezone: \"Europe/Vienna\" },\n    Current: { Time: \"\", TemperatureC: 0, CloudCoverPercent: 0, WeatherCode: 0, IsDay: false },\n    ActualSunshineLastHour: 0,\n    ActualSunshineLastHourPercent: 0,\n    ExpectedPercentSunshineNextHour: 0,\n    ExpectetPercentSunshineNextHour: 0,\n    ExpectedPercentSunshineNext6Hours: 0,\n    SunPowerExpected: false,\n    SunPowerExpectedText: \"NEIN · Wetterdienst nicht aktiv\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: \"\",\n    ExpectedSunshineThresholdPercent: 10,\n    ForecastNext6Hours: emptyForecast\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: NICHT AKTIV | Temperatur: 0 Grad C | Sonne letzte Stunde: 0%\" +\n    \" | Sonne nächste Stunde: 0% | Sonne nächste 6 Stunden: 0%\" +\n    \" | Solarleistung erwartet: NEIN | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn msg;",
-        "outputs": 1,
+        "func": "// Steuerungen bleiben im Fehlerfall sicher aus. Das Dashboard zeigt jedoch\n// vorhandene letzte gültige Messwerte statt erfundener Wetterwerte von 0.\nconst reason = msg.payload?.reason || msg.error?.message || \"Wetterdienst nicht erreichbar\";\nconst lastValid = global.get(\"WeatherLastValidData\");\nconst hasLastKnownValues = Boolean(\n    lastValid &&\n    lastValid.ActiveFlag === true &&\n    lastValid.Current &&\n    Array.isArray(lastValid.ForecastNext6Hours)\n);\nconst now = new Date();\nconst emptyForecast = Array.from({ length: 6 }, (_, index) => ({\n    Time: \"\",\n    TimeLabel: \"+\" + (index + 1) + \" h\",\n    SunshinePercent: 0,\n    TemperatureC: 0,\n    CloudCoverPercent: 0,\n    PrecipitationProbabilityPercent: 0,\n    WeatherCode: 0,\n    IsDaylight: false\n}));\nconst previous = hasLastKnownValues ? lastValid : {};\n\nmsg.payload = {\n    ...previous,\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"OFFLINE · letzte gültige Werte\",\n    ActiveFlag: false,\n    ActiveFlagf: false,\n    DataStaleFlag: true,\n    HasLastKnownValues: hasLastKnownValues,\n    UpdatedAt: now.toISOString(),\n    UpdatedAtText: now.toLocaleString(\"de-AT\"),\n    LastValidAt: hasLastKnownValues ? lastValid.UpdatedAt : null,\n    ErrorReason: reason,\n    Location: previous.Location || {\n        Name: \"Reindlmühl bei Altmünster am Traunsee\",\n        Latitude: 47.89464,\n        Longitude: 13.7163,\n        Timezone: \"Europe/Vienna\"\n    },\n    Current: hasLastKnownValues\n        ? previous.Current\n        : { Time: \"\", TemperatureC: 0, CloudCoverPercent: 0, WeatherCode: 0, IsDay: false },\n    ActualSunshineLastHour: hasLastKnownValues ? previous.ActualSunshineLastHour : 0,\n    ActualSunshineLastHourPercent: hasLastKnownValues ? previous.ActualSunshineLastHourPercent : 0,\n    ExpectedPercentSunshineNextHour: hasLastKnownValues ? previous.ExpectedPercentSunshineNextHour : 0,\n    ExpectetPercentSunshineNextHour: hasLastKnownValues ? previous.ExpectetPercentSunshineNextHour : 0,\n    ExpectedPercentSunshineNext6Hours: hasLastKnownValues ? previous.ExpectedPercentSunshineNext6Hours : 0,\n    // Sicherheitswert für Automationen: bei nicht erreichbarem Wetterdienst nie einschalten.\n    SunPowerExpected: false,\n    SunPowerExpectedText: \"NEIN · Wetterdienst offline\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: \"\",\n    ExpectedSunshineThresholdPercent: 10,\n    SunriseToday: hasLastKnownValues ? (previous.SunriseToday || \"\") : \"\",\n    SunsetToday: hasLastKnownValues ? (previous.SunsetToday || \"\") : \"\",\n    ForecastNext6Hours: hasLastKnownValues ? previous.ForecastNext6Hours : emptyForecast\n};\nmsg.payload.DashboardText = hasLastKnownValues\n    ? \"Wetterdienst OFFLINE | letzte gültige Werte vom \" + new Date(lastValid.UpdatedAt).toLocaleString(\"de-AT\") +\n      \" | Fehler: \" + reason\n    : \"Wetterdienst OFFLINE | noch keine gültigen Wetterwerte | Fehler: \" + reason;\n\nconst retryCount = Number(flow.get(\"WeatherRetryCount\")) || 0;\nlet retryMessage = null;\nif (retryCount < 3) {\n    flow.set(\"WeatherRetryCount\", retryCount + 1);\n    retryMessage = {\n        topic: \"weather/retry\",\n        payload: {\n            attempt: retryCount + 1,\n            reason\n        }\n    };\n}\nreturn [msg, retryMessage];\n",
+        "outputs": 2,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
@@ -8748,6 +8858,9 @@
         "wires": [
             [
                 "weather_publish"
+            ],
+            [
+                "weather_retry_delay"
             ]
         ]
     },
@@ -8756,7 +8869,7 @@
         "type": "function",
         "z": "weather_flow",
         "name": "Wetterdaten veröffentlichen",
-        "func": "global.set(\"WeatherData\", msg.payload);\nmsg.topic = \"WeatherData\";\nnode.status({\n fill: msg.payload.ActiveFlag ? \"green\" : \"red\",\n shape: msg.payload.ActiveFlag ? \"dot\" : \"ring\",\n text: msg.payload.WeatherServiceStatusText\n});\nreturn msg;",
+        "func": "global.set(\"WeatherData\", msg.payload);\nif (msg.payload.ActiveFlag === true) {\n global.set(\"WeatherLastValidData\", msg.payload);\n}\nmsg.topic = \"WeatherData\";\nnode.status({\n fill: msg.payload.ActiveFlag ? \"green\" : \"red\",\n shape: msg.payload.ActiveFlag ? \"dot\" : \"ring\",\n text: msg.payload.WeatherServiceStatusText\n});\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -8796,7 +8909,9 @@
         "z": "weather_flow",
         "name": "LINK_WETTERDATEN_OUT",
         "mode": "link",
-        "links": [],
+        "links": [
+            "datenbank_weather_in"
+        ],
         "x": 1305,
         "y": 320,
         "wires": []
@@ -8810,7 +8925,7 @@
         "order": 1,
         "width": "0",
         "height": 9,
-        "format": "<style>\n  .weather-card {\n    font-family: Roboto, Arial, sans-serif;\n    color: #263238;\n    padding: 4px 2px 10px\n  }\n\n  .weather-head {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    margin-bottom: 14px;\n    padding: 14px 16px;\n    border-radius: 12px;\n    background: linear-gradient(135deg, #f7fafc, #edf2f7)\n  }\n\n  .weather-light {\n    width: 54px;\n    height: 54px;\n    border-radius: 50%;\n    flex: 0 0 54px;\n    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .65), 0 3px 10px rgba(0, 0, 0, .18)\n  }\n\n  .weather-light.sun {\n    background: #facc15\n  }\n\n  .weather-light.low {\n    background: #94a3b8\n  }\n\n  .weather-title {\n    font-size: 20px;\n    font-weight: 700;\n    line-height: 1.15\n  }\n\n  .weather-status {\n    margin-top: 4px;\n    color: #546e7a\n  }\n\n  .weather-kpis {\n    display: grid;\n    grid-template-columns: repeat(4, minmax(90px, 1fr));\n    gap: 8px;\n    margin-bottom: 14px\n  }\n\n  .weather-kpi {\n    padding: 10px;\n    border-radius: 9px;\n    background: #fff;\n    border: 1px solid #dfe7ec;\n    text-align: center\n  }\n\n  .weather-kpi b {\n    display: block;\n    font-size: 19px;\n    color: #263238\n  }\n\n  .weather-kpi span {\n    font-size: 11px;\n    color: #607d8b\n  }\n\n  .weather-table-wrap {\n    overflow-x: auto;\n    border: 1px solid #dfe7ec;\n    border-radius: 9px\n  }\n\n  .weather-table {\n    width: 100%;\n    border-collapse: collapse;\n    min-width: 560px;\n    background: #fff\n  }\n\n  .weather-table th {\n    padding: 9px 8px;\n    text-align: left;\n    background: #455a64;\n    color: #fff;\n    font-size: 12px\n  }\n\n  .weather-table td {\n    padding: 9px 8px;\n    border-top: 1px solid #e8eef2;\n    font-size: 13px\n  }\n\n  .weather-table tr:nth-child(even) td {\n    background: #f8fafb\n  }\n\n  .sun-cell {\n    font-weight: 700;\n    color: #9a7400\n  }\n\n  .weather-legend {\n    display: flex;\n    gap: 16px;\n    margin-top: 10px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .legend-dot {\n    display: inline-block;\n    width: 11px;\n    height: 11px;\n    border-radius: 50%;\n    margin-right: 5px\n  }\n\n  .legend-yellow {\n    background: #facc15\n  }\n\n  .legend-grey {\n    background: #94a3b8\n  }\n\n  .weather-suntimes {\n    margin-top: 5px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .weather-table tr.night-row td {\n    background: #eceff1;\n    color: #78909c\n  }\n\n  .night-label {\n    font-size: 10px;\n    margin-left: 5px;\n    color: #78909c\n  }\n\n  @media(max-width:600px) {\n    .weather-kpis {\n      grid-template-columns: repeat(2, 1fr)\n    }\n\n    .weather-title {\n      font-size: 17px\n    }\n  }\n</style>\n<div class=\"weather-card\">\n  <div class=\"weather-head\">\n    <div class=\"weather-light\" ng-class=\"msg.payload.SunPowerExpected ? 'sun' : 'low'\"></div>\n    <div>\n      <div class=\"weather-title\">Sonnenprognose Reindlmühl</div>\n      <div class=\"weather-status\">{{msg.payload.SunPowerExpected ? 'Sonnenstunden vorhanden' : 'Wenig bis keine Sonne\n        erwartet'}}</div>\n      <div class=\"weather-suntimes\">Sonnenaufgang {{msg.payload.SunriseToday.substring(11,16)}} · Sonnenuntergang\n        {{msg.payload.SunsetToday.substring(11,16)}}</div>\n    </div>\n  </div>\n  <div class=\"weather-kpis\">\n    <div class=\"weather-kpi\"><b>{{msg.payload.ActualSunshineLastHour}} %</b><span>Sonne letzte Stunde</span></div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.ExpectedPercentSunshineNextHour}} %</b><span>Sonne nächste Stunde</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.ExpectedPercentSunshineNext6Hours}} %</b><span>Ø nächste 6 Stunden</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.Current.TemperatureC | number:1}} °C</b><span>Aktuelle Temperatur</span>\n    </div>\n  </div>\n  <div class=\"weather-table-wrap\">\n    <table class=\"weather-table\">\n      <thead>\n        <tr>\n          <th>Zeit</th>\n          <th>Sonne</th>\n          <th>Temperatur</th>\n          <th>Wolken</th>\n          <th>Regenrisiko</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat=\"hour in msg.payload.ForecastNext6Hours track by $index\"\n          ng-class=\"{'night-row': !hour.IsDaylight}\">\n          <td>{{hour.TimeLabel}}<span class=\"night-label\" ng-if=\"!hour.IsDaylight\">Nacht</span></td>\n          <td class=\"sun-cell\">{{hour.SunshinePercent}} %</td>\n          <td>{{hour.TemperatureC | number:1}} °C</td>\n          <td>{{hour.CloudCoverPercent}} %</td>\n          <td>{{hour.PrecipitationProbabilityPercent}} %</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"weather-legend\">\n    <span><i class=\"legend-dot legend-yellow\"></i>Sonnenstunden vorhanden</span><span><i class=\"legend-dot legend-grey\"></i>wenig bis keine Sonne</span>\n  </div>\n</div>",
+        "format": "<style>\n  .weather-card {\n    font-family: Roboto, Arial, sans-serif;\n    color: #263238;\n    padding: 4px 2px 10px\n  }\n\n  .weather-head {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    margin-bottom: 14px;\n    padding: 14px 16px;\n    border-radius: 12px;\n    background: linear-gradient(135deg, #f7fafc, #edf2f7)\n  }\n\n  .weather-light {\n    width: 54px;\n    height: 54px;\n    border-radius: 50%;\n    flex: 0 0 54px;\n    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .65), 0 3px 10px rgba(0, 0, 0, .18)\n  }\n\n  .weather-light.sun {\n    background: #facc15\n  }\n\n  .weather-light.low {\n    background: #94a3b8\n  }\n\n  .weather-light.offline {\n    background: #ef5350\n  }\n\n  .weather-title {\n    font-size: 20px;\n    font-weight: 700;\n    line-height: 1.15\n  }\n\n  .weather-status {\n    margin-top: 4px;\n    color: #546e7a\n  }\n\n  .weather-kpis {\n    display: grid;\n    grid-template-columns: repeat(4, minmax(90px, 1fr));\n    gap: 8px;\n    margin-bottom: 14px\n  }\n\n  .weather-kpi {\n    padding: 10px;\n    border-radius: 9px;\n    background: #fff;\n    border: 1px solid #dfe7ec;\n    text-align: center\n  }\n\n  .weather-kpi b {\n    display: block;\n    font-size: 19px;\n    color: #263238\n  }\n\n  .weather-kpi span {\n    font-size: 11px;\n    color: #607d8b\n  }\n\n  .weather-table-wrap {\n    overflow-x: auto;\n    border: 1px solid #dfe7ec;\n    border-radius: 9px\n  }\n\n  .weather-table {\n    width: 100%;\n    border-collapse: collapse;\n    min-width: 560px;\n    background: #fff\n  }\n\n  .weather-table th {\n    padding: 9px 8px;\n    text-align: left;\n    background: #455a64;\n    color: #fff;\n    font-size: 12px\n  }\n\n  .weather-table td {\n    padding: 9px 8px;\n    border-top: 1px solid #e8eef2;\n    font-size: 13px\n  }\n\n  .weather-table tr:nth-child(even) td {\n    background: #f8fafb\n  }\n\n  .sun-cell {\n    font-weight: 700;\n    color: #9a7400\n  }\n\n  .weather-legend {\n    display: flex;\n    gap: 16px;\n    margin-top: 10px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .legend-dot {\n    display: inline-block;\n    width: 11px;\n    height: 11px;\n    border-radius: 50%;\n    margin-right: 5px\n  }\n\n  .legend-yellow {\n    background: #facc15\n  }\n\n  .legend-grey {\n    background: #94a3b8\n  }\n\n  .weather-suntimes {\n    margin-top: 5px;\n    font-size: 12px;\n    color: #607d8b\n  }\n\n  .weather-offline-note {\n    margin: 0 0 12px;\n    padding: 9px 11px;\n    border: 1px solid #ef9a9a;\n    border-radius: 8px;\n    background: #ffebee;\n    color: #b71c1c;\n    font-size: 12px\n  }\n\n  .weather-table tr.night-row td {\n    background: #eceff1;\n    color: #78909c\n  }\n\n  .night-label {\n    font-size: 10px;\n    margin-left: 5px;\n    color: #78909c\n  }\n\n  @media(max-width:600px) {\n    .weather-kpis {\n      grid-template-columns: repeat(2, 1fr)\n    }\n\n    .weather-title {\n      font-size: 17px\n    }\n  }\n</style>\n<div class=\"weather-card\">\n  <div class=\"weather-head\">\n    <div class=\"weather-light\" ng-class=\"msg.payload.DataStaleFlag ? 'offline' : (msg.payload.SunPowerExpected ? 'sun' : 'low')\"></div>\n    <div>\n      <div class=\"weather-title\">Sonnenprognose Reindlmühl</div>\n      <div class=\"weather-status\" ng-if=\"!msg.payload.DataStaleFlag\">{{msg.payload.SunPowerExpected ? 'Sonnenstunden vorhanden' : 'Wenig bis keine Sonne\n        erwartet'}}</div>\n      <div class=\"weather-status\" ng-if=\"msg.payload.DataStaleFlag\">Wetterdienst offline · {{msg.payload.HasLastKnownValues ? 'letzte gültige Werte' : 'keine gültigen Werte vorhanden'}}</div>\n      <div class=\"weather-suntimes\" ng-if=\"msg.payload.SunriseToday && msg.payload.SunsetToday\">Sonnenaufgang {{msg.payload.SunriseToday.substring(11,16)}} · Sonnenuntergang\n        {{msg.payload.SunsetToday.substring(11,16)}}</div>\n    </div>\n  </div>\n  <div class=\"weather-offline-note\" ng-if=\"msg.payload.DataStaleFlag\">\n    {{msg.payload.HasLastKnownValues ? ('Stand der angezeigten Wetterwerte: ' + (msg.payload.LastValidAt | date:'dd.MM.yyyy HH:mm:ss')) : 'Wetterwerte werden nicht als 0 interpretiert.'}}\n    · {{msg.payload.ErrorReason}}\n  </div>\n  <div class=\"weather-kpis\">\n    <div class=\"weather-kpi\"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ActualSunshineLastHour + ' %' : '—'}}</b><span>Sonne letzte Stunde</span></div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNextHour + ' %' : '—'}}</b><span>Sonne nächste Stunde</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNext6Hours + ' %' : '—'}}</b><span>Ø nächste 6 Stunden</span>\n    </div>\n    <div class=\"weather-kpi\"><b>{{msg.payload.HasLastKnownValues ? (msg.payload.Current.TemperatureC | number:1) + ' °C' : '—'}}</b><span>Aktuelle Temperatur</span>\n    </div>\n  </div>\n  <div class=\"weather-table-wrap\" ng-if=\"msg.payload.HasLastKnownValues\">\n    <table class=\"weather-table\">\n      <thead>\n        <tr>\n          <th>Zeit</th>\n          <th>Sonne</th>\n          <th>Temperatur</th>\n          <th>Wolken</th>\n          <th>Regenrisiko</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat=\"hour in msg.payload.ForecastNext6Hours track by $index\"\n          ng-class=\"{'night-row': !hour.IsDaylight}\">\n          <td>{{hour.TimeLabel}}<span class=\"night-label\" ng-if=\"!hour.IsDaylight\">Nacht</span></td>\n          <td class=\"sun-cell\">{{hour.SunshinePercent}} %</td>\n          <td>{{hour.TemperatureC | number:1}} °C</td>\n          <td>{{hour.CloudCoverPercent}} %</td>\n          <td>{{hour.PrecipitationProbabilityPercent}} %</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"weather-legend\">\n    <span><i class=\"legend-dot legend-yellow\"></i>Sonnenstunden vorhanden</span><span><i class=\"legend-dot legend-grey\"></i>wenig bis keine Sonne</span>\n  </div>\n</div>\n",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
@@ -8855,5 +8970,1067 @@
                 "weather_ui_overview_table"
             ]
         ]
+    },
+    {
+        "id": "weather_retry_delay",
+        "type": "delay",
+        "z": "weather_flow",
+        "name": "Wetterfehler · nach 30 Sekunden erneut",
+        "pauseType": "delay",
+        "timeout": "30",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1100,
+        "y": 360,
+        "wires": [
+            [
+                "weather_build_request"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_tarif_zeitplan",
+        "type": "inject",
+        "z": "kosten_flow",
+        "name": "aWATTar Tarif alle 5 Minuten abrufen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "aWATTar/tariff/request",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 120,
+        "wires": [
+            [
+                "kosten_awattar_api"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_awattar_api",
+        "type": "http request",
+        "z": "kosten_flow",
+        "name": "aWATTar Marktpreise (AT)",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.awattar.at/v1/marketdata",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": true,
+        "headers": [],
+        "x": 440,
+        "y": 120,
+        "wires": [
+            [
+                "kosten_aktuellen_tarif_aufbereiten"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_aktuellen_tarif_aufbereiten",
+        "type": "function",
+        "z": "kosten_flow",
+        "name": "Aktuellen aWATTar-Tarif aufbereiten",
+        "func": "const priceSlots = Array.isArray(msg.payload?.data) ? msg.payload.data : [];\nconst now = Date.now();\nconst currentSlot = priceSlots.find((slot) =>\n    Number(slot.start_timestamp) <= now && now < Number(slot.end_timestamp)\n);\n\nif (!currentSlot || !Number.isFinite(Number(currentSlot.marketprice))) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"kein aktueller Tarif\" });\n    node.error(\"aWATTar lieferte keinen gültigen aktuellen Marktpreis\", msg);\n    return null;\n}\n\n// aWATTar liefert Eur/MWh. Für Cent/kWh wird durch 10 geteilt.\nconst priceCtPerKWh = Number(currentSlot.marketprice) / 10;\nconst tariff = {\n    provider: \"aWATTar\",\n    tariffType: \"Börsenpreis (ohne Netzentgelte, Abgaben und individuelle Aufschläge)\",\n    priceCtPerKWh,\n    priceEurPerKWh: priceCtPerKWh / 100,\n    marketPriceEurPerMWh: Number(currentSlot.marketprice),\n    validFrom: new Date(Number(currentSlot.start_timestamp)).toISOString(),\n    validUntil: new Date(Number(currentSlot.end_timestamp)).toISOString(),\n    fetchedAt: new Date(now).toISOString()\n};\n\ntariff.slots = priceSlots\n    .filter((slot) =>\n        Number.isFinite(Number(slot.start_timestamp)) &&\n        Number.isFinite(Number(slot.end_timestamp)) &&\n        Number.isFinite(Number(slot.marketprice))\n    )\n    .map((slot) => ({\n        validFrom: new Date(Number(slot.start_timestamp)).toISOString(),\n        validUntil: new Date(Number(slot.end_timestamp)).toISOString(),\n        marketPriceEurPerMWh: Number(slot.marketprice),\n        priceCtPerKWh: Number(slot.marketprice) / 10\n    }));\n\nconst viennaDate = new Intl.DateTimeFormat(\"en-CA\", {\n    timeZone: \"Europe/Vienna\", year: \"numeric\", month: \"2-digit\", day: \"2-digit\"\n});\nconst viennaTime = new Intl.DateTimeFormat(\"de-AT\", {\n    timeZone: \"Europe/Vienna\", hour: \"2-digit\", minute: \"2-digit\"\n});\nconst viennaDayLabel = new Intl.DateTimeFormat(\"de-AT\", {\n    timeZone: \"Europe/Vienna\", weekday: \"short\", day: \"2-digit\", month: \"2-digit\"\n});\nconst todayKey = viennaDate.format(new Date(now));\nconst [year, month] = todayKey.split(\"-\").map(Number);\nconst daysInMonth = new Date(year, month, 0).getDate();\nconst hourlyPricesByDay = new Map();\n\nfor (const slot of priceSlots) {\n    const start = new Date(Number(slot.start_timestamp));\n    const dayKey = viennaDate.format(start);\n    const hours = hourlyPricesByDay.get(dayKey) || [];\n    hours.push({\n        time: viennaTime.format(start),\n        marketPriceCtPerKWh: Number(slot.marketprice) / 10,\n        hourlyCostEur: null\n    });\n    hourlyPricesByDay.set(dayKey, hours);\n}\n\nconst days = Array.from({ length: daysInMonth }, (_, index) => {\n    const dayKey = `${year}-${String(month).padStart(2, \"0\")}-${String(index + 1).padStart(2, \"0\")}`;\n    const date = new Date(Date.UTC(year, month - 1, index + 1, 12));\n    return {\n        dayKey,\n        label: viennaDayLabel.format(date),\n        isToday: dayKey === todayKey,\n        dailyConsumptionKWh: null,\n        dailyCostEur: null,\n        hours: hourlyPricesByDay.get(dayKey) || []\n    };\n});\n\ntariff.dashboard = {\n    monthLabel: new Intl.DateTimeFormat(\"de-AT\", { timeZone: \"Europe/Vienna\", month: \"long\", year: \"numeric\" }).format(new Date(now)),\n    days,\n    dataStatus: \"Vorlage – Verbrauchsdaten werden im nächsten Schritt ergänzt\"\n};\n\nflow.set(\"aWATTarCurrentTariff\", tariff);\nglobal.set(\"aWATTarCurrentTariff\", tariff);\nnode.status({ fill: \"green\", shape: \"dot\", text: priceCtPerKWh.toFixed(3) + \" ct/kWh\" });\n\nmsg.topic = \"aWATTar/tariff/current\";\nmsg.payload = tariff;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 120,
+        "wires": [
+            [
+                "kosten_tarif_debug",
+                "kosten_dashboard_template",
+                "kosten_history_out"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_tarif_debug",
+        "type": "debug",
+        "z": "kosten_flow",
+        "name": "Aktueller aWATTar-Tarif",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "kosten_dashboard_template",
+        "type": "ui_template",
+        "z": "kosten_flow",
+        "group": "kosten_dashboard_group",
+        "name": "Kostenübersicht",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .cost-card { width:100%; max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }\n  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }\n  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }\n  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }\n  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }\n  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }\n  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }\n  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }\n  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }\n  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }\n  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }\n  .cost-info b { color:#fff; }\n  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }\n  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-offline { color:#ffad99; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }\n  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }\n  .cost-hour b { color:#fff; }\n  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }\n  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }\n  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }\n  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }\n  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }\n  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }\n  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }\n  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }\n  .cost-badge.online { color:#b9ffdc; background:#14613f; }\n  .cost-badge.offline { color:#ffd1c7; background:#71342d; }\n  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }\n  @media(max-width:900px) { .cost-head { grid-template-columns:repeat(2,1fr); } .cost-diagnostics { grid-template-columns:1fr; } }\n  @media(max-width:520px) { .cost-head { grid-template-columns:1fr; } .cost-kpi-value { font-size:23px; } }\n</style>\n\n<script>\n(function(scope) {\n  scope.view = scope.view || { period: \"month\", tariff: null, history: null };\n  var layoutTimers = [];\n\n  function refreshCostLayout() {\n    if (!window || !window.dispatchEvent) return;\n    window.dispatchEvent(new Event(\"resize\"));\n  }\n\n  function scheduleCostLayoutRefresh() {\n    layoutTimers.forEach(clearTimeout);\n    layoutTimers = [0, 100, 350, 800].map(function(delay) {\n      return setTimeout(refreshCostLayout, delay);\n    });\n  }\n\n  scope.selectCostPeriod = function(period) {\n    scope.view.period = period;\n    scope.send({ topic: \"history/dashboard\", payload: { period: period } });\n    scheduleCostLayoutRefresh();\n  };\n\n  scope.$watch(\"msg\", function(msg) {\n    if (!msg || !msg.payload) return;\n    if (msg.payload === \"connect\" || (msg.payload === \"change\" && msg.name === \"KOSTEN\")) {\n      scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n      scheduleCostLayoutRefresh();\n      return;\n    }\n    if (msg.topic === \"aWATTar/tariff/current\") {\n      scope.view.tariff = msg.payload;\n    }\n    if (msg.topic === \"history/dashboard/result\") {\n      scope.view.history = msg.payload;\n      scope.view.period = msg.payload.period || scope.view.period;\n      scheduleCostLayoutRefresh();\n    }\n  });\n\n  window.addEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n  document.addEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  scheduleCostLayoutRefresh();\n\n  var refreshTimer = setInterval(function() {\n    scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n  }, 60000);\n  scope.$on(\"$destroy\", function() {\n    clearInterval(refreshTimer);\n    layoutTimers.forEach(clearTimeout);\n    window.removeEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n    document.removeEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  });\n})(scope);\n</script>\n\n<div class=\"cost-card\">\n  <div class=\"cost-toolbar\">\n    <h2>KOSTEN · Energiehistorie</h2>\n    <div class=\"cost-periods\">\n      <button ng-class=\"{active:view.period==='day'}\" ng-click=\"selectCostPeriod('day')\">Tag</button>\n      <button ng-class=\"{active:view.period==='month'}\" ng-click=\"selectCostPeriod('month')\">Monat</button>\n      <button ng-class=\"{active:view.period==='year'}\" ng-click=\"selectCostPeriod('year')\">Jahr</button>\n    </div>\n  </div>\n\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar-Preis</div>\n      <div class=\"cost-kpi-value\">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">reiner Börsenpreis, ohne Gebühren</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Netzbezug jetzt</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.gridImportWatt | number:0}} W</div>\n      <div class=\"cost-kpi-note\">Momentanleistung aus dem Stromnetz</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Kosten bei aktueller Leistung</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.costPerHourEur | currency:'€':4}} / h</div>\n      <div class=\"cost-kpi-note\">wenn der Netzbezug eine Stunde gleich bleibt</div>\n    </div>\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Verbrauchswert im Zeitraum</div>\n      <div class=\"cost-kpi-value\">{{view.history.totals.energyCostEur | currency:'€':2}}</div>\n      <div class=\"cost-kpi-note\">\n        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·\n        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie\n      </div>\n    </div>\n  </div>\n\n  <div class=\"cost-info\">\n    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen\n    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen\n    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.\n    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.\n  </div>\n\n  <h3 class=\"cost-section-title\">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>\n  <div class=\"cost-table-wrap\" ng-if=\"view.history.rows.length\">\n    <table class=\"cost-table\">\n      <thead>\n        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>\n      </thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"row in view.history.rows\" ng-click=\"row.expanded=!row.expanded\">\n          <td><span class=\"cost-expand\">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>\n          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>\n          <td>{{row.gridImportKWh | number:3}} kWh</td>\n          <td>{{row.pvEnergyKWh | number:3}} kWh</td>\n          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class=\"cost-muted\">{{row.energyCostEur * 100 | number:2}} ct</span></td>\n          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class=\"cost-muted\">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>\n          <td>\n            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}\n            <br><span ng-class=\"{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}\">\n              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}\n            </span>\n          </td>\n          <td ng-class=\"{'cost-offline':row.recordedHourCount && row.offlineCount>0}\">\n            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}\n          </td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"row.expanded\">\n          <td colspan=\"8\"><div class=\"cost-hours-inner\">\n            <div class=\"cost-hour-grid\">\n              <div class=\"cost-hour\" ng-repeat=\"hour in row.hours\">\n                <b>{{hour.time}} Uhr</b><br>\n                <span ng-if=\"hour.recorded\">\n                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh\n                  <div class=\"cost-hour-price\">\n                    {{hour.energyCostEur | currency:'€':4}}\n                    <span class=\"cost-hour-cents\">· {{hour.energyCostEur * 100 | number:2}} ct</span>\n                  </div>\n                  <span class=\"cost-muted\">\n                    Netz {{hour.gridImportKWh | number:3}} kWh ·\n                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct\n                  </span><br>\n                </span>\n                <span ng-if=\"!hour.recorded\">\n                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>\n                  <span class=\"cost-muted\">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>\n                </span>\n                <span ng-if=\"hour.recorded\">\n                  Energie: <span ng-class=\"{'cost-offline':hour.energyStatus!=='online'}\">{{hour.energyStatus}}</span> ·\n                  Wetter: <span ng-class=\"{'cost-offline':hour.weatherStatus!=='online'}\">{{hour.weatherStatus}}</span> ·\n                  Tarif: <span ng-class=\"{'cost-offline':hour.tariffStatus!=='online'}\">{{hour.tariffStatus}}</span>\n                </span>\n                <span ng-if=\"!hour.recorded\">{{hour.status}}</span>\n              </div>\n            </div>\n          </div></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"cost-empty\" ng-if=\"view.history && !view.history.rows.length\">\n    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.\n  </div>\n\n  <h3 class=\"cost-section-title\">Service- und Fehlerdiagnose</h3>\n  <div class=\"cost-diagnostics\">\n    <div class=\"cost-source\" ng-repeat=\"source in view.history.diagnostics\">\n      <div class=\"cost-source-head\">\n        <span class=\"cost-source-name\">{{source.source}}</span>\n        <span class=\"cost-badge\" ng-class=\"source.status\">{{source.status}}</span>\n      </div>\n      <div class=\"cost-source-detail\">\n        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>\n        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}\n        <span ng-if=\"source.error\"><br>Hinweis: {{source.error}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 990,
+        "y": 180,
+        "wires": [
+            [
+                "kosten_history_query_out"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_history_out",
+        "type": "link out",
+        "z": "kosten_flow",
+        "name": "Tarif an Datenbank speichern",
+        "mode": "link",
+        "links": [
+            "datenbank_telemetry_in"
+        ],
+        "x": 945,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_query_out",
+        "type": "link out",
+        "z": "kosten_flow",
+        "name": "TAG/MONAT/JAHR VON DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_query_in"
+        ],
+        "x": 1245,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_result_in",
+        "type": "link in",
+        "z": "kosten_flow",
+        "name": "DATENBANKAUSWERTUNG AN DASHBOARD",
+        "links": [
+            "datenbank_dashboard_out"
+        ],
+        "x": 745,
+        "y": 300,
+        "wires": [
+            [
+                "kosten_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_history_initial",
+        "type": "inject",
+        "z": "kosten_flow",
+        "name": "Monatsansicht beim Start laden",
+        "props": [
+            {
+                "p": "payload",
+                "v": "{\"period\":\"month\"}",
+                "vt": "json"
+            },
+            {
+                "p": "topic",
+                "v": "history/dashboard",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "6",
+        "topic": "history/dashboard",
+        "payload": "{\"period\":\"month\"}",
+        "payloadType": "json",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "kosten_history_query_out"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_dashboard_ui_control",
+        "type": "ui_ui_control",
+        "z": "kosten_flow",
+        "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
+        "events": "all",
+        "x": 465,
+        "y": 360,
+        "wires": [
+            [
+                "kosten_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_telemetry_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "Telemetrie speichern",
+        "links": [
+            "kosten_history_out"
+        ],
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_backup_schedule",
+        "type": "inject",
+        "z": "datenbank_flow",
+        "name": "SQLite-Backup täglich 02:15",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "history/backup",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "15 2 * * *",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "history/backup",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 440,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_history_store",
+        "type": "home-automation-history",
+        "z": "datenbank_flow",
+        "name": "Home Automation Historie",
+        "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+        "backupRetention": 31,
+        "x": 690,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_result_router"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_history_debug",
+        "type": "debug",
+        "z": "datenbank_flow",
+        "name": "Datenbankstatus",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "history",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "datenbank_energy_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "ENERGIE · Payload empfangen",
+        "links": [
+            "datenbank_energy_out"
+        ],
+        "x": 155,
+        "y": 180,
+        "wires": [
+            [
+                "datenbank_energy_topic"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_energy_topic",
+        "type": "change",
+        "z": "datenbank_flow",
+        "name": "Quelle Energie kennzeichnen",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "history/source/energy",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "source",
+                "pt": "msg",
+                "to": "SolarEdge",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_weather_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "WETTER · Payload empfangen",
+        "links": [
+            "weather_link_out"
+        ],
+        "x": 155,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_weather_topic"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_weather_topic",
+        "type": "change",
+        "z": "datenbank_flow",
+        "name": "Quelle Wetter kennzeichnen",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "history/source/weather",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "source",
+                "pt": "msg",
+                "to": "Open-Meteo",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_query_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "DASHBOARD · Zeitraum abfragen",
+        "links": [
+            "kosten_history_query_out"
+        ],
+        "x": 155,
+        "y": 300,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_hourly_schedule",
+        "type": "inject",
+        "z": "datenbank_flow",
+        "name": "STUNDENSTAND · jede Stunde + Start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "history/hourly-snapshot",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "history/hourly-snapshot",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 380,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_result_router",
+        "type": "switch",
+        "z": "datenbank_flow",
+        "name": "Antworten sauber verteilen",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "history/dashboard/result",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 950,
+        "y": 240,
+        "wires": [
+            [
+                "datenbank_dashboard_out"
+            ],
+            [
+                "datenbank_history_debug"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_dashboard_out",
+        "type": "link out",
+        "z": "datenbank_flow",
+        "name": "TAG/MONAT/JAHR AN KOSTEN",
+        "mode": "link",
+        "links": [
+            "kosten_history_result_in"
+        ],
+        "x": 1195,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "datenbank_error_catch",
+        "type": "catch",
+        "z": "datenbank_flow",
+        "name": "DATENBANK · Fehler sichtbar machen",
+        "scope": [
+            "datenbank_history_store"
+        ],
+        "uncaught": false,
+        "x": 720,
+        "y": 520,
+        "wires": [
+            [
+                "datenbank_error_debug"
+            ]
+        ]
+    },
+    {
+        "id": "datenbank_error_debug",
+        "type": "debug",
+        "z": "datenbank_flow",
+        "name": "DATENBANKFEHLER · vollständig",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "error.message",
+        "statusType": "msg",
+        "x": 1010,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "system_dashboard_template",
+        "type": "ui_template",
+        "z": "system_dashboard_flow",
+        "group": "system_dashboard_group",
+        "name": "Technisches Hausnetz",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .sys-card { width: 100%; box-sizing: border-box; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; }\n  .sys-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }\n  .sys-header h2 { margin: 0; color: #fff; font-size: 24px; }\n  .sys-subtitle, .sys-muted { color: #a9c4c6; font-size: 12px; }\n  .sys-overview { padding: 10px 13px; border: 1px solid #405b5f; border-radius: 12px; background: #1d2d2f; font-size: 12px; }\n  .sys-dot { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: #7f9295; }\n  .sys-dot.online { background: #4bd88a; }\n  .sys-dot.offline { background: #ff826d; }\n  .sys-summary { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }\n  .sys-kpi { padding: 14px 15px; border-radius: 13px; background: linear-gradient(135deg, #1d3c41, #244d52); }\n  .sys-kpi-label { font-size: 11px; text-transform: uppercase; color: #b7ced0; }\n  .sys-kpi-value { margin-top: 6px; color: #fff; font-size: 23px; font-weight: 700; }\n  .sys-kpi-note { margin-top: 4px; color: #a9c4c6; font-size: 11px; }\n  .sys-title { margin: 22px 0 9px; color: #fff; font-size: 16px; }\n  .sys-panel { border: 1px solid #405b5f; border-radius: 13px; background: #1d2d2f; overflow: hidden; }\n  .sys-table-wrap { width: 100%; overflow-x: auto; }\n  .sys-table { width: 100%; min-width: 700px; border-collapse: collapse; }\n  .sys-table th { padding: 11px 12px; background: #0b5960; color: #fff; text-align: left; font-size: 12px; }\n  .sys-table td { padding: 11px 12px; border-top: 1px solid #395357; font-size: 12px; vertical-align: top; }\n  .sys-device-name { color: #fff; font-weight: 700; }\n  .sys-empty { padding: 25px; color: #9bb5b8; text-align: center; }\n  .sys-badge { padding: 4px 8px; border-radius: 999px; background: #405055; font-size: 10px; font-weight: 700; text-transform: uppercase; }\n  .sys-badge.online { background: #14613f; color: #b9ffdc; }\n  .sys-badge.offline { background: #71342d; color: #ffd1c7; }\n  @media (max-width: 900px) { .sys-summary { grid-template-columns: repeat(2, 1fr); } }\n</style>\n\n<script>\n(function (scope) {\n  var empty = {\n    network: { state: \"waiting\", label: \"Monitoring wird vorbereitet\" },\n    summary: { devices: null, online: null, offline: null, updatedAt: null },\n    devices: []\n  };\n  scope.systemView = angular.copy(empty);\n\n  scope.stateClass = function (state) {\n    return state === \"online\" ? \"online\" : (state === \"offline\" ? \"offline\" : \"waiting\");\n  };\n  scope.stateLabel = function (state) {\n    return state === \"online\" ? \"online\" : (state === \"offline\" ? \"offline\" : (state === \"scanning\" ? \"Scan läuft\" : \"ausstehend\"));\n  };\n  scope.$watch(\"msg\", function (msg) {\n    if (!msg || !msg.payload || typeof msg.payload !== \"object\") return;\n    var incoming = msg.payload.system || msg.payload;\n    scope.systemView = {\n      network: angular.extend({}, empty.network, incoming.network || {}),\n      summary: angular.extend({}, empty.summary, incoming.summary || {}),\n      devices: Array.isArray(incoming.devices) ? incoming.devices : []\n    };\n  });\n})(scope);\n</script>\n\n<div class=\"sys-card\">\n  <div class=\"sys-header\">\n    <div>\n      <h2>SYSTEM · Technisches Hausnetz</h2>\n      <div class=\"sys-subtitle\">Raspberry Pi, Dienste, Phidget-Anbindung und technische Zustände</div>\n    </div>\n    <div class=\"sys-overview\">\n      <span class=\"sys-dot\" ng-class=\"stateClass(systemView.network.state)\"></span>{{systemView.network.label}}\n    </div>\n  </div>\n\n  <div class=\"sys-summary\">\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Erfasste Geräte</div><div class=\"sys-kpi-value\">{{systemView.summary.devices === null ? '—' : systemView.summary.devices}}</div><div class=\"sys-kpi-note\">Raspberry Pi und Netzwerktechnik</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Online</div><div class=\"sys-kpi-value\">{{systemView.summary.online === null ? '—' : systemView.summary.online}}</div><div class=\"sys-kpi-note\">aktuell erreichbar</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Offline</div><div class=\"sys-kpi-value\">{{systemView.summary.offline === null ? '—' : systemView.summary.offline}}</div><div class=\"sys-kpi-note\">benötigt Aufmerksamkeit</div></div>\n    <div class=\"sys-kpi\"><div class=\"sys-kpi-label\">Letzte Aktualisierung</div><div class=\"sys-kpi-value\">{{systemView.summary.updatedAt ? (systemView.summary.updatedAt | date:'HH:mm:ss') : '—'}}</div><div class=\"sys-kpi-note\">Zeitpunkt der Systemprüfung</div></div>\n  </div>\n\n  <h3 class=\"sys-title\">Angeschlossene Systeme</h3>\n  <div class=\"sys-panel sys-table-wrap\" ng-if=\"systemView.devices.length\">\n    <table class=\"sys-table\">\n      <thead><tr><th>Hostname</th><th>IP</th><th>System</th><th>Temperatur</th><th>Letzte Antwort</th><th>Status</th></tr></thead>\n      <tbody><tr ng-repeat=\"device in systemView.devices\">\n        <td class=\"sys-device-name\">{{device.name}}<br><span class=\"sys-muted\">{{device.hostname || 'kein Hostname'}}</span></td>\n        <td>{{device.ip}}</td>\n        <td>{{device.model || '—'}}<br><span class=\"sys-muted\">{{device.operatingSystem}}</span></td>\n        <td>{{device.temperatureC === null || device.temperatureC === undefined ? '—' : (device.temperatureC | number:1) + ' °C'}}</td>\n        <td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td>\n        <td><span class=\"sys-badge\" ng-class=\"stateClass(device.state)\">{{stateLabel(device.state)}}</span></td>\n      </tr></tbody>\n    </table>\n  </div>\n  <div class=\"sys-panel sys-empty\" ng-if=\"!systemView.devices.length\">Noch keine erreichbaren Systeme erfasst.</div>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 535,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "system_dashboard_data_in",
+        "type": "link in",
+        "z": "system_dashboard_flow",
+        "name": "Live-Geräteliste vom System-Scan",
+        "links": [
+            "system_dashboard_data_out"
+        ],
+        "x": 265,
+        "y": 180,
+        "wires": [
+            [
+                "system_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_command_out",
+        "type": "link out",
+        "z": "system_dashboard_flow",
+        "name": "Tresorbefehl an Systemnetz",
+        "mode": "link",
+        "links": [
+            "system_vault_command_in"
+        ],
+        "x": 795,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "system_vault_response_in",
+        "type": "link in",
+        "z": "system_dashboard_flow",
+        "name": "Tresorstatus vom Systemnetz",
+        "links": [
+            "system_vault_response_out"
+        ],
+        "x": 275,
+        "y": 240,
+        "wires": [
+            [
+                "system_vault_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_dashboard_template",
+        "type": "ui_template",
+        "z": "system_dashboard_flow",
+        "group": "system_dashboard_group",
+        "name": "Verschlüsselte System-Zugangsdaten",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .vault { width: 100%; box-sizing: border-box; color: #eaf5f6; font-family: Roboto, Arial, sans-serif; border: 1px solid #405b5f; border-radius: 13px; background: #1d2d2f; overflow: hidden; }\n  .vault-head, .vault-actions { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }\n  .vault-head { padding: 13px 15px; border-bottom: 1px solid #395357; background: #20383b; color: #fff; font-weight: 700; font-size: 14px; }\n  .vault-body { padding: 13px 15px; }\n  .vault-status, .vault-muted { color: #a9c4c6; font-size: 12px; }\n  .vault-error { margin: 12px 0; padding: 10px 12px; border-radius: 8px; background: #5a2525; color: #ffd4cf; }\n  .vault-form { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 12px; }\n  .vault-field { display: flex; flex-direction: column; gap: 5px; }\n  .vault-field.wide { grid-column: 1 / -1; }\n  .vault-field label { font-size: 11px; color: #b7ced0; }\n  .vault-field input { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #526d71; border-radius: 7px; background: #132629; color: #fff; }\n  .vault-actions { justify-content: flex-start; margin-top: 12px; }\n  .vault-btn { border: 1px solid #4d7378; border-radius: 7px; padding: 8px 11px; background: #0b5960; color: #fff; cursor: pointer; }\n  .vault-btn.secondary { background: #283f43; }\n  .vault-btn.danger { background: #71342d; }\n  .vault-btn:disabled { opacity: .45; }\n  .vault-link { border: 0; background: none; color: #73dfe5; text-decoration: underline; cursor: pointer; }\n  .vault-subpanel, .vault-note { margin-top: 14px; padding: 13px; border: 1px solid #395357; border-radius: 9px; background: #182d30; }\n  .vault-note { border-left: 3px solid #61d6dd; color: #b7ced0; font-size: 12px; }\n  .vault-table-wrap { width: 100%; margin-top: 14px; overflow-x: auto; border: 1px solid #456367; border-radius: 9px; }\n  .vault-table { width: 100%; min-width: 700px; border-collapse: collapse; }\n  .vault-table th { padding: 11px 12px; background: #0b5960; color: #fff; text-align: left; font-size: 12px; }\n  .vault-table td { padding: 11px 12px; border-top: 1px solid #395357; font-size: 12px; vertical-align: top; }\n  .vault-secret { font-family: monospace; color: #ffe6a8; word-break: break-all; }\n  .vault-empty { padding: 20px; color: #9bb5b8; text-align: center; }\n  @media (max-width: 600px) { .vault-form { grid-template-columns: 1fr; } .vault-field.wide { grid-column: auto; } }\n</style>\n\n<script>\n(function (scope) {\n  scope.vault = { initialized: null, locked: true, entries: [] };\n  scope.vaultInput = {};\n  scope.deviceForm = {};\n  var revealTimer;\n\n  function send(topic, payload) {\n    scope.vault.error = null;\n    scope.send({ topic: topic, payload: payload || {} });\n  }\n  function passwordsMatch(left, right, label) {\n    if (!left || left !== right) {\n      scope.vault.error = label + \" stimmen nicht überein\";\n      return false;\n    }\n    return true;\n  }\n  function hideRevealedPassword() {\n    scope.revealed = null;\n    if (revealTimer) clearTimeout(revealTimer);\n    scope.$applyAsync();\n  }\n\n  scope.setup = function () {\n    if (!passwordsMatch(scope.vaultInput.master, scope.vaultInput.master2, \"Master-Passwörter\")) return;\n    send(\"system/vault/setup\", {\n      masterPassword: scope.vaultInput.master,\n      recoveryQuestion: scope.vaultInput.question,\n      recoveryAnswer: scope.vaultInput.answer\n    });\n  };\n  scope.unlock = function () {\n    send(\"system/vault/unlock\", { masterPassword: scope.vaultInput.master });\n  };\n  scope.lock = function () {\n    hideRevealedPassword();\n    send(\"system/vault/lock\");\n  };\n  scope.recover = function () {\n    if (!passwordsMatch(scope.vaultInput.newMaster, scope.vaultInput.newMaster2, \"Neue Master-Passwörter\")) return;\n    send(\"system/vault/recover\", {\n      recoveryAnswer: scope.vaultInput.answer,\n      newMasterPassword: scope.vaultInput.newMaster\n    });\n  };\n  scope.add = function () {\n    scope.deviceForm = {};\n    scope.showDeviceForm = true;\n  };\n  scope.edit = function (entry) {\n    scope.deviceForm = { id: entry.id, name: entry.name, ip: entry.ip, user: entry.user, password: \"\" };\n    scope.showDeviceForm = true;\n    hideRevealedPassword();\n  };\n  scope.save = function () {\n    send(\"system/vault/save\", { record: angular.copy(scope.deviceForm) });\n  };\n  scope.remove = function (entry) {\n    if (window.confirm(\"Zugangsdaten für \" + entry.name + \" löschen?\")) send(\"system/vault/delete\", { id: entry.id });\n  };\n  scope.reveal = function (entry) {\n    hideRevealedPassword();\n    send(\"system/vault/reveal\", { id: entry.id });\n  };\n  scope.changeMaster = function () {\n    if (!passwordsMatch(scope.vaultInput.newMaster, scope.vaultInput.newMaster2, \"Neue Master-Passwörter\")) return;\n    send(\"system/vault/change-master\", { newMasterPassword: scope.vaultInput.newMaster });\n  };\n  scope.changeRecovery = function () {\n    send(\"system/vault/change-recovery\", {\n      recoveryQuestion: scope.vaultInput.question,\n      recoveryAnswer: scope.vaultInput.answer\n    });\n  };\n  scope.$watch(\"msg\", function (msg) {\n    if (!msg || msg.topic !== \"system/vault/state\" || !msg.payload) return;\n    scope.vault = angular.extend({}, scope.vault, msg.payload);\n    if (msg.payload.revealed) {\n      scope.revealed = msg.payload.revealed;\n      revealTimer = setTimeout(hideRevealedPassword, 15000);\n    }\n    if (!msg.payload.error) {\n      scope.vaultInput.master = \"\";\n      scope.vaultInput.master2 = \"\";\n      scope.vaultInput.answer = \"\";\n      scope.vaultInput.newMaster = \"\";\n      scope.vaultInput.newMaster2 = \"\";\n      scope.showDeviceForm = false;\n      scope.deviceForm = {};\n    }\n  });\n  setTimeout(function () { send(\"system/vault/status\"); }, 250);\n})(scope);\n</script>\n\n<div class=\"vault\">\n  <div class=\"vault-head\">\n    <span>Verschlüsselte System-Zugangsdaten</span>\n    <span class=\"vault-status\" ng-if=\"vault.initialized\">{{vault.locked ? 'GESPERRT' : 'ENTSPERRT · automatische Sperre nach 10 Minuten'}}</span>\n  </div>\n  <div class=\"vault-body\">\n    <div class=\"vault-error\" ng-if=\"vault.error\">{{vault.error}}</div>\n    <div class=\"vault-muted\" ng-if=\"vault.initialized === null\">Tresorstatus wird geladen …</div>\n\n    <div ng-if=\"vault.initialized === false\">\n      <p>Master-Passwort und private Sicherheitsfrage festlegen.</p>\n      <div class=\"vault-form\">\n        <div class=\"vault-field\"><label>Master-Passwort (mindestens 10 Zeichen)</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.master\"></div>\n        <div class=\"vault-field\"><label>Master-Passwort wiederholen</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.master2\"></div>\n        <div class=\"vault-field wide\"><label>Private Sicherheitsfrage</label><input type=\"text\" autocomplete=\"off\" ng-model=\"vaultInput.question\"></div>\n        <div class=\"vault-field wide\"><label>Private Antwort (mindestens 12 Zeichen)</label><input type=\"password\" autocomplete=\"off\" ng-model=\"vaultInput.answer\"></div>\n      </div>\n      <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"setup()\">Tresor einrichten</button></div>\n    </div>\n\n    <div ng-if=\"vault.initialized && vault.locked\">\n      <div class=\"vault-field\"><label>Master-Passwort</label><input type=\"password\" autocomplete=\"current-password\" ng-model=\"vaultInput.master\" ng-keypress=\"$event.which === 13 && unlock()\"></div>\n      <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"unlock()\" ng-disabled=\"vault.retryAfterSeconds > 0\">Entsperren</button><button class=\"vault-link\" ng-click=\"showRecovery = !showRecovery\">Master-Passwort vergessen?</button></div>\n      <div class=\"vault-subpanel\" ng-if=\"showRecovery\">\n        <strong>{{vault.recoveryQuestion || 'Keine Sicherheitsfrage eingerichtet'}}</strong>\n        <div class=\"vault-form\" ng-if=\"vault.recoveryConfigured\">\n          <div class=\"vault-field wide\"><label>Private Antwort</label><input type=\"password\" autocomplete=\"off\" ng-model=\"vaultInput.answer\"></div>\n          <div class=\"vault-field\"><label>Neues Master-Passwort</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster\"></div>\n          <div class=\"vault-field\"><label>Wiederholen</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster2\"></div>\n        </div>\n        <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"recover()\" ng-disabled=\"!vault.recoveryConfigured || vault.retryAfterSeconds > 0\">Wiederherstellen</button></div>\n      </div>\n    </div>\n\n    <div ng-if=\"vault.initialized && !vault.locked\">\n      <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"add()\">System hinzufügen</button><button class=\"vault-btn secondary\" ng-click=\"showMaster = !showMaster\">Master-Passwort ändern</button><button class=\"vault-btn secondary\" ng-click=\"showQuestion = !showQuestion\">Sicherheitsfrage ändern</button><button class=\"vault-btn danger\" ng-click=\"lock()\">Jetzt sperren</button></div>\n      <div class=\"vault-table-wrap\" ng-if=\"vault.entries.length\">\n        <table class=\"vault-table\"><thead><tr><th>System</th><th>IP</th><th>Benutzer</th><th>Passwort</th><th>Aktionen</th></tr></thead><tbody>\n          <tr ng-repeat=\"entry in vault.entries\"><td><strong>{{entry.name}}</strong></td><td>{{entry.ip}}</td><td>{{entry.user}}</td><td><span ng-if=\"!revealed || revealed.id !== entry.id\">••••••••</span><span class=\"vault-secret\" ng-if=\"revealed && revealed.id === entry.id\">{{revealed.password}}</span></td><td><button class=\"vault-btn secondary\" ng-click=\"reveal(entry)\">15 s anzeigen</button> <button class=\"vault-btn secondary\" ng-click=\"edit(entry)\">Bearbeiten</button> <button class=\"vault-btn danger\" ng-click=\"remove(entry)\">Löschen</button></td></tr>\n        </tbody></table>\n      </div>\n      <div class=\"vault-empty\" ng-if=\"!vault.entries.length\">Noch keine Zugangsdaten gespeichert.</div>\n\n      <div class=\"vault-subpanel\" ng-if=\"showDeviceForm\">\n        <strong>{{deviceForm.id ? 'System bearbeiten' : 'System hinzufügen'}}</strong>\n        <div class=\"vault-form\">\n          <div class=\"vault-field\"><label>Name</label><input type=\"text\" ng-model=\"deviceForm.name\"></div>\n          <div class=\"vault-field\"><label>Private IP-Adresse</label><input type=\"text\" placeholder=\"192.168.0.150\" ng-model=\"deviceForm.ip\"></div>\n          <div class=\"vault-field\"><label>SSH-Benutzer</label><input type=\"text\" autocomplete=\"off\" ng-model=\"deviceForm.user\"></div>\n          <div class=\"vault-field\"><label>{{deviceForm.id ? 'Neues Passwort (leer = unverändert)' : 'Passwort'}}</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"deviceForm.password\"></div>\n        </div>\n        <div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"save()\">Verschlüsselt speichern</button><button class=\"vault-btn secondary\" ng-click=\"showDeviceForm = false\">Abbrechen</button></div>\n      </div>\n\n      <div class=\"vault-subpanel\" ng-if=\"showMaster\"><div class=\"vault-form\"><div class=\"vault-field\"><label>Neues Master-Passwort</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster\"></div><div class=\"vault-field\"><label>Wiederholen</label><input type=\"password\" autocomplete=\"new-password\" ng-model=\"vaultInput.newMaster2\"></div></div><div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"changeMaster()\">Master-Passwort ändern</button></div></div>\n      <div class=\"vault-subpanel\" ng-if=\"showQuestion\"><div class=\"vault-form\"><div class=\"vault-field wide\"><label>Neue private Sicherheitsfrage</label><input type=\"text\" ng-model=\"vaultInput.question\"></div><div class=\"vault-field wide\"><label>Neue private Antwort</label><input type=\"password\" autocomplete=\"off\" ng-model=\"vaultInput.answer\"></div></div><div class=\"vault-actions\"><button class=\"vault-btn\" ng-click=\"changeRecovery()\">Sicherheitsfrage ändern</button></div></div>\n    </div>\n\n    <div class=\"vault-note\">Der Tresor liegt AES-256-GCM-verschlüsselt außerhalb von Git. „Bearbeiten“ ändert den gespeicherten Zugang; das Passwort auf dem Raspberry Pi bleibt unverändert.</div>\n  </div>\n</div>\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 535,
+        "y": 240,
+        "wires": [
+            [
+                "system_vault_command_out"
+            ]
+        ]
+    },
+    {
+        "id": "system_project_info_schedule",
+        "type": "inject",
+        "z": "system_dashboard_flow",
+        "name": "Projektinformation beim Start und jede Minute",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/project/info/request",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "system/project/info/request",
+        "payload": "",
+        "payloadType": "date",
+        "x": 245,
+        "y": 100,
+        "wires": [
+            [
+                "system_project_info_node"
+            ]
+        ]
+    },
+    {
+        "id": "system_project_info_node",
+        "type": "home-automation-project-info",
+        "z": "system_dashboard_flow",
+        "name": "Aktives Projekt und Git-Stand lesen",
+        "x": 540,
+        "y": 100,
+        "wires": [
+            [
+                "system_project_info_template"
+            ]
+        ]
+    },
+    {
+        "id": "system_project_info_template",
+        "type": "ui_template",
+        "z": "system_dashboard_flow",
+        "group": "system_dashboard_group",
+        "name": "Version, Branch und Kurzinfo",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "format": "<style id=\"home-automation-project-info-styles\">\n  #home-automation-project-status { display:flex; align-items:center; gap:7px; min-width:0; margin-left:auto; font-family:Roboto,Arial,sans-serif; }\n  #home-automation-project-status .ha-status-name { max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }\n  #home-automation-project-status .ha-status-chip { padding:4px 8px; border-radius:999px; background:rgba(0,0,0,.18); color:#fff; font-size:11px; line-height:18px; white-space:nowrap; }\n  #home-automation-project-status .ha-status-branch { max-width:260px; overflow:hidden; text-overflow:ellipsis; background:#0b5960; }\n  #home-automation-project-status .ha-status-dirty { background:#75561d; color:#ffe9b6; }\n  #home-automation-project-info-button { min-width:30px; width:30px; height:30px; margin:0 4px 0 0; padding:0; border:1px solid rgba(255,255,255,.8); border-radius:50%; background:transparent; color:#fff; font-size:17px; font-weight:700; cursor:pointer; }\n  #home-automation-project-info-panel { position:fixed; z-index:10000; top:56px; right:12px; width:min(620px,calc(100vw - 24px)); max-height:calc(100vh - 72px); overflow:auto; box-sizing:border-box; padding:16px; border:1px solid #456367; border-radius:11px; background:#1d2d2f; color:#eaf5f6; box-shadow:0 10px 28px rgba(0,0,0,.45); font-family:Roboto,Arial,sans-serif; }\n  #home-automation-project-info-panel[hidden] { display:none; }\n  #home-automation-project-info-panel h3 { margin:0 0 5px; color:#fff; font-size:17px; }\n  #home-automation-project-info-panel .ha-branch-name { margin:0 0 9px; color:#73dfe5; font-family:monospace; overflow-wrap:anywhere; }\n  #home-automation-project-info-panel .ha-branch-purpose { margin:0 0 14px; padding:10px 12px; border-left:3px solid #61d6dd; background:#162729; line-height:1.45; }\n  #home-automation-project-info-panel .ha-info-grid { display:grid; grid-template-columns:repeat(2,minmax(200px,1fr)); gap:0 18px; }\n  #home-automation-project-info-panel .ha-info-row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid #395357; font-size:12px; }\n  #home-automation-project-info-panel .ha-info-label { color:#9bb5b8; }\n  #home-automation-project-info-panel .ha-info-value { color:#fff; text-align:right; font-family:monospace; overflow-wrap:anywhere; }\n  #home-automation-project-info-panel .ha-overview { margin:12px 0 0; padding-left:20px; color:#c9dfe1; font-size:12px; line-height:1.6; }\n  @media (max-width:900px) { #home-automation-project-status .ha-status-name, #home-automation-project-status .ha-status-project, #home-automation-project-status .ha-status-commit { display:none; } #home-automation-project-status .ha-status-branch { max-width:190px; } }\n  @media (max-width:520px) { #home-automation-project-status .ha-status-branch { max-width:125px; } #home-automation-project-info-panel .ha-info-grid { grid-template-columns:1fr; } }\n</style>\n\n<script>\n(function() {\n  var latest = null;\n\n  function element(tag, className) {\n    var item = document.createElement(tag);\n    if (className) item.className = className;\n    return item;\n  }\n\n  function value(parent, selector, text) {\n    var target = parent.querySelector(selector);\n    if (target) target.textContent = text == null || text === \"\" ? \"—\" : String(text);\n  }\n\n  function ensurePanel() {\n    var panel = document.getElementById(\"home-automation-project-info-panel\");\n    if (panel) return panel;\n    panel = element(\"section\");\n    panel.id = \"home-automation-project-info-panel\";\n    panel.hidden = true;\n    panel.setAttribute(\"role\", \"dialog\");\n    panel.setAttribute(\"aria-label\", \"Branch-Kurzinfo und technischer Überblick\");\n    panel.innerHTML = '<h3>Branch-Kurzinfo</h3><p class=\"ha-branch-name\"></p><p class=\"ha-branch-purpose\"></p>' +\n      '<div class=\"ha-info-grid\">' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">App-Version</span><span class=\"ha-info-value ha-version\"></span></div>' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">Aktives Projekt</span><span class=\"ha-info-value ha-project\"></span></div>' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">Commit</span><span class=\"ha-info-value ha-commit\"></span></div>' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">Arbeitsbaum</span><span class=\"ha-info-value ha-working-tree\"></span></div>' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">Node-RED</span><span class=\"ha-info-value ha-node-red\"></span></div>' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">Node.js</span><span class=\"ha-info-value ha-node\"></span></div>' +\n      '<div class=\"ha-info-row\"><span class=\"ha-info-label\">Plattform</span><span class=\"ha-info-value ha-platform\"></span></div>' +\n      '</div><ul class=\"ha-overview\"></ul>';\n    document.body.appendChild(panel);\n    return panel;\n  }\n\n  function ensureStatus() {\n    var toolbar = document.querySelector(\".md-toolbar-tools\");\n    if (!toolbar) return null;\n    var status = document.getElementById(\"home-automation-project-status\");\n    if (!status) {\n      status = element(\"div\");\n      status.id = \"home-automation-project-status\";\n      status.innerHTML = '<span class=\"ha-status-name\"></span><span class=\"ha-status-chip ha-status-version\"></span>' +\n        '<span class=\"ha-status-chip ha-status-project\"></span><span class=\"ha-status-chip ha-status-branch\"></span>' +\n        '<span class=\"ha-status-chip ha-status-commit\"></span><button id=\"home-automation-project-info-button\" type=\"button\" title=\"Was macht dieser Branch?\" aria-label=\"Branch-Kurzinfo öffnen\" aria-expanded=\"false\">i</button>';\n      status.querySelector(\"button\").addEventListener(\"click\", function() {\n        var panel = ensurePanel();\n        panel.hidden = !panel.hidden;\n        this.setAttribute(\"aria-expanded\", String(!panel.hidden));\n      });\n    }\n    if (status.parentNode !== toolbar) {\n      var clock = document.getElementById(\"clock\");\n      toolbar.insertBefore(status, clock && clock.parentNode && clock.parentNode.parentNode === toolbar ? clock.parentNode : null);\n    }\n    return status;\n  }\n\n  function render() {\n    var status = ensureStatus();\n    if (!status || !latest) return;\n    var app = latest.application || {};\n    var source = latest.source || {};\n    var runtime = latest.runtime || {};\n    value(status, \".ha-status-name\", app.name || \"Home Automation\");\n    value(status, \".ha-status-version\", \"v\" + (app.version || \"—\"));\n    value(status, \".ha-status-project\", source.project || \"—\");\n    value(status, \".ha-status-branch\", source.branch || \"—\");\n    var commit = status.querySelector(\".ha-status-commit\");\n    commit.classList.toggle(\"ha-status-dirty\", !!source.dirty);\n    value(status, \".ha-status-commit\", source.dirty ? source.changedFiles + \" Änderungen\" : source.commit);\n    status.querySelector(\".ha-status-branch\").title = \"Branch: \" + (source.branch || \"unbekannt\");\n\n    var panel = ensurePanel();\n    value(panel, \".ha-branch-name\", source.branch);\n    value(panel, \".ha-branch-purpose\", source.branchPurpose);\n    value(panel, \".ha-version\", app.version);\n    value(panel, \".ha-project\", source.project);\n    value(panel, \".ha-commit\", source.commit);\n    value(panel, \".ha-working-tree\", source.dirty ? source.changedFiles + \" nicht committete Dateien\" : \"sauber\");\n    value(panel, \".ha-node-red\", runtime.nodeRedVersion);\n    value(panel, \".ha-node\", runtime.nodeVersion);\n    value(panel, \".ha-platform\", runtime.platform);\n    var overview = panel.querySelector(\".ha-overview\");\n    overview.textContent = \"\";\n    (latest.overview || []).forEach(function(text) {\n      var item = element(\"li\");\n      item.textContent = text;\n      overview.appendChild(item);\n    });\n  }\n\n  function loadProjectInfo() {\n    ensureStatus();\n    fetch(\"/home-automation/project-info\", {\n      cache: \"no-store\",\n      credentials: \"same-origin\"\n    })\n    .then(function(response) {\n      if (!response.ok) throw new Error(\"HTTP \" + response.status);\n      return response.json();\n    })\n    .then(function(payload) {\n      latest = payload;\n      render();\n    })\n    .catch(function(error) {\n      var status = ensureStatus();\n      if (status) {\n        value(status, \".ha-status-name\", \"Projektinfo nicht erreichbar\");\n        status.title = error.message || String(error);\n      }\n    });\n  }\n\n  if (document.homeAutomationProjectInfoInterval) clearInterval(document.homeAutomationProjectInfoInterval);\n  document.homeAutomationProjectInfoInterval = setInterval(loadProjectInfo, 60000);\n  setTimeout(loadProjectInfo, 250);\n})();\n</script>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "global",
+        "className": "",
+        "x": 825,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "system_scan_schedule",
+        "type": "inject",
+        "z": "system_network_flow",
+        "name": "Systemnetz beim Start und alle 5 Minuten scannen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/network/scan",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "8",
+        "topic": "system/network/scan",
+        "payload": "",
+        "payloadType": "date",
+        "x": 245,
+        "y": 120,
+        "wires": [
+            [
+                "system_local_ip_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_local_ip_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/hostname -I",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "5",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Lokale IPv4-Adresse ermitteln",
+        "x": 510,
+        "y": 40,
+        "wires": [
+            [
+                "system_scan_targets"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_scan_targets",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Lokales /24-Scan-Netz sicher ableiten",
+        "func": "// nodeId: system_scan_targets\nconst value = String(msg.payload || \"\").trim();\nconst match = value.match(/\\b(\\d{1,3}(?:\\.\\d{1,3}){3})\\b/);\n\nif (!match) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Lokale IPv4-Adresse nicht erkannt\" });\n    node.warn(\"Systemnetz-Scan übersprungen: keine private lokale IPv4-Adresse erhalten.\");\n    return null;\n}\n\nconst ip = match[1];\nconst parts = ip.split(\".\").map(Number);\nif (parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Ungültige lokale IPv4-Adresse\" });\n    return null;\n}\n\nconst privateNetwork = parts[0] === 10\n    || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31)\n    || (parts[0] === 192 && parts[1] === 168);\nif (!privateNetwork) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Keine private lokale IPv4-Adresse\" });\n    node.warn(\"Systemnetz-Scan übersprungen: Adresse liegt nicht im privaten Heimnetzbereich.\");\n    return null;\n}\n\nconst subnet = parts.slice(0, 3).join(\".\");\nconst scanId = `${subnet}-${Date.now()}`;\nconst targets = [];\nfor (let host = 1; host <= 254; host += 1) {\n    const target = `${subnet}.${host}`;\n    if (target !== ip) targets.push(target);\n}\n\nflow.set(\"systemNetworkScan\", {\n    scanId,\n    subnet,\n    localIp: ip,\n    startedAt: new Date().toISOString(),\n    expected: targets.length,\n    completed: 0,\n    results: {}\n});\n\nmsg.topic = \"system/network/scan/target\";\nmsg.scanId = scanId;\nmsg.scanSubnet = subnet;\nmsg.payload = targets;\nnode.status({ fill: \"blue\", shape: \"dot\", text: `${subnet}.0/24 · ${targets.length} Ziele` });\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 40,
+        "wires": [
+            [
+                "system_scan_split"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_split",
+        "type": "split",
+        "z": "system_network_flow",
+        "name": "Ein Ping je Netzadresse",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1130,
+        "y": 40,
+        "wires": [
+            [
+                "system_scan_target_property"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_target_property",
+        "type": "change",
+        "z": "system_network_flow",
+        "name": "Ziel-IP für Auswertung merken",
+        "rules": [
+            {
+                "t": "set",
+                "p": "targetIp",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1190,
+        "y": 100,
+        "wires": [
+            [
+                "system_scan_rate_limit"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_rate_limit",
+        "type": "delay",
+        "z": "system_network_flow",
+        "name": "Gedrosselt · maximal 8 Prüfungen/Sekunde",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "8",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 240,
+        "y": 220,
+        "wires": [
+            [
+                "system_ping_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_ping_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/ping -c 1 -W 1",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "2",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Erreichbarkeit prüfen (ICMP)",
+        "x": 620,
+        "y": 160,
+        "wires": [
+            [],
+            [],
+            [
+                "system_ping_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Online-Liste mit Hostnamen bilden",
+        "func": "// nodeId: system_scan_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst liveMetricsUpdate = msg.liveMetricsUpdate === true;\nconst raspberryInventory = {\n    \"192.168.0.104\": { hostname: \"pieast\", model: \"Frühes Raspberry-Pi-Modell\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 55 },\n    \"192.168.0.105\": { hostname: \"piwest\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 54 },\n    \"192.168.0.125\": { hostname: \"PIANTE_\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 9 Stretch\", services: \"SSH 22 · SMB 445\", temperatureC: 52 },\n    \"192.168.0.150\": { hostname: \"PICENTER2\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 11 Bullseye\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 45 },\n    \"192.168.0.190\": { hostname: \"pientry\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 13 Trixie\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 48 }\n};\n\nif (!scan || (!liveMetricsUpdate && (msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || typeof msg.online !== \"boolean\"))) {\n    return null;\n}\n\nif (!liveMetricsUpdate) {\n    scan.completed += 1;\n    scan.results[targetIp] = {\n        ip: targetIp,\n        hostname: msg.online && msg.hostname ? String(msg.hostname) : null,\n        state: msg.online ? \"online\" : \"offline\",\n        observedAt: new Date().toISOString()\n    };\n    flow.set(\"systemNetworkScan\", scan);\n}\n\nconst liveMetrics = flow.get(\"systemLiveMetrics\") || {};\nconst entries = Object.values(scan.results);\nconst onlineDevices = entries\n    .filter((entry) => entry.state === \"online\")\n    .sort((left, right) => left.ip.localeCompare(right.ip, undefined, { numeric: true }))\n    .map((entry) => {\n        const inventory = raspberryInventory[entry.ip] || null;\n        const live = liveMetrics[entry.ip] || null;\n        return {\n            name: live?.hostname || inventory?.hostname || entry.hostname || \"Netzwerkgerät\",\n            hostname: live?.hostname || inventory?.hostname || entry.hostname || null,\n            model: inventory?.model || null,\n            operatingSystem: inventory?.operatingSystem || null,\n            services: inventory?.services || null,\n            temperatureC: live?.temperatureC ?? inventory?.temperatureC ?? null,\n            temperatureSource: live?.temperatureC !== null && live?.temperatureC !== undefined ? \"live\" : (inventory ? \"inventory\" : null),\n            memoryUsedPercent: live?.memoryUsedPercent ?? null,\n            diskUsedPercent: live?.diskUsedPercent ?? null,\n            uptimeSeconds: live?.uptimeSeconds ?? null,\n            loadAverage: live?.loadAverage ?? null,\n            inventoryObservedAt: inventory ? \"2026-07-26\" : null,\n            ip: entry.ip,\n            lastSeen: entry.observedAt,\n            state: \"online\"\n        };\n    });\nconst finished = scan.completed >= scan.expected;\n\nif (!liveMetricsUpdate && !finished && scan.completed % 5 !== 0) return null;\n\nmsg.topic = \"system/network/overview\";\nmsg.payload = {\n    system: {\n        network: {\n            state: finished ? \"online\" : \"scanning\",\n            label: liveMetricsUpdate\n                ? `Live-Systemwerte aktualisiert · ${Object.keys(liveMetrics).length} Raspberry Pis erreichbar`\n                : (finished\n                ? `Netzscan abgeschlossen · ${onlineDevices.length} Geräte erreichbar`\n                : `Netzscan läuft · ${scan.completed}/${scan.expected} Adressen geprüft`),\n            updatedAt: new Date().toISOString()\n        },\n        summary: {\n            devices: onlineDevices.length,\n            online: onlineDevices.length,\n            offline: null,\n            updatedAt: new Date().toISOString()\n        },\n        devices: onlineDevices\n    }\n};\nnode.status({\n    fill: finished || liveMetricsUpdate ? \"green\" : \"blue\",\n    shape: \"dot\",\n    text: liveMetricsUpdate ? `${Object.keys(liveMetrics).length} Live-Systeme` : (finished ? `${onlineDevices.length} Geräte online` : `${scan.completed}/${scan.expected} geprüft`)\n});\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 340,
+        "wires": [
+            [
+                "system_dashboard_data_out",
+                "system_scan_debug"
+            ]
+        ]
+    },
+    {
+        "id": "system_dashboard_data_out",
+        "type": "link out",
+        "z": "system_network_flow",
+        "name": "Online-Geräteliste an SYSTEM-Dashboard",
+        "mode": "link",
+        "links": [
+            "system_dashboard_data_in"
+        ],
+        "x": 1095,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "system_scan_debug",
+        "type": "debug",
+        "z": "system_network_flow",
+        "name": "Systemnetz · geprüfte Online-Liste",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "system_ping_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Ping-Ergebnis sicher auswerten",
+        "func": "// nodeId: system_ping_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst result = msg.payload;\nconst code = typeof result === \"object\" && result !== null ? Number(result.code) : Number(result);\n\nif (!scan || msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || !Number.isFinite(code)) {\n    return [null, null];\n}\n\nmsg.online = code === 0;\nmsg.payload = targetIp;\nreturn msg.online ? [msg, null] : [null, msg];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 240,
+        "wires": [
+            [
+                "system_hostname_exec"
+            ],
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_hostname_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/sh -c 'name=$(/usr/bin/dig +time=1 +tries=1 -x \"$1\" +short | /usr/bin/head -n 1 | /usr/bin/tr -d \"\\n\"); printf \"__SYSTEM_HOSTNAME__%s\\n\" \"$name\"' system-hostname",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "3",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Hostname für Online-Gerät auflösen",
+        "x": 1035,
+        "y": 180,
+        "wires": [
+            [
+                "system_hostname_result"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_hostname_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Hostname sicher übernehmen",
+        "func": "// nodeId: system_hostname_result\nconst marker = \"__SYSTEM_HOSTNAME__\";\nconst raw = String(msg.payload || \"\").trim();\nlet hostname = raw.startsWith(marker) ? raw.slice(marker.length).trim() : \"\";\n\nif (hostname.endsWith(\".\")) hostname = hostname.slice(0, -1);\nif (!/^[A-Za-z0-9][A-Za-z0-9.-]{0,251}$/.test(hostname)) hostname = \"\";\n\nmsg.hostname = hostname || null;\nmsg.online = true;\nmsg.payload = msg.targetIp;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1310,
+        "y": 240,
+        "wires": [
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_live_metrics_schedule",
+        "type": "inject",
+        "z": "system_network_flow",
+        "name": "Raspberry-Pi-Livewerte jede Minute abrufen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/vault/probe",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "15",
+        "topic": "system/vault/probe",
+        "payload": "",
+        "payloadType": "date",
+        "x": 270,
+        "y": 420,
+        "wires": [
+            [
+                "system_credential_vault"
+            ]
+        ]
+    },
+    {
+        "id": "system_live_metrics_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Livewerte prüfen und Dashboard aktualisieren",
+        "func": "// nodeId: system_live_metrics_result\nlet payload = msg.payload;\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n    } catch {\n        node.status({ fill: \"red\", shape: \"ring\", text: \"Livewerte nicht lesbar\" });\n        return null;\n    }\n}\n\nconst devices = Array.isArray(payload?.devices) ? payload.devices : [];\nconst errorText = typeof payload?.error === \"string\" ? payload.error.trim() : \"\";\nconst metrics = {};\nfor (const device of devices) {\n    if (!device?.online || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(String(device.ip || \"\"))) continue;\n    metrics[device.ip] = device;\n}\n\nflow.set(\"systemLiveMetrics\", metrics);\nflow.set(\"systemLiveMetricsError\", errorText || null);\nmsg.liveMetricsUpdate = true;\nmsg.liveMetricsError = errorText || null;\nmsg.topic = \"system/live/metrics\";\nmsg.payload = null;\nif (errorText) {\n    node.status({ fill: \"red\", shape: \"ring\", text: errorText.slice(0, 48) });\n    node.warn(`System-Livewerte: ${errorText}`);\n} else {\n    node.status({ fill: \"green\", shape: \"dot\", text: `${Object.keys(metrics).length} Live-Systeme erreichbar` });\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 580,
+        "wires": [
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_credential_vault",
+        "type": "home-automation-credential-vault",
+        "z": "system_network_flow",
+        "name": "Verschlüsselter System-Zugangstresor",
+        "vaultPath": "system-credentials.vault.json",
+        "autoLockMinutes": 10,
+        "x": 610,
+        "y": 540,
+        "wires": [
+            [
+                "system_vault_response_out"
+            ],
+            [
+                "system_live_metrics_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_command_in",
+        "type": "link in",
+        "z": "system_network_flow",
+        "name": "Tresorbefehl vom SYSTEM-Dashboard",
+        "links": [
+            "system_vault_command_out"
+        ],
+        "x": 345,
+        "y": 480,
+        "wires": [
+            [
+                "system_credential_vault"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_response_out",
+        "type": "link out",
+        "z": "system_network_flow",
+        "name": "Tresorstatus an SYSTEM-Dashboard",
+        "mode": "link",
+        "links": [
+            "system_vault_response_in"
+        ],
+        "x": 850,
+        "y": 480,
+        "wires": []
     }
 ]

@@ -16,6 +16,68 @@
     ]
   },
   {
+    "id": "datenbank_backup_schedule",
+    "type": "inject",
+    "z": "datenbank_flow",
+    "name": "SQLite-Backup täglich 02:15",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "v": "history/backup",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "15 2 * * *",
+    "once": true,
+    "onceDelay": "10",
+    "topic": "history/backup",
+    "payload": "",
+    "payloadType": "date",
+    "x": 190,
+    "y": 440,
+    "wires": [
+      [
+        "datenbank_history_store"
+      ]
+    ]
+  },
+  {
+    "id": "datenbank_history_store",
+    "type": "home-automation-history",
+    "z": "datenbank_flow",
+    "name": "Home Automation Historie",
+    "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+    "backupRetention": 31,
+    "x": 690,
+    "y": 240,
+    "wires": [
+      [
+        "datenbank_result_router"
+      ]
+    ]
+  },
+  {
+    "id": "datenbank_history_debug",
+    "type": "debug",
+    "z": "datenbank_flow",
+    "name": "Datenbankstatus",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "history",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1190,
+    "y": 280,
+    "wires": []
+  },
+  {
     "id": "datenbank_energy_in",
     "type": "link in",
     "z": "datenbank_flow",
@@ -162,51 +224,6 @@
     ]
   },
   {
-    "id": "datenbank_backup_schedule",
-    "type": "inject",
-    "z": "datenbank_flow",
-    "name": "SQLite-Backup täglich 02:15",
-    "props": [
-      {
-        "p": "payload"
-      },
-      {
-        "p": "topic",
-        "v": "history/backup",
-        "vt": "str"
-      }
-    ],
-    "repeat": "",
-    "crontab": "15 2 * * *",
-    "once": true,
-    "onceDelay": "10",
-    "topic": "history/backup",
-    "payload": "",
-    "payloadType": "date",
-    "x": 190,
-    "y": 440,
-    "wires": [
-      [
-        "datenbank_history_store"
-      ]
-    ]
-  },
-  {
-    "id": "datenbank_history_store",
-    "type": "home-automation-history",
-    "z": "datenbank_flow",
-    "name": "Home Automation Historie",
-    "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
-    "backupRetention": 31,
-    "x": 690,
-    "y": 240,
-    "wires": [
-      [
-        "datenbank_result_router"
-      ]
-    ]
-  },
-  {
     "id": "datenbank_result_router",
     "type": "switch",
     "z": "datenbank_flow",
@@ -248,23 +265,6 @@
     ],
     "x": 1195,
     "y": 200,
-    "wires": []
-  },
-  {
-    "id": "datenbank_history_debug",
-    "type": "debug",
-    "z": "datenbank_flow",
-    "name": "Datenbankstatus",
-    "active": false,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "history",
-    "targetType": "msg",
-    "statusVal": "",
-    "statusType": "auto",
-    "x": 1190,
-    "y": 280,
     "wires": []
   },
   {

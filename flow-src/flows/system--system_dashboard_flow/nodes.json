@@ -1,71 +1,5 @@
 [
   {
-    "id": "system_project_info_schedule",
-    "type": "inject",
-    "z": "system_dashboard_flow",
-    "name": "Projektinformation beim Start und jede Minute",
-    "props": [
-      {"p": "payload"},
-      {"p": "topic", "v": "system/project/info/request", "vt": "str"}
-    ],
-    "repeat": "60",
-    "crontab": "",
-    "once": true,
-    "onceDelay": "2",
-    "topic": "system/project/info/request",
-    "payload": "",
-    "payloadType": "date",
-    "x": 245,
-    "y": 100,
-    "wires": [["system_project_info_node"]]
-  },
-  {
-    "id": "system_project_info_node",
-    "type": "home-automation-project-info",
-    "z": "system_dashboard_flow",
-    "name": "Aktives Projekt und Git-Stand lesen",
-    "x": 540,
-    "y": 100,
-    "wires": [["system_project_info_template"]]
-  },
-  {
-    "id": "system_project_info_template",
-    "type": "ui_template",
-    "z": "system_dashboard_flow",
-    "group": "system_dashboard_group",
-    "name": "Version, Branch und Kurzinfo",
-    "order": 0,
-    "width": 0,
-    "height": 0,
-    "format": {
-      "$flowSource": "flows/system--system_dashboard_flow/templates/version-und-kurzinfo.html"
-    },
-    "storeOutMessages": true,
-    "fwdInMessages": false,
-    "resendOnRefresh": true,
-    "templateScope": "global",
-    "className": "",
-    "x": 825,
-    "y": 100,
-    "wires": [[]]
-  },
-  {
-    "id": "system_dashboard_data_in",
-    "type": "link in",
-    "z": "system_dashboard_flow",
-    "name": "Live-Geräteliste vom System-Scan",
-    "links": [
-      "system_dashboard_data_out"
-    ],
-    "x": 265,
-    "y": 180,
-    "wires": [
-      [
-        "system_dashboard_template"
-      ]
-    ]
-  },
-  {
     "id": "system_dashboard_template",
     "type": "ui_template",
     "z": "system_dashboard_flow",
@@ -84,7 +18,54 @@
     "className": "",
     "x": 535,
     "y": 180,
-    "wires": [[]]
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "system_dashboard_data_in",
+    "type": "link in",
+    "z": "system_dashboard_flow",
+    "name": "Live-Geräteliste vom System-Scan",
+    "links": [
+      "system_dashboard_data_out"
+    ],
+    "x": 265,
+    "y": 180,
+    "wires": [
+      [
+        "system_dashboard_template"
+      ]
+    ]
+  },
+  {
+    "id": "system_vault_command_out",
+    "type": "link out",
+    "z": "system_dashboard_flow",
+    "name": "Tresorbefehl an Systemnetz",
+    "mode": "link",
+    "links": [
+      "system_vault_command_in"
+    ],
+    "x": 795,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "system_vault_response_in",
+    "type": "link in",
+    "z": "system_dashboard_flow",
+    "name": "Tresorstatus vom Systemnetz",
+    "links": [
+      "system_vault_response_out"
+    ],
+    "x": 275,
+    "y": 240,
+    "wires": [
+      [
+        "system_vault_dashboard_template"
+      ]
+    ]
   },
   {
     "id": "system_vault_dashboard_template",
@@ -96,7 +77,7 @@
     "width": 0,
     "height": 0,
     "format": {
-      "$flowSource": "flows/system--system_dashboard_flow/templates/zugangsdaten-tresor.html"
+      "$flowSource": "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html"
     },
     "storeOutMessages": false,
     "fwdInMessages": false,
@@ -105,27 +86,76 @@
     "className": "",
     "x": 535,
     "y": 240,
-    "wires": [["system_vault_command_out"]]
+    "wires": [
+      [
+        "system_vault_command_out"
+      ]
+    ]
   },
   {
-    "id": "system_vault_command_out",
-    "type": "link out",
+    "id": "system_project_info_schedule",
+    "type": "inject",
     "z": "system_dashboard_flow",
-    "name": "Tresorbefehl an Systemnetz",
-    "mode": "link",
-    "links": ["system_vault_command_in"],
-    "x": 795,
-    "y": 240,
-    "wires": []
+    "name": "Projektinformation beim Start und jede Minute",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "v": "system/project/info/request",
+        "vt": "str"
+      }
+    ],
+    "repeat": "60",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "2",
+    "topic": "system/project/info/request",
+    "payload": "",
+    "payloadType": "date",
+    "x": 245,
+    "y": 100,
+    "wires": [
+      [
+        "system_project_info_node"
+      ]
+    ]
   },
   {
-    "id": "system_vault_response_in",
-    "type": "link in",
+    "id": "system_project_info_node",
+    "type": "home-automation-project-info",
     "z": "system_dashboard_flow",
-    "name": "Tresorstatus vom Systemnetz",
-    "links": ["system_vault_response_out"],
-    "x": 275,
-    "y": 240,
-    "wires": [["system_vault_dashboard_template"]]
+    "name": "Aktives Projekt und Git-Stand lesen",
+    "x": 540,
+    "y": 100,
+    "wires": [
+      [
+        "system_project_info_template"
+      ]
+    ]
+  },
+  {
+    "id": "system_project_info_template",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "system_dashboard_group",
+    "name": "Version, Branch und Kurzinfo",
+    "order": 0,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/version-branch-und-kurzinfo.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "global",
+    "className": "",
+    "x": 825,
+    "y": 100,
+    "wires": [
+      []
+    ]
   }
 ]

@@ -214,42 +214,6 @@
     ]
   },
   {
-    "id": "datenbank_energy_out",
-    "type": "link out",
-    "z": "b86cb602995b0261",
-    "name": "ENERGIEDATEN AN DATENBANK",
-    "mode": "link",
-    "links": [
-      "datenbank_energy_in"
-    ],
-    "x": 915,
-    "y": 620,
-    "wires": []
-  },
-  {
-    "id": "ui_house_total_power",
-    "type": "ui_template",
-    "z": "b86cb602995b0261",
-    "group": "24a6bcc7d3d966ac",
-    "name": "Gesamtleistungsaufnahme Haus",
-    "order": 5,
-    "width": 0,
-    "height": 2,
-    "format": {
-      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html"
-    },
-    "storeOutMessages": true,
-    "fwdInMessages": true,
-    "resendOnRefresh": true,
-    "templateScope": "local",
-    "className": "",
-    "x": 990,
-    "y": 680,
-    "wires": [
-      []
-    ]
-  },
-  {
     "id": "361eb71ca0080e07",
     "type": "debug",
     "z": "b86cb602995b0261",
@@ -482,6 +446,42 @@
     "wires": [
       [],
       [],
+      []
+    ]
+  },
+  {
+    "id": "datenbank_energy_out",
+    "type": "link out",
+    "z": "b86cb602995b0261",
+    "name": "ENERGIEDATEN AN DATENBANK",
+    "mode": "link",
+    "links": [
+      "datenbank_energy_in"
+    ],
+    "x": 915,
+    "y": 620,
+    "wires": []
+  },
+  {
+    "id": "ui_house_total_power",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "24a6bcc7d3d966ac",
+    "name": "Gesamtleistungsaufnahme Haus",
+    "order": 5,
+    "width": 0,
+    "height": 2,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 990,
+    "y": 680,
+    "wires": [
       []
     ]
   }

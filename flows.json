@@ -146,6 +146,38 @@
         "info": "Eigenständiger Wetter-Flow für Reindlmühl bei Altmünster am Traunsee mit Open-Meteo. Stündliche Aktualisierung, sicherer Ausfallzustand und strukturierte Payload für spätere Gerätesteuerungen."
     },
     {
+        "id": "kosten_flow",
+        "type": "tab",
+        "label": "KOSTEN",
+        "disabled": false,
+        "info": "Schritt 1: aWATTar-Börsenpreise abrufen. Der aktuelle Preis wird als aWATTarCurrentTariff im Flow- und Global-Context gespeichert.",
+        "env": []
+    },
+    {
+        "id": "datenbank_flow",
+        "type": "tab",
+        "label": "DATENBANK",
+        "disabled": false,
+        "info": "Projektlokale SQLite-Historie für fachliche Telemetrie, Tarife und Kosten. Datenbankdatei und Backups sind von Git ausgeschlossen.",
+        "env": []
+    },
+    {
+        "id": "system_dashboard_flow",
+        "type": "tab",
+        "label": "SYSTEM",
+        "disabled": false,
+        "info": "Dashboard-Vorlage für Netzwerk-, Raspberry-Pi- und Phidget-Status. Die technische Erfassung wird in einem separaten Schritt ergänzt.",
+        "env": []
+    },
+    {
+        "id": "system_network_flow",
+        "type": "tab",
+        "label": "System · Netzwerk-Scan",
+        "disabled": false,
+        "info": "Eigenständiger, gedrosselter ICMP-Scan des lokalen /24-Heimnetzes. Es werden nur erreichbare Geräte an das SYSTEM-Dashboard gemeldet; nicht antwortende IP-Adressen werden nicht als Geräte interpretiert.",
+        "env": []
+    },
+    {
         "id": "f6dd1fca.6c306",
         "type": "subflow",
         "name": "SUB_ANTEROOM_MAIN_LIGHT",
@@ -2021,7 +2053,7 @@
         ],
         "x": 2154,
         "y": 39,
-        "w": 362,
+        "w": 352,
         "h": 82
     },
     {
@@ -2364,9 +2396,9 @@
             "65acd935.85f9b8",
             "d3afa9e1.b3b358"
         ],
-        "x": 974,
+        "x": 964,
         "y": 699,
-        "w": 232,
+        "w": 252,
         "h": 242
     },
     {
@@ -2781,6 +2813,46 @@
         "type": "ui_group",
         "name": "WETTERÜBERSICHT",
         "tab": "weather_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "kosten_dashboard_tab",
+        "type": "ui_tab",
+        "name": "KOSTEN",
+        "icon": "euro_symbol",
+        "order": 14,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "kosten_dashboard_group",
+        "type": "ui_group",
+        "name": "STROMKOSTEN",
+        "tab": "kosten_dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "system_dashboard_tab",
+        "type": "ui_tab",
+        "name": "SYSTEM",
+        "icon": "dns",
+        "order": 15,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "system_dashboard_group",
+        "type": "ui_group",
+        "name": "TECHNISCHE ÜBERSICHT",
+        "tab": "system_dashboard_tab",
         "order": 1,
         "disp": true,
         "width": "18",
@@ -6371,7 +6443,9 @@
         "active": true,
         "x": 1360,
         "y": 60,
-        "wires": []
+        "wires": [
+            []
+        ]
     },
     {
         "id": "2a0fb1c8.57c7ae",
@@ -8305,6 +8379,40 @@
         ]
     },
     {
+        "id": "datenbank_energy_out",
+        "type": "link out",
+        "z": "b86cb602995b0261",
+        "name": "ENERGIEDATEN AN DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_energy_in"
+        ],
+        "x": 915,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "ui_house_total_power",
+        "type": "ui_template",
+        "z": "b86cb602995b0261",
+        "group": "24a6bcc7d3d966ac",
+        "name": "Gesamtleistungsaufnahme Haus",
+        "order": 5,
+        "width": 0,
+        "height": 2,
+        "format": "<style>\n.se-house-power{\n  box-sizing:border-box;\n  width:100%;\n  max-width:100%;\n  overflow:hidden;\n  padding:12px 14px;\n  border:1px solid #526b6e;\n  border-left:5px solid #00a6b2;\n  border-radius:9px;\n  background:linear-gradient(135deg,#203739,#29484b);\n  color:#eaf5f6;\n  font-family:Roboto,Arial,sans-serif;\n}\n.se-house-power.offline{border-left-color:#ef5350;opacity:.8}\n.se-house-power-head{display:grid;grid-template-columns:1fr;gap:1px}\n.se-house-power-label{min-width:0;font-size:14px;font-weight:700}\n.se-house-power-value{justify-self:end;min-width:0;font-size:23px;font-weight:800;color:#62dce4;white-space:nowrap;font-variant-numeric:tabular-nums}\n.se-house-power-formula{margin-top:7px;color:#b7ced0;font-size:12px;line-height:1.45}\n.se-house-power-formula b{color:#fff}\n.se-house-power-offline{margin-top:5px;color:#ffb5a8;font-size:11px}\n@media(max-width:520px){\n  .se-house-power-value{font-size:21px}\n}\n</style>\n<div class=\"se-house-power\" ng-class=\"{'offline':msg.payload.OfflineFlag}\">\n  <div class=\"se-house-power-head\">\n    <span class=\"se-house-power-label\">Gesamtleistungsaufnahme Haus</span>\n    <span class=\"se-house-power-value\">{{msg.payload.HouseConsumptionWatt | number:0}} W</span>\n  </div>\n  <div class=\"se-house-power-formula\">\n    <b>{{msg.payload.PvPowerWatt | number:0}} W</b> Solar\n    + <b>{{msg.payload.GridImportWatt | number:0}} W</b> Netzbezug\n    − <b>{{msg.payload.FeedInWatt | number:0}} W</b> Einspeisung\n  </div>\n  <div class=\"se-house-power-offline\" ng-if=\"msg.payload.OfflineFlag\">\n    SolarEdge offline · Anzeige bleibt bis zu gültigen Messwerten auf 0 W.\n  </div>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 990,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "se_read_power",
         "type": "modbus-read",
         "z": "tab_read_feedin",
@@ -8864,12 +8972,29 @@
         ]
     },
     {
-        "id": "kosten_flow",
-        "type": "tab",
-        "label": "KOSTEN",
-        "disabled": false,
-        "info": "Schritt 1: aWATTar-Börsenpreise abrufen. Der aktuelle Preis wird als aWATTarCurrentTariff im Flow- und Global-Context gespeichert.",
-        "env": []
+        "id": "weather_retry_delay",
+        "type": "delay",
+        "z": "weather_flow",
+        "name": "Wetterfehler · nach 30 Sekunden erneut",
+        "pauseType": "delay",
+        "timeout": "30",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1100,
+        "y": 360,
+        "wires": [
+            [
+                "weather_build_request"
+            ]
+        ]
     },
     {
         "id": "kosten_tarif_zeitplan",
@@ -8964,26 +9089,6 @@
         "wires": []
     },
     {
-        "id": "kosten_dashboard_tab",
-        "type": "ui_tab",
-        "name": "KOSTEN",
-        "icon": "euro_symbol",
-        "order": 14,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "kosten_dashboard_group",
-        "type": "ui_group",
-        "name": "STROMKOSTEN",
-        "tab": "kosten_dashboard_tab",
-        "order": 1,
-        "disp": true,
-        "width": "18",
-        "collapse": false,
-        "className": ""
-    },
-    {
         "id": "kosten_dashboard_template",
         "type": "ui_template",
         "z": "kosten_flow",
@@ -9007,12 +9112,92 @@
         ]
     },
     {
-        "id": "datenbank_flow",
-        "type": "tab",
-        "label": "DATENBANK",
-        "disabled": false,
-        "info": "Projektlokale SQLite-Historie für fachliche Telemetrie, Tarife und Kosten. Datenbankdatei und Backups sind von Git ausgeschlossen.",
-        "env": []
+        "id": "kosten_history_out",
+        "type": "link out",
+        "z": "kosten_flow",
+        "name": "Tarif an Datenbank speichern",
+        "mode": "link",
+        "links": [
+            "datenbank_telemetry_in"
+        ],
+        "x": 945,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_query_out",
+        "type": "link out",
+        "z": "kosten_flow",
+        "name": "TAG/MONAT/JAHR VON DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_query_in"
+        ],
+        "x": 1245,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "kosten_history_result_in",
+        "type": "link in",
+        "z": "kosten_flow",
+        "name": "DATENBANKAUSWERTUNG AN DASHBOARD",
+        "links": [
+            "datenbank_dashboard_out"
+        ],
+        "x": 745,
+        "y": 300,
+        "wires": [
+            [
+                "kosten_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_history_initial",
+        "type": "inject",
+        "z": "kosten_flow",
+        "name": "Monatsansicht beim Start laden",
+        "props": [
+            {
+                "p": "payload",
+                "v": "{\"period\":\"month\"}",
+                "vt": "json"
+            },
+            {
+                "p": "topic",
+                "v": "history/dashboard",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "6",
+        "topic": "history/dashboard",
+        "payload": "{\"period\":\"month\"}",
+        "payloadType": "json",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "kosten_history_query_out"
+            ]
+        ]
+    },
+    {
+        "id": "kosten_dashboard_ui_control",
+        "type": "ui_ui_control",
+        "z": "kosten_flow",
+        "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
+        "events": "all",
+        "x": 465,
+        "y": 360,
+        "wires": [
+            [
+                "kosten_dashboard_template"
+            ]
+        ]
     },
     {
         "id": "datenbank_telemetry_in",
@@ -9090,19 +9275,6 @@
         "statusType": "auto",
         "x": 1190,
         "y": 280,
-        "wires": []
-    },
-    {
-        "id": "kosten_history_out",
-        "type": "link out",
-        "z": "kosten_flow",
-        "name": "Tarif an Datenbank speichern",
-        "mode": "link",
-        "links": [
-            "datenbank_telemetry_in"
-        ],
-        "x": 945,
-        "y": 240,
         "wires": []
     },
     {
@@ -9330,168 +9502,6 @@
         "wires": []
     },
     {
-        "id": "kosten_history_query_out",
-        "type": "link out",
-        "z": "kosten_flow",
-        "name": "TAG/MONAT/JAHR VON DATENBANK",
-        "mode": "link",
-        "links": [
-            "datenbank_query_in"
-        ],
-        "x": 1245,
-        "y": 300,
-        "wires": []
-    },
-    {
-        "id": "kosten_history_result_in",
-        "type": "link in",
-        "z": "kosten_flow",
-        "name": "DATENBANKAUSWERTUNG AN DASHBOARD",
-        "links": [
-            "datenbank_dashboard_out"
-        ],
-        "x": 745,
-        "y": 300,
-        "wires": [
-            [
-                "kosten_dashboard_template"
-            ]
-        ]
-    },
-    {
-        "id": "kosten_history_initial",
-        "type": "inject",
-        "z": "kosten_flow",
-        "name": "Monatsansicht beim Start laden",
-        "props": [
-            {
-                "p": "payload",
-                "v": "{\"period\":\"month\"}",
-                "vt": "json"
-            },
-            {
-                "p": "topic",
-                "v": "history/dashboard",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "6",
-        "topic": "history/dashboard",
-        "payload": "{\"period\":\"month\"}",
-        "payloadType": "json",
-        "x": 220,
-        "y": 300,
-        "wires": [
-            [
-                "kosten_history_query_out"
-            ]
-        ]
-    },
-    {
-        "id": "datenbank_energy_out",
-        "type": "link out",
-        "z": "b86cb602995b0261",
-        "name": "ENERGIEDATEN AN DATENBANK",
-        "mode": "link",
-        "links": [
-            "datenbank_energy_in"
-        ],
-        "x": 915,
-        "y": 620,
-        "wires": []
-    },
-    {
-        "id": "ui_house_total_power",
-        "type": "ui_template",
-        "z": "b86cb602995b0261",
-        "group": "24a6bcc7d3d966ac",
-        "name": "Gesamtleistungsaufnahme Haus",
-        "order": 5,
-        "width": 0,
-        "height": 2,
-        "format": "<style>\n.se-house-power{\n  box-sizing:border-box;\n  width:100%;\n  max-width:100%;\n  overflow:hidden;\n  padding:12px 14px;\n  border:1px solid #526b6e;\n  border-left:5px solid #00a6b2;\n  border-radius:9px;\n  background:linear-gradient(135deg,#203739,#29484b);\n  color:#eaf5f6;\n  font-family:Roboto,Arial,sans-serif;\n}\n.se-house-power.offline{border-left-color:#ef5350;opacity:.8}\n.se-house-power-head{display:grid;grid-template-columns:1fr;gap:1px}\n.se-house-power-label{min-width:0;font-size:14px;font-weight:700}\n.se-house-power-value{justify-self:end;min-width:0;font-size:23px;font-weight:800;color:#62dce4;white-space:nowrap;font-variant-numeric:tabular-nums}\n.se-house-power-formula{margin-top:7px;color:#b7ced0;font-size:12px;line-height:1.45}\n.se-house-power-formula b{color:#fff}\n.se-house-power-offline{margin-top:5px;color:#ffb5a8;font-size:11px}\n@media(max-width:520px){\n  .se-house-power-value{font-size:21px}\n}\n</style>\n<div class=\"se-house-power\" ng-class=\"{'offline':msg.payload.OfflineFlag}\">\n  <div class=\"se-house-power-head\">\n    <span class=\"se-house-power-label\">Gesamtleistungsaufnahme Haus</span>\n    <span class=\"se-house-power-value\">{{msg.payload.HouseConsumptionWatt | number:0}} W</span>\n  </div>\n  <div class=\"se-house-power-formula\">\n    <b>{{msg.payload.PvPowerWatt | number:0}} W</b> Solar\n    + <b>{{msg.payload.GridImportWatt | number:0}} W</b> Netzbezug\n    − <b>{{msg.payload.FeedInWatt | number:0}} W</b> Einspeisung\n  </div>\n  <div class=\"se-house-power-offline\" ng-if=\"msg.payload.OfflineFlag\">\n    SolarEdge offline · Anzeige bleibt bis zu gültigen Messwerten auf 0 W.\n  </div>\n</div>\n",
-        "storeOutMessages": true,
-        "fwdInMessages": true,
-        "resendOnRefresh": true,
-        "templateScope": "local",
-        "className": "",
-        "x": 990,
-        "y": 680,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "weather_retry_delay",
-        "type": "delay",
-        "z": "weather_flow",
-        "name": "Wetterfehler · nach 30 Sekunden erneut",
-        "pauseType": "delay",
-        "timeout": "30",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 1100,
-        "y": 360,
-        "wires": [
-            [
-                "weather_build_request"
-            ]
-        ]
-    },
-    {
-        "id": "kosten_dashboard_ui_control",
-        "type": "ui_ui_control",
-        "z": "kosten_flow",
-        "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
-        "events": "all",
-        "x": 465,
-        "y": 360,
-        "wires": [
-            [
-                "kosten_dashboard_template"
-            ]
-        ]
-    },
-    {
-        "id": "system_dashboard_tab",
-        "type": "ui_tab",
-        "name": "SYSTEM",
-        "icon": "dns",
-        "order": 15,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "system_dashboard_group",
-        "type": "ui_group",
-        "name": "TECHNISCHE ÜBERSICHT",
-        "tab": "system_dashboard_tab",
-        "order": 1,
-        "disp": true,
-        "width": "18",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "system_dashboard_flow",
-        "type": "tab",
-        "label": "SYSTEM",
-        "disabled": false,
-        "info": "Dashboard-Vorlage für Netzwerk-, Raspberry-Pi- und Phidget-Status. Die technische Erfassung wird in einem separaten Schritt ergänzt.",
-        "env": []
-    },
-    {
         "id": "system_dashboard_template",
         "type": "ui_template",
         "z": "system_dashboard_flow",
@@ -9529,346 +9539,6 @@
         ]
     },
     {
-        "id": "system_network_flow",
-        "type": "tab",
-        "label": "System · Netzwerk-Scan",
-        "disabled": false,
-        "info": "Eigenständiger, gedrosselter ICMP-Scan des lokalen /24-Heimnetzes. Es werden nur erreichbare Geräte an das SYSTEM-Dashboard gemeldet; nicht antwortende IP-Adressen werden nicht als Geräte interpretiert.",
-        "env": []
-    },
-    {
-        "id": "system_scan_schedule",
-        "type": "inject",
-        "z": "system_network_flow",
-        "name": "Systemnetz beim Start und alle 5 Minuten scannen",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "v": "system/network/scan",
-                "vt": "str"
-            }
-        ],
-        "repeat": "300",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "8",
-        "topic": "system/network/scan",
-        "payload": "",
-        "payloadType": "date",
-        "x": 245,
-        "y": 120,
-        "wires": [
-            [
-                "system_local_ip_exec"
-            ]
-        ]
-    },
-    {
-        "id": "system_local_ip_exec",
-        "type": "exec",
-        "z": "system_network_flow",
-        "command": "/bin/hostname -I",
-        "addpay": false,
-        "append": "",
-        "useSpawn": "false",
-        "timer": "5",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Lokale IPv4-Adresse ermitteln",
-        "x": 525,
-        "y": 120,
-        "wires": [
-            [
-                "system_scan_targets"
-            ],
-            [],
-            []
-        ]
-    },
-    {
-        "id": "system_scan_targets",
-        "type": "function",
-        "z": "system_network_flow",
-        "name": "Lokales /24-Scan-Netz sicher ableiten",
-        "func": "// nodeId: system_scan_targets\nconst value = String(msg.payload || \"\").trim();\nconst match = value.match(/\\b(\\d{1,3}(?:\\.\\d{1,3}){3})\\b/);\n\nif (!match) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Lokale IPv4-Adresse nicht erkannt\" });\n    node.warn(\"Systemnetz-Scan übersprungen: keine private lokale IPv4-Adresse erhalten.\");\n    return null;\n}\n\nconst ip = match[1];\nconst parts = ip.split(\".\").map(Number);\nif (parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Ungültige lokale IPv4-Adresse\" });\n    return null;\n}\n\nconst privateNetwork = parts[0] === 10\n    || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31)\n    || (parts[0] === 192 && parts[1] === 168);\nif (!privateNetwork) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Keine private lokale IPv4-Adresse\" });\n    node.warn(\"Systemnetz-Scan übersprungen: Adresse liegt nicht im privaten Heimnetzbereich.\");\n    return null;\n}\n\nconst subnet = parts.slice(0, 3).join(\".\");\nconst scanId = `${subnet}-${Date.now()}`;\nconst targets = [];\nfor (let host = 1; host <= 254; host += 1) {\n    const target = `${subnet}.${host}`;\n    if (target !== ip) targets.push(target);\n}\n\nflow.set(\"systemNetworkScan\", {\n    scanId,\n    subnet,\n    localIp: ip,\n    startedAt: new Date().toISOString(),\n    expected: targets.length,\n    completed: 0,\n    results: {}\n});\n\nmsg.topic = \"system/network/scan/target\";\nmsg.scanId = scanId;\nmsg.scanSubnet = subnet;\nmsg.payload = targets;\nnode.status({ fill: \"blue\", shape: \"dot\", text: `${subnet}.0/24 · ${targets.length} Ziele` });\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 790,
-        "y": 120,
-        "wires": [
-            [
-                "system_scan_split"
-            ]
-        ]
-    },
-    {
-        "id": "system_scan_split",
-        "type": "split",
-        "z": "system_network_flow",
-        "name": "Ein Ping je Netzadresse",
-        "splt": "\\n",
-        "spltType": "str",
-        "arraySplt": "1",
-        "arraySpltType": "len",
-        "stream": false,
-        "addname": "",
-        "property": "payload",
-        "x": 1030,
-        "y": 120,
-        "wires": [
-            [
-                "system_scan_target_property"
-            ]
-        ]
-    },
-    {
-        "id": "system_scan_target_property",
-        "type": "change",
-        "z": "system_network_flow",
-        "name": "Ziel-IP für Auswertung merken",
-        "rules": [
-            {
-                "t": "set",
-                "p": "targetIp",
-                "pt": "msg",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1265,
-        "y": 120,
-        "wires": [
-            [
-                "system_scan_rate_limit"
-            ]
-        ]
-    },
-    {
-        "id": "system_scan_rate_limit",
-        "type": "delay",
-        "z": "system_network_flow",
-        "name": "Gedrosselt · maximal 8 Prüfungen/Sekunde",
-        "pauseType": "rate",
-        "timeout": "5",
-        "timeoutUnits": "seconds",
-        "rate": "8",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 240,
-        "y": 220,
-        "wires": [
-            [
-                "system_ping_exec"
-            ]
-        ]
-    },
-    {
-        "id": "system_ping_exec",
-        "type": "exec",
-        "z": "system_network_flow",
-        "command": "/bin/ping -c 1 -W 1",
-        "addpay": true,
-        "append": "",
-        "useSpawn": "false",
-        "timer": "2",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Erreichbarkeit prüfen (ICMP)",
-        "x": 510,
-        "y": 220,
-        "wires": [
-            [],
-            [],
-            [
-                "system_ping_result"
-            ]
-        ]
-    },
-    {
-        "id": "system_scan_result",
-        "type": "function",
-        "z": "system_network_flow",
-        "name": "Online-Liste mit Hostnamen bilden",
-        "func": "// nodeId: system_scan_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst liveMetricsUpdate = msg.liveMetricsUpdate === true;\nconst raspberryInventory = {\n    \"192.168.0.104\": { hostname: \"pieast\", model: \"Frühes Raspberry-Pi-Modell\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 55 },\n    \"192.168.0.105\": { hostname: \"piwest\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 54 },\n    \"192.168.0.125\": { hostname: \"PIANTE_\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 9 Stretch\", services: \"SSH 22 · SMB 445\", temperatureC: 52 },\n    \"192.168.0.150\": { hostname: \"PICENTER2\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 11 Bullseye\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 45 },\n    \"192.168.0.190\": { hostname: \"pientry\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 13 Trixie\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 48 }\n};\n\nif (!scan || (!liveMetricsUpdate && (msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || typeof msg.online !== \"boolean\"))) {\n    return null;\n}\n\nif (!liveMetricsUpdate) {\n    scan.completed += 1;\n    scan.results[targetIp] = {\n        ip: targetIp,\n        hostname: msg.online && msg.hostname ? String(msg.hostname) : null,\n        state: msg.online ? \"online\" : \"offline\",\n        observedAt: new Date().toISOString()\n    };\n    flow.set(\"systemNetworkScan\", scan);\n}\n\nconst liveMetrics = flow.get(\"systemLiveMetrics\") || {};\nconst entries = Object.values(scan.results);\nconst onlineDevices = entries\n    .filter((entry) => entry.state === \"online\")\n    .sort((left, right) => left.ip.localeCompare(right.ip, undefined, { numeric: true }))\n    .map((entry) => {\n        const inventory = raspberryInventory[entry.ip] || null;\n        const live = liveMetrics[entry.ip] || null;\n        return {\n            name: live?.hostname || inventory?.hostname || entry.hostname || \"Netzwerkgerät\",\n            hostname: live?.hostname || inventory?.hostname || entry.hostname || null,\n            model: inventory?.model || null,\n            operatingSystem: inventory?.operatingSystem || null,\n            services: inventory?.services || null,\n            temperatureC: live?.temperatureC ?? inventory?.temperatureC ?? null,\n            temperatureSource: live?.temperatureC !== null && live?.temperatureC !== undefined ? \"live\" : (inventory ? \"inventory\" : null),\n            memoryUsedPercent: live?.memoryUsedPercent ?? null,\n            diskUsedPercent: live?.diskUsedPercent ?? null,\n            uptimeSeconds: live?.uptimeSeconds ?? null,\n            loadAverage: live?.loadAverage ?? null,\n            inventoryObservedAt: inventory ? \"2026-07-26\" : null,\n            ip: entry.ip,\n            lastSeen: entry.observedAt,\n            state: \"online\"\n        };\n    });\nconst finished = scan.completed >= scan.expected;\n\nif (!liveMetricsUpdate && !finished && scan.completed % 5 !== 0) return null;\n\nmsg.topic = \"system/network/overview\";\nmsg.payload = {\n    system: {\n        network: {\n            state: finished ? \"online\" : \"scanning\",\n            label: liveMetricsUpdate\n                ? `Live-Systemwerte aktualisiert · ${Object.keys(liveMetrics).length} Raspberry Pis erreichbar`\n                : (finished\n                ? `Netzscan abgeschlossen · ${onlineDevices.length} Geräte erreichbar`\n                : `Netzscan läuft · ${scan.completed}/${scan.expected} Adressen geprüft`),\n            updatedAt: new Date().toISOString()\n        },\n        summary: {\n            devices: onlineDevices.length,\n            online: onlineDevices.length,\n            offline: null,\n            updatedAt: new Date().toISOString()\n        },\n        devices: onlineDevices\n    }\n};\nnode.status({\n    fill: finished || liveMetricsUpdate ? \"green\" : \"blue\",\n    shape: \"dot\",\n    text: liveMetricsUpdate ? `${Object.keys(liveMetrics).length} Live-Systeme` : (finished ? `${onlineDevices.length} Geräte online` : `${scan.completed}/${scan.expected} geprüft`)\n});\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 535,
-        "y": 300,
-        "wires": [
-            [
-                "system_dashboard_data_out",
-                "system_scan_debug"
-            ]
-        ]
-    },
-    {
-        "id": "system_dashboard_data_out",
-        "type": "link out",
-        "z": "system_network_flow",
-        "name": "Online-Geräteliste an SYSTEM-Dashboard",
-        "mode": "link",
-        "links": [
-            "system_dashboard_data_in"
-        ],
-        "x": 1095,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "system_scan_debug",
-        "type": "debug",
-        "z": "system_network_flow",
-        "name": "Systemnetz · geprüfte Online-Liste",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1105,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "system_ping_result",
-        "type": "function",
-        "z": "system_network_flow",
-        "name": "Ping-Ergebnis sicher auswerten",
-        "func": "// nodeId: system_ping_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst result = msg.payload;\nconst code = typeof result === \"object\" && result !== null ? Number(result.code) : Number(result);\n\nif (!scan || msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || !Number.isFinite(code)) {\n    return [null, null];\n}\n\nmsg.online = code === 0;\nmsg.payload = targetIp;\nreturn msg.online ? [msg, null] : [null, msg];\n",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 765,
-        "y": 220,
-        "wires": [
-            [
-                "system_hostname_exec"
-            ],
-            [
-                "system_scan_result"
-            ]
-        ]
-    },
-    {
-        "id": "system_hostname_exec",
-        "type": "exec",
-        "z": "system_network_flow",
-        "command": "/bin/sh -c 'name=$(/usr/bin/dig +time=1 +tries=1 -x \"$1\" +short | /usr/bin/head -n 1 | /usr/bin/tr -d \"\\n\"); printf \"__SYSTEM_HOSTNAME__%s\\n\" \"$name\"' system-hostname",
-        "addpay": true,
-        "append": "",
-        "useSpawn": "false",
-        "timer": "3",
-        "winHide": false,
-        "oldrc": false,
-        "name": "Hostname für Online-Gerät auflösen",
-        "x": 1035,
-        "y": 180,
-        "wires": [
-            [
-                "system_hostname_result"
-            ],
-            [],
-            []
-        ]
-    },
-    {
-        "id": "system_hostname_result",
-        "type": "function",
-        "z": "system_network_flow",
-        "name": "Hostname sicher übernehmen",
-        "func": "// nodeId: system_hostname_result\nconst marker = \"__SYSTEM_HOSTNAME__\";\nconst raw = String(msg.payload || \"\").trim();\nlet hostname = raw.startsWith(marker) ? raw.slice(marker.length).trim() : \"\";\n\nif (hostname.endsWith(\".\")) hostname = hostname.slice(0, -1);\nif (!/^[A-Za-z0-9][A-Za-z0-9.-]{0,251}$/.test(hostname)) hostname = \"\";\n\nmsg.hostname = hostname || null;\nmsg.online = true;\nmsg.payload = msg.targetIp;\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1260,
-        "y": 180,
-        "wires": [
-            [
-                "system_scan_result"
-            ]
-        ]
-    },
-    {
-        "id": "system_live_metrics_schedule",
-        "type": "inject",
-        "z": "system_network_flow",
-        "name": "Raspberry-Pi-Livewerte jede Minute abrufen",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "v": "system/vault/probe",
-                "vt": "str"
-            }
-        ],
-        "repeat": "60",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "15",
-        "topic": "system/vault/probe",
-        "payload": "",
-        "payloadType": "date",
-        "x": 270,
-        "y": 420,
-        "wires": [
-            [
-                "system_credential_vault"
-            ]
-        ]
-    },
-    {
-        "id": "system_live_metrics_result",
-        "type": "function",
-        "z": "system_network_flow",
-        "name": "Livewerte prüfen und Dashboard aktualisieren",
-        "func": "// nodeId: system_live_metrics_result\nlet payload = msg.payload;\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n    } catch {\n        node.status({ fill: \"red\", shape: \"ring\", text: \"Livewerte nicht lesbar\" });\n        return null;\n    }\n}\n\nconst devices = Array.isArray(payload?.devices) ? payload.devices : [];\nconst errorText = typeof payload?.error === \"string\" ? payload.error.trim() : \"\";\nconst metrics = {};\nfor (const device of devices) {\n    if (!device?.online || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(String(device.ip || \"\"))) continue;\n    metrics[device.ip] = device;\n}\n\nflow.set(\"systemLiveMetrics\", metrics);\nflow.set(\"systemLiveMetricsError\", errorText || null);\nmsg.liveMetricsUpdate = true;\nmsg.liveMetricsError = errorText || null;\nmsg.topic = \"system/live/metrics\";\nmsg.payload = null;\nif (errorText) {\n    node.status({ fill: \"red\", shape: \"ring\", text: errorText.slice(0, 48) });\n    node.warn(`System-Livewerte: ${errorText}`);\n} else {\n    node.status({ fill: \"green\", shape: \"dot\", text: `${Object.keys(metrics).length} Live-Systeme erreichbar` });\n}\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 885,
-        "y": 420,
-        "wires": [
-            [
-                "system_scan_result"
-            ]
-        ]
-    },
-    {
         "id": "system_vault_command_out",
         "type": "link out",
         "z": "system_dashboard_flow",
@@ -9896,53 +9566,6 @@
                 "system_vault_dashboard_template"
             ]
         ]
-    },
-    {
-        "id": "system_credential_vault",
-        "type": "home-automation-credential-vault",
-        "z": "system_network_flow",
-        "name": "Verschlüsselter System-Zugangstresor",
-        "vaultPath": "system-credentials.vault.json",
-        "autoLockMinutes": 10,
-        "x": 585,
-        "y": 420,
-        "wires": [
-            [
-                "system_vault_response_out"
-            ],
-            [
-                "system_live_metrics_result"
-            ]
-        ]
-    },
-    {
-        "id": "system_vault_command_in",
-        "type": "link in",
-        "z": "system_network_flow",
-        "name": "Tresorbefehl vom SYSTEM-Dashboard",
-        "links": [
-            "system_vault_command_out"
-        ],
-        "x": 345,
-        "y": 480,
-        "wires": [
-            [
-                "system_credential_vault"
-            ]
-        ]
-    },
-    {
-        "id": "system_vault_response_out",
-        "type": "link out",
-        "z": "system_network_flow",
-        "name": "Tresorstatus an SYSTEM-Dashboard",
-        "mode": "link",
-        "links": [
-            "system_vault_response_in"
-        ],
-        "x": 850,
-        "y": 480,
-        "wires": []
     },
     {
         "id": "system_vault_dashboard_template",
@@ -10030,5 +9653,384 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "system_scan_schedule",
+        "type": "inject",
+        "z": "system_network_flow",
+        "name": "Systemnetz beim Start und alle 5 Minuten scannen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/network/scan",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "8",
+        "topic": "system/network/scan",
+        "payload": "",
+        "payloadType": "date",
+        "x": 245,
+        "y": 120,
+        "wires": [
+            [
+                "system_local_ip_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_local_ip_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/hostname -I",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "5",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Lokale IPv4-Adresse ermitteln",
+        "x": 510,
+        "y": 40,
+        "wires": [
+            [
+                "system_scan_targets"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_scan_targets",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Lokales /24-Scan-Netz sicher ableiten",
+        "func": "// nodeId: system_scan_targets\nconst value = String(msg.payload || \"\").trim();\nconst match = value.match(/\\b(\\d{1,3}(?:\\.\\d{1,3}){3})\\b/);\n\nif (!match) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Lokale IPv4-Adresse nicht erkannt\" });\n    node.warn(\"Systemnetz-Scan übersprungen: keine private lokale IPv4-Adresse erhalten.\");\n    return null;\n}\n\nconst ip = match[1];\nconst parts = ip.split(\".\").map(Number);\nif (parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Ungültige lokale IPv4-Adresse\" });\n    return null;\n}\n\nconst privateNetwork = parts[0] === 10\n    || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31)\n    || (parts[0] === 192 && parts[1] === 168);\nif (!privateNetwork) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Keine private lokale IPv4-Adresse\" });\n    node.warn(\"Systemnetz-Scan übersprungen: Adresse liegt nicht im privaten Heimnetzbereich.\");\n    return null;\n}\n\nconst subnet = parts.slice(0, 3).join(\".\");\nconst scanId = `${subnet}-${Date.now()}`;\nconst targets = [];\nfor (let host = 1; host <= 254; host += 1) {\n    const target = `${subnet}.${host}`;\n    if (target !== ip) targets.push(target);\n}\n\nflow.set(\"systemNetworkScan\", {\n    scanId,\n    subnet,\n    localIp: ip,\n    startedAt: new Date().toISOString(),\n    expected: targets.length,\n    completed: 0,\n    results: {}\n});\n\nmsg.topic = \"system/network/scan/target\";\nmsg.scanId = scanId;\nmsg.scanSubnet = subnet;\nmsg.payload = targets;\nnode.status({ fill: \"blue\", shape: \"dot\", text: `${subnet}.0/24 · ${targets.length} Ziele` });\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 40,
+        "wires": [
+            [
+                "system_scan_split"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_split",
+        "type": "split",
+        "z": "system_network_flow",
+        "name": "Ein Ping je Netzadresse",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1130,
+        "y": 40,
+        "wires": [
+            [
+                "system_scan_target_property"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_target_property",
+        "type": "change",
+        "z": "system_network_flow",
+        "name": "Ziel-IP für Auswertung merken",
+        "rules": [
+            {
+                "t": "set",
+                "p": "targetIp",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1190,
+        "y": 100,
+        "wires": [
+            [
+                "system_scan_rate_limit"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_rate_limit",
+        "type": "delay",
+        "z": "system_network_flow",
+        "name": "Gedrosselt · maximal 8 Prüfungen/Sekunde",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "8",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 240,
+        "y": 220,
+        "wires": [
+            [
+                "system_ping_exec"
+            ]
+        ]
+    },
+    {
+        "id": "system_ping_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/ping -c 1 -W 1",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "2",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Erreichbarkeit prüfen (ICMP)",
+        "x": 620,
+        "y": 160,
+        "wires": [
+            [],
+            [],
+            [
+                "system_ping_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_scan_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Online-Liste mit Hostnamen bilden",
+        "func": "// nodeId: system_scan_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst liveMetricsUpdate = msg.liveMetricsUpdate === true;\nconst raspberryInventory = {\n    \"192.168.0.104\": { hostname: \"pieast\", model: \"Frühes Raspberry-Pi-Modell\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 55 },\n    \"192.168.0.105\": { hostname: \"piwest\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 7 Wheezy\", services: \"SSH 22 · SMB 445\", temperatureC: 54 },\n    \"192.168.0.125\": { hostname: \"PIANTE_\", model: \"Raspberry Pi Model B Rev 2\", operatingSystem: \"Raspbian 9 Stretch\", services: \"SSH 22 · SMB 445\", temperatureC: 52 },\n    \"192.168.0.150\": { hostname: \"PICENTER2\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 11 Bullseye\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 45 },\n    \"192.168.0.190\": { hostname: \"pientry\", model: \"Raspberry Pi 2 Model B Rev 1.1\", operatingSystem: \"Raspbian 13 Trixie\", services: \"SSH 22 · Node-RED 1880 · Dienst 8080\", temperatureC: 48 }\n};\n\nif (!scan || (!liveMetricsUpdate && (msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || typeof msg.online !== \"boolean\"))) {\n    return null;\n}\n\nif (!liveMetricsUpdate) {\n    scan.completed += 1;\n    scan.results[targetIp] = {\n        ip: targetIp,\n        hostname: msg.online && msg.hostname ? String(msg.hostname) : null,\n        state: msg.online ? \"online\" : \"offline\",\n        observedAt: new Date().toISOString()\n    };\n    flow.set(\"systemNetworkScan\", scan);\n}\n\nconst liveMetrics = flow.get(\"systemLiveMetrics\") || {};\nconst entries = Object.values(scan.results);\nconst onlineDevices = entries\n    .filter((entry) => entry.state === \"online\")\n    .sort((left, right) => left.ip.localeCompare(right.ip, undefined, { numeric: true }))\n    .map((entry) => {\n        const inventory = raspberryInventory[entry.ip] || null;\n        const live = liveMetrics[entry.ip] || null;\n        return {\n            name: live?.hostname || inventory?.hostname || entry.hostname || \"Netzwerkgerät\",\n            hostname: live?.hostname || inventory?.hostname || entry.hostname || null,\n            model: inventory?.model || null,\n            operatingSystem: inventory?.operatingSystem || null,\n            services: inventory?.services || null,\n            temperatureC: live?.temperatureC ?? inventory?.temperatureC ?? null,\n            temperatureSource: live?.temperatureC !== null && live?.temperatureC !== undefined ? \"live\" : (inventory ? \"inventory\" : null),\n            memoryUsedPercent: live?.memoryUsedPercent ?? null,\n            diskUsedPercent: live?.diskUsedPercent ?? null,\n            uptimeSeconds: live?.uptimeSeconds ?? null,\n            loadAverage: live?.loadAverage ?? null,\n            inventoryObservedAt: inventory ? \"2026-07-26\" : null,\n            ip: entry.ip,\n            lastSeen: entry.observedAt,\n            state: \"online\"\n        };\n    });\nconst finished = scan.completed >= scan.expected;\n\nif (!liveMetricsUpdate && !finished && scan.completed % 5 !== 0) return null;\n\nmsg.topic = \"system/network/overview\";\nmsg.payload = {\n    system: {\n        network: {\n            state: finished ? \"online\" : \"scanning\",\n            label: liveMetricsUpdate\n                ? `Live-Systemwerte aktualisiert · ${Object.keys(liveMetrics).length} Raspberry Pis erreichbar`\n                : (finished\n                ? `Netzscan abgeschlossen · ${onlineDevices.length} Geräte erreichbar`\n                : `Netzscan läuft · ${scan.completed}/${scan.expected} Adressen geprüft`),\n            updatedAt: new Date().toISOString()\n        },\n        summary: {\n            devices: onlineDevices.length,\n            online: onlineDevices.length,\n            offline: null,\n            updatedAt: new Date().toISOString()\n        },\n        devices: onlineDevices\n    }\n};\nnode.status({\n    fill: finished || liveMetricsUpdate ? \"green\" : \"blue\",\n    shape: \"dot\",\n    text: liveMetricsUpdate ? `${Object.keys(liveMetrics).length} Live-Systeme` : (finished ? `${onlineDevices.length} Geräte online` : `${scan.completed}/${scan.expected} geprüft`)\n});\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 340,
+        "wires": [
+            [
+                "system_dashboard_data_out",
+                "system_scan_debug"
+            ]
+        ]
+    },
+    {
+        "id": "system_dashboard_data_out",
+        "type": "link out",
+        "z": "system_network_flow",
+        "name": "Online-Geräteliste an SYSTEM-Dashboard",
+        "mode": "link",
+        "links": [
+            "system_dashboard_data_in"
+        ],
+        "x": 1095,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "system_scan_debug",
+        "type": "debug",
+        "z": "system_network_flow",
+        "name": "Systemnetz · geprüfte Online-Liste",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "system_ping_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Ping-Ergebnis sicher auswerten",
+        "func": "// nodeId: system_ping_result\nconst targetIp = String(msg.targetIp || \"\");\nconst scan = flow.get(\"systemNetworkScan\");\nconst result = msg.payload;\nconst code = typeof result === \"object\" && result !== null ? Number(result.code) : Number(result);\n\nif (!scan || msg.scanId !== scan.scanId || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(targetIp) || !Number.isFinite(code)) {\n    return [null, null];\n}\n\nmsg.online = code === 0;\nmsg.payload = targetIp;\nreturn msg.online ? [msg, null] : [null, msg];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 240,
+        "wires": [
+            [
+                "system_hostname_exec"
+            ],
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_hostname_exec",
+        "type": "exec",
+        "z": "system_network_flow",
+        "command": "/bin/sh -c 'name=$(/usr/bin/dig +time=1 +tries=1 -x \"$1\" +short | /usr/bin/head -n 1 | /usr/bin/tr -d \"\\n\"); printf \"__SYSTEM_HOSTNAME__%s\\n\" \"$name\"' system-hostname",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "3",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Hostname für Online-Gerät auflösen",
+        "x": 1035,
+        "y": 180,
+        "wires": [
+            [
+                "system_hostname_result"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "system_hostname_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Hostname sicher übernehmen",
+        "func": "// nodeId: system_hostname_result\nconst marker = \"__SYSTEM_HOSTNAME__\";\nconst raw = String(msg.payload || \"\").trim();\nlet hostname = raw.startsWith(marker) ? raw.slice(marker.length).trim() : \"\";\n\nif (hostname.endsWith(\".\")) hostname = hostname.slice(0, -1);\nif (!/^[A-Za-z0-9][A-Za-z0-9.-]{0,251}$/.test(hostname)) hostname = \"\";\n\nmsg.hostname = hostname || null;\nmsg.online = true;\nmsg.payload = msg.targetIp;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1310,
+        "y": 240,
+        "wires": [
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_live_metrics_schedule",
+        "type": "inject",
+        "z": "system_network_flow",
+        "name": "Raspberry-Pi-Livewerte jede Minute abrufen",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "v": "system/vault/probe",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "15",
+        "topic": "system/vault/probe",
+        "payload": "",
+        "payloadType": "date",
+        "x": 270,
+        "y": 420,
+        "wires": [
+            [
+                "system_credential_vault"
+            ]
+        ]
+    },
+    {
+        "id": "system_live_metrics_result",
+        "type": "function",
+        "z": "system_network_flow",
+        "name": "Livewerte prüfen und Dashboard aktualisieren",
+        "func": "// nodeId: system_live_metrics_result\nlet payload = msg.payload;\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n    } catch {\n        node.status({ fill: \"red\", shape: \"ring\", text: \"Livewerte nicht lesbar\" });\n        return null;\n    }\n}\n\nconst devices = Array.isArray(payload?.devices) ? payload.devices : [];\nconst errorText = typeof payload?.error === \"string\" ? payload.error.trim() : \"\";\nconst metrics = {};\nfor (const device of devices) {\n    if (!device?.online || !/^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(String(device.ip || \"\"))) continue;\n    metrics[device.ip] = device;\n}\n\nflow.set(\"systemLiveMetrics\", metrics);\nflow.set(\"systemLiveMetricsError\", errorText || null);\nmsg.liveMetricsUpdate = true;\nmsg.liveMetricsError = errorText || null;\nmsg.topic = \"system/live/metrics\";\nmsg.payload = null;\nif (errorText) {\n    node.status({ fill: \"red\", shape: \"ring\", text: errorText.slice(0, 48) });\n    node.warn(`System-Livewerte: ${errorText}`);\n} else {\n    node.status({ fill: \"green\", shape: \"dot\", text: `${Object.keys(metrics).length} Live-Systeme erreichbar` });\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 580,
+        "wires": [
+            [
+                "system_scan_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_credential_vault",
+        "type": "home-automation-credential-vault",
+        "z": "system_network_flow",
+        "name": "Verschlüsselter System-Zugangstresor",
+        "vaultPath": "system-credentials.vault.json",
+        "autoLockMinutes": 10,
+        "x": 610,
+        "y": 540,
+        "wires": [
+            [
+                "system_vault_response_out"
+            ],
+            [
+                "system_live_metrics_result"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_command_in",
+        "type": "link in",
+        "z": "system_network_flow",
+        "name": "Tresorbefehl vom SYSTEM-Dashboard",
+        "links": [
+            "system_vault_command_out"
+        ],
+        "x": 345,
+        "y": 480,
+        "wires": [
+            [
+                "system_credential_vault"
+            ]
+        ]
+    },
+    {
+        "id": "system_vault_response_out",
+        "type": "link out",
+        "z": "system_network_flow",
+        "name": "Tresorstatus an SYSTEM-Dashboard",
+        "mode": "link",
+        "links": [
+            "system_vault_response_in"
+        ],
+        "x": 850,
+        "y": 480,
+        "wires": []
     }
 ]

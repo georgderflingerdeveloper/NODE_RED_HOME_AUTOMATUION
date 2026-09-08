@@ -77,16 +77,20 @@
     ]
   },
   {
-    "id": "kosten_history_out",
-    "type": "link out",
+    "id": "kosten_tarif_debug",
+    "type": "debug",
     "z": "kosten_flow",
-    "name": "Tarif an Datenbank speichern",
-    "mode": "link",
-    "links": [
-      "datenbank_telemetry_in"
-    ],
-    "x": 945,
-    "y": 240,
+    "name": "Aktueller aWATTar-Tarif",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 980,
+    "y": 120,
     "wires": []
   },
   {
@@ -115,6 +119,19 @@
     ]
   },
   {
+    "id": "kosten_history_out",
+    "type": "link out",
+    "z": "kosten_flow",
+    "name": "Tarif an Datenbank speichern",
+    "mode": "link",
+    "links": [
+      "datenbank_telemetry_in"
+    ],
+    "x": 945,
+    "y": 240,
+    "wires": []
+  },
+  {
     "id": "kosten_history_query_out",
     "type": "link out",
     "z": "kosten_flow",
@@ -137,20 +154,6 @@
     ],
     "x": 745,
     "y": 300,
-    "wires": [
-      [
-        "kosten_dashboard_template"
-      ]
-    ]
-  },
-  {
-    "id": "kosten_dashboard_ui_control",
-    "type": "ui_ui_control",
-    "z": "kosten_flow",
-    "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
-    "events": "all",
-    "x": 465,
-    "y": 360,
     "wires": [
       [
         "kosten_dashboard_template"
@@ -190,20 +193,17 @@
     ]
   },
   {
-    "id": "kosten_tarif_debug",
-    "type": "debug",
+    "id": "kosten_dashboard_ui_control",
+    "type": "ui_ui_control",
     "z": "kosten_flow",
-    "name": "Aktueller aWATTar-Tarif",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "payload",
-    "targetType": "msg",
-    "statusVal": "",
-    "statusType": "auto",
-    "x": 980,
-    "y": 120,
-    "wires": []
+    "name": "Kosten-Seitengröße bei Wechsel aktualisieren",
+    "events": "all",
+    "x": 465,
+    "y": 360,
+    "wires": [
+      [
+        "kosten_dashboard_template"
+      ]
+    ]
   }
 ]

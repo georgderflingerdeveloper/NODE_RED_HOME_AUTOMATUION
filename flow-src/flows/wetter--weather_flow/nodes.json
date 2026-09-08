@@ -153,31 +153,6 @@
     ]
   },
   {
-    "id": "weather_retry_delay",
-    "type": "delay",
-    "z": "weather_flow",
-    "name": "Wetterfehler · nach 30 Sekunden erneut",
-    "pauseType": "delay",
-    "timeout": "30",
-    "timeoutUnits": "seconds",
-    "rate": "1",
-    "nbRateUnits": "1",
-    "rateUnits": "second",
-    "randomFirst": "1",
-    "randomLast": "5",
-    "randomUnits": "seconds",
-    "drop": false,
-    "allowrate": false,
-    "outputs": 1,
-    "x": 1100,
-    "y": 360,
-    "wires": [
-      [
-        "weather_build_request"
-      ]
-    ]
-  },
-  {
     "id": "weather_publish",
     "type": "function",
     "z": "weather_flow",
@@ -287,6 +262,31 @@
     "wires": [
       [
         "weather_ui_overview_table"
+      ]
+    ]
+  },
+  {
+    "id": "weather_retry_delay",
+    "type": "delay",
+    "z": "weather_flow",
+    "name": "Wetterfehler · nach 30 Sekunden erneut",
+    "pauseType": "delay",
+    "timeout": "30",
+    "timeoutUnits": "seconds",
+    "rate": "1",
+    "nbRateUnits": "1",
+    "rateUnits": "second",
+    "randomFirst": "1",
+    "randomLast": "5",
+    "randomUnits": "seconds",
+    "drop": false,
+    "allowrate": false,
+    "outputs": 1,
+    "x": 1100,
+    "y": 360,
+    "wires": [
+      [
+        "weather_build_request"
       ]
     ]
   }
