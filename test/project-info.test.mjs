@@ -53,7 +53,7 @@ test("unbekannter Branch erhält eine verständliche neutrale Kurzinfo", () => {
 test("Versionsinfo wird in der obersten Dashboard-Statusleiste installiert", () => {
   const template = readFileSync(join(
     process.cwd(),
-    "flow-src/flows/system--system_dashboard_flow/templates/version-und-kurzinfo.html",
+    "flow-src/flows/system--system_dashboard_flow/templates/version-branch-und-kurzinfo.html",
   ), "utf8");
   assert.match(template, /querySelector\("\.md-toolbar-tools"\)/);
   assert.match(template, /Was macht dieser Branch\?/);

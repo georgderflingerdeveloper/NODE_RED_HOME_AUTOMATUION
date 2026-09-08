@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "3cd22e788918aae54114af13b2202e61c3e57eb0ac5ff846c6bcd8e7af295d3e",
+  "flowSha256": "564763f400831fb4e481edad9a6d3656666952d0f41cf073bc79246b94416956",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -1219,7 +1219,7 @@
     "flows/system--system_dashboard_flow/nodes.json": "9907b1fa48b614823546ac10b942b76df00c2aabc7152dfa3aea7f86083ca5c0",
     "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": "94c0ea9a50121b0fd0de291a3cf51a46823964a00816b7ae781e0bed259ea59c",
     "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": "7307c29ef347b7a6ce54a7cbe3da25f549f42770a5b3b446c038a03a46fe0285",
-    "flows/system--system_dashboard_flow/templates/version-branch-und-kurzinfo.html": "36296238ec675679b1e6b50e29d886cf570e9161cadac9900e3d8a196a89409c",
+    "flows/system--system_dashboard_flow/templates/version-branch-und-kurzinfo.html": "7ffe9e48b7e755f0dead6700c322ffe43eaab1ee9066fff3760f5a3374645502",
     "flows/system-netzwerk-scan--system_network_flow/functions/hostname-sicher-ubernehmen.js": "958537e2bb109949696e6c31d0f7aa693908bf5b97b14760b4f7359d65e150b7",
     "flows/system-netzwerk-scan--system_network_flow/functions/livewerte-prufen-und-dashboard-aktualisieren.js": "4050addb9dea07be33d1d4d34c8daec5b9242ddeef4b8dd46dbd8c15a33c5bcc",
     "flows/system-netzwerk-scan--system_network_flow/functions/lokales-24-scan-netz-sicher-ableiten.js": "50b413640f3a99040a5be978b282b6fad3f8477566c4431a3aa7c6026745ac02",
