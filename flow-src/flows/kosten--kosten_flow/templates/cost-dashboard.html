@@ -214,10 +214,18 @@
     <div class="cost-anchor-head">
       <span class="cost-anchor-title">SolarEdge-Tagesanker · {{view.history.latestReconciliation.day}}</span>
       <span class="cost-badge" ng-class="view.history.latestReconciliation.quality === 'anchored' ? 'online' : 'offline'">
-        {{view.history.latestReconciliation.quality === 'anchored' ? 'verankert' : 'Teilzeitraum'}}
+        {{view.history.latestReconciliation.quality === 'anchored' ? 'verankert' : (view.history.latestReconciliation.quality === 'estimated-boundary' ? 'Grenze geschätzt' : (view.history.latestReconciliation.quality === 'grid-only' ? 'nur Netzanker' : 'Initialisierung'))}}
       </span>
     </div>
-    <div class="cost-anchor-grid">
+    <div class="cost-anchor-grid" ng-if="view.history.latestReconciliation.quality !== 'partial-day'">
+      <div class="cost-anchor-value">
+        <span>PV-Produktion · Zähler / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} / {{view.history.latestReconciliation.integratedPvProductionKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Hausverbrauch · bilanziert / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterHouseConsumptionKWh | number:3}} / {{view.history.latestReconciliation.integratedHouseConsumptionKWh | number:3}} kWh</b>
+      </div>
       <div class="cost-anchor-value">
         <span>Vom Netz · Zähler / erfasst</span>
         <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} / {{view.history.latestReconciliation.integratedImportKWh | number:3}} kWh</b>
@@ -235,11 +243,32 @@
         <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':4}}</b>
       </div>
     </div>
-    <div class="cost-anchor-note">
+    <div class="cost-anchor-note" ng-if="view.history.latestReconciliation.quality !== 'partial-day'">
       Sichtbare Fallback-Korrektur: Bezug {{view.history.latestReconciliation.fallbackImportKWh | number:3}} kWh ·
-      Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh.
+      Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh ·
+      PV {{view.history.latestReconciliation.fallbackPvProductionKWh | number:3}} kWh ·
+      Hausverbrauch {{view.history.latestReconciliation.fallbackHouseConsumptionKWh | number:3}} kWh.
       Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:3}} ct/kWh Börsenpreis;
       keine Netzentgelte und keine vertragliche Einspeisevergütung.
+    </div>
+    <div class="cost-anchor-grid" ng-if="view.history.latestReconciliation.quality === 'partial-day'">
+      <div class="cost-anchor-value">
+        <span>Vom Netz · seit erstem Zählerpunkt</span>
+        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Ins Netz · seit erstem Zählerpunkt</span>
+        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>PV-Produktion · seit erstem Zählerpunkt</span>
+        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} kWh</b>
+      </div>
+    </div>
+    <div class="cost-anchor-note" ng-if="view.history.latestReconciliation.quality === 'partial-day'">
+      Initialisierung: Der SolarEdge-Zähler und die Tageserfassung decken heute noch unterschiedliche Zeitfenster ab.
+      Daher werden noch keine Differenz, Fallback-Korrektur oder Vergleichskosten berechnet. Der erste belastbare
+      Tagesvergleich entsteht nach dem nächsten Tageswechsel.
     </div>
   </div>
 

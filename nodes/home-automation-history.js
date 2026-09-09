@@ -9,6 +9,7 @@ const DAY_MS = 24 * HOUR_MS;
 const SOURCE_FRESHNESS_MS = {
   energy: 2 * 60 * 1000,
   solaredgeMeter: 10 * 60 * 1000,
+  solaredgeInverterEnergy: 10 * 60 * 1000,
   weather: 2 * HOUR_MS,
   tariff: 70 * 60 * 1000,
 };
@@ -154,6 +155,18 @@ module.exports = function registerHistoryStore(RED) {
       SELECT * FROM solaredge_meter_readings
       WHERE local_day < ? ORDER BY observed_at DESC LIMIT 1
     `);
+    const insertSolarEdgeInverterReading = database.prepare(`
+      INSERT OR REPLACE INTO solaredge_inverter_readings
+        (observed_at, local_day, pv_production_total_kwh, scale_factor, raw_json)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    const selectSolarEdgeInverterReadingsForDay = database.prepare(`
+      SELECT * FROM solaredge_inverter_readings WHERE local_day = ? ORDER BY observed_at
+    `);
+    const selectPreviousSolarEdgeInverterReading = database.prepare(`
+      SELECT * FROM solaredge_inverter_readings
+      WHERE local_day < ? ORDER BY observed_at DESC LIMIT 1
+    `);
     const upsertDailyReconciliation = database.prepare(`
       INSERT INTO daily_energy_reconciliation (
         day, quality, baseline_kind, baseline_observed_at, latest_observed_at,
@@ -183,6 +196,31 @@ module.exports = function registerHistoryStore(RED) {
     `);
     const selectDailyReconciliations = database.prepare(`
       SELECT * FROM daily_energy_reconciliation ORDER BY day
+    `);
+    const upsertDailyEnergyBalance = database.prepare(`
+      INSERT INTO daily_energy_balance (
+        day, quality, baseline_observed_at, latest_observed_at,
+        meter_pv_production_kwh, meter_house_consumption_kwh,
+        integrated_pv_production_kwh, integrated_house_consumption_kwh,
+        pv_difference_kwh, house_difference_kwh,
+        fallback_pv_production_kwh, fallback_house_consumption_kwh, calculated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(day) DO UPDATE SET
+        quality = excluded.quality,
+        baseline_observed_at = excluded.baseline_observed_at,
+        latest_observed_at = excluded.latest_observed_at,
+        meter_pv_production_kwh = excluded.meter_pv_production_kwh,
+        meter_house_consumption_kwh = excluded.meter_house_consumption_kwh,
+        integrated_pv_production_kwh = excluded.integrated_pv_production_kwh,
+        integrated_house_consumption_kwh = excluded.integrated_house_consumption_kwh,
+        pv_difference_kwh = excluded.pv_difference_kwh,
+        house_difference_kwh = excluded.house_difference_kwh,
+        fallback_pv_production_kwh = excluded.fallback_pv_production_kwh,
+        fallback_house_consumption_kwh = excluded.fallback_house_consumption_kwh,
+        calculated_at = excluded.calculated_at
+    `);
+    const selectDailyEnergyBalance = database.prepare(`
+      SELECT * FROM daily_energy_balance WHERE day = ?
     `);
 
     let energyAccumulator = null;
@@ -321,16 +359,19 @@ module.exports = function registerHistoryStore(RED) {
       persistEnergyAccumulator();
       const readings = selectSolarEdgeReadingsForDay.all(day);
       if (!readings.length) return null;
+      const productionReadings = selectSolarEdgeInverterReadingsForDay.all(day);
       const roughRange = roughDayRange(day);
       const snapshots = querySnapshots.all(roughRange.from, roughRange.to)
         .filter((row) => localDay(row.interval_start) === day);
       const tariffs = queryTariffs.all(roughRange.from, roughRange.to)
         .filter((row) => localDay(row.valid_from) === day);
       const integrated = snapshots.reduce((totals, row) => ({
+        pvProductionKWh: totals.pvProductionKWh + finite(row.pv_energy_kwh),
+        houseConsumptionKWh: totals.houseConsumptionKWh + finite(row.house_consumption_kwh),
         gridImportKWh: totals.gridImportKWh + finite(row.grid_import_kwh),
         gridExportKWh: totals.gridExportKWh + finite(row.grid_export_kwh),
         gridImportCostEur: totals.gridImportCostEur + finite(row.energy_cost_eur),
-      }), { gridImportKWh: 0, gridExportKWh: 0, gridImportCostEur: 0 });
+      }), { pvProductionKWh: 0, houseConsumptionKWh: 0, gridImportKWh: 0, gridExportKWh: 0, gridImportCostEur: 0 });
       const tariffValues = tariffs.map((row) => Number(row.price_ct_kwh)).filter(Number.isFinite);
       const averageTariffCtPerKWh = integrated.gridImportKWh > 0
         ? integrated.gridImportCostEur / integrated.gridImportKWh * 100
@@ -342,6 +383,9 @@ module.exports = function registerHistoryStore(RED) {
         firstReading: readings[0],
         previousReading: selectPreviousSolarEdgeReading.get(day),
         lastReading: readings.at(-1),
+        firstProductionReading: productionReadings[0],
+        previousProductionReading: selectPreviousSolarEdgeInverterReading.get(day),
+        lastProductionReading: productionReadings.at(-1),
         integrated,
         averageTariffCtPerKWh,
       });
@@ -365,11 +409,27 @@ module.exports = function registerHistoryStore(RED) {
         result.exportComparisonValueEur,
         new Date().toISOString()
       );
+      upsertDailyEnergyBalance.run(
+        result.day,
+        result.quality,
+        result.productionBaselineObservedAt,
+        result.productionLatestObservedAt,
+        result.meterPvProductionKWh,
+        result.meterHouseConsumptionKWh,
+        result.integratedPvProductionKWh,
+        result.integratedHouseConsumptionKWh,
+        result.pvDifferenceKWh,
+        result.houseDifferenceKWh,
+        result.fallbackPvProductionKWh,
+        result.fallbackHouseConsumptionKWh,
+        new Date().toISOString()
+      );
       return result;
     }
 
     function reconciliationFromRow(row) {
       if (!row) return null;
+      const balance = selectDailyEnergyBalance.get(row.day);
       return {
         day: row.day,
         quality: row.quality,
@@ -388,6 +448,15 @@ module.exports = function registerHistoryStore(RED) {
         integratedImportCostEur: row.integrated_import_cost_eur,
         importComparisonCostEur: row.import_comparison_cost_eur,
         exportComparisonValueEur: row.export_comparison_value_eur,
+        energyBalanceAvailable: ["anchored", "estimated-boundary"].includes(row.quality),
+        meterPvProductionKWh: balance?.meter_pv_production_kwh ?? null,
+        meterHouseConsumptionKWh: balance?.meter_house_consumption_kwh ?? null,
+        integratedPvProductionKWh: balance?.integrated_pv_production_kwh ?? 0,
+        integratedHouseConsumptionKWh: balance?.integrated_house_consumption_kwh ?? 0,
+        pvDifferenceKWh: balance?.pv_difference_kwh ?? null,
+        houseDifferenceKWh: balance?.house_difference_kwh ?? null,
+        fallbackPvProductionKWh: balance?.fallback_pv_production_kwh ?? null,
+        fallbackHouseConsumptionKWh: balance?.fallback_house_consumption_kwh ?? null,
         calculatedAt: row.calculated_at,
       };
     }
@@ -533,7 +602,7 @@ module.exports = function registerHistoryStore(RED) {
         temperatures: undefined,
         sunshine: undefined,
       }));
-      const diagnostics = ["energy", "solaredgeMeter", "weather", "tariff"].map((source) => sourceStatus(source));
+      const diagnostics = ["energy", "solaredgeMeter", "solaredgeInverterEnergy", "weather", "tariff"].map((source) => sourceStatus(source));
       const tariff = diagnostics.find((item) => item.source === "tariff");
       const energy = diagnostics.find((item) => item.source === "energy");
       const priceCtPerKWh = tariff?.payload?.priceCtPerKWh ?? null;
@@ -552,8 +621,12 @@ module.exports = function registerHistoryStore(RED) {
           gridImportCostEur: rows.reduce((sum, row) => sum + row.gridImportCostEur, 0),
           meterImportKWh: reconciliations.reduce((sum, row) => sum + finite(row.meterImportKWh), 0),
           meterExportKWh: reconciliations.reduce((sum, row) => sum + finite(row.meterExportKWh), 0),
+          meterPvProductionKWh: reconciliations.reduce((sum, row) => sum + finite(row.meterPvProductionKWh), 0),
+          meterHouseConsumptionKWh: reconciliations.reduce((sum, row) => sum + finite(row.meterHouseConsumptionKWh), 0),
           fallbackImportKWh: reconciliations.reduce((sum, row) => sum + finite(row.fallbackImportKWh), 0),
           fallbackExportKWh: reconciliations.reduce((sum, row) => sum + finite(row.fallbackExportKWh), 0),
+          fallbackPvProductionKWh: reconciliations.reduce((sum, row) => sum + finite(row.fallbackPvProductionKWh), 0),
+          fallbackHouseConsumptionKWh: reconciliations.reduce((sum, row) => sum + finite(row.fallbackHouseConsumptionKWh), 0),
           importComparisonCostEur: reconciliations.reduce((sum, row) => sum + finite(row.importComparisonCostEur), 0),
           exportComparisonValueEur: reconciliations.reduce((sum, row) => sum + finite(row.exportComparisonValueEur), 0),
         },
@@ -664,6 +737,28 @@ module.exports = function registerHistoryStore(RED) {
           msg.payload = reconciliation;
           msg.history = { action: "daily-energy-reconciliation", day, databasePath };
           node.status({ fill: "green", shape: "dot", text: `SolarEdge-Tagesanker ${day}` });
+          send(msg);
+          done();
+          return;
+        }
+
+        if (msg.topic === "history/source/solaredge-inverter-total") {
+          const observedAt = asIso(payload?.observedAt || payload?.timestamp);
+          const productionTotal = Number(payload?.pvProductionTotalKWh);
+          const scaleFactor = Number(payload?.scaleFactor);
+          if (!Number.isFinite(productionTotal) || productionTotal < 0) {
+            throw new Error("Ungültige SolarEdge-PV-Gesamtenergie");
+          }
+          const day = localDay(observedAt);
+          insertSolarEdgeInverterReading.run(observedAt, day, productionTotal, scaleFactor, JSON.stringify(payload));
+          storeSource("solaredgeInverterEnergy", payload, observedAt, true);
+          const reconciliation = calculateDailyReconciliation(day);
+          const priorDay = localDay(new Date(observedAt).getTime() - DAY_MS);
+          if (priorDay !== day && selectSolarEdgeReadingsForDay.all(priorDay).length) calculateDailyReconciliation(priorDay);
+          msg.topic = "history/solaredge-inverter-total/result";
+          msg.payload = reconciliation;
+          msg.history = { action: "daily-energy-balance", day, databasePath };
+          node.status({ fill: "green", shape: "dot", text: `SolarEdge-PV-Zähler ${day}` });
           send(msg);
           done();
           return;

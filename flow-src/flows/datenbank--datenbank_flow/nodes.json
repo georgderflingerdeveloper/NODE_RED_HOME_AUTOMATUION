@@ -148,6 +148,22 @@
     ]
   },
   {
+    "id": "datenbank_solaredge_inverter_total_in",
+    "type": "link in",
+    "z": "datenbank_flow",
+    "name": "SOLAREDGE-PV-ZÄHLER · Payload empfangen",
+    "links": [
+      "se_inverter_energy_database_out"
+    ],
+    "x": 155,
+    "y": 380,
+    "wires": [
+      [
+        "datenbank_history_store"
+      ]
+    ]
+  },
+  {
     "id": "datenbank_hourly_schedule",
     "type": "inject",
     "z": "datenbank_flow",
@@ -241,15 +257,23 @@
         "vt": "str"
       },
       {
+        "t": "eq",
+        "v": "history/solaredge-inverter-total/result",
+        "vt": "str"
+      },
+      {
         "t": "else"
       }
     ],
     "checkall": "true",
     "repair": false,
-    "outputs": 3,
+    "outputs": 4,
     "x": 950,
     "y": 240,
     "wires": [
+      [
+        "datenbank_dashboard_out"
+      ],
       [
         "datenbank_dashboard_out"
       ],

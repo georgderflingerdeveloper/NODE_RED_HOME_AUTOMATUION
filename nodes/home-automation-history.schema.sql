@@ -83,6 +83,34 @@ CREATE TABLE IF NOT EXISTS solaredge_meter_readings (
 CREATE INDEX IF NOT EXISTS solaredge_meter_readings_day_idx
   ON solaredge_meter_readings(local_day, observed_at);
 
+CREATE TABLE IF NOT EXISTS solaredge_inverter_readings (
+  observed_at TEXT PRIMARY KEY,
+  local_day TEXT NOT NULL,
+  pv_production_total_kwh REAL NOT NULL,
+  scale_factor INTEGER NOT NULL,
+  raw_json TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS solaredge_inverter_readings_day_idx
+  ON solaredge_inverter_readings(local_day, observed_at);
+
+CREATE TABLE IF NOT EXISTS daily_energy_balance (
+  day TEXT PRIMARY KEY,
+  quality TEXT NOT NULL,
+  baseline_observed_at TEXT,
+  latest_observed_at TEXT,
+  meter_pv_production_kwh REAL,
+  meter_house_consumption_kwh REAL,
+  integrated_pv_production_kwh REAL NOT NULL DEFAULT 0,
+  integrated_house_consumption_kwh REAL NOT NULL DEFAULT 0,
+  pv_difference_kwh REAL,
+  house_difference_kwh REAL,
+  fallback_pv_production_kwh REAL,
+  fallback_house_consumption_kwh REAL,
+  calculated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS daily_energy_balance_calculated_idx
+  ON daily_energy_balance(calculated_at);
+
 CREATE TABLE IF NOT EXISTS daily_energy_reconciliation (
   day TEXT PRIMARY KEY,
   quality TEXT NOT NULL,

@@ -366,7 +366,8 @@
     "name": "SolarEdge PV · Kommunikationsfehler",
     "scope": [
       "8908334401038236",
-      "read_power_sf"
+      "read_power_sf",
+      "se_read_inverter_energy_total"
     ],
     "uncaught": false,
     "x": 190,
@@ -473,5 +474,69 @@
         "se_modbus_reconnector"
       ]
     ]
+  },
+  {
+    "id": "se_inverter_energy_comment",
+    "type": "comment",
+    "z": "79160448dc533f1d",
+    "name": "PV-TAGESENERGIE · KUMULIERTER WECHSELRICHTERZÄHLER",
+    "info": "SunSpec base 0: 40093..40094 I_AC_Energy_WH und 40095 I_AC_Energy_WH_SF. Der Lebenszeitzähler bildet zusammen mit den Meter-Zählern belastbare Tagesdifferenzen und überbrückt kurze Aufzeichnungslücken.",
+    "x": 330,
+    "y": 900,
+    "wires": []
+  },
+  {
+    "id": "se_read_inverter_energy_total",
+    "type": "modbus-read",
+    "z": "79160448dc533f1d",
+    "name": "READ: Inverter PV energy total (+SF)",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "40093",
+    "quantity": "3",
+    "rate": "30",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 220,
+    "y": 960,
+    "wires": [["se_parse_inverter_energy_total"], []]
+  },
+  {
+    "id": "se_parse_inverter_energy_total",
+    "type": "function",
+    "z": "79160448dc533f1d",
+    "name": "Parse SolarEdge inverter energy total",
+    "func": {"$flowSource": "flows/solar-power--79160448dc533f1d/functions/parse-solaredge-inverter-energy-total.js"},
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 560,
+    "y": 960,
+    "wires": [["se_inverter_energy_database_out"]]
+  },
+  {
+    "id": "se_inverter_energy_database_out",
+    "type": "link out",
+    "z": "79160448dc533f1d",
+    "name": "SOLAREDGE-PV-ZÄHLER AN DATENBANK",
+    "mode": "link",
+    "links": ["datenbank_solaredge_inverter_total_in"],
+    "x": 875,
+    "y": 960,
+    "wires": []
   }
 ]

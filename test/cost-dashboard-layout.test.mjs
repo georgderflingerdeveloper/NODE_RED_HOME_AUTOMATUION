@@ -54,5 +54,11 @@ test("Kosten-Dashboard zeigt den SolarEdge-Tagesanker und lädt ihn nach Zähler
   assert.match(template, /fallbackImportKWh/);
   assert.match(template, /importComparisonCostEur/);
   assert.match(template, /exportComparisonValueEur/);
+  assert.match(template, /meterPvProductionKWh/);
+  assert.match(template, /meterHouseConsumptionKWh/);
+  assert.match(template, /fallbackPvProductionKWh/);
+  assert.match(template, /fallbackHouseConsumptionKWh/);
+  assert.match(template, /Initialisierung: Der SolarEdge-Zähler/);
+  assert.match(template, /unterschiedliche Zeitfenster/);
   assert.match(template, /history\/solaredge-meter-totals\/result/);
 });
