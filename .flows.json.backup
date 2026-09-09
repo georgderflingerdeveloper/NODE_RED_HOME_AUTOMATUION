@@ -8761,7 +8761,7 @@
         "type": "function",
         "z": "weather_flow",
         "name": "WETTER KONFIGURATION · Reindlmühl",
-        "func": "// Zentral änderbare Standortkonfiguration\nconst LATITUDE = 47.89464;\nconst LONGITUDE = 13.7163;\nconst TIMEZONE = \"Europe/Vienna\";\n\nconst parameters = new URLSearchParams({\n    latitude: String(LATITUDE),\n    longitude: String(LONGITUDE),\n    timezone: TIMEZONE,\n    elevation: \"596\",\n    past_hours: \"1\",\n    forecast_hours: \"7\",\n    current: \"temperature_2m,weather_code,cloud_cover,is_day\",\n    hourly: \"sunshine_duration,temperature_2m,cloud_cover,precipitation_probability,weather_code\",\n    daily: \"sunrise,sunset\"\n});\nmsg.method = \"GET\";\nmsg.url = \"https://api.open-meteo.com/v1/forecast?\" + parameters.toString();\nreturn msg;",
+        "func": "// Zentral änderbare Standortkonfiguration\nconst LATITUDE = 47.89464;\nconst LONGITUDE = 13.7163;\nconst TIMEZONE = \"Europe/Vienna\";\n\nconst parameters = new URLSearchParams({\n    latitude: String(LATITUDE),\n    longitude: String(LONGITUDE),\n    timezone: TIMEZONE,\n    elevation: \"596\",\n    past_hours: \"1\",\n    // 36 Stunden reichen zu jeder Tageszeit bis zum nächsten Morgen.\n    forecast_hours: \"36\",\n    current: \"temperature_2m,weather_code,cloud_cover,is_day\",\n    hourly: \"sunshine_duration,temperature_2m,cloud_cover,precipitation_probability,weather_code\",\n    daily: \"sunrise,sunset\"\n});\nmsg.method = \"GET\";\nmsg.url = \"https://api.open-meteo.com/v1/forecast?\" + parameters.toString();\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -8805,7 +8805,7 @@
         "type": "function",
         "z": "weather_flow",
         "name": "Wetterdaten prüfen und Payload aufbauen",
-        "func": "// Open-Meteo-Antwort in eine stabile Steuerungs-Payload umwandeln\nif (Number(msg.statusCode) !== 200 || !msg.payload || !msg.payload.hourly) {\n    return [null, { payload: { reason: \"HTTP- oder Datenfehler\", statusCode: msg.statusCode } }];\n}\n\nconst data = msg.payload;\nconst hourly = data.hourly;\nconst times = Array.isArray(hourly.time) ? hourly.time : [];\nconst sunshine = Array.isArray(hourly.sunshine_duration) ? hourly.sunshine_duration : [];\nconst temperatures = Array.isArray(hourly.temperature_2m) ? hourly.temperature_2m : [];\nconst clouds = Array.isArray(hourly.cloud_cover) ? hourly.cloud_cover : [];\nconst rainProbability = Array.isArray(hourly.precipitation_probability) ? hourly.precipitation_probability : [];\nconst weatherCodes = Array.isArray(hourly.weather_code) ? hourly.weather_code : [];\nconst daily = data.daily || {};\nconst dailyDates = Array.isArray(daily.time) ? daily.time : [];\nconst sunrises = Array.isArray(daily.sunrise) ? daily.sunrise : [];\nconst sunsets = Array.isArray(daily.sunset) ? daily.sunset : [];\n\nif (!times.length || times.length !== sunshine.length || !dailyDates.length || dailyDates.length !== sunrises.length || dailyDates.length !== sunsets.length) {\n    return [null, { payload: { reason: \"Unvollständige Wetterdaten\" } }];\n}\n\nconst clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));\nconst solarTimesForHour = timeValue => {\n    const dateIndex = dailyDates.indexOf(String(timeValue).slice(0, 10));\n    if (dateIndex < 0) return null;\n    return {\n        sunrise: new Date(sunrises[dateIndex]),\n        sunset: new Date(sunsets[dateIndex])\n    };\n};\nconst daylightSecondsForHour = timeValue => {\n    const solarTimes = solarTimesForHour(timeValue);\n    if (!solarTimes) return 0;\n    const hourStart = new Date(timeValue);\n    const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);\n    const overlapStart = Math.max(hourStart.getTime(), solarTimes.sunrise.getTime());\n    const overlapEnd = Math.min(hourEnd.getTime(), solarTimes.sunset.getTime());\n    return Math.max(0, Math.round((overlapEnd - overlapStart) / 1000));\n};\nconst sunshinePercent = (seconds, timeValue) => {\n    const daylightSeconds = daylightSecondsForHour(timeValue);\n    if (daylightSeconds <= 0) return 0;\n    return clampPercent(((Number(seconds) || 0) / daylightSeconds) * 100);\n};\nconst now = new Date(data.current?.time || Date.now());\nconst currentHour = new Date(now);\ncurrentHour.setMinutes(0, 0, 0);\n\nconst parsedTimes = times.map(value => new Date(value));\nlet lastHourIndex = -1;\nfor (let index = 0; index < parsedTimes.length; index += 1) {\n    if (parsedTimes[index] < currentHour) lastHourIndex = index;\n}\nconst futureIndexes = parsedTimes\n    .map((time, index) => ({ time, index }))\n    .filter(item => item.time > currentHour)\n    .slice(0, 6);\n\nif (lastHourIndex < 0 || futureIndexes.length < 1) {\n    return [null, { payload: { reason: \"Keine passende Stundenprognose\" } }];\n}\n\nconst nextHourIndex = futureIndexes[0].index;\nconst actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex], times[lastHourIndex]);\nconst expectedNextHour = sunshinePercent(sunshine[nextHourIndex], times[nextHourIndex]);\nconst forecastNext6Hours = futureIndexes.map(item => ({\n    Time: times[item.index],\n    TimeLabel: times[item.index].slice(11, 16),\n    SunshinePercent: sunshinePercent(sunshine[item.index], times[item.index]),\n    DaylightSeconds: daylightSecondsForHour(times[item.index]),\n    IsDaylight: daylightSecondsForHour(times[item.index]) > 0,\n    TemperatureC: Number(temperatures[item.index]) || 0,\n    CloudCoverPercent: clampPercent(clouds[item.index]),\n    PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),\n    WeatherCode: Number(weatherCodes[item.index]) || 0\n}));\nconst expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => sum + item.SunshinePercent, 0) / forecastNext6Hours.length);\nconst expectedThresholdPercent = 10;\nconst sunPowerExpected = expectedNextHour >= expectedThresholdPercent;\nconst activeFlag = true;\nflow.set(\"WeatherRetryCount\", 0);\n\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"AKTIV\",\n    ActiveFlag: activeFlag,\n    ActiveFlagf: activeFlag,\n    DataStaleFlag: false,\n    HasLastKnownValues: true,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    Location: {\n        Name: \"Reindlmühl bei Altmünster am Traunsee\",\n        Latitude: Number(data.latitude),\n        Longitude: Number(data.longitude),\n        Timezone: data.timezone || \"Europe/Vienna\"\n    },\n    Current: {\n        Time: data.current?.time || \"\",\n        TemperatureC: Number(data.current?.temperature_2m) || 0,\n        CloudCoverPercent: clampPercent(data.current?.cloud_cover),\n        WeatherCode: Number(data.current?.weather_code) || 0,\n        IsDay: Number(data.current?.is_day) === 1\n    },\n    ActualSunshineLastHour: actualSunshineLastHour,\n    ActualSunshineLastHourPercent: actualSunshineLastHour,\n    ExpectedPercentSunshineNextHour: expectedNextHour,\n    ExpectetPercentSunshineNextHour: expectedNextHour,\n    ExpectedPercentSunshineNext6Hours: expectedNext6Hours,\n    SunPowerExpected: sunPowerExpected,\n    SunPowerExpectedText: sunPowerExpected ? \"JA · nächste Stunde\" : \"NEIN\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: times[nextHourIndex],\n    ExpectedSunshineThresholdPercent: expectedThresholdPercent,\n    SunriseToday: sunrises[0] || \"\",\n    SunsetToday: sunsets[0] || \"\",\n    ForecastNext6Hours: forecastNext6Hours\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: \" + msg.payload.WeatherServiceStatusText +\n    \" | Temperatur: \" + msg.payload.Current.TemperatureC + \" Grad C\" +\n    \" | Sonne letzte Stunde: \" + msg.payload.ActualSunshineLastHour + \"%\" +\n    \" | Sonne nächste Stunde: \" + msg.payload.ExpectedPercentSunshineNextHour + \"%\" +\n    \" | Sonne nächste 6 Stunden: \" + msg.payload.ExpectedPercentSunshineNext6Hours + \"%\" +\n    \" | Solarleistung erwartet: \" + msg.payload.SunPowerExpectedText +\n    \" | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn [msg, null];\n",
+        "func": "// Open-Meteo-Antwort in eine stabile Steuerungs-Payload umwandeln\nif (Number(msg.statusCode) !== 200 || !msg.payload || !msg.payload.hourly) {\n    return [null, { payload: { reason: \"HTTP- oder Datenfehler\", statusCode: msg.statusCode } }];\n}\n\nconst data = msg.payload;\nconst hourly = data.hourly;\nconst times = Array.isArray(hourly.time) ? hourly.time : [];\nconst sunshine = Array.isArray(hourly.sunshine_duration) ? hourly.sunshine_duration : [];\nconst temperatures = Array.isArray(hourly.temperature_2m) ? hourly.temperature_2m : [];\nconst clouds = Array.isArray(hourly.cloud_cover) ? hourly.cloud_cover : [];\nconst rainProbability = Array.isArray(hourly.precipitation_probability) ? hourly.precipitation_probability : [];\nconst weatherCodes = Array.isArray(hourly.weather_code) ? hourly.weather_code : [];\nconst daily = data.daily || {};\nconst dailyDates = Array.isArray(daily.time) ? daily.time : [];\nconst sunrises = Array.isArray(daily.sunrise) ? daily.sunrise : [];\nconst sunsets = Array.isArray(daily.sunset) ? daily.sunset : [];\n\nif (!times.length || times.length !== sunshine.length || !dailyDates.length || dailyDates.length !== sunrises.length || dailyDates.length !== sunsets.length) {\n    return [null, { payload: { reason: \"Unvollständige Wetterdaten\" } }];\n}\n\nconst clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));\nconst solarTimesForDate = timeValue => {\n    const dateIndex = dailyDates.indexOf(String(timeValue).slice(0, 10));\n    if (dateIndex < 0) return null;\n    return {\n        sunrise: new Date(sunrises[dateIndex]),\n        sunset: new Date(sunsets[dateIndex])\n    };\n};\nconst hourIntervalEndingAt = timeValue => {\n    const end = new Date(timeValue);\n    return {\n        start: new Date(end.getTime() - 60 * 60 * 1000),\n        end\n    };\n};\nconst formatHour = value => String(value.getHours()).padStart(2, \"0\") + \":00\";\nconst intervalLabel = timeValue => {\n    const interval = hourIntervalEndingAt(timeValue);\n    return formatHour(interval.start) + \"–\" + formatHour(interval.end);\n};\nconst daylightSecondsForInterval = timeValue => {\n    const interval = hourIntervalEndingAt(timeValue);\n    const solarTimes = solarTimesForDate(timeValue);\n    if (!solarTimes) return 0;\n    const overlapStart = Math.max(interval.start.getTime(), solarTimes.sunrise.getTime());\n    const overlapEnd = Math.min(interval.end.getTime(), solarTimes.sunset.getTime());\n    return Math.max(0, Math.round((overlapEnd - overlapStart) / 1000));\n};\nconst sunshinePercent = (seconds, timeValue) => {\n    const daylightSeconds = daylightSecondsForInterval(timeValue);\n    if (daylightSeconds <= 0) return 0;\n    return clampPercent(((Number(seconds) || 0) / daylightSeconds) * 100);\n};\nconst now = new Date(data.current?.time || Date.now());\nconst currentHour = new Date(now);\ncurrentHour.setMinutes(0, 0, 0);\n\nconst parsedTimes = times.map(value => new Date(value));\nlet lastHourIndex = -1;\nfor (let index = 0; index < parsedTimes.length; index += 1) {\n    if (parsedTimes[index] <= currentHour) lastHourIndex = index;\n}\nconst futureIndexes = parsedTimes\n    .map((time, index) => ({ time, index }))\n    .filter(item => item.time > currentHour)\n    .slice(0, 6);\n\nif (lastHourIndex < 0 || futureIndexes.length < 1) {\n    return [null, { payload: { reason: \"Keine passende Stundenprognose\" } }];\n}\n\nconst nextHourIndex = futureIndexes[0].index;\nconst nextMorningIndex = parsedTimes.findIndex(time => time > now && time.getHours() === 6);\nconst actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex], times[lastHourIndex]);\nconst expectedNextHour = sunshinePercent(sunshine[nextHourIndex], times[nextHourIndex]);\nconst estimatedTemperatureNextMorning = nextMorningIndex >= 0 && Number.isFinite(Number(temperatures[nextMorningIndex]))\n    ? Number(temperatures[nextMorningIndex])\n    : null;\nconst forecastNext6Hours = futureIndexes.map(item => ({\n    Time: times[item.index],\n    TimeLabel: intervalLabel(times[item.index]),\n    SunshinePercent: sunshinePercent(sunshine[item.index], times[item.index]),\n    DaylightSeconds: daylightSecondsForInterval(times[item.index]),\n    IsDaylight: daylightSecondsForInterval(times[item.index]) > 0,\n    TemperatureC: Number(temperatures[item.index]) || 0,\n    CloudCoverPercent: clampPercent(clouds[item.index]),\n    PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),\n    WeatherCode: Number(weatherCodes[item.index]) || 0\n}));\nconst expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => sum + item.SunshinePercent, 0) / forecastNext6Hours.length);\nconst expectedThresholdPercent = 10;\nconst sunPowerExpected = expectedNextHour >= expectedThresholdPercent;\nconst activeFlag = true;\nflow.set(\"WeatherRetryCount\", 0);\n\nmsg.payload = {\n    SchemaVersion: 1,\n    WeatherService: \"Open-Meteo\",\n    WeatherServiceStatusText: \"AKTIV\",\n    ActiveFlag: activeFlag,\n    ActiveFlagf: activeFlag,\n    DataStaleFlag: false,\n    HasLastKnownValues: true,\n    UpdatedAt: new Date().toISOString(),\n    UpdatedAtText: new Date().toLocaleString(\"de-AT\"),\n    Location: {\n        Name: \"Reindlmühl bei Altmünster am Traunsee\",\n        Latitude: Number(data.latitude),\n        Longitude: Number(data.longitude),\n        Timezone: data.timezone || \"Europe/Vienna\"\n    },\n    Current: {\n        Time: data.current?.time || \"\",\n        TemperatureC: Number(data.current?.temperature_2m) || 0,\n        CloudCoverPercent: clampPercent(data.current?.cloud_cover),\n        WeatherCode: Number(data.current?.weather_code) || 0,\n        IsDay: Number(data.current?.is_day) === 1\n    },\n    ActualSunshineLastHour: actualSunshineLastHour,\n    ActualSunshineLastHourPercent: actualSunshineLastHour,\n    ExpectedPercentSunshineNextHour: expectedNextHour,\n    ExpectetPercentSunshineNextHour: expectedNextHour,\n    ExpectedPercentSunshineNext6Hours: expectedNext6Hours,\n    SunPowerExpected: sunPowerExpected,\n    SunPowerExpectedText: sunPowerExpected ? \"JA · nächste Stunde\" : \"NEIN\",\n    SunPowerExpectedForHours: 1,\n    SunPowerExpectedUntil: times[nextHourIndex],\n    ExpectedSunshineThresholdPercent: expectedThresholdPercent,\n    SunriseToday: sunrises[0] || \"\",\n    SunsetToday: sunsets[0] || \"\",\n    EstimatedTemperatureNextMorning: estimatedTemperatureNextMorning,\n    ForecastNext6Hours: forecastNext6Hours\n};\nmsg.payload.DashboardText =\n    \"Standort: Reindlmühl | Dienst: \" + msg.payload.WeatherServiceStatusText +\n    \" | Temperatur: \" + msg.payload.Current.TemperatureC + \" Grad C\" +\n    \" | Sonne letzte Stunde: \" + msg.payload.ActualSunshineLastHour + \"%\" +\n    \" | Sonne nächste Stunde: \" + msg.payload.ExpectedPercentSunshineNextHour + \"%\" +\n    \" | Sonne nächste 6 Stunden: \" + msg.payload.ExpectedPercentSunshineNext6Hours + \"%\" +\n    \" | Solarleistung erwartet: \" + msg.payload.SunPowerExpectedText +\n    \" | Aktualisiert: \" + msg.payload.UpdatedAtText;\nreturn [msg, null];\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -8882,7 +8882,8 @@
             [
                 "weather_debug",
                 "weather_link_out",
-                "weather_ui_overview_table"
+                "weather_ui_overview_table",
+                "weather_automation_data"
             ]
         ]
     },
@@ -8997,6 +8998,67 @@
         ]
     },
     {
+        "id": "weather_automation_comment",
+        "type": "comment",
+        "z": "weather_flow",
+        "name": "AUTOMATION · globale WeatherAutomationData · Quellen über WeatherAutomationSelector",
+        "info": "Zentrale, stabile Schnittstelle für Automationen. Internet- und Sensorwerte werden je Feld über internet, sensor oder auto ausgewählt. Dokumentation: docs/WEATHER_AUTOMATION_DATA.md",
+        "x": 600,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "weather_sensor_data_in",
+        "type": "link in",
+        "z": "weather_flow",
+        "name": "WETTER SENSORIK IN",
+        "links": [],
+        "x": 355,
+        "y": 580,
+        "wires": [
+            [
+                "weather_automation_data"
+            ]
+        ]
+    },
+    {
+        "id": "weather_automation_data",
+        "type": "function",
+        "z": "weather_flow",
+        "name": "Wetterdaten für Automatisierung bereitstellen",
+        "func": "// Stabile globale Wetterstruktur für Heizungs-, Licht- und Solarautomationen.\n//\n// Globale Schnittstellen:\n//   WeatherAutomationData     -> aufbereitete Werte für Automationen\n//   WeatherAutomationSelector -> optionale Quellenwahl je Feld: internet, sensor, auto\n//   WeatherSensorData         -> zuletzt empfangene Sensorwerte\n//\n// Sensordaten können über den Link-In \"WETTER SENSORIK IN\" eingespeist werden:\n//   msg.topic = \"weather/sensor\"\n//   msg.payload = { ActualTemperature: 21.4, UpdatedAt: \"...\" }\n\nconst FIELD_NAMES = [\n    \"SunPercentageNextHour\",\n    \"Sunset\",\n    \"SunDawn\",\n    \"EstimatedTemperaturNextMorning\",\n    \"ActualTemperature\"\n];\n\nconst DEFAULT_SELECTOR = {\n    SunPercentageNextHour: \"internet\",\n    Sunset: \"internet\",\n    SunDawn: \"internet\",\n    EstimatedTemperaturNextMorning: \"internet\",\n    ActualTemperature: \"auto\"\n};\n\nconst isSensorMessage = msg.topic === \"weather/sensor\" || msg.source === \"sensor\";\nif (isSensorMessage && msg.payload && typeof msg.payload === \"object\") {\n    global.set(\"WeatherSensorData\", {\n        ...(global.get(\"WeatherSensorData\") || {}),\n        ...msg.payload,\n        UpdatedAt: msg.payload.UpdatedAt || new Date().toISOString()\n    });\n}\n\nconst internet = isSensorMessage\n    ? (global.get(\"WeatherData\") || {})\n    : (msg.payload || global.get(\"WeatherData\") || {});\nconst sensor = global.get(\"WeatherSensorData\") || {};\nconst configuredSelector = global.get(\"WeatherAutomationSelector\") || {};\nconst selector = {};\n\nfor (const field of FIELD_NAMES) {\n    const requested = String(configuredSelector[field] || DEFAULT_SELECTOR[field]).toLowerCase();\n    selector[field] = [\"internet\", \"sensor\", \"auto\"].includes(requested)\n        ? requested\n        : DEFAULT_SELECTOR[field];\n}\n\n// Sensorwerte gelten standardmäßig 15 Minuten als frisch. Der Wert ist konfigurierbar.\nconst sensorMaxAgeMs = Math.max(1000, Number(configuredSelector.SensorMaxAgeMs) || 15 * 60 * 1000);\nconst sensorUpdatedMs = Date.parse(sensor.UpdatedAt || \"\");\nconst sensorFresh = Number.isFinite(sensorUpdatedMs) && Date.now() - sensorUpdatedMs <= sensorMaxAgeMs;\n\nconst internetValues = {\n    SunPercentageNextHour: internet.ExpectedPercentSunshineNextHour,\n    Sunset: internet.SunsetToday,\n    SunDawn: internet.SunriseToday,\n    EstimatedTemperaturNextMorning: internet.EstimatedTemperatureNextMorning,\n    ActualTemperature: internet.Current?.TemperatureC\n};\n\nconst isNumberField = field => [\n    \"SunPercentageNextHour\",\n    \"EstimatedTemperaturNextMorning\",\n    \"ActualTemperature\"\n].includes(field);\nconst normalize = (field, value) => {\n    if (isNumberField(field)) return Number.isFinite(Number(value)) ? Number(value) : null;\n    return typeof value === \"string\" && value.trim() ? value : null;\n};\n\nconst values = {};\nconst sources = {};\nconst quality = {};\n\nfor (const field of FIELD_NAMES) {\n    const internetValue = normalize(field, internetValues[field]);\n    const sensorValue = normalize(field, sensor[field]);\n    const mode = selector[field];\n    let selectedValue = null;\n    let selectedSource = \"unavailable\";\n\n    if (mode === \"sensor\") {\n        if (sensorFresh && sensorValue !== null) {\n            selectedValue = sensorValue;\n            selectedSource = \"sensor\";\n        }\n    } else if (mode === \"auto\" && sensorFresh && sensorValue !== null) {\n        selectedValue = sensorValue;\n        selectedSource = \"sensor\";\n    } else if (internetValue !== null) {\n        selectedValue = internetValue;\n        selectedSource = \"internet\";\n    }\n\n    values[field] = selectedValue;\n    sources[field] = selectedSource;\n    quality[field] = selectedSource === \"unavailable\"\n        ? \"unavailable\"\n        : (selectedSource === \"internet\" && internet.DataStaleFlag ? \"stale\" : \"valid\");\n}\n\nconst automationData = {\n    SchemaVersion: 1,\n    UpdatedAt: new Date().toISOString(),\n    ...values,\n    Ready: FIELD_NAMES.every(field => values[field] !== null),\n    DataStaleFlag: FIELD_NAMES.some(field => quality[field] !== \"valid\"),\n    Sources: sources,\n    Quality: quality,\n    Selector: selector\n};\n\nglobal.set(\"WeatherAutomationSelector\", {\n    ...selector,\n    SensorMaxAgeMs: sensorMaxAgeMs\n});\nglobal.set(\"WeatherAutomationData\", automationData);\n\nnode.status({\n    fill: automationData.Ready && !automationData.DataStaleFlag ? \"green\" : \"yellow\",\n    shape: automationData.Ready ? \"dot\" : \"ring\",\n    text: automationData.Ready ? \"Automationsdaten bereit\" : \"Automationsdaten unvollständig\"\n});\n\nreturn {\n    ...msg,\n    topic: \"weather/automation\",\n    payload: automationData\n};\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 580,
+        "wires": [
+            [
+                "weather_automation_debug"
+            ]
+        ]
+    },
+    {
+        "id": "weather_automation_debug",
+        "type": "debug",
+        "z": "weather_flow",
+        "name": "AUTOMATION WEATHER DATA",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload.Ready",
+        "statusType": "jsonata",
+        "x": 1110,
+        "y": 580,
+        "wires": []
+    },
+    {
         "id": "kosten_tarif_zeitplan",
         "type": "inject",
         "z": "kosten_flow",
@@ -9084,8 +9146,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1070,
-        "y": 120,
+        "x": 1150,
+        "y": 100,
         "wires": []
     },
     {
@@ -9177,8 +9239,8 @@
         "topic": "history/dashboard",
         "payload": "{\"period\":\"month\"}",
         "payloadType": "json",
-        "x": 220,
-        "y": 300,
+        "x": 330,
+        "y": 220,
         "wires": [
             [
                 "kosten_history_query_out"

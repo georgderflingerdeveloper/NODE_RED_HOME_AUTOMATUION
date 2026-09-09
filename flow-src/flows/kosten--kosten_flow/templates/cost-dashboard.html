@@ -1,5 +1,9 @@
 <style>
-  .cost-card { width:100%; max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
+  .cost-dashboard-group { width:calc(100vw - 220px) !important; max-width:none !important; }
+  .cost-dashboard-grid { width:100% !important; min-height:calc(100vh - 118px) !important; min-height:calc(100dvh - 118px) !important; }
+  .cost-dashboard-widget { width:100% !important; height:auto !important; min-height:calc(100vh - 145px) !important; min-height:calc(100dvh - 145px) !important; left:0 !important; }
+  .cost-dashboard-template { height:auto !important; min-height:inherit !important; }
+  .cost-card { width:100%; min-height:calc(100vh - 165px); min-height:calc(100dvh - 165px); max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
   .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
   .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }
   .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }
@@ -39,8 +43,45 @@
   .cost-badge.online { color:#b9ffdc; background:#14613f; }
   .cost-badge.offline { color:#ffd1c7; background:#71342d; }
   .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }
-  @media(max-width:900px) { .cost-head { grid-template-columns:repeat(2,1fr); } .cost-diagnostics { grid-template-columns:1fr; } }
-  @media(max-width:520px) { .cost-head { grid-template-columns:1fr; } .cost-kpi-value { font-size:23px; } }
+  @media(max-width:900px) {
+    .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }
+    .cost-head { grid-template-columns:repeat(2,1fr); }
+    .cost-diagnostics { grid-template-columns:1fr; }
+  }
+  @media(max-width:600px) {
+    .cost-dashboard-group { width:calc(100vw - 12px) !important; margin-right:6px !important; margin-left:6px !important; }
+    .cost-dashboard-grid { min-height:calc(100dvh - 96px) !important; }
+    .cost-dashboard-widget { min-height:calc(100dvh - 118px) !important; }
+    .cost-card { min-height:calc(100dvh - 128px); padding:0 2px 12px; }
+    .cost-toolbar { display:block; margin-bottom:10px; }
+    .cost-toolbar h2 { margin-bottom:10px; font-size:20px; }
+    .cost-periods { display:grid; grid-template-columns:repeat(3,1fr); width:100%; box-sizing:border-box; }
+    .cost-periods button { min-width:0; padding:9px 4px; }
+    .cost-head { grid-template-columns:1fr; gap:8px; }
+    .cost-kpi { padding:12px; }
+    .cost-kpi-value { font-size:22px; }
+    .cost-info { padding:11px; }
+    .cost-table-wrap { overflow-x:hidden; border:0; background:transparent; }
+    .cost-table { display:block; min-width:0; }
+    .cost-table thead { display:none; }
+    .cost-table tbody { display:block; }
+    .cost-row { display:block; margin-bottom:10px; padding:7px 10px; border:1px solid #456367; border-radius:10px; background:#1d2d2f; }
+    .cost-row td { display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); gap:8px; padding:7px 2px; border-top:1px solid #395357; overflow-wrap:anywhere; }
+    .cost-row td:first-child { border-top:0; }
+    .cost-row td::before { color:#9bb5b8; font-size:11px; font-weight:700; }
+    .cost-row td:nth-child(1)::before { content:"Zeitraum"; }
+    .cost-row td:nth-child(2)::before { content:"Hausverbrauch"; }
+    .cost-row td:nth-child(3)::before { content:"Netzbezug"; }
+    .cost-row td:nth-child(4)::before { content:"PV-Erzeugung"; }
+    .cost-row td:nth-child(5)::before { content:"Verbrauchswert"; }
+    .cost-row td:nth-child(6)::before { content:"Netzkosten"; }
+    .cost-row td:nth-child(7)::before { content:"Wetter"; }
+    .cost-row td:nth-child(8)::before { content:"Daten"; }
+    .cost-hours { display:block; margin:-7px 0 10px; }
+    .cost-hours td { display:block; padding:0; border:0; }
+    .cost-hours-inner { padding:10px; }
+    .cost-hour-grid { grid-template-columns:1fr; }
+  }
 </style>
 
 <script>
@@ -48,7 +89,21 @@
   scope.view = scope.view || { period: "month", tariff: null, history: null };
   var layoutTimers = [];
 
+  function configureCostContainer() {
+    var card = document.querySelector(".cost-card");
+    if (!card) return;
+    var widget = card.closest(".nr-dashboard-cardpanel");
+    var template = card.closest(".nr-dashboard-template");
+    var grid = card.closest(".gridster");
+    var group = card.closest(".nr-dashboard-cardcontainer");
+    if (widget) widget.classList.add("cost-dashboard-widget");
+    if (template) template.classList.add("cost-dashboard-template");
+    if (grid) grid.classList.add("cost-dashboard-grid");
+    if (group) group.classList.add("cost-dashboard-group");
+  }
+
   function refreshCostLayout() {
+    configureCostContainer();
     if (!window || !window.dispatchEvent) return;
     window.dispatchEvent(new Event("resize"));
   }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "d54a2f0da0c34d0f92f25f52c7dec44985b9eb40df76899053ff527b18175a44",
+  "flowSha256": "c79215e1dda3075f91f9d0e6f11ee1f8c6e482ee08849b88c7e619ac5d0b0f92",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -1107,8 +1107,8 @@
     "flows/home--7fa0f8f.5a71708/nodes.json": "19cf90e3db3bc6a08b70dd8a446bf4e7fb5fc62740913a75dca9cc7d1c8ea5eb",
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "3533971c7dfd0e01b8f0a042cfae91ad789ff3b383217c64dce65610ed8021d7",
-    "flows/kosten--kosten_flow/nodes.json": "7d72b2abe7f0f5a804da272b3fe5a30d6e4b69cafbe261fee0087198cd9de817",
-    "flows/kosten--kosten_flow/templates/kostenubersicht.html": "41e2eaa611a1bc19ccd9178742f31402c254f572753252b5de64e341b597a3f1",
+    "flows/kosten--kosten_flow/nodes.json": "1132212c95a641ce3c406a2ae1044aedf9d9e7e7a220aaeb479291b84a2e7987",
+    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "7f4d34be2a05374d01f4b04d0d1feccb8fde2223b95232eae4d703e5f78e1ec9",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",

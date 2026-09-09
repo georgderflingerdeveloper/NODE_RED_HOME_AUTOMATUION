@@ -3,7 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const templatePath = new URL(
-  "../flow-src/flows/kosten--kosten_flow/templates/kostenubersicht.html",
+  "../flow-src/flows/kosten--kosten_flow/templates/cost-dashboard.html",
   import.meta.url,
 );
 const nodesPath = new URL(
@@ -23,4 +23,24 @@ test("Kosten-Dashboard berechnet seine Größe nach Verbindung und Tab-Wechsel n
   assert.match(template, /msg\.name === "KOSTEN"/);
   assert.match(template, /window\.dispatchEvent\(new Event\("resize"\)\)/);
   assert.match(template, /\[0, 100, 350, 800\]/);
+});
+
+test("Kosten-Dashboard nutzt die verfügbare Höhe und Breite", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /cost-dashboard-group/);
+  assert.match(template, /width:calc\(100vw - 220px\)/);
+  assert.match(template, /min-height:calc\(100dvh - 165px\)/);
+  assert.match(template, /closest\("\.nr-dashboard-cardcontainer"\)/);
+  assert.match(template, /closest\("\.nr-dashboard-cardpanel"\)/);
+});
+
+test("Kosten-Dashboard besitzt eine mobile Einspaltenansicht", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /@media\(max-width:600px\)/);
+  assert.match(template, /\.cost-head \{ grid-template-columns:1fr/);
+  assert.match(template, /\.cost-table thead \{ display:none/);
+  assert.match(template, /\.cost-row td:nth-child\(8\)::before \{ content:"Daten"/);
+  assert.match(template, /\.cost-hour-grid \{ grid-template-columns:1fr/);
 });
