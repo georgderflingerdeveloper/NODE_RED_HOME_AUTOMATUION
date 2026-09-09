@@ -9017,8 +9017,8 @@
         "topic": "aWATTar/tariff/request",
         "payload": "",
         "payloadType": "date",
-        "x": 180,
-        "y": 120,
+        "x": 150,
+        "y": 60,
         "wires": [
             [
                 "kosten_awattar_api"
@@ -9041,8 +9041,8 @@
         "authType": "",
         "senderr": true,
         "headers": [],
-        "x": 440,
-        "y": 120,
+        "x": 320,
+        "y": 140,
         "wires": [
             [
                 "kosten_aktuellen_tarif_aufbereiten"
@@ -9084,8 +9084,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 980,
-        "y": 120,
+        "x": 1150,
+        "y": 100,
         "wires": []
     },
     {
@@ -9103,8 +9103,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 990,
-        "y": 180,
+        "x": 960,
+        "y": 420,
         "wires": [
             [
                 "kosten_history_query_out"
