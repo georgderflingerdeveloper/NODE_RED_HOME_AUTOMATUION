@@ -43,6 +43,10 @@ function finite(value, fallback = 0) {
   return Number.isFinite(number) ? number : fallback;
 }
 
+function sortDashboardRows(rows) {
+  return [...rows].sort((left, right) => String(left.key).localeCompare(String(right.key)));
+}
+
 module.exports = function registerHistoryStore(RED) {
   function HistoryStoreNode(config) {
     RED.nodes.createNode(this, config);
@@ -589,7 +593,7 @@ module.exports = function registerHistoryStore(RED) {
         })
         .map(reconciliationFromRow);
       const reconciliationByDay = new Map(reconciliations.map((item) => [item.day, item]));
-      const rows = [...groups.values()].map((group) => ({
+      const rows = sortDashboardRows([...groups.values()].map((group) => ({
         ...group,
         reconciliation: period === "month" ? reconciliationByDay.get(group.key) || null : null,
         hours: group.hours.sort((left, right) => left.intervalStart.localeCompare(right.intervalStart)),
@@ -601,7 +605,7 @@ module.exports = function registerHistoryStore(RED) {
           : null,
         temperatures: undefined,
         sunshine: undefined,
-      }));
+      })));
       const diagnostics = ["energy", "solaredgeMeter", "solaredgeInverterEnergy", "weather", "tariff"].map((source) => sourceStatus(source));
       const tariff = diagnostics.find((item) => item.source === "tariff");
       const energy = diagnostics.find((item) => item.source === "energy");
@@ -817,3 +821,5 @@ module.exports = function registerHistoryStore(RED) {
 
   RED.nodes.registerType("home-automation-history", HistoryStoreNode);
 };
+
+module.exports.sortDashboardRows = sortDashboardRows;

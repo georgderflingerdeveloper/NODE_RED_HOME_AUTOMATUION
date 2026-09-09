@@ -9,6 +9,15 @@ import test from "node:test";
 const require = createRequire(import.meta.url);
 const registerHistoryStore = require("../nodes/home-automation-history.js");
 
+test("Datenbank-Dashboard sortiert Tageszeilen chronologisch nach Zeitstempel", () => {
+  const rows = registerHistoryStore.sortDashboardRows([
+    { key: "2026-09-09T18:00:00.000Z", label: "20:00" },
+    { key: "2026-09-08T22:00:00.000Z", label: "00:00" },
+    { key: "2026-09-09T08:00:00.000Z", label: "10:00" },
+  ]);
+  assert.deepEqual(rows.map((row) => row.label), ["00:00", "10:00", "20:00"]);
+});
+
 test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", () => {
   const userDir = mkdtempSync(join(tmpdir(), "home-automation-history-"));
   let HistoryStore;
@@ -110,7 +119,7 @@ test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", ()
   assert.ok(dashboard.payload.totals.gridImportKWh < 0.0003);
   assert.ok(dashboard.payload.totals.energyCostEur > 0.00002);
   assert.ok(dashboard.payload.totals.energyCostEur > dashboard.payload.totals.gridImportCostEur);
-  assert.ok(dashboard.payload.rows[0].hours[0].recorded);
+  assert.ok(dashboard.payload.rows.some((row) => row.hours.some((hour) => hour.recorded)));
   assert.equal(dashboard.payload.live.priceCtPerKWh, 10);
   assert.equal(dashboard.payload.latestReconciliation.quality, "partial-day");
   assert.equal(dashboard.payload.latestReconciliation.meterImportKWh, 0.25);
