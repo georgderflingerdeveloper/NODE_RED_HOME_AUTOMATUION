@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "02da37cf03030647e557e3a91ce2a5d62b1fc38bf835af05b306ae406d478ce4",
+  "flowSha256": "a4d2b61559b1f01725e6b3d9d2e292a0ab23cc22d795e8ee161c61717bbfc1f2",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -1094,7 +1094,7 @@
     "wetter/sicherer-ausfall-wetterwerte-auf-0.js": "f88b550a99104d84e9bce8b89e8a853463d56236420fcc2a01b420d40a8b50d8",
     "wetter/wetter-konfiguration-reindlmuhl.js": "3ffae26fdd99af845485decf12772f6602a36c6790b16f19afe0190942174616",
     "wetter/wetterdaten-fur-automatisierung-bereitstellen.js": "2a0533430c7b45a32a28f94b8f14e75e5257b560c7751bc0db18c06440abe8e7",
-    "wetter/wetterdaten-prufen-und-payload-aufbauen.js": "3b47d5521a95f3926205f827f3151f71b4c1f339147aaa00b351015d744ff43b",
+    "wetter/wetterdaten-prufen-und-payload-aufbauen.js": "d6201c66112321c8d7ed3f324f29e59ec105f7f176da08b406438e54c74dfab3",
     "wetter/wetterdaten-veroffentlichen.js": "cd66297f65a7f1a8061402c0b662379927d629eb288c4cb26f3209906cb6520e",
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
@@ -1264,7 +1264,7 @@
     "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js": "9fbf0f524194d90c025a73cefb0cad7ffc43c7ea3360e66c69e0cf513a2e7d82",
     "flows/wetter--weather_flow/functions/wetter-konfiguration-reindlmuhl.js": "2c93ea37934b3416c84d89c75fe9cf5f257c245f079011d7a10f644faf4d4bc4",
     "flows/wetter--weather_flow/functions/wetterdaten-fur-automatisierung-bereitstellen.js": "11349f9adf4b841d68609382322c429b9535509232c02733726b43b15147a7b1",
-    "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js": "9d45d6b25799599441abcabcaad3bc29f23d704c0425ad7b428900a569b7890b",
+    "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js": "70e43e8df00a3d5ae138197333c9ec942cd106d0536eda34f324fcecd7f163c9",
     "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js": "40d6f42311f34803356593deb4795ecca26bde3146bdf4b152632c54b46309d1",
     "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren.js": "98bb02159f606f37629187b4ada352c19011e289664abee734e17e64b191978a",
     "flows/wetter--weather_flow/nodes.json": "71c52b11a6626ed1bc16c783c3bc13cb3ee452a1e51c6b412fad1898a5ba5c6d",
