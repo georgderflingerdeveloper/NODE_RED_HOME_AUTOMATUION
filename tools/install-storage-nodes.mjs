@@ -10,6 +10,7 @@ const files = [
   "home-automation-history.js",
   "home-automation-history.html",
   "home-automation-history.schema.sql",
+  "reconcile-solaredge-daily-energy.cjs",
   "home-automation-credential-vault-core.cjs",
   "home-automation-credential-vault.js",
   "home-automation-credential-vault.html",

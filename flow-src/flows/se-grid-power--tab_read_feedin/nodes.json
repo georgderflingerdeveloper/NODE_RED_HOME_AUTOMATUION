@@ -191,7 +191,8 @@
     "z": "tab_read_feedin",
     "name": "SolarEdge Meter · Kommunikationsfehler",
     "scope": [
-      "se_read_power"
+      "se_read_power",
+      "se_read_energy_totals"
     ],
     "uncaught": false,
     "x": 220,
@@ -201,5 +202,82 @@
         "se_grid_offline_handler"
       ]
     ]
+  },
+  {
+    "id": "se_energy_totals_comment",
+    "type": "comment",
+    "z": "tab_read_feedin",
+    "name": "TAGESENERGIEANKER · SOLAREDGE-ZÄHLERSTÄNDE",
+    "info": "SunSpec Meter, Basis 0: M_Exported 226..227, M_Imported 234..235, M_Energy_W_SF 242. Die kumulativen Zählerstände werden getrennt von der schnellen Leistungsmessung gelesen und in SQLite täglich abgeglichen.",
+    "x": 330,
+    "y": 520,
+    "wires": []
+  },
+  {
+    "id": "se_read_energy_totals",
+    "type": "modbus-read",
+    "z": "tab_read_feedin",
+    "name": "READ: Meter export/import totals (+SF)",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "226",
+    "quantity": "17",
+    "rate": "30",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 230,
+    "y": 580,
+    "wires": [
+      [
+        "se_parse_energy_totals"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "se_parse_energy_totals",
+    "type": "function",
+    "z": "tab_read_feedin",
+    "name": "Parse SolarEdge meter energy totals",
+    "func": {
+      "$flowSource": "flows/se-grid-power--tab_read_feedin/functions/parse-solaredge-meter-energy-totals.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 560,
+    "y": 580,
+    "wires": [
+      [
+        "se_energy_totals_database_out"
+      ]
+    ]
+  },
+  {
+    "id": "se_energy_totals_database_out",
+    "type": "link out",
+    "z": "tab_read_feedin",
+    "name": "SOLAREDGE-ZÄHLERSTÄNDE AN DATENBANK",
+    "mode": "link",
+    "links": [
+      "datenbank_solaredge_totals_in"
+    ],
+    "x": 875,
+    "y": 580,
+    "wires": []
   }
 ]

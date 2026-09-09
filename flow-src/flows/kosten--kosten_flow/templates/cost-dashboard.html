@@ -17,6 +17,14 @@
   .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
   .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
   .cost-info b { color:#fff; }
+  .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid #0f8e96; border-radius:12px; background:#183638; }
+  .cost-anchor-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px; }
+  .cost-anchor-title { color:#fff; font-weight:700; }
+  .cost-anchor-grid { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:9px; }
+  .cost-anchor-value { padding:10px; border-radius:9px; background:#223f42; }
+  .cost-anchor-value span { display:block; color:#9fc3c6; font-size:10px; text-transform:uppercase; }
+  .cost-anchor-value b { display:block; margin-top:4px; color:#fff; font-size:17px; }
+  .cost-anchor-note { margin-top:10px; color:#a9c4c6; font-size:11px; line-height:1.45; }
   .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }
   .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
   .cost-table { width:100%; min-width:760px; border-collapse:collapse; }
@@ -46,6 +54,7 @@
   @media(max-width:900px) {
     .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }
     .cost-head { grid-template-columns:repeat(2,1fr); }
+    .cost-anchor-grid { grid-template-columns:repeat(2,1fr); }
     .cost-diagnostics { grid-template-columns:1fr; }
   }
   @media(max-width:600px) {
@@ -58,6 +67,7 @@
     .cost-periods { display:grid; grid-template-columns:repeat(3,1fr); width:100%; box-sizing:border-box; }
     .cost-periods button { min-width:0; padding:9px 4px; }
     .cost-head { grid-template-columns:1fr; gap:8px; }
+    .cost-anchor-grid { grid-template-columns:1fr; }
     .cost-kpi { padding:12px; }
     .cost-kpi-value { font-size:22px; }
     .cost-info { padding:11px; }
@@ -136,6 +146,9 @@
       scope.view.period = msg.payload.period || scope.view.period;
       scheduleCostLayoutRefresh();
     }
+    if (msg.topic === "history/solaredge-meter-totals/result") {
+      scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+    }
   });
 
   window.addEventListener("orientationchange", scheduleCostLayoutRefresh);
@@ -195,6 +208,39 @@
     aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen
     nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.
     Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.
+  </div>
+
+  <div class="cost-anchor" ng-if="view.history.latestReconciliation">
+    <div class="cost-anchor-head">
+      <span class="cost-anchor-title">SolarEdge-Tagesanker · {{view.history.latestReconciliation.day}}</span>
+      <span class="cost-badge" ng-class="view.history.latestReconciliation.quality === 'anchored' ? 'online' : 'offline'">
+        {{view.history.latestReconciliation.quality === 'anchored' ? 'verankert' : 'Teilzeitraum'}}
+      </span>
+    </div>
+    <div class="cost-anchor-grid">
+      <div class="cost-anchor-value">
+        <span>Vom Netz · Zähler / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} / {{view.history.latestReconciliation.integratedImportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Ins Netz · Zähler / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} / {{view.history.latestReconciliation.integratedExportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Vergleichskosten vom Netz</span>
+        <b>{{view.history.latestReconciliation.importComparisonCostEur | currency:'€':4}}</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Vergleichswert ins Netz</span>
+        <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':4}}</b>
+      </div>
+    </div>
+    <div class="cost-anchor-note">
+      Sichtbare Fallback-Korrektur: Bezug {{view.history.latestReconciliation.fallbackImportKWh | number:3}} kWh ·
+      Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh.
+      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:3}} ct/kWh Börsenpreis;
+      keine Netzentgelte und keine vertragliche Einspeisevergütung.
+    </div>
   </div>
 
   <h3 class="cost-section-title">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>

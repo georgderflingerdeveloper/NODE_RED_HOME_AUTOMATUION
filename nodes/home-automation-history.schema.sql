@@ -71,3 +71,37 @@ CREATE TABLE IF NOT EXISTS hourly_snapshots (
   data_quality TEXT NOT NULL DEFAULT 'offline'
 );
 CREATE INDEX IF NOT EXISTS hourly_snapshots_interval_end_idx ON hourly_snapshots(interval_end);
+
+CREATE TABLE IF NOT EXISTS solaredge_meter_readings (
+  observed_at TEXT PRIMARY KEY,
+  local_day TEXT NOT NULL,
+  grid_import_total_kwh REAL NOT NULL,
+  grid_export_total_kwh REAL NOT NULL,
+  scale_factor INTEGER NOT NULL,
+  raw_json TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS solaredge_meter_readings_day_idx
+  ON solaredge_meter_readings(local_day, observed_at);
+
+CREATE TABLE IF NOT EXISTS daily_energy_reconciliation (
+  day TEXT PRIMARY KEY,
+  quality TEXT NOT NULL,
+  baseline_kind TEXT NOT NULL,
+  baseline_observed_at TEXT,
+  latest_observed_at TEXT,
+  meter_import_kwh REAL,
+  meter_export_kwh REAL,
+  integrated_import_kwh REAL NOT NULL DEFAULT 0,
+  integrated_export_kwh REAL NOT NULL DEFAULT 0,
+  import_difference_kwh REAL,
+  export_difference_kwh REAL,
+  fallback_import_kwh REAL,
+  fallback_export_kwh REAL,
+  average_tariff_ct_kwh REAL,
+  integrated_import_cost_eur REAL NOT NULL DEFAULT 0,
+  import_comparison_cost_eur REAL,
+  export_comparison_value_eur REAL,
+  calculated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS daily_energy_reconciliation_calculated_idx
+  ON daily_energy_reconciliation(calculated_at);

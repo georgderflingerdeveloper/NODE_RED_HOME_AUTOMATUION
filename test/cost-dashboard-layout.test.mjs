@@ -44,3 +44,15 @@ test("Kosten-Dashboard besitzt eine mobile Einspaltenansicht", () => {
   assert.match(template, /\.cost-row td:nth-child\(8\)::before \{ content:"Daten"/);
   assert.match(template, /\.cost-hour-grid \{ grid-template-columns:1fr/);
 });
+
+test("Kosten-Dashboard zeigt den SolarEdge-Tagesanker und lädt ihn nach Zählerwerten neu", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /SolarEdge-Tagesanker/);
+  assert.match(template, /meterImportKWh/);
+  assert.match(template, /meterExportKWh/);
+  assert.match(template, /fallbackImportKWh/);
+  assert.match(template, /importComparisonCostEur/);
+  assert.match(template, /exportComparisonValueEur/);
+  assert.match(template, /history\/solaredge-meter-totals\/result/);
+});

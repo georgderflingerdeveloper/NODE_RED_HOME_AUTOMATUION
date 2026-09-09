@@ -67,6 +67,24 @@ test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", ()
   });
   deliver(energy(0));
   deliver(energy(1000));
+  deliver({
+    topic: "history/source/solaredge-meter-totals",
+    payload: {
+      observedAt: new Date(now.getTime() - 1000).toISOString(),
+      gridImportTotalKWh: 120,
+      gridExportTotalKWh: 230,
+      scaleFactor: 0,
+    },
+  });
+  deliver({
+    topic: "history/source/solaredge-meter-totals",
+    payload: {
+      observedAt: new Date(now.getTime() + 2000).toISOString(),
+      gridImportTotalKWh: 120.25,
+      gridExportTotalKWh: 230.5,
+      scaleFactor: 0,
+    },
+  });
   deliver({ topic: "history/dashboard", payload: { period: "day", anchor: now.toISOString() } });
 
   const dashboard = sent.at(-1);
@@ -78,6 +96,10 @@ test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", ()
   assert.ok(dashboard.payload.totals.energyCostEur > dashboard.payload.totals.gridImportCostEur);
   assert.ok(dashboard.payload.rows[0].hours[0].recorded);
   assert.equal(dashboard.payload.live.priceCtPerKWh, 10);
+  assert.equal(dashboard.payload.latestReconciliation.quality, "partial-day");
+  assert.equal(dashboard.payload.latestReconciliation.meterImportKWh, 0.25);
+  assert.equal(dashboard.payload.latestReconciliation.meterExportKWh, 0.5);
+  assert.equal(dashboard.payload.diagnostics.find((item) => item.source === "solaredgeMeter").status, "online");
 
   node.emit("close");
   rmSync(userDir, { recursive: true, force: true });
