@@ -21,7 +21,7 @@ if (!times.length || times.length !== sunshine.length || !dailyDates.length || d
 }
 
 const clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
-const solarTimesForHour = timeValue => {
+const solarTimesForDate = timeValue => {
     const dateIndex = dailyDates.indexOf(String(timeValue).slice(0, 10));
     if (dateIndex < 0) return null;
     return {
@@ -29,17 +29,28 @@ const solarTimesForHour = timeValue => {
         sunset: new Date(sunsets[dateIndex])
     };
 };
-const daylightSecondsForHour = timeValue => {
-    const solarTimes = solarTimesForHour(timeValue);
+const hourIntervalEndingAt = timeValue => {
+    const end = new Date(timeValue);
+    return {
+        start: new Date(end.getTime() - 60 * 60 * 1000),
+        end
+    };
+};
+const formatHour = value => String(value.getHours()).padStart(2, "0") + ":00";
+const intervalLabel = timeValue => {
+    const interval = hourIntervalEndingAt(timeValue);
+    return formatHour(interval.start) + "–" + formatHour(interval.end);
+};
+const daylightSecondsForInterval = timeValue => {
+    const interval = hourIntervalEndingAt(timeValue);
+    const solarTimes = solarTimesForDate(timeValue);
     if (!solarTimes) return 0;
-    const hourStart = new Date(timeValue);
-    const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);
-    const overlapStart = Math.max(hourStart.getTime(), solarTimes.sunrise.getTime());
-    const overlapEnd = Math.min(hourEnd.getTime(), solarTimes.sunset.getTime());
+    const overlapStart = Math.max(interval.start.getTime(), solarTimes.sunrise.getTime());
+    const overlapEnd = Math.min(interval.end.getTime(), solarTimes.sunset.getTime());
     return Math.max(0, Math.round((overlapEnd - overlapStart) / 1000));
 };
 const sunshinePercent = (seconds, timeValue) => {
-    const daylightSeconds = daylightSecondsForHour(timeValue);
+    const daylightSeconds = daylightSecondsForInterval(timeValue);
     if (daylightSeconds <= 0) return 0;
     return clampPercent(((Number(seconds) || 0) / daylightSeconds) * 100);
 };
@@ -50,7 +61,7 @@ currentHour.setMinutes(0, 0, 0);
 const parsedTimes = times.map(value => new Date(value));
 let lastHourIndex = -1;
 for (let index = 0; index < parsedTimes.length; index += 1) {
-    if (parsedTimes[index] < currentHour) lastHourIndex = index;
+    if (parsedTimes[index] <= currentHour) lastHourIndex = index;
 }
 const futureIndexes = parsedTimes
     .map((time, index) => ({ time, index }))
@@ -62,14 +73,18 @@ if (lastHourIndex < 0 || futureIndexes.length < 1) {
 }
 
 const nextHourIndex = futureIndexes[0].index;
+const nextMorningIndex = parsedTimes.findIndex(time => time > now && time.getHours() === 6);
 const actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex], times[lastHourIndex]);
 const expectedNextHour = sunshinePercent(sunshine[nextHourIndex], times[nextHourIndex]);
+const estimatedTemperatureNextMorning = nextMorningIndex >= 0 && Number.isFinite(Number(temperatures[nextMorningIndex]))
+    ? Number(temperatures[nextMorningIndex])
+    : null;
 const forecastNext6Hours = futureIndexes.map(item => ({
     Time: times[item.index],
-    TimeLabel: times[item.index].slice(11, 16),
+    TimeLabel: intervalLabel(times[item.index]),
     SunshinePercent: sunshinePercent(sunshine[item.index], times[item.index]),
-    DaylightSeconds: daylightSecondsForHour(times[item.index]),
-    IsDaylight: daylightSecondsForHour(times[item.index]) > 0,
+    DaylightSeconds: daylightSecondsForInterval(times[item.index]),
+    IsDaylight: daylightSecondsForInterval(times[item.index]) > 0,
     TemperatureC: Number(temperatures[item.index]) || 0,
     CloudCoverPercent: clampPercent(clouds[item.index]),
     PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),
@@ -116,6 +131,7 @@ msg.payload = {
     ExpectedSunshineThresholdPercent: expectedThresholdPercent,
     SunriseToday: sunrises[0] || "",
     SunsetToday: sunsets[0] || "",
+    EstimatedTemperatureNextMorning: estimatedTemperatureNextMorning,
     ForecastNext6Hours: forecastNext6Hours
 };
 msg.payload.DashboardText =

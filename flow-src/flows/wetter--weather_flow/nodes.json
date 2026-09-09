@@ -172,7 +172,8 @@
       [
         "weather_debug",
         "weather_link_out",
-        "weather_ui_overview_table"
+        "weather_ui_overview_table",
+        "weather_automation_data"
       ]
     ]
   },
@@ -289,5 +290,68 @@
         "weather_build_request"
       ]
     ]
+  },
+  {
+    "id": "weather_automation_comment",
+    "type": "comment",
+    "z": "weather_flow",
+    "name": "AUTOMATION · globale WeatherAutomationData · Quellen über WeatherAutomationSelector",
+    "info": "Zentrale, stabile Schnittstelle für Automationen. Internet- und Sensorwerte werden je Feld über internet, sensor oder auto ausgewählt. Dokumentation: docs/WEATHER_AUTOMATION_DATA.md",
+    "x": 600,
+    "y": 540,
+    "wires": []
+  },
+  {
+    "id": "weather_sensor_data_in",
+    "type": "link in",
+    "z": "weather_flow",
+    "name": "WETTER SENSORIK IN",
+    "links": [],
+    "x": 355,
+    "y": 580,
+    "wires": [
+      [
+        "weather_automation_data"
+      ]
+    ]
+  },
+  {
+    "id": "weather_automation_data",
+    "type": "function",
+    "z": "weather_flow",
+    "name": "Wetterdaten für Automatisierung bereitstellen",
+    "func": {
+      "$flowSource": "flows/wetter--weather_flow/functions/wetterdaten-fur-automatisierung-bereitstellen.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 740,
+    "y": 580,
+    "wires": [
+      [
+        "weather_automation_debug"
+      ]
+    ]
+  },
+  {
+    "id": "weather_automation_debug",
+    "type": "debug",
+    "z": "weather_flow",
+    "name": "AUTOMATION WEATHER DATA",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.Ready",
+    "statusType": "jsonata",
+    "x": 1110,
+    "y": 580,
+    "wires": []
   }
 ]
