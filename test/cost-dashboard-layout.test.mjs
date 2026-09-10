@@ -93,3 +93,14 @@ test("Kosten-Dashboard markiert die aktuelle Stunde und Online-Zustände hellgr�
   assert.match(template, /'cost-online':hour\.weatherStatus==='online'/);
   assert.match(template, /'cost-online':hour\.tariffStatus==='online'/);
 });
+
+test("Hausleistungsanzeige besitzt einen begrenzten Grün-Gelb-Rot-Verlauf bis 10 kW", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /scope\.housePowerStyle = function\(powerWatt\)/);
+  assert.match(template, /var maximumWatt = 10000/);
+  assert.match(template, /Math\.min\(maximumWatt, Math\.max\(0,/);
+  assert.match(template, /var hue = Math\.round\(120 \* \(1 - ratio\)\)/);
+  assert.match(template, /linear-gradient\(135deg,hsl/);
+  assert.match(template, /ng-style="housePowerStyle\(view\.history\.live\.houseConsumptionWatt\)"/);
+});

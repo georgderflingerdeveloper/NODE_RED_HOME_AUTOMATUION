@@ -12,6 +12,7 @@
   .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }
   .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }
   .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }
+  .cost-kpi.cost-house-power { transition:background .45s ease,border-color .45s ease; border:1px solid transparent; }
   .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }
   .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }
   .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
@@ -164,6 +165,20 @@
     return Number.isFinite(intervalStart) && intervalStart <= now && now < intervalStart + 60 * 60 * 1000;
   };
 
+  scope.housePowerStyle = function(powerWatt) {
+    /* SELBST ÄNDERN: 10000 ist der rote Endwert des Verlaufs in Watt. */
+    var maximumWatt = 10000;
+    var measuredWatt = Number(powerWatt);
+    var limitedWatt = Math.min(maximumWatt, Math.max(0, Number.isFinite(measuredWatt) ? measuredWatt : 0));
+    var ratio = limitedWatt / maximumWatt;
+    /* Farbton 120 = grün, 60 = gelb, 0 = rot. */
+    var hue = Math.round(120 * (1 - ratio));
+    return {
+      background: "linear-gradient(135deg,hsl(" + hue + ",55%,25%),hsl(" + hue + ",68%,34%))",
+      borderColor: "hsl(" + hue + ",72%,48%)"
+    };
+  };
+
   scope.$watch("msg", function(msg) {
     if (!msg || !msg.payload) return;
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
@@ -216,7 +231,7 @@
       <div class="cost-kpi-value">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>
       <div class="cost-kpi-note">reiner Börsenpreis, ohne Gebühren</div>
     </div>
-    <div class="cost-kpi secondary">
+    <div class="cost-kpi cost-house-power" ng-style="housePowerStyle(view.history.live.houseConsumptionWatt)">
       <div class="cost-kpi-label">Hausleistung jetzt</div>
       <div class="cost-kpi-value">{{view.history.live.houseConsumptionWatt | number:0}} W</div>
       <div class="cost-kpi-note">Netz {{view.history.live.gridImportWatt | number:0}} W · PV {{view.history.live.pvPowerWatt | number:0}} W</div>
