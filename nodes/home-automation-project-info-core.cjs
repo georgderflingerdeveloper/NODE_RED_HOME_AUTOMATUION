@@ -4,6 +4,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
+// Gibt den konfigurierten Wert aus Node-RED-Einstellungen zurück. Wenn eine
+// Einstellungsvorlage vorhanden ist, hat sie Vorrang vor einem direkten Feldzugriff.
 function configured(settings, key) {
   if (settings && typeof settings.get === "function") {
     const value = settings.get(key);
@@ -12,11 +14,14 @@ function configured(settings, key) {
   return settings?.[key];
 }
 
+// Liest eine JSON-Datei sicher ein und gibt null zurück, wenn die Datei fehlt
+// oder fehlerhaft ist. Dadurch bleiben nachgelagerte Funktionen robust.
 function readJson(filePath) {
   try { return JSON.parse(fs.readFileSync(filePath, "utf8")); }
   catch { return null; }
 }
 
+// Ermittelt den aktuell aktiven Projektnamen aus der Node-RED-Project-Konfiguration.
 function activeProjectName(userDir) {
   const configuration = readJson(path.join(userDir, ".config.projects.json"));
   return configuration?.activeProject
@@ -25,6 +30,9 @@ function activeProjectName(userDir) {
     || null;
 }
 
+// Bestimmt das Projekt-Root, je nach Node-RED-Setup und aktivem Projekt.
+// Priorität: absoluter Flow-Pfad, explizites Projektverzeichnis, aktives Projekt,
+// sonst der Benutzerordner selbst.
 function resolveProjectRoot(settings) {
   const userDir = path.resolve(configured(settings, "userDir") || process.cwd());
   const flowFile = configured(settings, "flowFile");
@@ -41,11 +49,16 @@ function resolveProjectRoot(settings) {
   return userDir;
 }
 
+// Führt einen Git-Befehl im gewählten Projektverzeichnis aus und liefert die
+// Ausgabe zurück, falls der Befehl erfolgreich war.
 function git(projectRoot, args) {
   const result = spawnSync("git", ["-C", projectRoot, ...args], { encoding: "utf8", timeout: 3000 });
   return result.status === 0 ? result.stdout.trim() : "";
 }
 
+// Liefert die beschreibende Zweckbestimmung des aktuellen Branches aus der
+// Package-Konfiguration. Falls nichts definiert ist, bleibt eine generische
+// Beschreibung zurück.
 function branchPurpose(packageData, branch) {
   const purposes = packageData?.homeAutomation?.branchPurposes;
   if (purposes && typeof purposes[branch] === "string" && purposes[branch].trim()) {
@@ -54,6 +67,8 @@ function branchPurpose(packageData, branch) {
   return "Arbeitsstand der Hausautomation; Details sind in der Branch-Dokumentation und im Git-Verlauf beschrieben.";
 }
 
+// Hauptfunktion: sammelt alle verfügbaren Projekt- und Laufzeitinformationen für
+// die UI bzw. die späteren Node-RED-Node-Ausgaben.
 function projectInfo(settings, options = {}) {
   const projectRoot = resolveProjectRoot(settings);
   const packageData = readJson(path.join(projectRoot, "package.json")) || {};

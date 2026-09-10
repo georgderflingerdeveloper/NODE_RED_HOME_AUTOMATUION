@@ -1,0 +1,384 @@
+<style>
+  .cost-dashboard-group { width:calc(100vw - 220px) !important; max-width:none !important; }
+  .cost-dashboard-grid { width:100% !important; min-height:calc(100vh - 118px) !important; min-height:calc(100dvh - 118px) !important; }
+  .cost-dashboard-widget { width:100% !important; height:auto !important; min-height:calc(100vh - 145px) !important; min-height:calc(100dvh - 145px) !important; left:0 !important; }
+  .cost-dashboard-template { height:auto !important; min-height:inherit !important; }
+  .cost-card { width:100%; min-height:calc(100vh - 165px); min-height:calc(100dvh - 165px); max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
+  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }
+  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }
+  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }
+  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }
+  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }
+  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }
+  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }
+  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }
+  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }
+  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
+  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
+  .cost-info b { color:#fff; }
+  .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid #0f8e96; border-radius:12px; background:#183638; }
+  .cost-anchor-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px; }
+  .cost-anchor-title { color:#fff; font-weight:700; }
+  .cost-anchor-grid { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:9px; }
+  .cost-anchor-value { padding:10px; border-radius:9px; background:#223f42; }
+  .cost-anchor-value span { display:block; color:#9fc3c6; font-size:10px; text-transform:uppercase; }
+  .cost-anchor-value b { display:block; margin-top:4px; color:#fff; font-size:17px; }
+  .cost-anchor-note { margin-top:10px; color:#a9c4c6; font-size:11px; line-height:1.45; }
+  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }
+  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
+  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }
+  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }
+  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }
+  .cost-row { cursor:pointer; transition:background .15s; }
+  .cost-row:hover td { background:#294347; }
+  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }
+  .cost-muted { color:#9bb5b8; }
+  .cost-offline { color:#ffad99; }
+  /* SELBST ÄNDERN: Schriftfarbe für den Status „online“. */
+  .cost-online { color:#8df0ae; font-weight:800; }
+  .cost-hours td { padding:0; background:#132426; }
+  .cost-hours-inner { padding:12px 18px 14px 42px; }
+  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }
+  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }
+  /* SELBST ÄNDERN: Hintergrund und Rahmen der aktuell laufenden Stundenkarte. */
+  .cost-hour.cost-hour-current { color:#15351f; background:#d7f5df; border:2px solid #79d99a; box-shadow:0 0 0 2px rgba(121,217,154,.18); }
+  .cost-hour.cost-hour-current b,
+  .cost-hour.cost-hour-current .cost-hour-price { color:#15351f; }
+  .cost-hour.cost-hour-current .cost-muted { color:#477157; }
+  .cost-hour.cost-hour-current .cost-hour-cents,
+  .cost-hour.cost-hour-current .cost-online { color:#176b37; }
+  .cost-current-label { float:right; color:#176b37; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+  .cost-hour b { color:#fff; }
+  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }
+  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }
+  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }
+  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }
+  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }
+  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }
+  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }
+  .cost-badge.online { color:#b9ffdc; background:#14613f; }
+  .cost-badge.offline { color:#ffd1c7; background:#71342d; }
+  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }
+  @media(max-width:900px) {
+    .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }
+    .cost-head { grid-template-columns:repeat(2,1fr); }
+    .cost-anchor-grid { grid-template-columns:repeat(2,1fr); }
+    .cost-diagnostics { grid-template-columns:1fr; }
+  }
+  @media(max-width:600px) {
+    .cost-dashboard-group { width:calc(100vw - 12px) !important; margin-right:6px !important; margin-left:6px !important; }
+    .cost-dashboard-grid { min-height:calc(100dvh - 96px) !important; }
+    .cost-dashboard-widget { min-height:calc(100dvh - 118px) !important; }
+    .cost-card { min-height:calc(100dvh - 128px); padding:0 2px 12px; }
+    .cost-toolbar { display:block; margin-bottom:10px; }
+    .cost-toolbar h2 { margin-bottom:10px; font-size:20px; }
+    .cost-periods { display:grid; grid-template-columns:repeat(3,1fr); width:100%; box-sizing:border-box; }
+    .cost-periods button { min-width:0; padding:9px 4px; }
+    .cost-head { grid-template-columns:1fr; gap:8px; }
+    .cost-anchor-grid { grid-template-columns:1fr; }
+    .cost-kpi { padding:12px; }
+    .cost-kpi-value { font-size:22px; }
+    .cost-info { padding:11px; }
+    .cost-table-wrap { overflow-x:hidden; border:0; background:transparent; }
+    .cost-table { display:block; min-width:0; }
+    .cost-table thead { display:none; }
+    .cost-table tbody { display:block; }
+    .cost-row { display:block; margin-bottom:10px; padding:7px 10px; border:1px solid #456367; border-radius:10px; background:#1d2d2f; }
+    .cost-row td { display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); gap:8px; padding:7px 2px; border-top:1px solid #395357; overflow-wrap:anywhere; }
+    .cost-row td:first-child { border-top:0; }
+    .cost-row td::before { color:#9bb5b8; font-size:11px; font-weight:700; }
+    .cost-row td:nth-child(1)::before { content:"Zeitraum"; }
+    .cost-row td:nth-child(2)::before { content:"Hausverbrauch"; }
+    .cost-row td:nth-child(3)::before { content:"Netzbezug"; }
+    .cost-row td:nth-child(4)::before { content:"PV-Erzeugung"; }
+    .cost-row td:nth-child(5)::before { content:"Verbrauchswert"; }
+    .cost-row td:nth-child(6)::before { content:"Netzkosten"; }
+    .cost-row td:nth-child(7)::before { content:"Wetter"; }
+    .cost-row td:nth-child(8)::before { content:"Daten"; }
+    .cost-hours { display:block; margin:-7px 0 10px; }
+    .cost-hours td { display:block; padding:0; border:0; }
+    .cost-hours-inner { padding:10px; }
+    .cost-hour-grid { grid-template-columns:1fr; }
+  }
+</style>
+
+<script>
+(function(scope) {
+  scope.view = scope.view || { period: "month", tariff: null, history: null };
+  scope.expandedCostRows = scope.expandedCostRows || {};
+  var layoutTimers = [];
+
+  function restoreExpandedCostRows(history) {
+    if (!history || !Array.isArray(history.rows)) return history;
+    history.rows.forEach(function(row) {
+      row.expanded = Boolean(scope.expandedCostRows[String(row.key)]);
+    });
+    return history;
+  }
+
+  function configureCostContainer() {
+    var card = document.querySelector(".cost-card");
+    if (!card) return;
+    var widget = card.closest(".nr-dashboard-cardpanel");
+    var template = card.closest(".nr-dashboard-template");
+    var grid = card.closest(".gridster");
+    var group = card.closest(".nr-dashboard-cardcontainer");
+    if (widget) widget.classList.add("cost-dashboard-widget");
+    if (template) template.classList.add("cost-dashboard-template");
+    if (grid) grid.classList.add("cost-dashboard-grid");
+    if (group) group.classList.add("cost-dashboard-group");
+  }
+
+  function refreshCostLayout() {
+    configureCostContainer();
+    if (!window || !window.dispatchEvent) return;
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  function scheduleCostLayoutRefresh() {
+    layoutTimers.forEach(clearTimeout);
+    layoutTimers = [0, 100, 350, 800].map(function(delay) {
+      return setTimeout(refreshCostLayout, delay);
+    });
+  }
+
+  scope.selectCostPeriod = function(period) {
+    scope.view.period = period;
+    scope.send({ topic: "history/dashboard", payload: { period: period } });
+    scheduleCostLayoutRefresh();
+  };
+
+  scope.toggleCostRow = function(row) {
+    var key = String(row.key);
+    var expanded = !scope.expandedCostRows[key];
+    if (expanded) scope.expandedCostRows[key] = true;
+    else delete scope.expandedCostRows[key];
+    row.expanded = expanded;
+  };
+
+  scope.isCurrentCostHour = function(hour) {
+    var intervalStart = new Date(hour && hour.intervalStart).getTime();
+    var now = Date.now();
+    return Number.isFinite(intervalStart) && intervalStart <= now && now < intervalStart + 60 * 60 * 1000;
+  };
+
+  scope.$watch("msg", function(msg) {
+    if (!msg || !msg.payload) return;
+    if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
+      scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+      scheduleCostLayoutRefresh();
+      return;
+    }
+    if (msg.topic === "aWATTar/tariff/current") {
+      scope.view.tariff = msg.payload;
+    }
+    if (msg.topic === "history/dashboard/result") {
+      scope.view.history = restoreExpandedCostRows(msg.payload);
+      scope.view.period = msg.payload.period || scope.view.period;
+      scheduleCostLayoutRefresh();
+    }
+    if (msg.topic === "history/solaredge-meter-totals/result") {
+      scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+    }
+  });
+
+  window.addEventListener("orientationchange", scheduleCostLayoutRefresh);
+  document.addEventListener("visibilitychange", scheduleCostLayoutRefresh);
+  scheduleCostLayoutRefresh();
+
+  var refreshTimer = setInterval(function() {
+    scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+  }, 60000);
+  scope.$on("$destroy", function() {
+    clearInterval(refreshTimer);
+    layoutTimers.forEach(clearTimeout);
+    window.removeEventListener("orientationchange", scheduleCostLayoutRefresh);
+    document.removeEventListener("visibilitychange", scheduleCostLayoutRefresh);
+  });
+})(scope);
+</script>
+
+<div class="cost-card">
+  <div class="cost-toolbar">
+    <h2>KOSTEN · Energiehistorie</h2>
+    <div class="cost-periods">
+      <button ng-class="{active:view.period==='day'}" ng-click="selectCostPeriod('day')">Tag</button>
+      <button ng-class="{active:view.period==='month'}" ng-click="selectCostPeriod('month')">Monat</button>
+      <button ng-class="{active:view.period==='year'}" ng-click="selectCostPeriod('year')">Jahr</button>
+    </div>
+  </div>
+
+  <div class="cost-head">
+    <div class="cost-kpi">
+      <div class="cost-kpi-label">Aktueller aWATTar-Preis</div>
+      <div class="cost-kpi-value">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>
+      <div class="cost-kpi-note">reiner Börsenpreis, ohne Gebühren</div>
+    </div>
+    <div class="cost-kpi secondary">
+      <div class="cost-kpi-label">Hausleistung jetzt</div>
+      <div class="cost-kpi-value">{{view.history.live.houseConsumptionWatt | number:0}} W</div>
+      <div class="cost-kpi-note">Netz {{view.history.live.gridImportWatt | number:0}} W · PV {{view.history.live.pvPowerWatt | number:0}} W</div>
+    </div>
+    <div class="cost-kpi secondary">
+      <div class="cost-kpi-label">Verbrauchswert bei aktueller Hausleistung</div>
+      <div class="cost-kpi-value">{{view.history.live.energyValuePerHourEur | currency:'€':4}} / h</div>
+      <div class="cost-kpi-note">Netzkosten aktuell {{view.history.live.gridImportCostPerHourEur | currency:'€':4}} / h</div>
+    </div>
+    <div class="cost-kpi">
+      <div class="cost-kpi-label">Verbrauchswert im Zeitraum</div>
+      <div class="cost-kpi-value">{{view.history.totals.energyCostEur | currency:'€':2}}</div>
+      <div class="cost-kpi-note">
+        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·
+        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie
+      </div>
+    </div>
+  </div>
+
+  <div class="cost-info">
+    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen
+    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen
+    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.
+    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.
+  </div>
+
+  <div class="cost-anchor" ng-if="view.history.latestReconciliation">
+    <div class="cost-anchor-head">
+      <span class="cost-anchor-title">SolarEdge-Tagesanker · {{view.history.latestReconciliation.day}}</span>
+      <span class="cost-badge" ng-class="view.history.latestReconciliation.quality === 'anchored' ? 'online' : 'offline'">
+        {{view.history.latestReconciliation.quality === 'anchored' ? 'verankert' : (view.history.latestReconciliation.quality === 'estimated-boundary' ? 'Grenze geschätzt' : (view.history.latestReconciliation.quality === 'grid-only' ? 'nur Netzanker' : 'Initialisierung'))}}
+      </span>
+    </div>
+    <div class="cost-anchor-grid" ng-if="view.history.latestReconciliation.quality !== 'partial-day'">
+      <div class="cost-anchor-value">
+        <span>PV-Produktion · Zähler / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} / {{view.history.latestReconciliation.integratedPvProductionKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Hausverbrauch · bilanziert / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterHouseConsumptionKWh | number:3}} / {{view.history.latestReconciliation.integratedHouseConsumptionKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Vom Netz · Zähler / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} / {{view.history.latestReconciliation.integratedImportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Ins Netz · Zähler / erfasst</span>
+        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} / {{view.history.latestReconciliation.integratedExportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Vergleichskosten vom Netz</span>
+        <b>{{view.history.latestReconciliation.importComparisonCostEur | currency:'€':4}}</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Vergleichswert ins Netz</span>
+        <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':4}}</b>
+      </div>
+    </div>
+    <div class="cost-anchor-note" ng-if="view.history.latestReconciliation.quality !== 'partial-day'">
+      Sichtbare Fallback-Korrektur: Bezug {{view.history.latestReconciliation.fallbackImportKWh | number:3}} kWh ·
+      Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh ·
+      PV {{view.history.latestReconciliation.fallbackPvProductionKWh | number:3}} kWh ·
+      Hausverbrauch {{view.history.latestReconciliation.fallbackHouseConsumptionKWh | number:3}} kWh.
+      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:3}} ct/kWh Börsenpreis;
+      keine Netzentgelte und keine vertragliche Einspeisevergütung.
+    </div>
+    <div class="cost-anchor-grid" ng-if="view.history.latestReconciliation.quality === 'partial-day'">
+      <div class="cost-anchor-value">
+        <span>Vom Netz · seit erstem Zählerpunkt</span>
+        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>Ins Netz · seit erstem Zählerpunkt</span>
+        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} kWh</b>
+      </div>
+      <div class="cost-anchor-value">
+        <span>PV-Produktion · seit erstem Zählerpunkt</span>
+        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} kWh</b>
+      </div>
+    </div>
+    <div class="cost-anchor-note" ng-if="view.history.latestReconciliation.quality === 'partial-day'">
+      Initialisierung: Der SolarEdge-Zähler und die Tageserfassung decken heute noch unterschiedliche Zeitfenster ab.
+      Daher werden noch keine Differenz, Fallback-Korrektur oder Vergleichskosten berechnet. Der erste belastbare
+      Tagesvergleich entsteht nach dem nächsten Tageswechsel.
+    </div>
+  </div>
+
+  <h3 class="cost-section-title">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>
+  <div class="cost-table-wrap" ng-if="view.history.rows.length">
+    <table class="cost-table">
+      <thead>
+        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>
+      </thead>
+      <tbody>
+        <tr class="cost-row" ng-repeat-start="row in view.history.rows" ng-click="toggleCostRow(row)">
+          <td><span class="cost-expand">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>
+          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
+          <td>{{row.gridImportKWh | number:3}} kWh</td>
+          <td>{{row.pvEnergyKWh | number:3}} kWh</td>
+          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class="cost-muted">{{row.energyCostEur * 100 | number:2}} ct</span></td>
+          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class="cost-muted">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>
+          <td>
+            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}
+            <br><span ng-class="{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}">
+              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}
+            </span>
+          </td>
+          <td ng-class="{'cost-offline':row.recordedHourCount && row.offlineCount>0}">
+            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}
+          </td>
+        </tr>
+        <tr class="cost-hours" ng-repeat-end ng-if="row.expanded">
+          <td colspan="8"><div class="cost-hours-inner">
+            <div class="cost-hour-grid">
+              <div class="cost-hour" ng-class="{'cost-hour-current':isCurrentCostHour(hour)}" ng-repeat="hour in row.hours">
+                <span class="cost-current-label" ng-if="isCurrentCostHour(hour)">aktuelle Stunde</span>
+                <b>{{hour.time}} Uhr</b><br>
+                <span ng-if="hour.recorded">
+                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh
+                  <div class="cost-hour-price">
+                    {{hour.energyCostEur | currency:'€':4}}
+                    <span class="cost-hour-cents">· {{hour.energyCostEur * 100 | number:2}} ct</span>
+                  </div>
+                  <span class="cost-muted">
+                    Netz {{hour.gridImportKWh | number:3}} kWh ·
+                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct
+                  </span><br>
+                </span>
+                <span ng-if="!hour.recorded">
+                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>
+                  <span class="cost-muted">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>
+                </span>
+                <span ng-if="hour.recorded">
+                  Energie: <span ng-class="{'cost-online':hour.energyStatus==='online','cost-offline':hour.energyStatus!=='online'}">{{hour.energyStatus}}</span> ·
+                  Wetter: <span ng-class="{'cost-online':hour.weatherStatus==='online','cost-offline':hour.weatherStatus!=='online'}">{{hour.weatherStatus}}</span> ·
+                  Tarif: <span ng-class="{'cost-online':hour.tariffStatus==='online','cost-offline':hour.tariffStatus!=='online'}">{{hour.tariffStatus}}</span>
+                </span>
+                <span ng-if="!hour.recorded">{{hour.status}}</span>
+              </div>
+            </div>
+          </div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cost-empty" ng-if="view.history && !view.history.rows.length">
+    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.
+  </div>
+
+  <h3 class="cost-section-title">Service- und Fehlerdiagnose</h3>
+  <div class="cost-diagnostics">
+    <div class="cost-source" ng-repeat="source in view.history.diagnostics">
+      <div class="cost-source-head">
+        <span class="cost-source-name">{{source.source}}</span>
+        <span class="cost-badge" ng-class="source.status">{{source.status}}</span>
+      </div>
+      <div class="cost-source-detail">
+        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>
+        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}
+        <span ng-if="source.error"><br>Hinweis: {{source.error}}</span>
+      </div>
+    </div>
+  </div>
+</div>

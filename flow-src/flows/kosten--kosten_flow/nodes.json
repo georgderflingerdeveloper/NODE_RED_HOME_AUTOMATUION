@@ -103,7 +103,7 @@
     "width": 0,
     "height": 0,
     "format": {
-      "$flowSource": "flows/kosten--kosten_flow/templates/cost-dashboard.html"
+      "$flowSource": "flows/kosten--kosten_flow/templates/kostenubersicht.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": false,

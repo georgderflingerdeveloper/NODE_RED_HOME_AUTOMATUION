@@ -510,14 +510,21 @@
     "emptyMsgOnFail": false,
     "x": 220,
     "y": 960,
-    "wires": [["se_parse_inverter_energy_total"], []]
+    "wires": [
+      [
+        "se_parse_inverter_energy_total"
+      ],
+      []
+    ]
   },
   {
     "id": "se_parse_inverter_energy_total",
     "type": "function",
     "z": "79160448dc533f1d",
     "name": "Parse SolarEdge inverter energy total",
-    "func": {"$flowSource": "flows/solar-power--79160448dc533f1d/functions/parse-solaredge-inverter-energy-total.js"},
+    "func": {
+      "$flowSource": "flows/solar-power--79160448dc533f1d/functions/parse-solaredge-inverter-energy-total.js"
+    },
     "outputs": 1,
     "timeout": 0,
     "noerr": 0,
@@ -526,7 +533,11 @@
     "libs": [],
     "x": 560,
     "y": 960,
-    "wires": [["se_inverter_energy_database_out"]]
+    "wires": [
+      [
+        "se_inverter_energy_database_out"
+      ]
+    ]
   },
   {
     "id": "se_inverter_energy_database_out",
@@ -534,7 +545,9 @@
     "z": "79160448dc533f1d",
     "name": "SOLAREDGE-PV-ZÄHLER AN DATENBANK",
     "mode": "link",
-    "links": ["datenbank_solaredge_inverter_total_in"],
+    "links": [
+      "datenbank_solaredge_inverter_total_in"
+    ],
     "x": 875,
     "y": 960,
     "wires": []

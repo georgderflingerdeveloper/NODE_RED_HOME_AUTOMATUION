@@ -4,7 +4,12 @@ const { projectInfo } = require("./home-automation-project-info-core.cjs");
 
 let projectInfoRouteRegistered = false;
 
+// Registriert die HTTP-Route und den Node-RED-Node für Projektinformationen.
+// Die Route ist nur einmalig erforderlich, damit die API nicht mehrfach doppelt
+// gebunden wird, wenn Node-RED dieselbe Datei mehrfach initialisiert.
 module.exports = function registerProjectInfo(RED) {
+  // HTTP-Endpunkt für die Projektinformation: liefert eine JSON-Ausgabe mit
+  // Versions-, Git- und Statusdaten für das aktuelle Projekt.
   if (!projectInfoRouteRegistered && RED.httpNode && typeof RED.httpNode.get === "function") {
     RED.httpNode.get("/home-automation/project-info", (_request, response) => {
       try {
@@ -19,6 +24,8 @@ module.exports = function registerProjectInfo(RED) {
     projectInfoRouteRegistered = true;
   }
 
+  // Node-RED-Node-Implementierung: liest die Projektinformationen beim Empfang
+  // eines Trigger-Inputs und veröffentlicht das Ergebnis auf der Flow-Ausgabe.
   function ProjectInfoNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
@@ -36,5 +43,7 @@ module.exports = function registerProjectInfo(RED) {
       }
     });
   }
+
+  // Node-Typ für die Palette registrieren.
   RED.nodes.registerType("home-automation-project-info", ProjectInfoNode);
 };

@@ -1,16 +1,25 @@
+// Ein Tag in Millisekunden; wird für die Berechnung von Vor- und Folge-Tagen
+// verwendet, wenn Zeiträume über Tage hinweg verglichen werden.
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// Konvertiert einen Wert nur dann in eine Number, wenn er tatsächlich finite ist.
+// Andernfalls wird null zurückgegeben, damit nachgelagerte Berechnungen sauber
+// mit fehlenden Werten umgehen können.
 function finiteOrNull(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
 
+// Rundet Zahlen auf eine feste Anzahl Nachkommastellen und liefert null für
+// ungültige Werte. Dadurch bleiben die Ergebnisse konsistent und gut lesbar.
 function round(value, digits = 6) {
   if (!Number.isFinite(value)) return null;
   const factor = 10 ** digits;
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
+// Wandelt einen Zeitstempel in das lokale Tagesdatum im gewünschten Zeitbereich
+// um, z. B. für Vergleiche zwischen Tagesgrenzen.
 function localDay(value, timeZone = "Europe/Vienna") {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,
@@ -22,16 +31,19 @@ function localDay(value, timeZone = "Europe/Vienna") {
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
+// Berechnet den nächsten Tag eines Datums, basierend auf einem UTC-Tag-Mittelpunkt.
 function nextDay(day) {
   const date = new Date(`${day}T12:00:00Z`);
   return localDay(date.getTime() + DAY_MS, "UTC");
 }
 
+// Berechnet den vorherigen Tag eines Datums analog zum nächstliegenden Tag.
 function previousDay(day) {
   const date = new Date(`${day}T12:00:00Z`);
   return localDay(date.getTime() - DAY_MS, "UTC");
 }
 
+// Extrahiert die UTC-Stunde eines Zeitstempels in der gewünschten Zeitzone.
 function localHour(value, timeZone = "Europe/Vienna") {
   return Number(new Intl.DateTimeFormat("en-GB", {
     timeZone,
@@ -40,6 +52,9 @@ function localHour(value, timeZone = "Europe/Vienna") {
   }).format(new Date(value)));
 }
 
+// Hauptlogik zur Konsistenzbildung von SolarEdge-Tageswerten. Diese Funktion
+// vergleicht Zählerstände, Integrationswerte und Produktionsdaten und bildet
+// daraus einen sauberen Tageswert mit Qualitätsmerkmalen.
 function reconcileSolarEdgeDailyEnergy({
   day,
   firstReading,

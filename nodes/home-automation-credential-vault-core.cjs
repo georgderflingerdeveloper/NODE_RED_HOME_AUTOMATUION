@@ -6,14 +6,26 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawn } = require("node:child_process");
 
+// Abschnitt 1: Konfiguration und Grundwerte
+// Diese Konstanten definieren das Dateiformat, die Schlüsselgröße und die
+// Parameter der Schlüsselableitung. Die Werte sind bewusst fest, damit der
+// Tresor über verschiedene Läufe hinweg konsistent verschlüsselt bleibt.
 const FORMAT_VERSION = 1;
 const KEY_BYTES = 32;
 const SCRYPT = Object.freeze({ N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 });
 
+// Abschnitt 2: Hilfsfunktionen für Base64 und Identitäten
+// Diese kleinen Funktionen standardisieren den Umgang mit Binärdaten sowie mit
+// eindeutigen Bezeichnern. Dadurch bleibt der Code für Verschlüsselung und
+// Datensatz-Handling konsistent lesbar.
 function b64(value) { return Buffer.from(value).toString("base64"); }
 function unb64(value) { return Buffer.from(String(value || ""), "base64"); }
 function idFor(record) { return String(record.id || record.ip || "").trim(); }
 
+// Abschnitt 3: Validierung privater IPv4-Adressen
+// Nur Adressen aus privaten Heim- und Intranet-Bereichen sind für diesen Tresor
+// zulässig. Damit werden versehentliche Verbindungen zu öffentlichen Netzen
+// verhindert und die Zugriffsgrenzen bleiben sauber.
 function privateIpv4(value) {
   const parts = String(value || "").trim().split(".").map(Number);
   if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return false;
@@ -22,12 +34,20 @@ function privateIpv4(value) {
     || (parts[0] === 192 && parts[1] === 168);
 }
 
+// Abschnitt 4: Sicherheitsprüfung von Passwörtern
+// Passwörter werden bewusst mit einer Mindestlänge validiert, damit ein zu
+// kurzes Secret nicht versehentlich den Tresor schwächen kann.
 function validateSecret(value, label, minimum = 10) {
   if (typeof value !== "string" || value.length < minimum) {
     throw new Error(`${label} muss mindestens ${minimum} Zeichen lang sein`);
   }
 }
 
+// Abschnitt 5: Schlüsselableitung und Verschlüsselung
+// Der Master-Key wird aus dem Geheimnis und einem Salt mit scrypt abgeleitet.
+// Danach werden Daten mit AES-256-GCM verschlüsselt und zusätzlich mit einem
+// Zweck-Tag versehen, damit dieselben Schlüssel nicht für verschiedene Kontexten
+// missbraucht werden.
 function deriveKey(secret, salt) {
   return crypto.scryptSync(secret, salt, KEY_BYTES, SCRYPT);
 }
@@ -66,6 +86,11 @@ function unwrapDataKey(wrapper, secret, purpose) {
   }
 }
 
+// Abschnitt 6: Normalisierung von Einträgen
+// Ein Datensatz wird vor dem Speichern auf ein konsistentes Format gebracht.
+// Dabei werden IP, Nutzer und Passwort geprüft und bei bestehenden Einträgen
+// vorhandene Werte für leere Felder beibehalten. So bleibt das Update-Verhalten
+// nachvollziehbar, ohne dass alte Daten verloren gehen.
 function normalizeRecord(record, previous = null) {
   const ip = String(record?.ip || "").trim();
   if (!privateIpv4(ip)) throw new Error("Nur private IPv4-Adressen sind erlaubt");
@@ -85,6 +110,10 @@ function normalizeRecord(record, previous = null) {
   };
 }
 
+// Abschnitt 7: Dateisystem und sichere Speicherung
+// Das JSON-File wird atomar geschrieben, damit ein unvollständiger Schreibvorgang
+// den Tresor nicht beschädigt. Der Schlüssel selbst wird ebenfalls atomar in einer
+// separaten Datei abgelegt und mit restriktiven Dateirechten geschützt.
 function atomicWriteJson(filePath, value) {
   const directory = path.dirname(filePath);
   fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
@@ -94,6 +123,9 @@ function atomicWriteJson(filePath, value) {
   fs.chmodSync(filePath, 0o600);
 }
 
+// Betriebsschlüssel für den Tresor: Bei erstmaliger Verwendung wird ein zufälliger
+// 32-Byte-Schlüssel erzeugt und mit strengen Dateirechten auf der Festplatte
+// abgelegt. Danach wird derselbe Schlüssel wiederverwendet.
 function machineKey(filePath) {
   const keyPath = `${filePath}.key`;
   if (fs.existsSync(keyPath)) {
@@ -112,6 +144,10 @@ function machineKey(filePath) {
   return key;
 }
 
+// Abschnitt 8: SSH-Expect-Skript für Systemprobe
+// Dieses Skript verbindet sich per SSH mit einem Zielsystem, loggt sich mit dem
+// gespeicherten Passwort ein und liest dabei wichtige Temperatur-, Speicher- und
+// Laufzeitdaten aus. Die Ausgabe wird in klaren Schlüssel-Wert-Formaten geparst.
 const expectScript = String.raw`log_user 0
 set timeout 12
 spawn ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password,keyboard-interactive -o PubkeyAuthentication=no $env(SSH_USER)@$env(SSH_IP) {printf "HOST="; hostname; printf "TEMP="; (vcgencmd measure_temp 2>/dev/null || cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null); printf "MEM="; free -m | awk '/Mem:/ {printf "%s/%s", $3, $2}'; printf "DISK="; df -Pm / | awk 'NR==2 {printf "%s/%s", $3, $2}'; printf "UPTIME="; cut -d. -f1 /proc/uptime; printf "LOAD="; cut -d" " -f1 /proc/loadavg}
@@ -120,6 +156,11 @@ expect {
   eof { puts -nonewline $expect_out(buffer) }
 }`;
 
+// Abschnitt 9: Live-Probe eines einzelnen Systems
+// Die SSH-Abfrage liefert Rohdaten, die in saubere Werte wie Hostname,
+// Temperatur und Speicherauslastung umgewandelt werden. Bei Fehlern wird der
+// Eintrag trotzdem als offline markiert, damit das System sauber fortgesetzt
+// werden kann.
 function probe(record, spawnImpl = spawn) {
   return new Promise((resolve) => {
     const child = spawnImpl("/usr/bin/expect", ["-c", expectScript], {
@@ -153,6 +194,10 @@ function probe(record, spawnImpl = spawn) {
   });
 }
 
+// Abschnitt 10: Klasse für den verschlüsselten Tresor
+// Der Tresor kapselt alle Zustände: Dateien, Schlüssel, Sperrzeiten und
+// Datensätze. Dadurch bleibt der gesamte Zugriff auf vertrauliche SSH-Daten an
+// einem zentralen Ort und kann konsistent geschützt werden.
 class CredentialVault {
   constructor(filePath, options = {}) {
     this.filePath = filePath;
@@ -166,12 +211,15 @@ class CredentialVault {
     this.blockedUntil = 0;
   }
 
+  // Lesen des Tresor-Encapsulationsobjekts aus der JSON-Datei.
   readEnvelope() {
     const envelope = JSON.parse(fs.readFileSync(this.filePath, "utf8"));
     if (envelope.version !== FORMAT_VERSION || !envelope.master || !envelope.data) throw new Error("Tresorformat wird nicht unterstützt");
     return envelope;
   }
 
+  // Statusabfrage für UI und Debugging: zeigt an, ob der Tresor aktiv, gesperrt
+  // und mit Wiederherstellung konfiguriert ist.
   status() {
     this.autoLock();
     let question = null;
@@ -189,12 +237,17 @@ class CredentialVault {
     };
   }
 
+  // Automatisches Sperren nach Ablauf der Session-Zeit.
   autoLock() {
     if (this.dataKey && this.now() >= this.unlockedUntil) this.lock();
   }
 
+  // Session-Zeit verlängern: Nach jeder erfolgreichen Nutzung wird der Lockout-Timeout
+  // wieder auf das aktuelle Intervall gesetzt.
   touch() { this.unlockedUntil = this.now() + this.autoLockMs; }
 
+  // Sperren des Tresors: Schlüssel aus dem Speicher entfernen und Datensätze
+  // verwerfen, damit vertrauliche Werte nicht länger im RAM verbleiben.
   lock() {
     if (this.dataKey) this.dataKey.fill(0);
     this.dataKey = null;
@@ -202,10 +255,13 @@ class CredentialVault {
     this.unlockedUntil = 0;
   }
 
+  // Brute-Force-Schutz: nach mehreren Fehlversuchen wird der Zugriff kurz blockiert.
   checkRateLimit() {
     if (this.now() < this.blockedUntil) throw new Error("Zu viele Fehlversuche; bitte später erneut versuchen");
   }
 
+  // Fehlversuch protokollieren: Nach mehreren falschen Versuchen wird der Zugriff
+  // für kurze Zeit gesperrt, damit brute-force Angriffe erschwert werden.
   authFailed() {
     this.failures += 1;
     if (this.failures >= 5) {
@@ -214,8 +270,11 @@ class CredentialVault {
     }
   }
 
+  // Erfolgreicher Login setzt den Fehlversuchs-Zähler zurück und hebt die
+  // Sperre wieder auf.
   authSucceeded() { this.failures = 0; this.blockedUntil = 0; }
 
+  // Entschlüsseln der Datensätze mit dem aktuellen Datenkey.
   decryptRecords(envelope, dataKey) {
     const plaintext = decrypt(dataKey, envelope.data, "home-automation-vault:data:v1");
     const parsed = JSON.parse(plaintext.toString("utf8"));
@@ -224,6 +283,8 @@ class CredentialVault {
     return parsed.records;
   }
 
+  // Erstinitialisierung des Tresors: Master-Key, Recovery-Key und Daten-Envelope
+  // werden erzeugt und im lokalen JSON-Format abgesichert.
   initialize(masterPassword, question, recoveryAnswer) {
     if (fs.existsSync(this.filePath)) throw new Error("Tresor ist bereits eingerichtet");
     validateSecret(masterPassword, "Master-Passwort");
@@ -252,6 +313,9 @@ class CredentialVault {
     return this.status();
   }
 
+  // Entsperren mit Master-Passwort. Dabei wird der Schlüssel wiederhergestellt,
+  // die Datensätze entschlüsselt und der aktive Tresor in den gelockten Zustand
+  // übernommen.
   unlock(masterPassword) {
     this.checkRateLimit();
     if (!fs.existsSync(this.filePath)) throw new Error("Tresor ist noch nicht eingerichtet");
@@ -274,6 +338,8 @@ class CredentialVault {
     }
   }
 
+  // Recovery-Pfad: Ein vertrauliches Wiederherstellungsgeheimnis kann das
+  // Master-Passwort ersetzen, ohne die gespeicherten Datensätze zu verlieren.
   recover(recoveryAnswer, newMasterPassword) {
     this.checkRateLimit();
     validateSecret(newMasterPassword, "Neues Master-Passwort");
@@ -300,12 +366,15 @@ class CredentialVault {
     }
   }
 
+  // Vor jeder Operation wird geprüft, ob der Tresor noch aktiv ist.
   requireUnlocked() {
     this.autoLock();
     if (!this.dataKey || !this.records) throw new Error("Tresor ist gesperrt");
     this.touch();
   }
 
+  // Speichern der aktiven Datensätze im verschlüsselten Format. Dabei wird nur
+  // das vollständige, aktualisierte Record-Set atomar auf die Datei geschrieben.
   persist() {
     this.requireUnlocked();
     const plaintext = Buffer.from(JSON.stringify({ records: this.records }), "utf8");
@@ -314,11 +383,15 @@ class CredentialVault {
     atomicWriteJson(this.filePath, this.envelope);
   }
 
+  // Lesen aller Einträge ohne Passwörter im Klartext.
   list() {
     this.requireUnlocked();
     return this.records.map(({ password, ...record }) => ({ ...record, hasPassword: Boolean(password) }));
   }
 
+  // Ein einzelner Eintrag kann genau identifiziert und im Klartext zurückgegeben
+  // werden, solange der Tresor entsperrt ist. Das Passwort wird dabei nicht
+  // verborgen, sondern ausdrücklich mit dem vollständigen Record mitgeliefert.
   reveal(id) {
     this.requireUnlocked();
     const record = this.records.find((entry) => entry.id === String(id));
@@ -326,6 +399,8 @@ class CredentialVault {
     return { ...record };
   }
 
+  // Speichern oder Aktualisieren eines Systems: Validierung, Duplikatprüfung
+  // und Sortierung nach IP sorgen für einen konsistenten Tresor-Zustand.
   upsert(record) {
     this.requireUnlocked();
     const requestedId = idFor(record);
@@ -340,6 +415,8 @@ class CredentialVault {
     return this.list();
   }
 
+  // Ein einzelnes System wird aus dem Tresor entfernt, nachdem es eindeutig
+  // identifiziert wurde und der aktive Zustand noch entsperrt ist.
   remove(id) {
     this.requireUnlocked();
     const before = this.records.length;
@@ -349,6 +426,8 @@ class CredentialVault {
     return this.list();
   }
 
+  // Master-Passwort und Recovery-Informationen können später aktualisiert werden,
+  // ohne die vorhandenen Datensätze neu zu erzeugen.
   changeMaster(newMasterPassword) {
     this.requireUnlocked();
     validateSecret(newMasterPassword, "Neues Master-Passwort");
@@ -357,6 +436,8 @@ class CredentialVault {
     return this.status();
   }
 
+  // Recovery-Informationen werden hier aktualisiert, damit die Wiederherstellung
+  // auch nach einem Passwortwechsel noch konsistent und sicher bleibt.
   changeRecovery(question, recoveryAnswer) {
     this.requireUnlocked();
     validateSecret(recoveryAnswer, "Private Antwort", 12);
@@ -369,6 +450,9 @@ class CredentialVault {
     return this.status();
   }
 
+  // Massenprüfung aller registrierten Systeme per SSH. Dabei werden entweder die
+  // bereits geladenen Einträge genutzt oder der Tresor aus dem Dateisystem
+  // entschlüsselt und danach wieder sauber bereinigt.
   async probeAll() {
     let records;
     let temporaryKey = null;
@@ -393,6 +477,9 @@ class CredentialVault {
   }
 }
 
+// Abschnitt 11: Standardpfad und Export
+// Der Standardlokationspfad liegt im Node-RED-Userdir, damit der Tresor vom
+// Projekt konsistent verwendet und an einem definierten Ort verwaltet wird.
 function defaultVaultPath(userDir = path.join(os.homedir(), ".node-red")) {
   return path.join(userDir, "system-credentials.vault.json");
 }

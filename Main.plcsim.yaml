@@ -1,0 +1,47 @@
+name: Main — low-pass filter test
+
+# How to run:
+#   1. Open Main.st in VS Code
+#   2. Run command: PLCSim: Open Simulator
+#   3. Open the Testing tab (flask icon) — this file appears automatically
+#   4. Press ▶ to run the test sequence
+
+steps:
+  - comment: "Initialize the low-pass test setup"
+  - set: sqFrequencyHz
+    value: 20
+  - set: tau
+    value: 0.01
+  - set: timeStep
+    value: 0.001
+  - wait: 100
+
+  - comment: "Check the square generator at 20 Hz"
+  - assert_range: sqValue
+    min: -1.0
+    max: 1.0
+    message: Square signal must alternate between -1 and +1
+
+  - comment: "Check the filter output is finite and smoothed"
+  - assert_range: filteredValue
+    min: -1.1
+    max: 1.1
+    message: Filter output should stay in a bounded range
+
+  - comment: "Increase the time constant to test stronger smoothing"
+  - set: tau
+    value: 0.05
+  - wait: 200
+  - assert_range: filteredValue
+    min: -1.1
+    max: 1.1
+    message: Filter remains stable with a larger time constant
+
+  - comment: "Decrease the frequency to 10 Hz and verify stability"
+  - set: sqFrequencyHz
+    value: 10
+  - wait: 200
+  - assert_range: filteredValue
+    min: -1.1
+    max: 1.1
+    message: Filter output remains stable at lower frequency
