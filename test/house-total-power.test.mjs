@@ -3,7 +3,7 @@ import test from "node:test";
 import { runFunctionNode } from "./helpers/function-node-harness.mjs";
 
 test("Hausgesamtleistung berücksichtigt PV und Einspeisung", async () => {
-  const { result } = await runFunctionNode("d22dd481e7e81932", {
+  const { result } = await runFunctionNode("GetExcessPower", {
     msg: { payload: { PvPowerWatt: 5000, GridPowerWatt: 1200 } },
     globalValues: { SolarEdgeData: { OnlineFlag: true, Source: "Test" } },
   });
@@ -15,7 +15,7 @@ test("Hausgesamtleistung berücksichtigt PV und Einspeisung", async () => {
 });
 
 test("Hausgesamtleistung berücksichtigt PV und Netzbezug", async () => {
-  const { result } = await runFunctionNode("d22dd481e7e81932", {
+  const { result } = await runFunctionNode("GetExcessPower", {
     msg: { payload: { PvPowerWatt: 1000, GridPowerWatt: -2200 } },
     globalValues: { SolarEdgeData: { OnlineFlag: true, Source: "Test" } },
   });

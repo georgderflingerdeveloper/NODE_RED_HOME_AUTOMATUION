@@ -19,10 +19,30 @@ export function resetFunctionNodeCache() {
   cachedNodes = undefined;
 }
 
-export function getNodeDefinition(nodeId) {
-  const definition = nodesById().get(nodeId);
-  if (!definition) throw new Error(`Node ${nodeId} wurde in flow-src nicht gefunden.`);
-  return definition;
+export function getNodeDefinition(nodeReference) {
+  const reference = String(nodeReference);
+  const definitionById = nodesById().get(reference);
+  if (definitionById) return definitionById;
+
+  const matchesByName = [...nodesById().values()].filter(
+    (node) => node.type === "function" && node.name === reference,
+  );
+  if (matchesByName.length === 1) return matchesByName[0];
+  if (matchesByName.length > 1) {
+    const ids = matchesByName.map((node) => `${node.name} (${node.id})`).join(", ");
+    throw new Error(`Function-Name "${reference}" ist mehrdeutig. Verwende eine eindeutige Node-ID: ${ids}`);
+  }
+
+  const matchesByNameCaseInsensitive = [...nodesById().values()].filter(
+    (node) => node.type === "function" && node.name && node.name.toLowerCase() === reference.toLowerCase(),
+  );
+  if (matchesByNameCaseInsensitive.length === 1) return matchesByNameCaseInsensitive[0];
+  if (matchesByNameCaseInsensitive.length > 1) {
+    const ids = matchesByNameCaseInsensitive.map((node) => `${node.name} (${node.id})`).join(", ");
+    throw new Error(`Function-Name "${reference}" ist mehrdeutig. Verwende eine eindeutige Node-ID: ${ids}`);
+  }
+
+  throw new Error(`Node ${reference} wurde in flow-src nicht gefunden. Verwende eine vorhandene Function-Node-ID oder den exakten Namen.`);
 }
 
 export function createContextStore(initialValues = {}) {
@@ -103,10 +123,10 @@ export async function runFunctionSource(source, {
   };
 }
 
-export async function runFunctionNode(nodeId, options = {}) {
-  const definition = getNodeDefinition(nodeId);
+export async function runFunctionNode(nodeReference, options = {}) {
+  const definition = getNodeDefinition(nodeReference);
   if (definition.type !== "function") {
-    throw new Error(`Node ${nodeId} ist kein Function-Node, sondern ${definition.type}.`);
+    throw new Error(`Node ${nodeReference} ist kein Function-Node, sondern ${definition.type}.`);
   }
   return runFunctionSource(definition.func, options);
 }

@@ -178,14 +178,6 @@
         "env": []
     },
     {
-        "id": "energy_forecast_flow",
-        "type": "tab",
-        "label": "ENERGY_FORECAST",
-        "disabled": false,
-        "info": "Provider-neutral energy price forecast and global automation state EnergyForecastData.",
-        "env": []
-    },
-    {
         "id": "f6dd1fca.6c306",
         "type": "subflow",
         "name": "SUB_ANTEROOM_MAIN_LIGHT",
@@ -7956,81 +7948,6 @@
         ]
     },
     {
-        "id": "se_inverter_energy_comment",
-        "type": "comment",
-        "z": "79160448dc533f1d",
-        "name": "PV-TAGESENERGIE · KUMULIERTER WECHSELRICHTERZÄHLER",
-        "info": "SunSpec base 0: 40093..40094 I_AC_Energy_WH und 40095 I_AC_Energy_WH_SF. Der Lebenszeitzähler bildet zusammen mit den Meter-Zählern belastbare Tagesdifferenzen und überbrückt kurze Aufzeichnungslücken.",
-        "x": 330,
-        "y": 900,
-        "wires": []
-    },
-    {
-        "id": "se_read_inverter_energy_total",
-        "type": "modbus-read",
-        "z": "79160448dc533f1d",
-        "name": "READ: Inverter PV energy total (+SF)",
-        "topic": "",
-        "showStatusActivities": true,
-        "logIOActivities": false,
-        "showErrors": true,
-        "showWarnings": true,
-        "unitid": "1",
-        "dataType": "HoldingRegister",
-        "adr": "40093",
-        "quantity": "3",
-        "rate": "30",
-        "rateUnit": "s",
-        "delayOnStart": false,
-        "startDelayTime": "",
-        "server": "befceeb9cba11998",
-        "useIOFile": false,
-        "ioFile": "",
-        "useIOForPayload": false,
-        "emptyMsgOnFail": false,
-        "x": 220,
-        "y": 960,
-        "wires": [
-            [
-                "se_parse_inverter_energy_total"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "se_parse_inverter_energy_total",
-        "type": "function",
-        "z": "79160448dc533f1d",
-        "name": "Parse SolarEdge inverter energy total",
-        "func": "// SolarEdge inverter SunSpec model, Modbus protocol address base 0:\n// 40093..40094 I_AC_Energy_WH, 40095 I_AC_Energy_WH_SF.\nconst registers = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!registers || registers.length < 3) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"PV-Zähler: 3 Register erwartet\"});\n    return null;\n}\n\nconst toInt16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst toUint32 = (highWord, lowWord) => ((highWord & 0xffff) * 0x10000) + (lowWord & 0xffff);\nconst producedRawWh = toUint32(registers[0], registers[1]);\nconst scaleFactor = toInt16(registers[2]);\nif (producedRawWh === 0xffffffff || scaleFactor === -32768 || scaleFactor < -6 || scaleFactor > 3) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"PV-Zähler: ungültige SunSpec-Werte\"});\n    return null;\n}\n\nconst pvProductionTotalKWh = producedRawWh * Math.pow(10, scaleFactor) / 1000;\nconst previous = Number(global.get(\"SolarEdgePvProductionTotalKWh\"));\nif (Number.isFinite(previous) && pvProductionTotalKWh + 0.001 < previous) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"PV-Zähler: Rücksprung erkannt\"});\n    return null;\n}\n\nconst observedAt = new Date().toISOString();\nglobal.set(\"SolarEdgePvProductionTotalKWh\", pvProductionTotalKWh);\nglobal.set(\"SolarEdgeInverterEnergyLastSuccessMs\", Date.now());\nnode.status({fill:\"green\", shape:\"dot\", text:\"PV gesamt: \" + pvProductionTotalKWh.toFixed(3) + \" kWh\"});\nmsg.topic = \"history/source/solaredge-inverter-total\";\nmsg.source = \"SolarEdgeSunSpecInverter\";\nmsg.payload = {\n    schemaVersion: 1,\n    source: \"SolarEdgeSunSpecInverter\",\n    observedAt,\n    pvProductionTotalKWh,\n    scaleFactor,\n    registers: {baseZeroStart: 40093, quantity: 3, producedRawWh}\n};\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 560,
-        "y": 960,
-        "wires": [
-            [
-                "se_inverter_energy_database_out"
-            ]
-        ]
-    },
-    {
-        "id": "se_inverter_energy_database_out",
-        "type": "link out",
-        "z": "79160448dc533f1d",
-        "name": "SOLAREDGE-PV-ZÄHLER AN DATENBANK",
-        "mode": "link",
-        "links": [
-            "datenbank_solaredge_inverter_total_in"
-        ],
-        "x": 875,
-        "y": 960,
-        "wires": []
-    },
-    {
         "id": "214546f88e881fdd",
         "type": "link in",
         "z": "b86cb602995b0261",
@@ -8697,81 +8614,6 @@
         ]
     },
     {
-        "id": "se_energy_totals_comment",
-        "type": "comment",
-        "z": "tab_read_feedin",
-        "name": "TAGESENERGIEANKER · SOLAREDGE-ZÄHLERSTÄNDE",
-        "info": "SunSpec Meter, Basis 0: M_Exported 226..227, M_Imported 234..235, M_Energy_W_SF 242. Die kumulativen Zählerstände werden getrennt von der schnellen Leistungsmessung gelesen und in SQLite täglich abgeglichen.",
-        "x": 330,
-        "y": 520,
-        "wires": []
-    },
-    {
-        "id": "se_read_energy_totals",
-        "type": "modbus-read",
-        "z": "tab_read_feedin",
-        "name": "READ: Meter export/import totals (+SF)",
-        "topic": "",
-        "showStatusActivities": true,
-        "logIOActivities": false,
-        "showErrors": true,
-        "showWarnings": true,
-        "unitid": "1",
-        "dataType": "HoldingRegister",
-        "adr": "226",
-        "quantity": "17",
-        "rate": "30",
-        "rateUnit": "s",
-        "delayOnStart": false,
-        "startDelayTime": "",
-        "server": "befceeb9cba11998",
-        "useIOFile": false,
-        "ioFile": "",
-        "useIOForPayload": false,
-        "emptyMsgOnFail": false,
-        "x": 230,
-        "y": 580,
-        "wires": [
-            [
-                "se_parse_energy_totals"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "se_parse_energy_totals",
-        "type": "function",
-        "z": "tab_read_feedin",
-        "name": "Parse SolarEdge meter energy totals",
-        "func": "// SolarEdge/SunSpec meter model (base-0):\n// 226..227 M_Exported, 234..235 M_Imported, 242 M_Energy_W_SF.\nconst registers = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!registers || registers.length < 17) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"Energiezähler: 17 Register erwartet\"});\n    return null;\n}\n\nconst toInt16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst toUint32 = (highWord, lowWord) => ((highWord & 0xffff) * 0x10000) + (lowWord & 0xffff);\nconst exportedRawWh = toUint32(registers[0], registers[1]);\nconst importedRawWh = toUint32(registers[8], registers[9]);\nconst scaleFactor = toInt16(registers[16]);\n\nif (\n    exportedRawWh === 0xffffffff ||\n    importedRawWh === 0xffffffff ||\n    scaleFactor === -32768 ||\n    scaleFactor < -6 ||\n    scaleFactor > 3\n) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"Energiezähler: ungültige SunSpec-Werte\"});\n    return null;\n}\n\nconst wattHourFactor = Math.pow(10, scaleFactor);\nconst gridExportTotalKWh = exportedRawWh * wattHourFactor / 1000;\nconst gridImportTotalKWh = importedRawWh * wattHourFactor / 1000;\nconst previousImport = Number(global.get(\"SolarEdgeGridImportTotalKWh\"));\nconst previousExport = Number(global.get(\"SolarEdgeGridExportTotalKWh\"));\nif (\n    Number.isFinite(previousImport) && gridImportTotalKWh + 0.001 < previousImport ||\n    Number.isFinite(previousExport) && gridExportTotalKWh + 0.001 < previousExport\n) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"Energiezähler: Rücksprung erkannt\"});\n    return null;\n}\n\nconst observedAt = new Date().toISOString();\nconst payload = {\n    schemaVersion: 1,\n    source: \"SolarEdgeSunSpecMeter\",\n    observedAt,\n    gridImportTotalKWh,\n    gridExportTotalKWh,\n    scaleFactor,\n    registers: {\n        baseZeroStart: 226,\n        quantity: 17,\n        importedRawWh,\n        exportedRawWh\n    }\n};\n\nglobal.set(\"SolarEdgeGridImportTotalKWh\", gridImportTotalKWh);\nglobal.set(\"SolarEdgeGridExportTotalKWh\", gridExportTotalKWh);\nglobal.set(\"SolarEdgeMeterEnergyLastSuccessMs\", Date.now());\nnode.status({\n    fill:\"green\",\n    shape:\"dot\",\n    text:\"Zähler: Bezug \" + gridImportTotalKWh.toFixed(3) + \" · Einspeisung \" + gridExportTotalKWh.toFixed(3) + \" kWh\"\n});\nmsg.topic = \"history/source/solaredge-meter-totals\";\nmsg.source = \"SolarEdgeSunSpecMeter\";\nmsg.payload = payload;\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 560,
-        "y": 580,
-        "wires": [
-            [
-                "se_energy_totals_database_out"
-            ]
-        ]
-    },
-    {
-        "id": "se_energy_totals_database_out",
-        "type": "link out",
-        "z": "tab_read_feedin",
-        "name": "SOLAREDGE-ZÄHLERSTÄNDE AN DATENBANK",
-        "mode": "link",
-        "links": [
-            "datenbank_solaredge_totals_in"
-        ],
-        "x": 875,
-        "y": 580,
-        "wires": []
-    },
-    {
         "id": "c_hint",
         "type": "comment",
         "z": "tab-fixsf",
@@ -9158,67 +9000,6 @@
         ]
     },
     {
-        "id": "weather_automation_comment",
-        "type": "comment",
-        "z": "weather_flow",
-        "name": "AUTOMATION · globale WeatherAutomationData · Quellen über WeatherAutomationSelector",
-        "info": "Zentrale, stabile Schnittstelle für Automationen. Internet- und Sensorwerte werden je Feld über internet, sensor oder auto ausgewählt. Dokumentation: docs/WEATHER_AUTOMATION_DATA.md",
-        "x": 600,
-        "y": 540,
-        "wires": []
-    },
-    {
-        "id": "weather_sensor_data_in",
-        "type": "link in",
-        "z": "weather_flow",
-        "name": "WETTER SENSORIK IN",
-        "links": [],
-        "x": 355,
-        "y": 580,
-        "wires": [
-            [
-                "weather_automation_data"
-            ]
-        ]
-    },
-    {
-        "id": "weather_automation_data",
-        "type": "function",
-        "z": "weather_flow",
-        "name": "Wetterdaten für Automatisierung bereitstellen",
-        "func": "// Stabile globale Wetterstruktur für Heizungs-, Licht- und Solarautomationen.\n//\n// Globale Schnittstellen:\n//   WeatherAutomationData     -> aufbereitete Werte für Automationen\n//   WeatherAutomationSelector -> optionale Quellenwahl je Feld: internet, sensor, auto\n//   WeatherSensorData         -> zuletzt empfangene Sensorwerte\n//\n// Sensordaten können über den Link-In \"WETTER SENSORIK IN\" eingespeist werden:\n//   msg.topic = \"weather/sensor\"\n//   msg.payload = { ActualTemperature: 21.4, UpdatedAt: \"...\" }\n\nconst FIELD_NAMES = [\n    \"SunPercentageNextHour\",\n    \"Sunset\",\n    \"SunDawn\",\n    \"EstimatedTemperaturNextMorning\",\n    \"ActualTemperature\"\n];\n\nconst DEFAULT_SELECTOR = {\n    SunPercentageNextHour: \"internet\",\n    Sunset: \"internet\",\n    SunDawn: \"internet\",\n    EstimatedTemperaturNextMorning: \"internet\",\n    ActualTemperature: \"auto\"\n};\n\nconst isSensorMessage = msg.topic === \"weather/sensor\" || msg.source === \"sensor\";\nif (isSensorMessage && msg.payload && typeof msg.payload === \"object\") {\n    global.set(\"WeatherSensorData\", {\n        ...(global.get(\"WeatherSensorData\") || {}),\n        ...msg.payload,\n        UpdatedAt: msg.payload.UpdatedAt || new Date().toISOString()\n    });\n}\n\nconst internet = isSensorMessage\n    ? (global.get(\"WeatherData\") || {})\n    : (msg.payload || global.get(\"WeatherData\") || {});\nconst sensor = global.get(\"WeatherSensorData\") || {};\nconst configuredSelector = global.get(\"WeatherAutomationSelector\") || {};\nconst selector = {};\n\nfor (const field of FIELD_NAMES) {\n    const requested = String(configuredSelector[field] || DEFAULT_SELECTOR[field]).toLowerCase();\n    selector[field] = [\"internet\", \"sensor\", \"auto\"].includes(requested)\n        ? requested\n        : DEFAULT_SELECTOR[field];\n}\n\n// Sensorwerte gelten standardmäßig 15 Minuten als frisch. Der Wert ist konfigurierbar.\nconst sensorMaxAgeMs = Math.max(1000, Number(configuredSelector.SensorMaxAgeMs) || 15 * 60 * 1000);\nconst sensorUpdatedMs = Date.parse(sensor.UpdatedAt || \"\");\nconst sensorFresh = Number.isFinite(sensorUpdatedMs) && Date.now() - sensorUpdatedMs <= sensorMaxAgeMs;\n\nconst internetValues = {\n    SunPercentageNextHour: internet.ExpectedPercentSunshineNextHour,\n    Sunset: internet.SunsetToday,\n    SunDawn: internet.SunriseToday,\n    EstimatedTemperaturNextMorning: internet.EstimatedTemperatureNextMorning,\n    ActualTemperature: internet.Current?.TemperatureC\n};\n\nconst isNumberField = field => [\n    \"SunPercentageNextHour\",\n    \"EstimatedTemperaturNextMorning\",\n    \"ActualTemperature\"\n].includes(field);\nconst normalize = (field, value) => {\n    if (isNumberField(field)) return Number.isFinite(Number(value)) ? Number(value) : null;\n    return typeof value === \"string\" && value.trim() ? value : null;\n};\n\nconst values = {};\nconst sources = {};\nconst quality = {};\n\nfor (const field of FIELD_NAMES) {\n    const internetValue = normalize(field, internetValues[field]);\n    const sensorValue = normalize(field, sensor[field]);\n    const mode = selector[field];\n    let selectedValue = null;\n    let selectedSource = \"unavailable\";\n\n    if (mode === \"sensor\") {\n        if (sensorFresh && sensorValue !== null) {\n            selectedValue = sensorValue;\n            selectedSource = \"sensor\";\n        }\n    } else if (mode === \"auto\" && sensorFresh && sensorValue !== null) {\n        selectedValue = sensorValue;\n        selectedSource = \"sensor\";\n    } else if (internetValue !== null) {\n        selectedValue = internetValue;\n        selectedSource = \"internet\";\n    }\n\n    values[field] = selectedValue;\n    sources[field] = selectedSource;\n    quality[field] = selectedSource === \"unavailable\"\n        ? \"unavailable\"\n        : (selectedSource === \"internet\" && internet.DataStaleFlag ? \"stale\" : \"valid\");\n}\n\nconst automationData = {\n    SchemaVersion: 1,\n    UpdatedAt: new Date().toISOString(),\n    ...values,\n    Ready: FIELD_NAMES.every(field => values[field] !== null),\n    DataStaleFlag: FIELD_NAMES.some(field => quality[field] !== \"valid\"),\n    Sources: sources,\n    Quality: quality,\n    Selector: selector\n};\n\nglobal.set(\"WeatherAutomationSelector\", {\n    ...selector,\n    SensorMaxAgeMs: sensorMaxAgeMs\n});\nglobal.set(\"WeatherAutomationData\", automationData);\n\nnode.status({\n    fill: automationData.Ready && !automationData.DataStaleFlag ? \"green\" : \"yellow\",\n    shape: automationData.Ready ? \"dot\" : \"ring\",\n    text: automationData.Ready ? \"Automationsdaten bereit\" : \"Automationsdaten unvollständig\"\n});\n\nreturn {\n    ...msg,\n    topic: \"weather/automation\",\n    payload: automationData\n};\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 740,
-        "y": 580,
-        "wires": [
-            [
-                "weather_automation_debug"
-            ]
-        ]
-    },
-    {
-        "id": "weather_automation_debug",
-        "type": "debug",
-        "z": "weather_flow",
-        "name": "AUTOMATION WEATHER DATA",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": true,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "payload.Ready",
-        "statusType": "jsonata",
-        "x": 1110,
-        "y": 580,
-        "wires": []
-    },
-    {
         "id": "kosten_tarif_zeitplan",
         "type": "inject",
         "z": "kosten_flow",
@@ -9289,8 +9070,7 @@
             [
                 "kosten_tarif_debug",
                 "kosten_dashboard_template",
-                "kosten_history_out",
-                "kosten_forecast_provider_out"
+                "kosten_history_out"
             ]
         ]
     },
@@ -9320,17 +9100,17 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "format": "<style>\n  .cost-dashboard-group { width:calc(100vw - 220px) !important; max-width:none !important; }\n  .cost-dashboard-grid { width:100% !important; min-height:calc(100vh - 118px) !important; min-height:calc(100dvh - 118px) !important; }\n  .cost-dashboard-widget { width:100% !important; height:auto !important; min-height:calc(100vh - 145px) !important; min-height:calc(100dvh - 145px) !important; left:0 !important; }\n  .cost-dashboard-template { height:auto !important; min-height:inherit !important; }\n  .cost-card { width:100%; min-height:calc(100vh - 165px); min-height:calc(100dvh - 165px); max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }\n  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }\n  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }\n  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }\n  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }\n  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }\n  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }\n  .cost-kpi.cost-house-power { transition:background .45s ease,border-color .45s ease; border:1px solid transparent; }\n  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }\n  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }\n  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }\n  .cost-kpi-range { margin-top:7px; padding-top:6px; border-top:1px solid rgba(255,255,255,.22); color:#d6f5f7; font-size:11px; font-weight:700; }\n  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }\n  .cost-info b { color:#fff; }\n  .cost-forecast { margin-bottom:14px; padding:14px; border:1px solid #477579; border-radius:12px; background:#1b3234; }\n  .cost-forecast-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }\n  .cost-forecast-title { color:#fff; font-size:16px; font-weight:700; }\n  .cost-forecast-grid { display:grid; grid-template-columns:repeat(4,minmax(145px,1fr)); gap:9px; }\n  .cost-forecast-field { padding:10px; border-radius:9px; background:#233f42; }\n  .cost-forecast-field span { display:block; color:#a5c4c6; font-size:10px; text-transform:uppercase; }\n  .cost-forecast-field b { display:block; margin-top:5px; color:#fff; font-size:15px; }\n  .cost-forecast-field b.true { color:#8df0ae; }\n  .cost-forecast-field b.false { color:#9bb5b8; }\n  .cost-forecast-recommendation { margin-top:10px; padding:10px; border-left:4px solid #58c77d; color:#cfe8d7; background:#203c33; font-weight:700; }\n  .cost-forecast-recommendation.expensive { border-left-color:#ff7a68; color:#ffd1c9; background:#412b29; }\n  .cost-forecast-recommendation.unavailable { border-left-color:#e6bb5a; color:#f3ddb0; background:#3f3928; }\n  .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid #0f8e96; border-radius:12px; background:#183638; }\n  .cost-anchor-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px; }\n  .cost-anchor-title { color:#fff; font-weight:700; }\n  .cost-anchor-grid { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:9px; }\n  .cost-anchor-value { padding:10px; border-radius:9px; background:#223f42; }\n  .cost-anchor-value span { display:block; color:#9fc3c6; font-size:10px; text-transform:uppercase; }\n  .cost-anchor-value b { display:block; margin-top:4px; color:#fff; font-size:17px; }\n  .cost-anchor-note { margin-top:10px; color:#a9c4c6; font-size:11px; line-height:1.45; }\n  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }\n  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-offline { color:#ffad99; }\n  /* SELBST ÄNDERN: Schriftfarbe für den Status „online“. */\n  .cost-online { color:#8df0ae; font-weight:800; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }\n  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }\n  /* SELBST ÄNDERN: Hintergrund und Rahmen der aktuell laufenden Stundenkarte. */\n  .cost-hour.cost-hour-current { color:#15351f; background:#d7f5df; border:2px solid #79d99a; box-shadow:0 0 0 2px rgba(121,217,154,.18); }\n  .cost-hour.cost-hour-current b,\n  .cost-hour.cost-hour-current .cost-hour-price { color:#15351f; }\n  .cost-hour.cost-hour-current .cost-muted { color:#477157; }\n  .cost-hour.cost-hour-current .cost-hour-cents,\n  .cost-hour.cost-hour-current .cost-online { color:#176b37; }\n  .cost-current-label { float:right; color:#176b37; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }\n  .cost-hour b { color:#fff; }\n  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }\n  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }\n  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }\n  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }\n  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }\n  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }\n  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }\n  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }\n  .cost-badge.online { color:#b9ffdc; background:#14613f; }\n  .cost-badge.offline { color:#ffd1c7; background:#71342d; }\n  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }\n  @media(max-width:900px) {\n    .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }\n    .cost-head { grid-template-columns:repeat(2,1fr); }\n    .cost-forecast-grid { grid-template-columns:repeat(2,1fr); }\n    .cost-anchor-grid { grid-template-columns:repeat(2,1fr); }\n    .cost-diagnostics { grid-template-columns:1fr; }\n  }\n  @media(max-width:600px) {\n    .cost-dashboard-group { width:calc(100vw - 12px) !important; margin-right:6px !important; margin-left:6px !important; }\n    .cost-dashboard-grid { min-height:calc(100dvh - 96px) !important; }\n    .cost-dashboard-widget { min-height:calc(100dvh - 118px) !important; }\n    .cost-card { min-height:calc(100dvh - 128px); padding:0 2px 12px; }\n    .cost-toolbar { display:block; margin-bottom:10px; }\n    .cost-toolbar h2 { margin-bottom:10px; font-size:20px; }\n    .cost-periods { display:grid; grid-template-columns:repeat(3,1fr); width:100%; box-sizing:border-box; }\n    .cost-periods button { min-width:0; padding:9px 4px; }\n    .cost-head { grid-template-columns:1fr; gap:8px; }\n    .cost-forecast-grid { grid-template-columns:1fr; }\n    .cost-anchor-grid { grid-template-columns:1fr; }\n    .cost-kpi { padding:12px; }\n    .cost-kpi-value { font-size:22px; }\n    .cost-info { padding:11px; }\n    .cost-table-wrap { overflow-x:hidden; border:0; background:transparent; }\n    .cost-table { display:block; min-width:0; }\n    .cost-table thead { display:none; }\n    .cost-table tbody { display:block; }\n    .cost-row { display:block; margin-bottom:10px; padding:7px 10px; border:1px solid #456367; border-radius:10px; background:#1d2d2f; }\n    .cost-row td { display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); gap:8px; padding:7px 2px; border-top:1px solid #395357; overflow-wrap:anywhere; }\n    .cost-row td:first-child { border-top:0; }\n    .cost-row td::before { color:#9bb5b8; font-size:11px; font-weight:700; }\n    .cost-row td:nth-child(1)::before { content:\"Zeitraum\"; }\n    .cost-row td:nth-child(2)::before { content:\"Hausverbrauch\"; }\n    .cost-row td:nth-child(3)::before { content:\"Netzbezug\"; }\n    .cost-row td:nth-child(4)::before { content:\"PV-Erzeugung\"; }\n    .cost-row td:nth-child(5)::before { content:\"Verbrauchswert\"; }\n    .cost-row td:nth-child(6)::before { content:\"Netzkosten\"; }\n    .cost-row td:nth-child(7)::before { content:\"Wetter\"; }\n    .cost-row td:nth-child(8)::before { content:\"Daten\"; }\n    .cost-hours { display:block; margin:-7px 0 10px; }\n    .cost-hours td { display:block; padding:0; border:0; }\n    .cost-hours-inner { padding:10px; }\n    .cost-hour-grid { grid-template-columns:1fr; }\n  }\n</style>\n\n<script>\n(function(scope) {\n  scope.view = scope.view || { period: \"month\", tariff: null, history: null, forecast: null };\n  scope.expandedCostRows = scope.expandedCostRows || {};\n  var layoutTimers = [];\n\n  function restoreExpandedCostRows(history) {\n    if (!history || !Array.isArray(history.rows)) return history;\n    history.rows.forEach(function(row) {\n      row.expanded = Boolean(scope.expandedCostRows[String(row.key)]);\n    });\n    return history;\n  }\n\n  function configureCostContainer() {\n    var card = document.querySelector(\".cost-card\");\n    if (!card) return;\n    var widget = card.closest(\".nr-dashboard-cardpanel\");\n    var template = card.closest(\".nr-dashboard-template\");\n    var grid = card.closest(\".gridster\");\n    var group = card.closest(\".nr-dashboard-cardcontainer\");\n    if (widget) widget.classList.add(\"cost-dashboard-widget\");\n    if (template) template.classList.add(\"cost-dashboard-template\");\n    if (grid) grid.classList.add(\"cost-dashboard-grid\");\n    if (group) group.classList.add(\"cost-dashboard-group\");\n  }\n\n  function refreshCostLayout() {\n    configureCostContainer();\n    if (!window || !window.dispatchEvent) return;\n    window.dispatchEvent(new Event(\"resize\"));\n  }\n\n  function scheduleCostLayoutRefresh() {\n    layoutTimers.forEach(clearTimeout);\n    layoutTimers = [0, 100, 350, 800].map(function(delay) {\n      return setTimeout(refreshCostLayout, delay);\n    });\n  }\n\n  scope.selectCostPeriod = function(period) {\n    scope.view.period = period;\n    scope.send({ topic: \"history/dashboard\", payload: { period: period } });\n    scheduleCostLayoutRefresh();\n  };\n\n  function requestEnergyForecast() {\n    scope.send({ topic: \"energy/forecast/read\", payload: {} });\n  }\n\n  scope.forecastRecommendation = function(forecast) {\n    if (!forecast || forecast.NotAvailable) return \"Keine belastbare Preisprognose – Automatisierung verwendet ihre sichere Rückfalleinstellung.\";\n    if (forecast.EstimatedCostCheap) return \"Günstiges Preisfenster – verschiebbare Verbraucher können bevorzugt freigegeben werden.\";\n    if (forecast.EstimatedCostExpensive) return \"Teures Preisfenster – verschiebbare Verbraucher möglichst zurückstellen.\";\n    return \"Normales Preisfenster – keine kostenbedingte Umschaltung erforderlich.\";\n  };\n\n  scope.toggleCostRow = function(row) {\n    var key = String(row.key);\n    var expanded = !scope.expandedCostRows[key];\n    if (expanded) scope.expandedCostRows[key] = true;\n    else delete scope.expandedCostRows[key];\n    row.expanded = expanded;\n  };\n\n  scope.isCurrentCostHour = function(hour) {\n    var intervalStart = new Date(hour && hour.intervalStart).getTime();\n    var now = Date.now();\n    return Number.isFinite(intervalStart) && intervalStart <= now && now < intervalStart + 60 * 60 * 1000;\n  };\n\n  scope.housePowerStyle = function(powerWatt) {\n    /* SELBST ÄNDERN: 10000 ist der rote Endwert des Verlaufs in Watt. */\n    var maximumWatt = 10000;\n    var measuredWatt = Number(powerWatt);\n    var limitedWatt = Math.min(maximumWatt, Math.max(0, Number.isFinite(measuredWatt) ? measuredWatt : 0));\n    var ratio = limitedWatt / maximumWatt;\n    /* Farbton 120 = grün, 60 = gelb, 0 = rot. */\n    var hue = Math.round(120 * (1 - ratio));\n    return {\n      background: \"linear-gradient(135deg,hsl(\" + hue + \",55%,25%),hsl(\" + hue + \",68%,34%))\",\n      borderColor: \"hsl(\" + hue + \",72%,48%)\"\n    };\n  };\n\n  scope.costPeriodDateRange = function(history) {\n    var from = new Date(history && history.range && history.range.from);\n    var exclusiveTo = new Date(history && history.range && history.range.to);\n    if (!Number.isFinite(from.getTime()) || !Number.isFinite(exclusiveTo.getTime())) return \"Zeitraum noch nicht verfügbar\";\n    var inclusiveTo = new Date(exclusiveTo.getTime() - 1);\n    var formatter = new Intl.DateTimeFormat(\"de-AT\", {\n      timeZone: \"Europe/Vienna\",\n      day: \"2-digit\",\n      month: \"2-digit\",\n      year: \"numeric\"\n    });\n    return \"von \" + formatter.format(from) + \" bis \" + formatter.format(inclusiveTo);\n  };\n\n  scope.$watch(\"msg\", function(msg) {\n    if (!msg || !msg.payload) return;\n    if (msg.payload === \"connect\" || (msg.payload === \"change\" && msg.name === \"KOSTEN\")) {\n      scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n      requestEnergyForecast();\n      scheduleCostLayoutRefresh();\n      return;\n    }\n    if (msg.topic === \"aWATTar/tariff/current\") {\n      scope.view.tariff = msg.payload;\n    }\n    if (msg.topic === \"history/dashboard/result\") {\n      scope.view.history = restoreExpandedCostRows(msg.payload);\n      scope.view.period = msg.payload.period || scope.view.period;\n      scheduleCostLayoutRefresh();\n    }\n    if (msg.topic === \"energy/forecast/result\") {\n      scope.view.forecast = msg.payload;\n    }\n    if (msg.topic === \"history/solaredge-meter-totals/result\") {\n      scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n    }\n  });\n\n  window.addEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n  document.addEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  scheduleCostLayoutRefresh();\n\n  var refreshTimer = setInterval(function() {\n    scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n  }, 60000);\n  scope.$on(\"$destroy\", function() {\n    clearInterval(refreshTimer);\n    layoutTimers.forEach(clearTimeout);\n    window.removeEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n    document.removeEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  });\n})(scope);\n</script>\n\n<div class=\"cost-card\">\n  <div class=\"cost-toolbar\">\n    <h2>KOSTEN · Energiehistorie</h2>\n    <div class=\"cost-periods\">\n      <button ng-class=\"{active:view.period==='day'}\" ng-click=\"selectCostPeriod('day')\">Tag</button>\n      <button ng-class=\"{active:view.period==='month'}\" ng-click=\"selectCostPeriod('month')\">Monat</button>\n      <button ng-class=\"{active:view.period==='year'}\" ng-click=\"selectCostPeriod('year')\">Jahr</button>\n    </div>\n  </div>\n\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar-Preis</div>\n      <div class=\"cost-kpi-value\">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">reiner Börsenpreis, ohne Gebühren</div>\n    </div>\n    <div class=\"cost-kpi cost-house-power\" ng-style=\"housePowerStyle(view.history.live.houseConsumptionWatt)\">\n      <div class=\"cost-kpi-label\">Hausleistung jetzt</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.houseConsumptionWatt | number:0}} W</div>\n      <div class=\"cost-kpi-note\">Netz {{view.history.live.gridImportWatt | number:0}} W · PV {{view.history.live.pvPowerWatt | number:0}} W</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Verbrauchswert bei aktueller Hausleistung</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.energyValuePerHourEur | currency:'€':4}} / h</div>\n      <div class=\"cost-kpi-note\">Netzkosten aktuell {{view.history.live.gridImportCostPerHourEur | currency:'€':4}} / h</div>\n    </div>\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Verbrauchswert im Zeitraum</div>\n      <div class=\"cost-kpi-value\">{{view.history.totals.energyCostEur | currency:'€':2}}</div>\n      <div class=\"cost-kpi-note\">\n        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·\n        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie\n      </div>\n      <div class=\"cost-kpi-range\">{{costPeriodDateRange(view.history)}}</div>\n    </div>\n  </div>\n\n  <div class=\"cost-info\">\n    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen\n    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen\n    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.\n    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.\n  </div>\n\n  <div class=\"cost-forecast\" ng-if=\"view.forecast\">\n    <div class=\"cost-forecast-head\">\n      <span class=\"cost-forecast-title\">PROGNOSE · Anbieterunabhängige Automationsdaten</span>\n      <span class=\"cost-badge\" ng-class=\"view.forecast.ProviderOnline ? 'online' : 'offline'\">\n        {{view.forecast.ProviderOnline ? 'Provider online' : 'nicht verfügbar'}}\n      </span>\n    </div>\n    <div class=\"cost-forecast-grid\">\n      <div class=\"cost-forecast-field\">\n        <span>ProviderOnline · {{view.forecast.Provider.Name}}</span>\n        <b ng-class=\"view.forecast.ProviderOnline ? 'true' : 'false'\">{{view.forecast.ProviderOnline}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>EstimatedCostCheap</span>\n        <b ng-class=\"view.forecast.EstimatedCostCheap ? 'true' : 'false'\">{{view.forecast.EstimatedCostCheap}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>EstimatedCostExpensive</span>\n        <b ng-class=\"view.forecast.EstimatedCostExpensive ? 'true' : 'false'\">{{view.forecast.EstimatedCostExpensive}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>NotAvailable</span>\n        <b ng-class=\"view.forecast.NotAvailable ? 'true' : 'false'\">{{view.forecast.NotAvailable}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>Aktueller Prognosepreis</span>\n        <b>{{view.forecast.Current ? (view.forecast.Current.PriceCtPerKWh | number:3) + ' ct/kWh' : '—'}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>Günstig bis</span>\n        <b>{{view.forecast.Thresholds.CheapCtPerKWh === null ? '—' : (view.forecast.Thresholds.CheapCtPerKWh | number:3) + ' ct/kWh'}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>Teuer ab</span>\n        <b>{{view.forecast.Thresholds.ExpensiveCtPerKWh === null ? '—' : (view.forecast.Thresholds.ExpensiveCtPerKWh | number:3) + ' ct/kWh'}}</b>\n      </div>\n      <div class=\"cost-forecast-field\">\n        <span>KI-Erweiterung</span>\n        <b>{{view.forecast.Extensions.AI.Status}}</b>\n      </div>\n    </div>\n    <div class=\"cost-forecast-recommendation\"\n         ng-class=\"{'expensive':view.forecast.EstimatedCostExpensive,'unavailable':view.forecast.NotAvailable}\">\n      {{forecastRecommendation(view.forecast)}}\n    </div>\n  </div>\n\n  <div class=\"cost-anchor\" ng-if=\"view.history.latestReconciliation\">\n    <div class=\"cost-anchor-head\">\n      <span class=\"cost-anchor-title\">SolarEdge-Tagesanker · {{view.history.latestReconciliation.day}}</span>\n      <span class=\"cost-badge\" ng-class=\"view.history.latestReconciliation.quality === 'anchored' ? 'online' : 'offline'\">\n        {{view.history.latestReconciliation.quality === 'anchored' ? 'verankert' : (view.history.latestReconciliation.quality === 'estimated-boundary' ? 'Grenze geschätzt' : (view.history.latestReconciliation.quality === 'grid-only' ? 'nur Netzanker' : 'Initialisierung'))}}\n      </span>\n    </div>\n    <div class=\"cost-anchor-grid\" ng-if=\"view.history.latestReconciliation.quality !== 'partial-day'\">\n      <div class=\"cost-anchor-value\">\n        <span>PV-Produktion · Zähler / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} / {{view.history.latestReconciliation.integratedPvProductionKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Hausverbrauch · bilanziert / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterHouseConsumptionKWh | number:3}} / {{view.history.latestReconciliation.integratedHouseConsumptionKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Vom Netz · Zähler / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} / {{view.history.latestReconciliation.integratedImportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Ins Netz · Zähler / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} / {{view.history.latestReconciliation.integratedExportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Vergleichskosten vom Netz</span>\n        <b>{{view.history.latestReconciliation.importComparisonCostEur | currency:'€':4}}</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Vergleichswert ins Netz</span>\n        <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':4}}</b>\n      </div>\n    </div>\n    <div class=\"cost-anchor-note\" ng-if=\"view.history.latestReconciliation.quality !== 'partial-day'\">\n      Sichtbare Fallback-Korrektur: Bezug {{view.history.latestReconciliation.fallbackImportKWh | number:3}} kWh ·\n      Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh ·\n      PV {{view.history.latestReconciliation.fallbackPvProductionKWh | number:3}} kWh ·\n      Hausverbrauch {{view.history.latestReconciliation.fallbackHouseConsumptionKWh | number:3}} kWh.\n      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:3}} ct/kWh Börsenpreis;\n      keine Netzentgelte und keine vertragliche Einspeisevergütung.\n    </div>\n    <div class=\"cost-anchor-grid\" ng-if=\"view.history.latestReconciliation.quality === 'partial-day'\">\n      <div class=\"cost-anchor-value\">\n        <span>Vom Netz · seit erstem Zählerpunkt</span>\n        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Ins Netz · seit erstem Zählerpunkt</span>\n        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>PV-Produktion · seit erstem Zählerpunkt</span>\n        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} kWh</b>\n      </div>\n    </div>\n    <div class=\"cost-anchor-note\" ng-if=\"view.history.latestReconciliation.quality === 'partial-day'\">\n      Initialisierung: Der SolarEdge-Zähler und die Tageserfassung decken heute noch unterschiedliche Zeitfenster ab.\n      Daher werden noch keine Differenz, Fallback-Korrektur oder Vergleichskosten berechnet. Der erste belastbare\n      Tagesvergleich entsteht nach dem nächsten Tageswechsel.\n    </div>\n  </div>\n\n  <h3 class=\"cost-section-title\">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>\n  <div class=\"cost-table-wrap\" ng-if=\"view.history.rows.length\">\n    <table class=\"cost-table\">\n      <thead>\n        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>\n      </thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"row in view.history.rows\" ng-click=\"toggleCostRow(row)\">\n          <td><span class=\"cost-expand\">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>\n          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>\n          <td>{{row.gridImportKWh | number:3}} kWh</td>\n          <td>{{row.pvEnergyKWh | number:3}} kWh</td>\n          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class=\"cost-muted\">{{row.energyCostEur * 100 | number:2}} ct</span></td>\n          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class=\"cost-muted\">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>\n          <td>\n            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}\n            <br><span ng-class=\"{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}\">\n              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}\n            </span>\n          </td>\n          <td ng-class=\"{'cost-offline':row.recordedHourCount && row.offlineCount>0}\">\n            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}\n          </td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"row.expanded\">\n          <td colspan=\"8\"><div class=\"cost-hours-inner\">\n            <div class=\"cost-hour-grid\">\n              <div class=\"cost-hour\" ng-class=\"{'cost-hour-current':isCurrentCostHour(hour)}\" ng-repeat=\"hour in row.hours\">\n                <span class=\"cost-current-label\" ng-if=\"isCurrentCostHour(hour)\">aktuelle Stunde</span>\n                <b>{{hour.time}} Uhr</b><br>\n                <span ng-if=\"hour.recorded\">\n                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh\n                  <div class=\"cost-hour-price\">\n                    {{hour.energyCostEur | currency:'€':4}}\n                    <span class=\"cost-hour-cents\">· {{hour.energyCostEur * 100 | number:2}} ct</span>\n                  </div>\n                  <span class=\"cost-muted\">\n                    Netz {{hour.gridImportKWh | number:3}} kWh ·\n                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct\n                  </span><br>\n                </span>\n                <span ng-if=\"!hour.recorded\">\n                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>\n                  <span class=\"cost-muted\">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>\n                </span>\n                <span ng-if=\"hour.recorded\">\n                  Energie: <span ng-class=\"{'cost-online':hour.energyStatus==='online','cost-offline':hour.energyStatus!=='online'}\">{{hour.energyStatus}}</span> ·\n                  Wetter: <span ng-class=\"{'cost-online':hour.weatherStatus==='online','cost-offline':hour.weatherStatus!=='online'}\">{{hour.weatherStatus}}</span> ·\n                  Tarif: <span ng-class=\"{'cost-online':hour.tariffStatus==='online','cost-offline':hour.tariffStatus!=='online'}\">{{hour.tariffStatus}}</span>\n                </span>\n                <span ng-if=\"!hour.recorded\">{{hour.status}}</span>\n              </div>\n            </div>\n          </div></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"cost-empty\" ng-if=\"view.history && !view.history.rows.length\">\n    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.\n  </div>\n\n  <h3 class=\"cost-section-title\">Service- und Fehlerdiagnose</h3>\n  <div class=\"cost-diagnostics\">\n    <div class=\"cost-source\" ng-repeat=\"source in view.history.diagnostics\">\n      <div class=\"cost-source-head\">\n        <span class=\"cost-source-name\">{{source.source}}</span>\n        <span class=\"cost-badge\" ng-class=\"source.status\">{{source.status}}</span>\n      </div>\n      <div class=\"cost-source-detail\">\n        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>\n        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}\n        <span ng-if=\"source.error\"><br>Hinweis: {{source.error}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n",
+        "format": "<style>\n  .cost-dashboard-group { width:calc(100vw - 220px) !important; max-width:none !important; }\n  .cost-dashboard-grid { width:100% !important; min-height:calc(100vh - 118px) !important; min-height:calc(100dvh - 118px) !important; }\n  .cost-dashboard-widget { width:100% !important; height:auto !important; min-height:calc(100vh - 145px) !important; min-height:calc(100dvh - 145px) !important; left:0 !important; }\n  .cost-dashboard-template { height:auto !important; min-height:inherit !important; }\n  .cost-card { width:100%; min-height:calc(100vh - 165px); min-height:calc(100dvh - 165px); max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }\n  .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }\n  .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }\n  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }\n  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }\n  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }\n  .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }\n  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }\n  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }\n  .cost-kpi.cost-house-power { transition:background .45s ease,border-color .45s ease; border:1px solid transparent; }\n  .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }\n  .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }\n  .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }\n  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }\n  .cost-info b { color:#fff; }\n  .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid #0f8e96; border-radius:12px; background:#183638; }\n  .cost-anchor-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px; }\n  .cost-anchor-title { color:#fff; font-weight:700; }\n  .cost-anchor-grid { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:9px; }\n  .cost-anchor-value { padding:10px; border-radius:9px; background:#223f42; }\n  .cost-anchor-value span { display:block; color:#9fc3c6; font-size:10px; text-transform:uppercase; }\n  .cost-anchor-value b { display:block; margin-top:4px; color:#fff; font-size:17px; }\n  .cost-anchor-note { margin-top:10px; color:#a9c4c6; font-size:11px; line-height:1.45; }\n  .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }\n  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }\n  .cost-table { width:100%; min-width:760px; border-collapse:collapse; }\n  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }\n  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }\n  .cost-row { cursor:pointer; transition:background .15s; }\n  .cost-row:hover td { background:#294347; }\n  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }\n  .cost-muted { color:#9bb5b8; }\n  .cost-offline { color:#ffad99; }\n  /* SELBST ÄNDERN: Schriftfarbe für den Status „online“. */\n  .cost-online { color:#8df0ae; font-weight:800; }\n  .cost-hours td { padding:0; background:#132426; }\n  .cost-hours-inner { padding:12px 18px 14px 42px; }\n  .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }\n  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }\n  /* SELBST ÄNDERN: Hintergrund und Rahmen der aktuell laufenden Stundenkarte. */\n  .cost-hour.cost-hour-current { color:#15351f; background:#d7f5df; border:2px solid #79d99a; box-shadow:0 0 0 2px rgba(121,217,154,.18); }\n  .cost-hour.cost-hour-current b,\n  .cost-hour.cost-hour-current .cost-hour-price { color:#15351f; }\n  .cost-hour.cost-hour-current .cost-muted { color:#477157; }\n  .cost-hour.cost-hour-current .cost-hour-cents,\n  .cost-hour.cost-hour-current .cost-online { color:#176b37; }\n  .cost-current-label { float:right; color:#176b37; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }\n  .cost-hour b { color:#fff; }\n  .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }\n  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }\n  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }\n  .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }\n  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }\n  .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }\n  .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }\n  .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }\n  .cost-badge.online { color:#b9ffdc; background:#14613f; }\n  .cost-badge.offline { color:#ffd1c7; background:#71342d; }\n  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }\n  @media(max-width:900px) {\n    .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }\n    .cost-head { grid-template-columns:repeat(2,1fr); }\n    .cost-anchor-grid { grid-template-columns:repeat(2,1fr); }\n    .cost-diagnostics { grid-template-columns:1fr; }\n  }\n  @media(max-width:600px) {\n    .cost-dashboard-group { width:calc(100vw - 12px) !important; margin-right:6px !important; margin-left:6px !important; }\n    .cost-dashboard-grid { min-height:calc(100dvh - 96px) !important; }\n    .cost-dashboard-widget { min-height:calc(100dvh - 118px) !important; }\n    .cost-card { min-height:calc(100dvh - 128px); padding:0 2px 12px; }\n    .cost-toolbar { display:block; margin-bottom:10px; }\n    .cost-toolbar h2 { margin-bottom:10px; font-size:20px; }\n    .cost-periods { display:grid; grid-template-columns:repeat(3,1fr); width:100%; box-sizing:border-box; }\n    .cost-periods button { min-width:0; padding:9px 4px; }\n    .cost-head { grid-template-columns:1fr; gap:8px; }\n    .cost-anchor-grid { grid-template-columns:1fr; }\n    .cost-kpi { padding:12px; }\n    .cost-kpi-value { font-size:22px; }\n    .cost-info { padding:11px; }\n    .cost-table-wrap { overflow-x:hidden; border:0; background:transparent; }\n    .cost-table { display:block; min-width:0; }\n    .cost-table thead { display:none; }\n    .cost-table tbody { display:block; }\n    .cost-row { display:block; margin-bottom:10px; padding:7px 10px; border:1px solid #456367; border-radius:10px; background:#1d2d2f; }\n    .cost-row td { display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); gap:8px; padding:7px 2px; border-top:1px solid #395357; overflow-wrap:anywhere; }\n    .cost-row td:first-child { border-top:0; }\n    .cost-row td::before { color:#9bb5b8; font-size:11px; font-weight:700; }\n    .cost-row td:nth-child(1)::before { content:\"Zeitraum\"; }\n    .cost-row td:nth-child(2)::before { content:\"Hausverbrauch\"; }\n    .cost-row td:nth-child(3)::before { content:\"Netzbezug\"; }\n    .cost-row td:nth-child(4)::before { content:\"PV-Erzeugung\"; }\n    .cost-row td:nth-child(5)::before { content:\"Verbrauchswert\"; }\n    .cost-row td:nth-child(6)::before { content:\"Netzkosten\"; }\n    .cost-row td:nth-child(7)::before { content:\"Wetter\"; }\n    .cost-row td:nth-child(8)::before { content:\"Daten\"; }\n    .cost-hours { display:block; margin:-7px 0 10px; }\n    .cost-hours td { display:block; padding:0; border:0; }\n    .cost-hours-inner { padding:10px; }\n    .cost-hour-grid { grid-template-columns:1fr; }\n  }\n</style>\n\n<script>\n(function(scope) {\n  scope.view = scope.view || { period: \"month\", tariff: null, history: null };\n  scope.expandedCostRows = scope.expandedCostRows || {};\n  var layoutTimers = [];\n\n  function restoreExpandedCostRows(history) {\n    if (!history || !Array.isArray(history.rows)) return history;\n    history.rows.forEach(function(row) {\n      row.expanded = Boolean(scope.expandedCostRows[String(row.key)]);\n    });\n    return history;\n  }\n\n  function configureCostContainer() {\n    var card = document.querySelector(\".cost-card\");\n    if (!card) return;\n    var widget = card.closest(\".nr-dashboard-cardpanel\");\n    var template = card.closest(\".nr-dashboard-template\");\n    var grid = card.closest(\".gridster\");\n    var group = card.closest(\".nr-dashboard-cardcontainer\");\n    if (widget) widget.classList.add(\"cost-dashboard-widget\");\n    if (template) template.classList.add(\"cost-dashboard-template\");\n    if (grid) grid.classList.add(\"cost-dashboard-grid\");\n    if (group) group.classList.add(\"cost-dashboard-group\");\n  }\n\n  function refreshCostLayout() {\n    configureCostContainer();\n    if (!window || !window.dispatchEvent) return;\n    window.dispatchEvent(new Event(\"resize\"));\n  }\n\n  function scheduleCostLayoutRefresh() {\n    layoutTimers.forEach(clearTimeout);\n    layoutTimers = [0, 100, 350, 800].map(function(delay) {\n      return setTimeout(refreshCostLayout, delay);\n    });\n  }\n\n  scope.selectCostPeriod = function(period) {\n    scope.view.period = period;\n    scope.send({ topic: \"history/dashboard\", payload: { period: period } });\n    scheduleCostLayoutRefresh();\n  };\n\n  scope.toggleCostRow = function(row) {\n    var key = String(row.key);\n    var expanded = !scope.expandedCostRows[key];\n    if (expanded) scope.expandedCostRows[key] = true;\n    else delete scope.expandedCostRows[key];\n    row.expanded = expanded;\n  };\n\n  scope.isCurrentCostHour = function(hour) {\n    var intervalStart = new Date(hour && hour.intervalStart).getTime();\n    var now = Date.now();\n    return Number.isFinite(intervalStart) && intervalStart <= now && now < intervalStart + 60 * 60 * 1000;\n  };\n\n  scope.housePowerStyle = function(powerWatt) {\n    /* SELBST ÄNDERN: 10000 ist der rote Endwert des Verlaufs in Watt. */\n    var maximumWatt = 10000;\n    var measuredWatt = Number(powerWatt);\n    var limitedWatt = Math.min(maximumWatt, Math.max(0, Number.isFinite(measuredWatt) ? measuredWatt : 0));\n    var ratio = limitedWatt / maximumWatt;\n    /* Farbton 120 = grün, 60 = gelb, 0 = rot. */\n    var hue = Math.round(120 * (1 - ratio));\n    return {\n      background: \"linear-gradient(135deg,hsl(\" + hue + \",55%,25%),hsl(\" + hue + \",68%,34%))\",\n      borderColor: \"hsl(\" + hue + \",72%,48%)\"\n    };\n  };\n\n  scope.$watch(\"msg\", function(msg) {\n    if (!msg || !msg.payload) return;\n    if (msg.payload === \"connect\" || (msg.payload === \"change\" && msg.name === \"KOSTEN\")) {\n      scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n      scheduleCostLayoutRefresh();\n      return;\n    }\n    if (msg.topic === \"aWATTar/tariff/current\") {\n      scope.view.tariff = msg.payload;\n    }\n    if (msg.topic === \"history/dashboard/result\") {\n      scope.view.history = restoreExpandedCostRows(msg.payload);\n      scope.view.period = msg.payload.period || scope.view.period;\n      scheduleCostLayoutRefresh();\n    }\n    if (msg.topic === \"history/solaredge-meter-totals/result\") {\n      scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n    }\n  });\n\n  window.addEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n  document.addEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  scheduleCostLayoutRefresh();\n\n  var refreshTimer = setInterval(function() {\n    scope.send({ topic: \"history/dashboard\", payload: { period: scope.view.period } });\n  }, 60000);\n  scope.$on(\"$destroy\", function() {\n    clearInterval(refreshTimer);\n    layoutTimers.forEach(clearTimeout);\n    window.removeEventListener(\"orientationchange\", scheduleCostLayoutRefresh);\n    document.removeEventListener(\"visibilitychange\", scheduleCostLayoutRefresh);\n  });\n})(scope);\n</script>\n\n<div class=\"cost-card\">\n  <div class=\"cost-toolbar\">\n    <h2>KOSTEN · Energiehistorie</h2>\n    <div class=\"cost-periods\">\n      <button ng-class=\"{active:view.period==='day'}\" ng-click=\"selectCostPeriod('day')\">Tag</button>\n      <button ng-class=\"{active:view.period==='month'}\" ng-click=\"selectCostPeriod('month')\">Monat</button>\n      <button ng-class=\"{active:view.period==='year'}\" ng-click=\"selectCostPeriod('year')\">Jahr</button>\n    </div>\n  </div>\n\n  <div class=\"cost-head\">\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Aktueller aWATTar-Preis</div>\n      <div class=\"cost-kpi-value\">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>\n      <div class=\"cost-kpi-note\">reiner Börsenpreis, ohne Gebühren</div>\n    </div>\n    <div class=\"cost-kpi cost-house-power\" ng-style=\"housePowerStyle(view.history.live.houseConsumptionWatt)\">\n      <div class=\"cost-kpi-label\">Hausleistung jetzt</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.houseConsumptionWatt | number:0}} W</div>\n      <div class=\"cost-kpi-note\">Netz {{view.history.live.gridImportWatt | number:0}} W · PV {{view.history.live.pvPowerWatt | number:0}} W</div>\n    </div>\n    <div class=\"cost-kpi secondary\">\n      <div class=\"cost-kpi-label\">Verbrauchswert bei aktueller Hausleistung</div>\n      <div class=\"cost-kpi-value\">{{view.history.live.energyValuePerHourEur | currency:'€':4}} / h</div>\n      <div class=\"cost-kpi-note\">Netzkosten aktuell {{view.history.live.gridImportCostPerHourEur | currency:'€':4}} / h</div>\n    </div>\n    <div class=\"cost-kpi\">\n      <div class=\"cost-kpi-label\">Verbrauchswert im Zeitraum</div>\n      <div class=\"cost-kpi-value\">{{view.history.totals.energyCostEur | currency:'€':2}}</div>\n      <div class=\"cost-kpi-note\">\n        {{view.history.totals.energyCostEur * 100 | number:2}} ct ·\n        {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie\n      </div>\n    </div>\n  </div>\n\n  <div class=\"cost-info\">\n    <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen\n    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen\n    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.\n    Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.\n  </div>\n\n  <div class=\"cost-anchor\" ng-if=\"view.history.latestReconciliation\">\n    <div class=\"cost-anchor-head\">\n      <span class=\"cost-anchor-title\">SolarEdge-Tagesanker · {{view.history.latestReconciliation.day}}</span>\n      <span class=\"cost-badge\" ng-class=\"view.history.latestReconciliation.quality === 'anchored' ? 'online' : 'offline'\">\n        {{view.history.latestReconciliation.quality === 'anchored' ? 'verankert' : (view.history.latestReconciliation.quality === 'estimated-boundary' ? 'Grenze geschätzt' : (view.history.latestReconciliation.quality === 'grid-only' ? 'nur Netzanker' : 'Initialisierung'))}}\n      </span>\n    </div>\n    <div class=\"cost-anchor-grid\" ng-if=\"view.history.latestReconciliation.quality !== 'partial-day'\">\n      <div class=\"cost-anchor-value\">\n        <span>PV-Produktion · Zähler / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} / {{view.history.latestReconciliation.integratedPvProductionKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Hausverbrauch · bilanziert / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterHouseConsumptionKWh | number:3}} / {{view.history.latestReconciliation.integratedHouseConsumptionKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Vom Netz · Zähler / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} / {{view.history.latestReconciliation.integratedImportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Ins Netz · Zähler / erfasst</span>\n        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} / {{view.history.latestReconciliation.integratedExportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Vergleichskosten vom Netz</span>\n        <b>{{view.history.latestReconciliation.importComparisonCostEur | currency:'€':4}}</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Vergleichswert ins Netz</span>\n        <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':4}}</b>\n      </div>\n    </div>\n    <div class=\"cost-anchor-note\" ng-if=\"view.history.latestReconciliation.quality !== 'partial-day'\">\n      Sichtbare Fallback-Korrektur: Bezug {{view.history.latestReconciliation.fallbackImportKWh | number:3}} kWh ·\n      Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh ·\n      PV {{view.history.latestReconciliation.fallbackPvProductionKWh | number:3}} kWh ·\n      Hausverbrauch {{view.history.latestReconciliation.fallbackHouseConsumptionKWh | number:3}} kWh.\n      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:3}} ct/kWh Börsenpreis;\n      keine Netzentgelte und keine vertragliche Einspeisevergütung.\n    </div>\n    <div class=\"cost-anchor-grid\" ng-if=\"view.history.latestReconciliation.quality === 'partial-day'\">\n      <div class=\"cost-anchor-value\">\n        <span>Vom Netz · seit erstem Zählerpunkt</span>\n        <b>{{view.history.latestReconciliation.meterImportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>Ins Netz · seit erstem Zählerpunkt</span>\n        <b>{{view.history.latestReconciliation.meterExportKWh | number:3}} kWh</b>\n      </div>\n      <div class=\"cost-anchor-value\">\n        <span>PV-Produktion · seit erstem Zählerpunkt</span>\n        <b>{{view.history.latestReconciliation.meterPvProductionKWh | number:3}} kWh</b>\n      </div>\n    </div>\n    <div class=\"cost-anchor-note\" ng-if=\"view.history.latestReconciliation.quality === 'partial-day'\">\n      Initialisierung: Der SolarEdge-Zähler und die Tageserfassung decken heute noch unterschiedliche Zeitfenster ab.\n      Daher werden noch keine Differenz, Fallback-Korrektur oder Vergleichskosten berechnet. Der erste belastbare\n      Tagesvergleich entsteht nach dem nächsten Tageswechsel.\n    </div>\n  </div>\n\n  <h3 class=\"cost-section-title\">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>\n  <div class=\"cost-table-wrap\" ng-if=\"view.history.rows.length\">\n    <table class=\"cost-table\">\n      <thead>\n        <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>\n      </thead>\n      <tbody>\n        <tr class=\"cost-row\" ng-repeat-start=\"row in view.history.rows\" ng-click=\"toggleCostRow(row)\">\n          <td><span class=\"cost-expand\">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>\n          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>\n          <td>{{row.gridImportKWh | number:3}} kWh</td>\n          <td>{{row.pvEnergyKWh | number:3}} kWh</td>\n          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class=\"cost-muted\">{{row.energyCostEur * 100 | number:2}} ct</span></td>\n          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class=\"cost-muted\">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>\n          <td>\n            {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}\n            <br><span ng-class=\"{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}\">\n              {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}\n            </span>\n          </td>\n          <td ng-class=\"{'cost-offline':row.recordedHourCount && row.offlineCount>0}\">\n            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}\n          </td>\n        </tr>\n        <tr class=\"cost-hours\" ng-repeat-end ng-if=\"row.expanded\">\n          <td colspan=\"8\"><div class=\"cost-hours-inner\">\n            <div class=\"cost-hour-grid\">\n              <div class=\"cost-hour\" ng-class=\"{'cost-hour-current':isCurrentCostHour(hour)}\" ng-repeat=\"hour in row.hours\">\n                <span class=\"cost-current-label\" ng-if=\"isCurrentCostHour(hour)\">aktuelle Stunde</span>\n                <b>{{hour.time}} Uhr</b><br>\n                <span ng-if=\"hour.recorded\">\n                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh\n                  <div class=\"cost-hour-price\">\n                    {{hour.energyCostEur | currency:'€':4}}\n                    <span class=\"cost-hour-cents\">· {{hour.energyCostEur * 100 | number:2}} ct</span>\n                  </div>\n                  <span class=\"cost-muted\">\n                    Netz {{hour.gridImportKWh | number:3}} kWh ·\n                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct\n                  </span><br>\n                </span>\n                <span ng-if=\"!hour.recorded\">\n                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>\n                  <span class=\"cost-muted\">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>\n                </span>\n                <span ng-if=\"hour.recorded\">\n                  Energie: <span ng-class=\"{'cost-online':hour.energyStatus==='online','cost-offline':hour.energyStatus!=='online'}\">{{hour.energyStatus}}</span> ·\n                  Wetter: <span ng-class=\"{'cost-online':hour.weatherStatus==='online','cost-offline':hour.weatherStatus!=='online'}\">{{hour.weatherStatus}}</span> ·\n                  Tarif: <span ng-class=\"{'cost-online':hour.tariffStatus==='online','cost-offline':hour.tariffStatus!=='online'}\">{{hour.tariffStatus}}</span>\n                </span>\n                <span ng-if=\"!hour.recorded\">{{hour.status}}</span>\n              </div>\n            </div>\n          </div></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"cost-empty\" ng-if=\"view.history && !view.history.rows.length\">\n    Für diesen Zeitraum sind noch keine Stundenwerte vorhanden. Die Aufzeichnung läuft ab jetzt automatisch.\n  </div>\n\n  <h3 class=\"cost-section-title\">Service- und Fehlerdiagnose</h3>\n  <div class=\"cost-diagnostics\">\n    <div class=\"cost-source\" ng-repeat=\"source in view.history.diagnostics\">\n      <div class=\"cost-source-head\">\n        <span class=\"cost-source-name\">{{source.source}}</span>\n        <span class=\"cost-badge\" ng-class=\"source.status\">{{source.status}}</span>\n      </div>\n      <div class=\"cost-source-detail\">\n        Letzter Wert: {{source.observedAt ? (source.observedAt | date:'dd.MM.yyyy HH:mm:ss') : 'noch keiner'}}<br>\n        Alter: {{source.ageMinutes === null ? '—' : (source.ageMinutes | number:1) + ' min'}}\n        <span ng-if=\"source.error\"><br>Hinweis: {{source.error}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n",
         "storeOutMessages": true,
         "fwdInMessages": false,
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 990,
-        "y": 180,
+        "x": 960,
+        "y": 420,
         "wires": [
             [
-                "kosten_dashboard_request_router"
+                "kosten_history_query_out"
             ]
         ]
     },
@@ -9419,123 +9199,6 @@
         "wires": [
             [
                 "kosten_dashboard_template"
-            ]
-        ]
-    },
-    {
-        "id": "kosten_forecast_provider_out",
-        "type": "link out",
-        "z": "kosten_flow",
-        "name": "NORMALIZED TARIFF TO FORECAST",
-        "mode": "link",
-        "links": [
-            "energy_forecast_provider_in"
-        ],
-        "x": 1010,
-        "y": 60,
-        "wires": []
-    },
-    {
-        "id": "kosten_dashboard_request_router",
-        "type": "function",
-        "z": "kosten_flow",
-        "name": "Route cost dashboard request",
-        "func": "if (msg.topic === \"history/dashboard\") return [msg, null];\nif (msg.topic === \"energy/forecast/read\") return [null, msg];\nnode.warn(`Unbekannte Dashboard-Abfrage ignoriert: ${msg.topic || \"ohne Topic\"}`);\nreturn [null, null];\n",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1190,
-        "y": 220,
-        "wires": [
-            [
-                "kosten_history_query_out"
-            ],
-            [
-                "kosten_forecast_query_out"
-            ]
-        ]
-    },
-    {
-        "id": "kosten_forecast_query_out",
-        "type": "link out",
-        "z": "kosten_flow",
-        "name": "READ ENERGY FORECAST",
-        "mode": "link",
-        "links": [
-            "energy_forecast_read_in"
-        ],
-        "x": 1450,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "kosten_forecast_result_in",
-        "type": "link in",
-        "z": "kosten_flow",
-        "name": "ENERGY FORECAST TO COST DASHBOARD",
-        "links": [
-            "energy_forecast_dashboard_out"
-        ],
-        "x": 745,
-        "y": 340,
-        "wires": [
-            [
-                "kosten_dashboard_template"
-            ]
-        ]
-    },
-    {
-        "id": "kosten_forecast_provider_catch",
-        "type": "catch",
-        "z": "kosten_flow",
-        "name": "Tariff provider unavailable",
-        "scope": [
-            "kosten_awattar_api",
-            "kosten_aktuellen_tarif_aufbereiten"
-        ],
-        "uncaught": false,
-        "x": 250,
-        "y": 420,
-        "wires": [
-            [
-                "kosten_forecast_provider_offline"
-            ]
-        ]
-    },
-    {
-        "id": "kosten_forecast_provider_offline",
-        "type": "change",
-        "z": "kosten_flow",
-        "name": "Normalize unavailable tariff provider",
-        "rules": [
-            {
-                "t": "set",
-                "p": "topic",
-                "pt": "msg",
-                "to": "energy/forecast/provider",
-                "tot": "str"
-            },
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "{\"provider\":\"aWATTar\",\"online\":false,\"slots\":[]}",
-                "tot": "json"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 550,
-        "y": 420,
-        "wires": [
-            [
-                "kosten_forecast_provider_out"
             ]
         ]
     },
@@ -9832,8 +9495,8 @@
             "datenbank_history_store"
         ],
         "uncaught": false,
-        "x": 610,
-        "y": 480,
+        "x": 720,
+        "y": 520,
         "wires": [
             [
                 "datenbank_error_debug"
@@ -9856,38 +9519,6 @@
         "x": 1010,
         "y": 520,
         "wires": []
-    },
-    {
-        "id": "datenbank_solaredge_totals_in",
-        "type": "link in",
-        "z": "datenbank_flow",
-        "name": "SOLAREDGE-ZÄHLERSTÄNDE · Payload empfangen",
-        "links": [
-            "se_energy_totals_database_out"
-        ],
-        "x": 155,
-        "y": 340,
-        "wires": [
-            [
-                "datenbank_history_store"
-            ]
-        ]
-    },
-    {
-        "id": "datenbank_solaredge_inverter_total_in",
-        "type": "link in",
-        "z": "datenbank_flow",
-        "name": "SOLAREDGE-PV-ZÄHLER · Payload empfangen",
-        "links": [
-            "se_inverter_energy_database_out"
-        ],
-        "x": 155,
-        "y": 380,
-        "wires": [
-            [
-                "datenbank_history_store"
-            ]
-        ]
     },
     {
         "id": "system_dashboard_template",
@@ -10422,146 +10053,246 @@
         "wires": []
     },
     {
-        "id": "energy_forecast_comment",
+        "id": "weather_automation_comment",
         "type": "comment",
-        "z": "energy_forecast_flow",
-        "name": "PROVIDER-NEUTRAL ENERGY FORECAST · GLOBAL AUTOMATION CONTRACT",
-        "info": "Input adapters provide normalized price slots. The flow publishes global EnergyForecastData. Future AI layers extend Extensions.AI without changing provider adapters or dashboard consumers.",
-        "x": 430,
-        "y": 60,
+        "z": "weather_flow",
+        "name": "AUTOMATION · globale WeatherAutomationData · Quellen über WeatherAutomationSelector",
+        "info": "Zentrale, stabile Schnittstelle für Automationen. Internet- und Sensorwerte werden je Feld über internet, sensor oder auto ausgewählt. Dokumentation: docs/WEATHER_AUTOMATION_DATA.md",
+        "x": 600,
+        "y": 540,
         "wires": []
     },
     {
-        "id": "energy_forecast_provider_in",
+        "id": "weather_sensor_data_in",
         "type": "link in",
-        "z": "energy_forecast_flow",
-        "name": "NORMALIZED PROVIDER DATA IN",
-        "links": [
-            "kosten_forecast_provider_out"
-        ],
-        "x": 155,
-        "y": 140,
+        "z": "weather_flow",
+        "name": "WETTER SENSORIK IN",
+        "links": [],
+        "x": 355,
+        "y": 580,
         "wires": [
             [
-                "energy_forecast_build"
+                "weather_automation_data"
             ]
         ]
     },
     {
-        "id": "energy_forecast_build",
+        "id": "weather_automation_data",
         "type": "function",
-        "z": "energy_forecast_flow",
-        "name": "Build provider-neutral energy forecast",
-        "func": "const nowMs = Number.isFinite(Number(msg.now)) ? Number(msg.now) : Date.now();\nconst input = msg.payload && typeof msg.payload === \"object\" ? msg.payload : {};\nconst providerName = String(input.provider || input.ProviderName || input.source || \"unknown\");\nconst previous = global.get(\"EnergyForecastData\") || {};\n\nconst slots = (Array.isArray(input.slots) ? input.slots : [])\n    .map((slot) => {\n        const validFromMs = new Date(slot.validFrom ?? slot.ValidFrom).getTime();\n        const validUntilMs = new Date(slot.validUntil ?? slot.ValidUntil).getTime();\n        const priceCtPerKWh = Number(slot.priceCtPerKWh ?? slot.PriceCtPerKWh);\n        if (!Number.isFinite(validFromMs) || !Number.isFinite(validUntilMs) || !Number.isFinite(priceCtPerKWh)) return null;\n        return {\n            ValidFrom: new Date(validFromMs).toISOString(),\n            ValidUntil: new Date(validUntilMs).toISOString(),\n            PriceCtPerKWh: priceCtPerKWh\n        };\n    })\n    .filter(Boolean)\n    .sort((left, right) => left.ValidFrom.localeCompare(right.ValidFrom));\n\nconst currentSlot = slots.find((slot) =>\n    new Date(slot.ValidFrom).getTime() <= nowMs && nowMs < new Date(slot.ValidUntil).getTime()\n);\nconst prices = slots.map((slot) => slot.PriceCtPerKWh).sort((left, right) => left - right);\nconst quantile = (fraction) => prices[Math.floor((prices.length - 1) * fraction)];\nconst cheapThreshold = prices.length ? quantile(1 / 3) : null;\nconst expensiveThreshold = prices.length ? quantile(2 / 3) : null;\nconst providerOnline = input.ProviderOnline !== false && input.online !== false && Boolean(currentSlot);\nconst currentPrice = currentSlot?.PriceCtPerKWh ?? null;\nconst estimatedCostCheap = providerOnline && cheapThreshold !== expensiveThreshold && currentPrice <= cheapThreshold;\nconst estimatedCostExpensive = providerOnline && cheapThreshold !== expensiveThreshold && currentPrice >= expensiveThreshold;\nconst notAvailable = !providerOnline || currentPrice === null;\nconst classification = notAvailable\n    ? \"not-available\"\n    : estimatedCostCheap\n        ? \"cheap\"\n        : estimatedCostExpensive\n            ? \"expensive\"\n            : \"normal\";\n\nconst classifySlot = (slot) => ({\n    ...slot,\n    Classification: cheapThreshold !== expensiveThreshold && slot.PriceCtPerKWh <= cheapThreshold\n        ? \"cheap\"\n        : cheapThreshold !== expensiveThreshold && slot.PriceCtPerKWh >= expensiveThreshold\n            ? \"expensive\"\n            : \"normal\"\n});\nconst classifiedSlots = slots.map(classifySlot);\nconst byPrice = [...classifiedSlots].sort((left, right) => left.PriceCtPerKWh - right.PriceCtPerKWh);\n\nconst forecast = {\n    SchemaVersion: 1,\n    UpdatedAt: new Date(nowMs).toISOString(),\n    ProviderOnline: providerOnline,\n    EstimatedCostExpensive: estimatedCostExpensive,\n    EstimatedCostCheap: estimatedCostCheap,\n    NotAvailable: notAvailable,\n    Classification: classification,\n    Provider: {\n        Name: providerName,\n        Online: providerOnline,\n        LastUpdate: input.fetchedAt || input.UpdatedAt || new Date(nowMs).toISOString(),\n        ValidUntil: currentSlot?.ValidUntil ?? null\n    },\n    Current: currentSlot ? {\n        PriceCtPerKWh: currentPrice,\n        ValidFrom: currentSlot.ValidFrom,\n        ValidUntil: currentSlot.ValidUntil\n    } : null,\n    Thresholds: {\n        Method: \"provider-window-tertiles\",\n        CheapCtPerKWh: cheapThreshold,\n        ExpensiveCtPerKWh: expensiveThreshold\n    },\n    Forecast: {\n        HorizonStart: classifiedSlots[0]?.ValidFrom ?? null,\n        HorizonEnd: classifiedSlots.at(-1)?.ValidUntil ?? null,\n        Slots: classifiedSlots,\n        CheapestSlots: byPrice.slice(0, 3),\n        MostExpensiveSlots: byPrice.slice(-3).reverse()\n    },\n    Extensions: previous.Extensions || {\n        AI: { Enabled: false, Status: \"not-configured\", Prediction: null }\n    }\n};\n\nglobal.set(\"EnergyForecastData\", forecast);\nnode.status({\n    fill: notAvailable ? \"red\" : estimatedCostCheap ? \"green\" : estimatedCostExpensive ? \"red\" : \"yellow\",\n    shape: notAvailable ? \"ring\" : \"dot\",\n    text: notAvailable ? \"Prognose nicht verfügbar\" : `${classification}: ${currentPrice.toFixed(3)} ct/kWh`\n});\nmsg.topic = \"energy/forecast/result\";\nmsg.payload = forecast;\nreturn msg;\n",
+        "z": "weather_flow",
+        "name": "Wetterdaten für Automatisierung bereitstellen",
+        "func": "// Stabile globale Wetterstruktur für Heizungs-, Licht- und Solarautomationen.\n//\n// Globale Schnittstellen:\n//   WeatherAutomationData     -> aufbereitete Werte für Automationen\n//   WeatherAutomationSelector -> optionale Quellenwahl je Feld: internet, sensor, auto\n//   WeatherSensorData         -> zuletzt empfangene Sensorwerte\n//\n// Sensordaten können über den Link-In \"WETTER SENSORIK IN\" eingespeist werden:\n//   msg.topic = \"weather/sensor\"\n//   msg.payload = { ActualTemperature: 21.4, UpdatedAt: \"...\" }\n\nconst FIELD_NAMES = [\n    \"SunPercentageNextHour\",\n    \"Sunset\",\n    \"SunDawn\",\n    \"EstimatedTemperaturNextMorning\",\n    \"ActualTemperature\"\n];\n\nconst DEFAULT_SELECTOR = {\n    SunPercentageNextHour: \"internet\",\n    Sunset: \"internet\",\n    SunDawn: \"internet\",\n    EstimatedTemperaturNextMorning: \"internet\",\n    ActualTemperature: \"auto\"\n};\n\nconst isSensorMessage = msg.topic === \"weather/sensor\" || msg.source === \"sensor\";\nif (isSensorMessage && msg.payload && typeof msg.payload === \"object\") {\n    global.set(\"WeatherSensorData\", {\n        ...(global.get(\"WeatherSensorData\") || {}),\n        ...msg.payload,\n        UpdatedAt: msg.payload.UpdatedAt || new Date().toISOString()\n    });\n}\n\nconst internet = isSensorMessage\n    ? (global.get(\"WeatherData\") || {})\n    : (msg.payload || global.get(\"WeatherData\") || {});\nconst sensor = global.get(\"WeatherSensorData\") || {};\nconst configuredSelector = global.get(\"WeatherAutomationSelector\") || {};\nconst selector = {};\n\nfor (const field of FIELD_NAMES) {\n    const requested = String(configuredSelector[field] || DEFAULT_SELECTOR[field]).toLowerCase();\n    selector[field] = [\"internet\", \"sensor\", \"auto\"].includes(requested)\n        ? requested\n        : DEFAULT_SELECTOR[field];\n}\n\n// Sensorwerte gelten standardmäßig 15 Minuten als frisch. Der Wert ist konfigurierbar.\nconst sensorMaxAgeMs = Math.max(1000, Number(configuredSelector.SensorMaxAgeMs) || 15 * 60 * 1000);\nconst sensorUpdatedMs = Date.parse(sensor.UpdatedAt || \"\");\nconst sensorFresh = Number.isFinite(sensorUpdatedMs) && Date.now() - sensorUpdatedMs <= sensorMaxAgeMs;\n\nconst internetValues = {\n    SunPercentageNextHour: internet.ExpectedPercentSunshineNextHour,\n    Sunset: internet.SunsetToday,\n    SunDawn: internet.SunriseToday,\n    EstimatedTemperaturNextMorning: internet.EstimatedTemperatureNextMorning,\n    ActualTemperature: internet.Current?.TemperatureC\n};\n\nconst isNumberField = field => [\n    \"SunPercentageNextHour\",\n    \"EstimatedTemperaturNextMorning\",\n    \"ActualTemperature\"\n].includes(field);\nconst normalize = (field, value) => {\n    if (isNumberField(field)) return Number.isFinite(Number(value)) ? Number(value) : null;\n    return typeof value === \"string\" && value.trim() ? value : null;\n};\n\nconst values = {};\nconst sources = {};\nconst quality = {};\n\nfor (const field of FIELD_NAMES) {\n    const internetValue = normalize(field, internetValues[field]);\n    const sensorValue = normalize(field, sensor[field]);\n    const mode = selector[field];\n    let selectedValue = null;\n    let selectedSource = \"unavailable\";\n\n    if (mode === \"sensor\") {\n        if (sensorFresh && sensorValue !== null) {\n            selectedValue = sensorValue;\n            selectedSource = \"sensor\";\n        }\n    } else if (mode === \"auto\" && sensorFresh && sensorValue !== null) {\n        selectedValue = sensorValue;\n        selectedSource = \"sensor\";\n    } else if (internetValue !== null) {\n        selectedValue = internetValue;\n        selectedSource = \"internet\";\n    }\n\n    values[field] = selectedValue;\n    sources[field] = selectedSource;\n    quality[field] = selectedSource === \"unavailable\"\n        ? \"unavailable\"\n        : (selectedSource === \"internet\" && internet.DataStaleFlag ? \"stale\" : \"valid\");\n}\n\nconst automationData = {\n    SchemaVersion: 1,\n    UpdatedAt: new Date().toISOString(),\n    ...values,\n    Ready: FIELD_NAMES.every(field => values[field] !== null),\n    DataStaleFlag: FIELD_NAMES.some(field => quality[field] !== \"valid\"),\n    Sources: sources,\n    Quality: quality,\n    Selector: selector\n};\n\nglobal.set(\"WeatherAutomationSelector\", {\n    ...selector,\n    SensorMaxAgeMs: sensorMaxAgeMs\n});\nglobal.set(\"WeatherAutomationData\", automationData);\n\nnode.status({\n    fill: automationData.Ready && !automationData.DataStaleFlag ? \"green\" : \"yellow\",\n    shape: automationData.Ready ? \"dot\" : \"ring\",\n    text: automationData.Ready ? \"Automationsdaten bereit\" : \"Automationsdaten unvollständig\"\n});\n\nreturn {\n    ...msg,\n    topic: \"weather/automation\",\n    payload: automationData\n};\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 430,
-        "y": 140,
+        "x": 740,
+        "y": 580,
         "wires": [
             [
-                "energy_forecast_dashboard_out",
-                "energy_forecast_debug"
+                "weather_automation_debug"
             ]
         ]
     },
     {
-        "id": "energy_forecast_read_in",
-        "type": "link in",
-        "z": "energy_forecast_flow",
-        "name": "FORECAST READ REQUEST IN",
-        "links": [
-            "kosten_forecast_query_out"
-        ],
-        "x": 155,
-        "y": 240,
-        "wires": [
-            [
-                "energy_forecast_read"
-            ]
-        ]
-    },
-    {
-        "id": "energy_forecast_refresh",
-        "type": "inject",
-        "z": "energy_forecast_flow",
-        "name": "Refresh forecast state every minute",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "60",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "4",
-        "topic": "energy/forecast/read",
-        "payload": "",
-        "payloadType": "date",
-        "x": 210,
-        "y": 300,
-        "wires": [
-            [
-                "energy_forecast_read"
-            ]
-        ]
-    },
-    {
-        "id": "energy_forecast_read",
-        "type": "function",
-        "z": "energy_forecast_flow",
-        "name": "Read energy forecast data",
-        "func": "const nowMs = Number.isFinite(Number(msg.now)) ? Number(msg.now) : Date.now();\nconst stored = global.get(\"EnergyForecastData\");\nconst forecast = stored ? JSON.parse(JSON.stringify(stored)) : {\n    SchemaVersion: 1,\n    UpdatedAt: new Date(nowMs).toISOString(),\n    ProviderOnline: false,\n    EstimatedCostExpensive: false,\n    EstimatedCostCheap: false,\n    NotAvailable: true,\n    Classification: \"not-available\",\n    Provider: { Name: \"unknown\", Online: false, LastUpdate: null, ValidUntil: null },\n    Current: null,\n    Thresholds: { Method: \"provider-window-tertiles\", CheapCtPerKWh: null, ExpensiveCtPerKWh: null },\n    Forecast: { HorizonStart: null, HorizonEnd: null, Slots: [], CheapestSlots: [], MostExpensiveSlots: [] },\n    Extensions: { AI: { Enabled: false, Status: \"not-configured\", Prediction: null } }\n};\n\nconst validUntilMs = new Date(forecast.Provider?.ValidUntil || 0).getTime();\nif (!Number.isFinite(validUntilMs) || nowMs >= validUntilMs) {\n    forecast.ProviderOnline = false;\n    forecast.EstimatedCostExpensive = false;\n    forecast.EstimatedCostCheap = false;\n    forecast.NotAvailable = true;\n    forecast.Classification = \"not-available\";\n    forecast.Provider = { ...forecast.Provider, Online: false };\n}\n\nglobal.set(\"EnergyForecastData\", forecast);\nnode.status({\n    fill: forecast.NotAvailable ? \"red\" : \"green\",\n    shape: forecast.NotAvailable ? \"ring\" : \"dot\",\n    text: forecast.NotAvailable ? \"keine gültige Prognose\" : forecast.Classification\n});\nmsg.topic = \"energy/forecast/result\";\nmsg.payload = forecast;\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 460,
-        "y": 240,
-        "wires": [
-            [
-                "energy_forecast_dashboard_out",
-                "energy_forecast_debug"
-            ]
-        ]
-    },
-    {
-        "id": "energy_forecast_dashboard_out",
-        "type": "link out",
-        "z": "energy_forecast_flow",
-        "name": "ENERGY FORECAST TO DASHBOARD",
-        "mode": "link",
-        "links": [
-            "kosten_forecast_result_in"
-        ],
-        "x": 790,
-        "y": 180,
-        "wires": []
-    },
-    {
-        "id": "energy_forecast_debug",
+        "id": "weather_automation_debug",
         "type": "debug",
-        "z": "energy_forecast_flow",
-        "name": "EnergyForecastData",
-        "active": false,
+        "z": "weather_flow",
+        "name": "AUTOMATION WEATHER DATA",
+        "active": true,
         "tosidebar": true,
         "console": false,
-        "tostatus": false,
+        "tostatus": true,
         "complete": "payload",
         "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 720,
-        "y": 280,
+        "statusVal": "payload.Ready",
+        "statusType": "jsonata",
+        "x": 1110,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "datenbank_solaredge_totals_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "SOLAREDGE-ZÄHLERSTÄNDE · Payload empfangen",
+        "links": [
+            "se_energy_totals_database_out"
+        ],
+        "x": 155,
+        "y": 340,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "se_energy_totals_comment",
+        "type": "comment",
+        "z": "tab_read_feedin",
+        "name": "TAGESENERGIEANKER · SOLAREDGE-ZÄHLERSTÄNDE",
+        "info": "SunSpec Meter, Basis 0: M_Exported 226..227, M_Imported 234..235, M_Energy_W_SF 242. Die kumulativen Zählerstände werden getrennt von der schnellen Leistungsmessung gelesen und in SQLite täglich abgeglichen.",
+        "x": 330,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "se_read_energy_totals",
+        "type": "modbus-read",
+        "z": "tab_read_feedin",
+        "name": "READ: Meter export/import totals (+SF)",
+        "topic": "",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "226",
+        "quantity": "17",
+        "rate": "30",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "befceeb9cba11998",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 230,
+        "y": 580,
+        "wires": [
+            [
+                "se_parse_energy_totals"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "se_parse_energy_totals",
+        "type": "function",
+        "z": "tab_read_feedin",
+        "name": "Parse SolarEdge meter energy totals",
+        "func": "// SolarEdge/SunSpec meter model (base-0):\n// 226..227 M_Exported, 234..235 M_Imported, 242 M_Energy_W_SF.\nconst registers = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!registers || registers.length < 17) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"Energiezähler: 17 Register erwartet\"});\n    return null;\n}\n\nconst toInt16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst toUint32 = (highWord, lowWord) => ((highWord & 0xffff) * 0x10000) + (lowWord & 0xffff);\nconst exportedRawWh = toUint32(registers[0], registers[1]);\nconst importedRawWh = toUint32(registers[8], registers[9]);\nconst scaleFactor = toInt16(registers[16]);\n\nif (\n    exportedRawWh === 0xffffffff ||\n    importedRawWh === 0xffffffff ||\n    scaleFactor === -32768 ||\n    scaleFactor < -6 ||\n    scaleFactor > 3\n) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"Energiezähler: ungültige SunSpec-Werte\"});\n    return null;\n}\n\nconst wattHourFactor = Math.pow(10, scaleFactor);\nconst gridExportTotalKWh = exportedRawWh * wattHourFactor / 1000;\nconst gridImportTotalKWh = importedRawWh * wattHourFactor / 1000;\nconst previousImport = Number(global.get(\"SolarEdgeGridImportTotalKWh\"));\nconst previousExport = Number(global.get(\"SolarEdgeGridExportTotalKWh\"));\nif (\n    Number.isFinite(previousImport) && gridImportTotalKWh + 0.001 < previousImport ||\n    Number.isFinite(previousExport) && gridExportTotalKWh + 0.001 < previousExport\n) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"Energiezähler: Rücksprung erkannt\"});\n    return null;\n}\n\nconst observedAt = new Date().toISOString();\nconst payload = {\n    schemaVersion: 1,\n    source: \"SolarEdgeSunSpecMeter\",\n    observedAt,\n    gridImportTotalKWh,\n    gridExportTotalKWh,\n    scaleFactor,\n    registers: {\n        baseZeroStart: 226,\n        quantity: 17,\n        importedRawWh,\n        exportedRawWh\n    }\n};\n\nglobal.set(\"SolarEdgeGridImportTotalKWh\", gridImportTotalKWh);\nglobal.set(\"SolarEdgeGridExportTotalKWh\", gridExportTotalKWh);\nglobal.set(\"SolarEdgeMeterEnergyLastSuccessMs\", Date.now());\nnode.status({\n    fill:\"green\",\n    shape:\"dot\",\n    text:\"Zähler: Bezug \" + gridImportTotalKWh.toFixed(3) + \" · Einspeisung \" + gridExportTotalKWh.toFixed(3) + \" kWh\"\n});\nmsg.topic = \"history/source/solaredge-meter-totals\";\nmsg.source = \"SolarEdgeSunSpecMeter\";\nmsg.payload = payload;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 580,
+        "wires": [
+            [
+                "se_energy_totals_database_out"
+            ]
+        ]
+    },
+    {
+        "id": "se_energy_totals_database_out",
+        "type": "link out",
+        "z": "tab_read_feedin",
+        "name": "SOLAREDGE-ZÄHLERSTÄNDE AN DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_solaredge_totals_in"
+        ],
+        "x": 875,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "datenbank_solaredge_inverter_total_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "SOLAREDGE-PV-ZÄHLER · Payload empfangen",
+        "links": [
+            "se_inverter_energy_database_out"
+        ],
+        "x": 155,
+        "y": 380,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "se_inverter_energy_comment",
+        "type": "comment",
+        "z": "79160448dc533f1d",
+        "name": "PV-TAGESENERGIE · KUMULIERTER WECHSELRICHTERZÄHLER",
+        "info": "SunSpec base 0: 40093..40094 I_AC_Energy_WH und 40095 I_AC_Energy_WH_SF. Der Lebenszeitzähler bildet zusammen mit den Meter-Zählern belastbare Tagesdifferenzen und überbrückt kurze Aufzeichnungslücken.",
+        "x": 330,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "se_read_inverter_energy_total",
+        "type": "modbus-read",
+        "z": "79160448dc533f1d",
+        "name": "READ: Inverter PV energy total (+SF)",
+        "topic": "",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "40093",
+        "quantity": "3",
+        "rate": "30",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "befceeb9cba11998",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 220,
+        "y": 960,
+        "wires": [
+            [
+                "se_parse_inverter_energy_total"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "se_parse_inverter_energy_total",
+        "type": "function",
+        "z": "79160448dc533f1d",
+        "name": "Parse SolarEdge inverter energy total",
+        "func": "// SolarEdge inverter SunSpec model, Modbus protocol address base 0:\n// 40093..40094 I_AC_Energy_WH, 40095 I_AC_Energy_WH_SF.\nconst registers = Array.isArray(msg.payload) ? msg.payload : msg.payload?.data;\nif (!registers || registers.length < 3) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"PV-Zähler: 3 Register erwartet\"});\n    return null;\n}\n\nconst toInt16 = value => (value & 0x8000) ? value - 0x10000 : value;\nconst toUint32 = (highWord, lowWord) => ((highWord & 0xffff) * 0x10000) + (lowWord & 0xffff);\nconst producedRawWh = toUint32(registers[0], registers[1]);\nconst scaleFactor = toInt16(registers[2]);\nif (producedRawWh === 0xffffffff || scaleFactor === -32768 || scaleFactor < -6 || scaleFactor > 3) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"PV-Zähler: ungültige SunSpec-Werte\"});\n    return null;\n}\n\nconst pvProductionTotalKWh = producedRawWh * Math.pow(10, scaleFactor) / 1000;\nconst previous = Number(global.get(\"SolarEdgePvProductionTotalKWh\"));\nif (Number.isFinite(previous) && pvProductionTotalKWh + 0.001 < previous) {\n    node.status({fill:\"red\", shape:\"ring\", text:\"PV-Zähler: Rücksprung erkannt\"});\n    return null;\n}\n\nconst observedAt = new Date().toISOString();\nglobal.set(\"SolarEdgePvProductionTotalKWh\", pvProductionTotalKWh);\nglobal.set(\"SolarEdgeInverterEnergyLastSuccessMs\", Date.now());\nnode.status({fill:\"green\", shape:\"dot\", text:\"PV gesamt: \" + pvProductionTotalKWh.toFixed(3) + \" kWh\"});\nmsg.topic = \"history/source/solaredge-inverter-total\";\nmsg.source = \"SolarEdgeSunSpecInverter\";\nmsg.payload = {\n    schemaVersion: 1,\n    source: \"SolarEdgeSunSpecInverter\",\n    observedAt,\n    pvProductionTotalKWh,\n    scaleFactor,\n    registers: {baseZeroStart: 40093, quantity: 3, producedRawWh}\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 960,
+        "wires": [
+            [
+                "se_inverter_energy_database_out"
+            ]
+        ]
+    },
+    {
+        "id": "se_inverter_energy_database_out",
+        "type": "link out",
+        "z": "79160448dc533f1d",
+        "name": "SOLAREDGE-PV-ZÄHLER AN DATENBANK",
+        "mode": "link",
+        "links": [
+            "datenbank_solaredge_inverter_total_in"
+        ],
+        "x": 875,
+        "y": 960,
         "wires": []
     }
 ]
