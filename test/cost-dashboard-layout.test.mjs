@@ -80,3 +80,16 @@ test("Kosten-Dashboard hält geöffnete Detailzeilen bei Aktualisierungen offen"
   assert.match(template, /scope\.expandedCostRows\[String\(row\.key\)\]/);
   assert.match(template, /ng-click="toggleCostRow\(row\)"/);
 });
+
+test("Kosten-Dashboard markiert die aktuelle Stunde und Online-Zustände hellgrün", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /scope\.isCurrentCostHour = function\(hour\)/);
+  assert.match(template, /intervalStart <= now && now < intervalStart \+ 60 \* 60 \* 1000/);
+  assert.match(template, /'cost-hour-current':isCurrentCostHour\(hour\)/);
+  assert.match(template, /background:#d7f5df/);
+  assert.match(template, /\.cost-online \{ color:#8df0ae; font-weight:800; \}/);
+  assert.match(template, /'cost-online':hour\.energyStatus==='online'/);
+  assert.match(template, /'cost-online':hour\.weatherStatus==='online'/);
+  assert.match(template, /'cost-online':hour\.tariffStatus==='online'/);
+});

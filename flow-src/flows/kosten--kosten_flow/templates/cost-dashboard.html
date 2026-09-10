@@ -35,10 +35,20 @@
   .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }
   .cost-muted { color:#9bb5b8; }
   .cost-offline { color:#ffad99; }
+  /* SELBST ÄNDERN: Schriftfarbe für den Status „online“. */
+  .cost-online { color:#8df0ae; font-weight:800; }
   .cost-hours td { padding:0; background:#132426; }
   .cost-hours-inner { padding:12px 18px 14px 42px; }
   .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }
   .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }
+  /* SELBST ÄNDERN: Hintergrund und Rahmen der aktuell laufenden Stundenkarte. */
+  .cost-hour.cost-hour-current { color:#15351f; background:#d7f5df; border:2px solid #79d99a; box-shadow:0 0 0 2px rgba(121,217,154,.18); }
+  .cost-hour.cost-hour-current b,
+  .cost-hour.cost-hour-current .cost-hour-price { color:#15351f; }
+  .cost-hour.cost-hour-current .cost-muted { color:#477157; }
+  .cost-hour.cost-hour-current .cost-hour-cents,
+  .cost-hour.cost-hour-current .cost-online { color:#176b37; }
+  .cost-current-label { float:right; color:#176b37; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
   .cost-hour b { color:#fff; }
   .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }
   .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }
@@ -146,6 +156,12 @@
     if (expanded) scope.expandedCostRows[key] = true;
     else delete scope.expandedCostRows[key];
     row.expanded = expanded;
+  };
+
+  scope.isCurrentCostHour = function(hour) {
+    var intervalStart = new Date(hour && hour.intervalStart).getTime();
+    var now = Date.now();
+    return Number.isFinite(intervalStart) && intervalStart <= now && now < intervalStart + 60 * 60 * 1000;
   };
 
   scope.$watch("msg", function(msg) {
@@ -316,7 +332,8 @@
         <tr class="cost-hours" ng-repeat-end ng-if="row.expanded">
           <td colspan="8"><div class="cost-hours-inner">
             <div class="cost-hour-grid">
-              <div class="cost-hour" ng-repeat="hour in row.hours">
+              <div class="cost-hour" ng-class="{'cost-hour-current':isCurrentCostHour(hour)}" ng-repeat="hour in row.hours">
+                <span class="cost-current-label" ng-if="isCurrentCostHour(hour)">aktuelle Stunde</span>
                 <b>{{hour.time}} Uhr</b><br>
                 <span ng-if="hour.recorded">
                   Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh
@@ -334,9 +351,9 @@
                   <span class="cost-muted">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>
                 </span>
                 <span ng-if="hour.recorded">
-                  Energie: <span ng-class="{'cost-offline':hour.energyStatus!=='online'}">{{hour.energyStatus}}</span> ·
-                  Wetter: <span ng-class="{'cost-offline':hour.weatherStatus!=='online'}">{{hour.weatherStatus}}</span> ·
-                  Tarif: <span ng-class="{'cost-offline':hour.tariffStatus!=='online'}">{{hour.tariffStatus}}</span>
+                  Energie: <span ng-class="{'cost-online':hour.energyStatus==='online','cost-offline':hour.energyStatus!=='online'}">{{hour.energyStatus}}</span> ·
+                  Wetter: <span ng-class="{'cost-online':hour.weatherStatus==='online','cost-offline':hour.weatherStatus!=='online'}">{{hour.weatherStatus}}</span> ·
+                  Tarif: <span ng-class="{'cost-online':hour.tariffStatus==='online','cost-offline':hour.tariffStatus!=='online'}">{{hour.tariffStatus}}</span>
                 </span>
                 <span ng-if="!hour.recorded">{{hour.status}}</span>
               </div>
