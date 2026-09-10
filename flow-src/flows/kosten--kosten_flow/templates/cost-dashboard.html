@@ -97,7 +97,16 @@
 <script>
 (function(scope) {
   scope.view = scope.view || { period: "month", tariff: null, history: null };
+  scope.expandedCostRows = scope.expandedCostRows || {};
   var layoutTimers = [];
+
+  function restoreExpandedCostRows(history) {
+    if (!history || !Array.isArray(history.rows)) return history;
+    history.rows.forEach(function(row) {
+      row.expanded = Boolean(scope.expandedCostRows[String(row.key)]);
+    });
+    return history;
+  }
 
   function configureCostContainer() {
     var card = document.querySelector(".cost-card");
@@ -131,6 +140,14 @@
     scheduleCostLayoutRefresh();
   };
 
+  scope.toggleCostRow = function(row) {
+    var key = String(row.key);
+    var expanded = !scope.expandedCostRows[key];
+    if (expanded) scope.expandedCostRows[key] = true;
+    else delete scope.expandedCostRows[key];
+    row.expanded = expanded;
+  };
+
   scope.$watch("msg", function(msg) {
     if (!msg || !msg.payload) return;
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
@@ -142,7 +159,7 @@
       scope.view.tariff = msg.payload;
     }
     if (msg.topic === "history/dashboard/result") {
-      scope.view.history = msg.payload;
+      scope.view.history = restoreExpandedCostRows(msg.payload);
       scope.view.period = msg.payload.period || scope.view.period;
       scheduleCostLayoutRefresh();
     }
@@ -184,14 +201,14 @@
       <div class="cost-kpi-note">reiner Börsenpreis, ohne Gebühren</div>
     </div>
     <div class="cost-kpi secondary">
-      <div class="cost-kpi-label">Netzbezug jetzt</div>
-      <div class="cost-kpi-value">{{view.history.live.gridImportWatt | number:0}} W</div>
-      <div class="cost-kpi-note">Momentanleistung aus dem Stromnetz</div>
+      <div class="cost-kpi-label">Hausleistung jetzt</div>
+      <div class="cost-kpi-value">{{view.history.live.houseConsumptionWatt | number:0}} W</div>
+      <div class="cost-kpi-note">Netz {{view.history.live.gridImportWatt | number:0}} W · PV {{view.history.live.pvPowerWatt | number:0}} W</div>
     </div>
     <div class="cost-kpi secondary">
-      <div class="cost-kpi-label">Kosten bei aktueller Leistung</div>
-      <div class="cost-kpi-value">{{view.history.live.costPerHourEur | currency:'€':4}} / h</div>
-      <div class="cost-kpi-note">wenn der Netzbezug eine Stunde gleich bleibt</div>
+      <div class="cost-kpi-label">Verbrauchswert bei aktueller Hausleistung</div>
+      <div class="cost-kpi-value">{{view.history.live.energyValuePerHourEur | currency:'€':4}} / h</div>
+      <div class="cost-kpi-note">Netzkosten aktuell {{view.history.live.gridImportCostPerHourEur | currency:'€':4}} / h</div>
     </div>
     <div class="cost-kpi">
       <div class="cost-kpi-label">Verbrauchswert im Zeitraum</div>
@@ -279,7 +296,7 @@
         <tr><th>Zeitraum</th><th>Hausverbrauch</th><th>Netzbezug</th><th>PV-Erzeugung</th><th>Verbrauchswert</th><th>Netzkosten</th><th>Wetter</th><th>Daten</th></tr>
       </thead>
       <tbody>
-        <tr class="cost-row" ng-repeat-start="row in view.history.rows" ng-click="row.expanded=!row.expanded">
+        <tr class="cost-row" ng-repeat-start="row in view.history.rows" ng-click="toggleCostRow(row)">
           <td><span class="cost-expand">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>
           <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
           <td>{{row.gridImportKWh | number:3}} kWh</td>

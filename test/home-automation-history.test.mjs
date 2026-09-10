@@ -121,6 +121,10 @@ test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", ()
   assert.ok(dashboard.payload.totals.energyCostEur > dashboard.payload.totals.gridImportCostEur);
   assert.ok(dashboard.payload.rows.some((row) => row.hours.some((hour) => hour.recorded)));
   assert.equal(dashboard.payload.live.priceCtPerKWh, 10);
+  assert.equal(dashboard.payload.live.houseConsumptionWatt, 1500);
+  assert.equal(dashboard.payload.live.gridImportWatt, 1000);
+  assert.ok(Math.abs(dashboard.payload.live.energyValuePerHourEur - 0.15) < 1e-12);
+  assert.ok(Math.abs(dashboard.payload.live.gridImportCostPerHourEur - 0.1) < 1e-12);
   assert.equal(dashboard.payload.latestReconciliation.quality, "partial-day");
   assert.equal(dashboard.payload.latestReconciliation.meterImportKWh, 0.25);
   assert.equal(dashboard.payload.latestReconciliation.meterExportKWh, 0.5);

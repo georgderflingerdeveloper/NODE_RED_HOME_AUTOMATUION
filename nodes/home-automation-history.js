@@ -611,6 +611,8 @@ module.exports = function registerHistoryStore(RED) {
       const energy = diagnostics.find((item) => item.source === "energy");
       const priceCtPerKWh = tariff?.payload?.priceCtPerKWh ?? null;
       const gridImportWatt = finite(energy?.payload?.GridImportWatt);
+      const houseConsumptionWatt = finite(energy?.payload?.HouseConsumptionWatt);
+      const priceEurPerKWh = priceCtPerKWh === null ? null : priceCtPerKWh / 100;
       return {
         schemaVersion: 1,
         generatedAt: new Date().toISOString(),
@@ -637,9 +639,10 @@ module.exports = function registerHistoryStore(RED) {
         live: {
           priceCtPerKWh,
           gridImportWatt,
-          houseConsumptionWatt: finite(energy?.payload?.HouseConsumptionWatt),
+          houseConsumptionWatt,
           pvPowerWatt: finite(energy?.payload?.PvPowerWatt),
-          costPerHourEur: priceCtPerKWh === null ? null : (gridImportWatt / 1000) * (priceCtPerKWh / 100),
+          energyValuePerHourEur: priceEurPerKWh === null ? null : (houseConsumptionWatt / 1000) * priceEurPerKWh,
+          gridImportCostPerHourEur: priceEurPerKWh === null ? null : (gridImportWatt / 1000) * priceEurPerKWh,
         },
         rows,
         reconciliations,

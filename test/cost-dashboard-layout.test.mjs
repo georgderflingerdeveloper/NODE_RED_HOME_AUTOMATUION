@@ -62,3 +62,21 @@ test("Kosten-Dashboard zeigt den SolarEdge-Tagesanker und lädt ihn nach Zähler
   assert.match(template, /unterschiedliche Zeitfenster/);
   assert.match(template, /history\/solaredge-meter-totals\/result/);
 });
+
+test("Kosten-Dashboard zeigt die Hausleistung und trennt Verbrauchswert von Netzkosten", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /Hausleistung jetzt/);
+  assert.match(template, /view\.history\.live\.houseConsumptionWatt/);
+  assert.match(template, /view\.history\.live\.energyValuePerHourEur/);
+  assert.match(template, /view\.history\.live\.gridImportCostPerHourEur/);
+});
+
+test("Kosten-Dashboard hält geöffnete Detailzeilen bei Aktualisierungen offen", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /scope\.expandedCostRows = scope\.expandedCostRows \|\| \{\}/);
+  assert.match(template, /restoreExpandedCostRows\(msg\.payload\)/);
+  assert.match(template, /scope\.expandedCostRows\[String\(row\.key\)\]/);
+  assert.match(template, /ng-click="toggleCostRow\(row\)"/);
+});
