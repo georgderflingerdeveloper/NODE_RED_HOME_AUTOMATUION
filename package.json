@@ -1,7 +1,7 @@
 {
     "name": "node-red-project",
     "description": "GEORGSHOME Home Automation",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "private": true,
     "homeAutomation": {
         "branchPurposes": {
@@ -22,6 +22,9 @@
         "history:install": "npm run nodes:install",
         "history:restore": "node tools/restore-history-db.mjs",
         "flow:deploy": "npm run nodes:install && npm run library:install && node tools/flow-source/deploy.mjs",
+        "version:patch": "node tools/bump-version.mjs patch",
+        "version:minor": "node tools/bump-version.mjs minor",
+        "version:major": "node tools/bump-version.mjs major",
         "test": "node --test test/*.test.mjs"
     },
     "engines": {

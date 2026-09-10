@@ -11,7 +11,7 @@ nicht committete Änderungen ohne Terminal sofort erkennbar.
 1. `home-automation-project-info` liest ausschließlich lokale Metadaten.
 2. Der nur lesende Endpunkt `/home-automation/project-info` stellt diese
    ungefährlichen Versionsdaten dem Dashboard bereit.
-3. `version-und-kurzinfo.html` liest den Endpunkt beim Laden und jede Minute,
+3. `project-version-and-branch-info.html` liest den Endpunkt beim Laden und jede Minute,
    setzt Version, Branch und den Info-Schalter in die oberste
    Dashboard-Statusleiste und zeigt den aufklappbaren Überblick.
 
@@ -43,7 +43,14 @@ Die App-Version folgt `MAJOR.MINOR.PATCH`:
 - `MINOR`: neue wartbare Funktion;
 - `PATCH`: Fehlerbehebung ohne geänderte Bedienlogik.
 
-Die Passwortverwaltung und Projektinformation bilden Version `0.1.0`.
+Die SolarEdge-Energiebilanz und die erweiterte Projektinformation bilden
+Version `0.2.0`.
+
+Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
+stehen `npm run version:patch`, `npm run version:minor` und
+`npm run version:major` bereit. Installationspakete müssen `package.json`
+mitführen, damit die sichtbare Versionsnummer dem tatsächlich installierten
+Stand entspricht.
 
 ## Branch-Kurzinfo pflegen
 
@@ -64,5 +71,5 @@ So kann ein neuer Branch beschrieben werden, ohne Dashboard- oder Node-Code zu
 
 Neue Metadaten werden zuerst in
 `nodes/home-automation-project-info-core.cjs` ergänzt. Die Darstellung bleibt in
-`flow-src/flows/system--system_dashboard_flow/templates/version-und-kurzinfo.html`.
-Für jede neue Erkennung ist ein Test in `test/project-info.test.mjs` hinzuzufügen.
+`flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html`.
+Für jede neue Erkennung ist ein Test in `test/home-automation-project-info.test.mjs` hinzuzufügen.

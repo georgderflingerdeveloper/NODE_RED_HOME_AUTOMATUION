@@ -70,15 +70,43 @@ der Metadatenzeile `// nodeId:` erhalten.
 | `npm run library:install` | versionierte Functions nach `~/.node-red/lib/functions/HOMEAUTOMATION_NG/` installieren |
 | `npm run nodes:install` | eigene Datenbank- und Tresorknoten nach `~/.node-red/nodes/` installieren |
 | `npm run flow:deploy` | validiertes `flows.json` lokal zu Node-RED deployen |
+| `npm run version:patch` | Version für eine Fehlerkorrektur erhöhen |
+| `npm run version:minor` | Version für eine neue kompatible Funktion erhöhen |
+| `npm run version:major` | Version für eine inkompatible Änderung erhöhen |
 
 Die gleichen Befehle sind in VS Code unter **Terminal → Task ausführen** verfügbar.
+
+## Verbindliche Versionierung
+
+Jeder Commit, Patch und jedes andere ausgelieferte Änderungspaket erhält eine
+neue Version in `package.json`. Die Version wird vor der abschließenden Prüfung
+genau einmal erhöht:
+
+- Fehlerkorrektur oder kleine Wartungsänderung: `npm run version:patch`;
+- neue rückwärtskompatible Funktion: `npm run version:minor`;
+- inkompatible Änderung an Flows, Schnittstellen oder Daten: `npm run version:major`.
+
+Ein Installationspaket muss die aktualisierte `package.json` enthalten und in
+das aktive Projekt kopieren. Dadurch zeigt der Dashboard-Kopf nach dem
+Node-RED-Neustart immer den ausgelieferten Stand. Die nächste Änderung nach
+Version `0.2.0` beginnt somit mit mindestens `0.2.1`.
+
+Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
+`NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und
+`NODE_RED_PASSWORD` automatisch ein kurzlebiges Zugriffstoken an. Zugangsdaten
+werden nicht in Git gespeichert. Ein bereits aktualisiertes aktives Projekt kann
+alternativ mit `node-red-restart` neu geladen werden.
 
 ## Einen Function-Node bearbeiten
 
 1. Die Node-ID im Node-RED-Editor ablesen.
 2. In VS Code global nach der ID suchen.
 3. Die gefundene Datei unter `flow-src/**/functions/` bearbeiten.
-4. Einen Test unter `test/NAME.test.mjs` ergänzen.
+4. Einen Test unter `test/FUNCTION-NAME.test.mjs` ergänzen. Der englische
+   Dateiname muss exakt dem Namen der JavaScript-Datei entsprechen, zum Beispiel
+   `provide-weather-automation-data.js` und
+   `provide-weather-automation-data.test.mjs`. Alle direkten Tests derselben
+   Function gehören in diese eine Testdatei.
 5. `npm test` ausführen.
 6. `npm run flow:import` ausführen.
 7. `npm run flow:check` und `npm run flow:roundtrip` ausführen.
@@ -142,11 +170,11 @@ sicherste Oberfläche.
 Architektur, Zustände, Nachrichtenschnittstelle und Erweiterungsregeln der
 Passwortverwaltung stehen in [`SYSTEM_CREDENTIAL_VAULT.md`](SYSTEM_CREDENTIAL_VAULT.md).
 Änderungen am Tresor müssen die dort beschriebenen Sicherheitsregeln und die
-Tests in `test/system-credential-vault.test.mjs` einhalten.
+Tests in `test/home-automation-credential-vault-core.test.mjs` und
+`test/home-automation-credential-vault.test.mjs` einhalten.
 
 ## Projekt- und Versionsinformation
 
 Die Herkunft von App-Version, aktivem Projekt, Branch und Commit sowie die
 Regeln zur Erweiterung stehen in
 [`PROJECT_VERSION_INFO.md`](PROJECT_VERSION_INFO.md).
-
