@@ -48,6 +48,8 @@ Version `0.2.0`. Der anbieterunabhängige Flow `ENERGY_FORECAST` und die globale
 Automationsstruktur `EnergyForecastData` bilden Version `0.3.0`.
 Der kompatible Installer mit englischen Source-Dateinamen und aktualisierten
 Bestandstests bildet Patch-Version `0.3.1`.
+Die sichtbare Von-bis-Datumsangabe für den ausgewählten Kostenzeitraum bildet
+Patch-Version `0.3.2`.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

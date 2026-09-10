@@ -72,6 +72,18 @@ test("Kosten-Dashboard zeigt die Hausleistung und trennt Verbrauchswert von Netz
   assert.match(template, /view\.history\.live\.gridImportCostPerHourEur/);
 });
 
+test("Verbrauchswert zeigt den ausgewählten Zeitraum mit Von- und Bis-Datum", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+
+  assert.match(template, /scope\.costPeriodDateRange = function\(history\)/);
+  assert.match(template, /history\.range\.from/);
+  assert.match(template, /history\.range\.to/);
+  assert.match(template, /exclusiveTo\.getTime\(\) - 1/);
+  assert.match(template, /timeZone: "Europe\/Vienna"/);
+  assert.match(template, /"von " \+ formatter\.format\(from\) \+ " bis "/);
+  assert.match(template, /\{\{costPeriodDateRange\(view\.history\)\}\}/);
+});
+
 test("Kosten-Dashboard hält geöffnete Detailzeilen bei Aktualisierungen offen", () => {
   const template = fs.readFileSync(templatePath, "utf8");
 

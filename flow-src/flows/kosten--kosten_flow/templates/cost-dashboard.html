@@ -16,6 +16,7 @@
   .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }
   .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }
   .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
+  .cost-kpi-range { margin-top:7px; padding-top:6px; border-top:1px solid rgba(255,255,255,.22); color:#d6f5f7; font-size:11px; font-weight:700; }
   .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
   .cost-info b { color:#fff; }
   .cost-forecast { margin-bottom:14px; padding:14px; border:1px solid #477579; border-radius:12px; background:#1b3234; }
@@ -204,6 +205,20 @@
     };
   };
 
+  scope.costPeriodDateRange = function(history) {
+    var from = new Date(history && history.range && history.range.from);
+    var exclusiveTo = new Date(history && history.range && history.range.to);
+    if (!Number.isFinite(from.getTime()) || !Number.isFinite(exclusiveTo.getTime())) return "Zeitraum noch nicht verfügbar";
+    var inclusiveTo = new Date(exclusiveTo.getTime() - 1);
+    var formatter = new Intl.DateTimeFormat("de-AT", {
+      timeZone: "Europe/Vienna",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+    return "von " + formatter.format(from) + " bis " + formatter.format(inclusiveTo);
+  };
+
   scope.$watch("msg", function(msg) {
     if (!msg || !msg.payload) return;
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
@@ -277,6 +292,7 @@
         {{view.history.totals.energyCostEur * 100 | number:2}} ct ·
         {{view.history.totals.houseConsumptionKWh | number:3}} kWh Hausenergie
       </div>
+      <div class="cost-kpi-range">{{costPeriodDateRange(view.history)}}</div>
     </div>
   </div>
 
