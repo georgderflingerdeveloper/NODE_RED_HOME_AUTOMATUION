@@ -104,3 +104,20 @@ test("Hausleistungsanzeige besitzt einen begrenzten Grün-Gelb-Rot-Verlauf bis 1
   assert.match(template, /linear-gradient\(135deg,hsl/);
   assert.match(template, /ng-style="housePowerStyle\(view\.history\.live\.houseConsumptionWatt\)"/);
 });
+
+test("Kosten-Dashboard zeigt den provider-neutralen Prognosevertrag", () => {
+  const template = fs.readFileSync(templatePath, "utf8");
+  const nodes = JSON.parse(fs.readFileSync(nodesPath, "utf8"));
+  const templateNode = nodes.find((node) => node.id === "kosten_dashboard_template");
+  const router = nodes.find((node) => node.id === "kosten_dashboard_request_router");
+
+  assert.match(template, /PROGNOSE · Anbieterunabhängige Automationsdaten/);
+  assert.match(template, /ProviderOnline/);
+  assert.match(template, /EstimatedCostCheap/);
+  assert.match(template, /EstimatedCostExpensive/);
+  assert.match(template, /NotAvailable/);
+  assert.match(template, /energy\/forecast\/read/);
+  assert.match(template, /energy\/forecast\/result/);
+  assert.deepEqual(templateNode.wires, [["kosten_dashboard_request_router"]]);
+  assert.deepEqual(router.wires, [["kosten_history_query_out"], ["kosten_forecast_query_out"]]);
+});

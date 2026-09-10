@@ -72,7 +72,8 @@
       [
         "kosten_tarif_debug",
         "kosten_dashboard_template",
-        "kosten_history_out"
+        "kosten_history_out",
+        "kosten_forecast_provider_out"
       ]
     ]
   },
@@ -103,18 +104,18 @@
     "width": 0,
     "height": 0,
     "format": {
-      "$flowSource": "flows/kosten--kosten_flow/templates/kostenubersicht.html"
+      "$flowSource": "flows/kosten--kosten_flow/templates/cost-dashboard.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": false,
     "resendOnRefresh": true,
     "templateScope": "local",
     "className": "",
-    "x": 960,
-    "y": 420,
+    "x": 990,
+    "y": 180,
     "wires": [
       [
-        "kosten_history_query_out"
+        "kosten_dashboard_request_router"
       ]
     ]
   },
@@ -203,6 +204,125 @@
     "wires": [
       [
         "kosten_dashboard_template"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_forecast_provider_out",
+    "type": "link out",
+    "z": "kosten_flow",
+    "name": "NORMALIZED TARIFF TO FORECAST",
+    "mode": "link",
+    "links": [
+      "energy_forecast_provider_in"
+    ],
+    "x": 1010,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "kosten_dashboard_request_router",
+    "type": "function",
+    "z": "kosten_flow",
+    "name": "Route cost dashboard request",
+    "func": {
+      "$flowSource": "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js"
+    },
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1190,
+    "y": 180,
+    "wires": [
+      [
+        "kosten_history_query_out"
+      ],
+      [
+        "kosten_forecast_query_out"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_forecast_query_out",
+    "type": "link out",
+    "z": "kosten_flow",
+    "name": "READ ENERGY FORECAST",
+    "mode": "link",
+    "links": [
+      "energy_forecast_read_in"
+    ],
+    "x": 1450,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "kosten_forecast_result_in",
+    "type": "link in",
+    "z": "kosten_flow",
+    "name": "ENERGY FORECAST TO COST DASHBOARD",
+    "links": [
+      "energy_forecast_dashboard_out"
+    ],
+    "x": 745,
+    "y": 340,
+    "wires": [
+      [
+        "kosten_dashboard_template"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_forecast_provider_catch",
+    "type": "catch",
+    "z": "kosten_flow",
+    "name": "Tariff provider unavailable",
+    "scope": [
+      "kosten_awattar_api",
+      "kosten_aktuellen_tarif_aufbereiten"
+    ],
+    "uncaught": false,
+    "x": 250,
+    "y": 420,
+    "wires": [
+      [
+        "kosten_forecast_provider_offline"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_forecast_provider_offline",
+    "type": "change",
+    "z": "kosten_flow",
+    "name": "Normalize unavailable tariff provider",
+    "rules": [
+      {
+        "t": "set",
+        "p": "topic",
+        "pt": "msg",
+        "to": "energy/forecast/provider",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "{\"provider\":\"aWATTar\",\"online\":false,\"slots\":[]}",
+        "tot": "json"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 550,
+    "y": 420,
+    "wires": [
+      [
+        "kosten_forecast_provider_out"
       ]
     ]
   }

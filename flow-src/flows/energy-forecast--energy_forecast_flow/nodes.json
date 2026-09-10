@@ -1,0 +1,149 @@
+[
+  {
+    "id": "energy_forecast_comment",
+    "type": "comment",
+    "z": "energy_forecast_flow",
+    "name": "PROVIDER-NEUTRAL ENERGY FORECAST · GLOBAL AUTOMATION CONTRACT",
+    "info": "Input adapters provide normalized price slots. The flow publishes global EnergyForecastData. Future AI layers extend Extensions.AI without changing provider adapters or dashboard consumers.",
+    "x": 430,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "energy_forecast_provider_in",
+    "type": "link in",
+    "z": "energy_forecast_flow",
+    "name": "NORMALIZED PROVIDER DATA IN",
+    "links": [
+      "kosten_forecast_provider_out"
+    ],
+    "x": 155,
+    "y": 140,
+    "wires": [
+      [
+        "energy_forecast_build"
+      ]
+    ]
+  },
+  {
+    "id": "energy_forecast_build",
+    "type": "function",
+    "z": "energy_forecast_flow",
+    "name": "Build provider-neutral energy forecast",
+    "func": {
+      "$flowSource": "flows/energy-forecast--energy_forecast_flow/functions/build-provider-neutral-energy-forecast.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 450,
+    "y": 140,
+    "wires": [
+      [
+        "energy_forecast_dashboard_out",
+        "energy_forecast_debug"
+      ]
+    ]
+  },
+  {
+    "id": "energy_forecast_read_in",
+    "type": "link in",
+    "z": "energy_forecast_flow",
+    "name": "FORECAST READ REQUEST IN",
+    "links": [
+      "kosten_forecast_query_out"
+    ],
+    "x": 155,
+    "y": 240,
+    "wires": [
+      [
+        "energy_forecast_read"
+      ]
+    ]
+  },
+  {
+    "id": "energy_forecast_refresh",
+    "type": "inject",
+    "z": "energy_forecast_flow",
+    "name": "Refresh forecast state every minute",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "60",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "4",
+    "topic": "energy/forecast/read",
+    "payload": "",
+    "payloadType": "date",
+    "x": 210,
+    "y": 300,
+    "wires": [
+      [
+        "energy_forecast_read"
+      ]
+    ]
+  },
+  {
+    "id": "energy_forecast_read",
+    "type": "function",
+    "z": "energy_forecast_flow",
+    "name": "Read energy forecast data",
+    "func": {
+      "$flowSource": "flows/energy-forecast--energy_forecast_flow/functions/read-energy-forecast-data.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 460,
+    "y": 240,
+    "wires": [
+      [
+        "energy_forecast_dashboard_out",
+        "energy_forecast_debug"
+      ]
+    ]
+  },
+  {
+    "id": "energy_forecast_dashboard_out",
+    "type": "link out",
+    "z": "energy_forecast_flow",
+    "name": "ENERGY FORECAST TO DASHBOARD",
+    "mode": "link",
+    "links": [
+      "kosten_forecast_result_in"
+    ],
+    "x": 790,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "energy_forecast_debug",
+    "type": "debug",
+    "z": "energy_forecast_flow",
+    "name": "EnergyForecastData",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 720,
+    "y": 280,
+    "wires": []
+  }
+]

@@ -88,8 +88,10 @@ genau einmal erhöht:
 
 Ein Installationspaket muss die aktualisierte `package.json` enthalten und in
 das aktive Projekt kopieren. Dadurch zeigt der Dashboard-Kopf nach dem
-Node-RED-Neustart immer den ausgelieferten Stand. Die nächste Änderung nach
-Version `0.2.0` beginnt somit mit mindestens `0.2.1`.
+Node-RED-Neustart immer den ausgelieferten Stand. Der provider-neutrale
+Forecast-Flow beginnt mit Version `0.3.0`; die nächste Korrektur ist mindestens
+Version `0.3.1`. Diese Patch-Version aktualisiert auch ältere Projekttests auf
+die englischen Dashboard-Source-Dateinamen.
 
 Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
 `NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und

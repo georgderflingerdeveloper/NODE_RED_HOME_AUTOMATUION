@@ -111,7 +111,7 @@ vorhandenen persönlichen Dateien direkt unter `~/.node-red/lib/functions/` werd
 nicht verändert.
 
 Ordner und JavaScript-Dateien verwenden ausschließlich verständliche Namen, zum
-Beispiel `wetter/wetterdaten-prufen-und-payload-aufbauen.js`. Bei identischen
+Beispiel `wetter/validate-weather-data-and-build-payload.js`. Bei identischen
 Function-Namen im selben Flow wird stabil mit `-2`, `-3` usw. unterschieden.
 Technische Node-IDs stehen nur in den unsichtbaren Metadaten zur sicheren Zuordnung.
 
@@ -164,6 +164,14 @@ Cent dargestellt. Fehlende oder veraltete Quellen werden als `offline`
 gespeichert und im Dashboard unter `Service- und Fehlerdiagnose` angezeigt. Die
 Tabellen `source_state` und `hourly_snapshots` sind für eine direkte technische
 Prüfung mit jedem SQLite-Werkzeug lesbar.
+
+Der eigenständige Flow `ENERGY_FORECAST` stellt zusätzlich die
+anbieterunabhängige globale Struktur `EnergyForecastData` bereit. Andere
+Automationen lesen damit `ProviderOnline`, `EstimatedCostCheap`,
+`EstimatedCostExpensive` und `NotAvailable`, ohne den konkreten Tarifanbieter zu
+kennen. Schnittstelle und spätere KI-Erweiterung sind in
+[`docs/ENERGY_FORECAST_AUTOMATION.md`](docs/ENERGY_FORECAST_AUTOMATION.md)
+beschrieben.
 
 Vor einer Wiederherstellung Node-RED beenden und den Vorgang zunächst prüfen:
 

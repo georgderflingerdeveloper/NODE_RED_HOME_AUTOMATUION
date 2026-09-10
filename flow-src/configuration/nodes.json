@@ -2448,5 +2448,13 @@
     "width": "18",
     "collapse": false,
     "className": ""
+  },
+  {
+    "id": "energy_forecast_flow",
+    "type": "tab",
+    "label": "ENERGY_FORECAST",
+    "disabled": false,
+    "info": "Provider-neutral energy price forecast and global automation state EnergyForecastData.",
+    "env": []
   }
 ]

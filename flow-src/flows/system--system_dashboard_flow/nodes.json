@@ -145,7 +145,7 @@
     "width": 0,
     "height": 0,
     "format": {
-      "$flowSource": "flows/system--system_dashboard_flow/templates/version-branch-und-kurzinfo.html"
+      "$flowSource": "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html"
     },
     "storeOutMessages": true,
     "fwdInMessages": false,

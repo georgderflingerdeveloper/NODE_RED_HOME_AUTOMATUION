@@ -18,6 +18,18 @@
   .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
   .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
   .cost-info b { color:#fff; }
+  .cost-forecast { margin-bottom:14px; padding:14px; border:1px solid #477579; border-radius:12px; background:#1b3234; }
+  .cost-forecast-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .cost-forecast-title { color:#fff; font-size:16px; font-weight:700; }
+  .cost-forecast-grid { display:grid; grid-template-columns:repeat(4,minmax(145px,1fr)); gap:9px; }
+  .cost-forecast-field { padding:10px; border-radius:9px; background:#233f42; }
+  .cost-forecast-field span { display:block; color:#a5c4c6; font-size:10px; text-transform:uppercase; }
+  .cost-forecast-field b { display:block; margin-top:5px; color:#fff; font-size:15px; }
+  .cost-forecast-field b.true { color:#8df0ae; }
+  .cost-forecast-field b.false { color:#9bb5b8; }
+  .cost-forecast-recommendation { margin-top:10px; padding:10px; border-left:4px solid #58c77d; color:#cfe8d7; background:#203c33; font-weight:700; }
+  .cost-forecast-recommendation.expensive { border-left-color:#ff7a68; color:#ffd1c9; background:#412b29; }
+  .cost-forecast-recommendation.unavailable { border-left-color:#e6bb5a; color:#f3ddb0; background:#3f3928; }
   .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid #0f8e96; border-radius:12px; background:#183638; }
   .cost-anchor-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px; }
   .cost-anchor-title { color:#fff; font-weight:700; }
@@ -65,6 +77,7 @@
   @media(max-width:900px) {
     .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }
     .cost-head { grid-template-columns:repeat(2,1fr); }
+    .cost-forecast-grid { grid-template-columns:repeat(2,1fr); }
     .cost-anchor-grid { grid-template-columns:repeat(2,1fr); }
     .cost-diagnostics { grid-template-columns:1fr; }
   }
@@ -78,6 +91,7 @@
     .cost-periods { display:grid; grid-template-columns:repeat(3,1fr); width:100%; box-sizing:border-box; }
     .cost-periods button { min-width:0; padding:9px 4px; }
     .cost-head { grid-template-columns:1fr; gap:8px; }
+    .cost-forecast-grid { grid-template-columns:1fr; }
     .cost-anchor-grid { grid-template-columns:1fr; }
     .cost-kpi { padding:12px; }
     .cost-kpi-value { font-size:22px; }
@@ -107,7 +121,7 @@
 
 <script>
 (function(scope) {
-  scope.view = scope.view || { period: "month", tariff: null, history: null };
+  scope.view = scope.view || { period: "month", tariff: null, history: null, forecast: null };
   scope.expandedCostRows = scope.expandedCostRows || {};
   var layoutTimers = [];
 
@@ -151,6 +165,17 @@
     scheduleCostLayoutRefresh();
   };
 
+  function requestEnergyForecast() {
+    scope.send({ topic: "energy/forecast/read", payload: {} });
+  }
+
+  scope.forecastRecommendation = function(forecast) {
+    if (!forecast || forecast.NotAvailable) return "Keine belastbare Preisprognose – Automatisierung verwendet ihre sichere Rückfalleinstellung.";
+    if (forecast.EstimatedCostCheap) return "Günstiges Preisfenster – verschiebbare Verbraucher können bevorzugt freigegeben werden.";
+    if (forecast.EstimatedCostExpensive) return "Teures Preisfenster – verschiebbare Verbraucher möglichst zurückstellen.";
+    return "Normales Preisfenster – keine kostenbedingte Umschaltung erforderlich.";
+  };
+
   scope.toggleCostRow = function(row) {
     var key = String(row.key);
     var expanded = !scope.expandedCostRows[key];
@@ -183,6 +208,7 @@
     if (!msg || !msg.payload) return;
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
       scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
+      requestEnergyForecast();
       scheduleCostLayoutRefresh();
       return;
     }
@@ -193,6 +219,9 @@
       scope.view.history = restoreExpandedCostRows(msg.payload);
       scope.view.period = msg.payload.period || scope.view.period;
       scheduleCostLayoutRefresh();
+    }
+    if (msg.topic === "energy/forecast/result") {
+      scope.view.forecast = msg.payload;
     }
     if (msg.topic === "history/solaredge-meter-totals/result") {
       scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
@@ -256,6 +285,53 @@
     aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen
     nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.
     Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.
+  </div>
+
+  <div class="cost-forecast" ng-if="view.forecast">
+    <div class="cost-forecast-head">
+      <span class="cost-forecast-title">PROGNOSE · Anbieterunabhängige Automationsdaten</span>
+      <span class="cost-badge" ng-class="view.forecast.ProviderOnline ? 'online' : 'offline'">
+        {{view.forecast.ProviderOnline ? 'Provider online' : 'nicht verfügbar'}}
+      </span>
+    </div>
+    <div class="cost-forecast-grid">
+      <div class="cost-forecast-field">
+        <span>ProviderOnline · {{view.forecast.Provider.Name}}</span>
+        <b ng-class="view.forecast.ProviderOnline ? 'true' : 'false'">{{view.forecast.ProviderOnline}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>EstimatedCostCheap</span>
+        <b ng-class="view.forecast.EstimatedCostCheap ? 'true' : 'false'">{{view.forecast.EstimatedCostCheap}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>EstimatedCostExpensive</span>
+        <b ng-class="view.forecast.EstimatedCostExpensive ? 'true' : 'false'">{{view.forecast.EstimatedCostExpensive}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>NotAvailable</span>
+        <b ng-class="view.forecast.NotAvailable ? 'true' : 'false'">{{view.forecast.NotAvailable}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>Aktueller Prognosepreis</span>
+        <b>{{view.forecast.Current ? (view.forecast.Current.PriceCtPerKWh | number:3) + ' ct/kWh' : '—'}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>Günstig bis</span>
+        <b>{{view.forecast.Thresholds.CheapCtPerKWh === null ? '—' : (view.forecast.Thresholds.CheapCtPerKWh | number:3) + ' ct/kWh'}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>Teuer ab</span>
+        <b>{{view.forecast.Thresholds.ExpensiveCtPerKWh === null ? '—' : (view.forecast.Thresholds.ExpensiveCtPerKWh | number:3) + ' ct/kWh'}}</b>
+      </div>
+      <div class="cost-forecast-field">
+        <span>KI-Erweiterung</span>
+        <b>{{view.forecast.Extensions.AI.Status}}</b>
+      </div>
+    </div>
+    <div class="cost-forecast-recommendation"
+         ng-class="{'expensive':view.forecast.EstimatedCostExpensive,'unavailable':view.forecast.NotAvailable}">
+      {{forecastRecommendation(view.forecast)}}
+    </div>
   </div>
 
   <div class="cost-anchor" ng-if="view.history.latestReconciliation">
