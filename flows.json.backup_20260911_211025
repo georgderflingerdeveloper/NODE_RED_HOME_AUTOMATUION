@@ -10575,37 +10575,19 @@
         "wires": []
     },
     {
-        "id": "lightcontrollerkitchen",
+        "id": "e21323f858eaca3d",
         "type": "function",
         "z": "0d664d3204146a72",
-        "name": "LightControllerKitchen",
-        "func": "const lcModule = global.get(\"LightControllerKitchenModule\");\n\nif (!lcModule || typeof lcModule.LightControllerKitchen !== \"function\") {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Modul fehlt\" });\n    node.error(\"LightControllerKitchenModule ist nicht geladen. settings.js prüfen.\", msg);\n    return null;\n}\n\nlet controller = context.get(\"lightControllerKitchen\");\n\nif (!controller || typeof controller.process !== \"function\") {\n    controller = new lcModule.LightControllerKitchen();\n    context.set(\"lightControllerKitchen\", controller);\n}\n\nmsg.payload = controller.process(msg.payload || {});\n\nconst active = Array.isArray(msg.payload.ActiveLights)\n    ? msg.payload.ActiveLights.map(i => i + 1).join(\",\")\n    : \"\";\n\nif (msg.payload.ScenarioSaved) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: \"Szenario gespeichert\" });\n} else if (active) {\n    node.status({ fill: \"green\", shape: \"dot\", text: `Licht ${active}` });\n} else {\n    node.status({ fill: \"grey\", shape: \"ring\", text: \"alle aus\" });\n}\n\nreturn msg;",
+        "name": "function 1",
+        "func": "\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
-        "y": 2180,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "87853d5bc61f37ad",
-        "type": "function",
-        "z": "0d664d3204146a72",
-        "name": "LightControllerKitchen",
-        "func": "const lcModule = global.get(\"LightControllerKitchenlcModule\");\n\nif (!lcModule || typeof lcModule.LightControllerKitchen !== \"function\") {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Modul fehlt\" });\n    node.error(\"LightControllerKitchenlcModule ist nicht geladen. settings.js prüfen.\", msg);\n    return null;\n}\n\nlet controller = context.get(\"lightControllerKitchen\");\n\nif (!controller || typeof controller.process !== \"function\") {\n    controller = new lcModule.LightControllerKitchen();\n    context.set(\"lightControllerKitchen\", controller);\n}\n\nmsg.payload = controller.process(msg.payload || {});\n\nconst active = Array.isArray(msg.payload.ActiveLights)\n    ? msg.payload.ActiveLights.map(i => i + 1).join(\",\")\n    : \"\";\n\nif (msg.payload.ScenarioSaved) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: \"Szenario gespeichert\" });\n} else if (active) {\n    node.status({ fill: \"green\", shape: \"dot\", text: `Licht ${active}` });\n} else {\n    node.status({ fill: \"grey\", shape: \"ring\", text: \"alle aus\" });\n}\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 660,
-        "y": 580,
+        "x": 300,
+        "y": 840,
         "wires": [
             []
         ]

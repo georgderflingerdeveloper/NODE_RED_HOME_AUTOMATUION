@@ -10609,5 +10609,239 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "inj_lck_press_100",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Taste DRÜCKEN 100%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":true,\"DutyCycle\":100}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 400,
+        "wires": [
+            [
+                "87853d5bc61f37ad"
+            ]
+        ]
+    },
+    {
+        "id": "inj_lck_release_100",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Taste LOSLASSEN 100%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":100}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 440,
+        "wires": [
+            [
+                "87853d5bc61f37ad"
+            ]
+        ]
+    },
+    {
+        "id": "inj_lck_press_50",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Taste DRÜCKEN 50%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":true,\"DutyCycle\":50}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_release_50",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Taste LOSLASSEN 50%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":50}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_press_10",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Taste DRÜCKEN 10%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":true,\"DutyCycle\":10}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_release_10",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Taste LOSLASSEN 10%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":10}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_duty_25",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Nur DutyCycle → 25%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":25}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 710,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_duty_75",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Nur DutyCycle → 75%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":75}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 750,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_invalid_high",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Grenzwert-Test 150%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":150}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_lck_invalid_low",
+        "type": "inject",
+        "z": "0d664d3204146a72",
+        "name": "Grenzwert-Test -10%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":-10}",
+        "payloadType": "json",
+        "x": 240,
+        "y": 860,
+        "wires": [
+            []
+        ]
     }
 ]
