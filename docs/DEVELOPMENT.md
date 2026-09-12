@@ -94,6 +94,8 @@ Version `0.3.1`. Diese Patch-Version aktualisiert auch ältere Projekttests auf
 die englischen Dashboard-Source-Dateinamen.
 Die nächste Dashboard-Erweiterung mit sichtbarem Von-bis-Zeitraum ist Version
 `0.3.2`.
+Die neue rückwärtskompatible, generische Lichtsteuerung beginnt mit Version
+`0.4.0`.
 
 Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
 `NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und

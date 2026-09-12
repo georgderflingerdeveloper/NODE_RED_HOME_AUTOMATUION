@@ -1,0 +1,30 @@
+[
+  {
+    "id": "light_controller_flow",
+    "type": "tab",
+    "label": "LIGHT_CONTROLLER",
+    "disabled": false,
+    "info": "Generische Lichtsteuerungen; nur die Instanznamen sind raumspezifisch.",
+    "env": []
+  },
+  {
+    "id": "lightcontrollerkitchen",
+    "type": "function",
+    "z": "light_controller_flow",
+    "name": "LightControllerKitchen",
+    "func": {
+      "$flowSource": "flows/light-controller--light_controller_flow/functions/light-controller-kitchen.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 640,
+    "y": 160,
+    "wires": [
+      []
+    ]
+  }
+]

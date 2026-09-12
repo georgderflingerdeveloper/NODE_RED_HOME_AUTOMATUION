@@ -1,0 +1,20 @@
+[
+  {
+    "id": "lightcontrollerkitchen",
+    "type": "function",
+    "z": "",
+    "name": "LightControllerKitchen",
+    "func": "// Generische Klasse, raumspezifische Instanz.\nconst INSTANCE_NAME = \"Kitchen\";\nconst controllerModule = global.get(\"LightControllerModule\") || global.get(\"LightControllerKitchenModule\");\nconst Controller = controllerModule && (controllerModule.LightController || controllerModule.LightControllerKitchen);\n\nif (typeof Controller !== \"function\") {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"LightController-Modul fehlt\" });\n    node.error(\"LightController ist nicht geladen. settings.js und Moduldatei prüfen.\", msg);\n    return null;\n}\n\nconst defaultConfiguration = {\n    instanceName: INSTANCE_NAME,\n    inputCount: 1,\n    outputCount: 6,\n    holdTimeMs: 2000,\n    inputBindings: [{ shortAction: \"next\", longAction: \"toggle-next\" }]\n};\n\nlet configuration = flow.get(\"LightControllerKitchenConfiguration\") || defaultConfiguration;\nconfiguration = { ...configuration, instanceName: INSTANCE_NAME };\nlet fingerprint = JSON.stringify(configuration);\nlet controller = context.get(\"lightControllerKitchen\");\nlet previousFingerprint = context.get(\"lightControllerKitchenConfigurationFingerprint\");\n\nif (!controller || typeof controller.process !== \"function\" || fingerprint !== previousFingerprint) {\n    controller = new Controller(configuration);\n    context.set(\"lightControllerKitchen\", controller);\n    context.set(\"lightControllerKitchenConfigurationFingerprint\", fingerprint);\n}\n\nif (msg.topic === \"light-controller/configure\") {\n    configuration = { ...configuration, ...(msg.payload || {}), instanceName: INSTANCE_NAME };\n    controller = new Controller(configuration);\n    fingerprint = JSON.stringify(configuration);\n    flow.set(\"LightControllerKitchenConfiguration\", configuration);\n    context.set(\"lightControllerKitchen\", controller);\n    context.set(\"lightControllerKitchenConfigurationFingerprint\", fingerprint);\n    msg.payload = controller.getOutput({ event: \"configuration_changed\" });\n} else {\n    msg.payload = controller.process(msg.payload || {});\n}\n\nconst active = msg.payload.ActiveLights.map(index => index + 1).join(\",\");\nif (msg.payload.Event === \"configuration_changed\") {\n    node.status({ fill: \"blue\", shape: \"dot\", text: `Konfiguration v${msg.payload.ConfigurationVersion}` });\n} else if (msg.payload.ScenarioSaved) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: \"Szenario gespeichert\" });\n} else if (active) {\n    node.status({ fill: \"green\", shape: \"dot\", text: `${msg.payload.ScenarioName || \"Licht\"}: ${active}` });\n} else {\n    node.status({ fill: \"grey\", shape: \"ring\", text: \"alle aus\" });\n}\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 640,
+    "y": 160,
+    "wires": [
+      []
+    ]
+  }
+]

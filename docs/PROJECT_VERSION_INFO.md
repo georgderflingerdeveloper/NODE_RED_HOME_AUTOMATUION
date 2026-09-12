@@ -50,6 +50,9 @@ Der kompatible Installer mit englischen Source-Dateinamen und aktualisierten
 Bestandstests bildet Patch-Version `0.3.1`.
 Die sichtbare Von-bis-Datumsangabe für den ausgewählten Kostenzeitraum bildet
 Patch-Version `0.3.2`.
+Die generische und dynamisch konfigurierbare Lichtsteuerung bildet Version
+`0.4.0`; `LightControllerKitchen` ist ab dort ausschließlich Instanzname und
+Kompatibilitätsalias.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

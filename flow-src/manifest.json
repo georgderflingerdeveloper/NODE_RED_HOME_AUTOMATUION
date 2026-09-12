@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "79ecf9165b8465f69841671ec9c1f8e126fedb9f13600fdedda06f9f04fb7b33",
+  "flowSha256": "169b7f0576ebc9cb2829fd0a273e6b78e7e75bcc911729d1e5c48c68e8fd771e",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -524,7 +524,9 @@
     "kosten_forecast_query_out",
     "kosten_forecast_result_in",
     "kosten_forecast_provider_catch",
-    "kosten_forecast_provider_offline"
+    "kosten_forecast_provider_offline",
+    "light_controller_flow",
+    "lightcontrollerkitchen"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -835,6 +837,8 @@
     "4bc9db11.460844": "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json",
     "5138ce61.f5ce7": "flows/light-bath-all--3486c1a7.a51b3e/nodes.json",
     "8f311a56.6e0af8": "flows/light-bath-all--3486c1a7.a51b3e/nodes.json",
+    "light_controller_flow": "flows/light-controller--light_controller_flow/nodes.json",
+    "lightcontrollerkitchen": "flows/light-controller--light_controller_flow/nodes.json",
     "589874b4.69d95c": "flows/light-door-entry-left--58c186d2.cc7718/nodes.json",
     "7d276b21.d1de14": "flows/light-door-entry-left--58c186d2.cc7718/nodes.json",
     "f5edce8d.7058b": "flows/light-gallery-down--1976d7f.0dd9028/nodes.json",
@@ -1062,6 +1066,7 @@
     "kosten/route-cost-dashboard-request.js": "73e4f0bc1d15a45e077447e3819e0bc7fb7bd49cfd220c948b7b3245bf7e3d7e",
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
     "light-bath-all/light-command-bathroom-all.js": "9e29a2a2c99c414cbe6f7e65ecbd8af29381e849a14b5e5b67960fc35c7a26a5",
+    "light-controller/lightcontrollerkitchen.js": "2f925579542c8fa39613b33045198df22e21ec4cf4f3f1a9be9c0a95f0f2854f",
     "light-door-entry-left/light-door-entry-left.js": "f07f19c6e2298302ccbbbebca9f92d354f78ec6d793c1f3750e7c8c80513dd34",
     "light-gallery-down-1/light-command-gallery-down-1.js": "2afd0dc7137c5d18166d2365a021123c52763adf04da032e7d4070b452232ece",
     "light-gallery-down-2/light-command-gallery-down-2.js": "028ffdae5b8482d74d85d4654beef34cbd7bcec53f415cf59efa0df000b9b7fc",
@@ -1172,6 +1177,8 @@
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",
     "flows/light-bath-all--3486c1a7.a51b3e/nodes.json": "281f4eaba0e17e9f3105d3c9ec6d1af4a2b5d3396e1c6db979a8ca0cabb45803",
+    "flows/light-controller--light_controller_flow/functions/light-controller-kitchen.js": "c42b871f74325f307c2bebb058bdde0002abee8724863e3af18b00325d4afae7",
+    "flows/light-controller--light_controller_flow/nodes.json": "eab0af1db3bb9849f0246a5d5e782c70668dc9e94299008f15efcfd4c2436387",
     "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left.js": "ea2970dc0b72fb1a23dc7de6ac4e514c234fb35357c66f63e700594b879cb5a3",
     "flows/light-door-entry-left--58c186d2.cc7718/nodes.json": "20de83c18832f21a31c0c37019b20034fed28194cbcb027a0ba158f6389cc388",
     "flows/light-gallery-down--1976d7f.0dd9028/functions/light-command-gallery-down.js": "ba8473de1243f513e91db46cbdaca85eeea00ca7eed0eb783feec7d7bae96763",
