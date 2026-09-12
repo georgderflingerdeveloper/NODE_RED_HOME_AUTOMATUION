@@ -1,6 +1,3 @@
-// name: LightControllerKitchen
-// nodeId: lightcontrollerkitchen
-// flow: LIGHT_CONTROLLER
 // Generische Klasse, raumspezifische Instanz.
 const INSTANCE_NAME = "Kitchen";
 const CONFIGURATION_KEY = "LightControllerKitchenConfiguration";

@@ -228,8 +228,9 @@ test('36 - doppelte Szenario-IDs werden abgewiesen', () => {
     assert.throws(() => new LightController({ scenarios: [{ id: 'same' }, { id: 'same' }] }), RangeError);
 });
 
-test('37 - leere Szenarioliste wird abgewiesen', () => {
-    assert.throws(() => new LightController({ scenarios: [] }), RangeError);
+test('37 - leere Szenarioliste ist für ClearAllScenarios zulässig', () => {
+    const controller = new LightController({ scenarios: [] });
+    assert.equal(controller.getOutput().ScenarioCount, 0);
 });
 
 test('38 - setScenarios ersetzt Szenarien zur Laufzeit', () => {
@@ -460,4 +461,168 @@ test('65 - AllLightsOn ohne DutyCycle behält die zuletzt gesetzte Helligkeit', 
     controller.process({ ButtonPressed: false, DutyCycle: 35 });
     const output = controller.process({ Command: 'AllLightsOn' });
     assert.deepEqual(output.LedOutput, [0.35, 0.35]);
+});
+
+test('66 - LED-Status benennt jeden Ausgang verständlich', () => {
+    const output = new LightController({ outputCount: 3 }).getOutput();
+    assert.deepEqual(output.LedStatus, ['1=Off', '2=Off', '3=Off']);
+    assert.equal(output.LedStatusText, '1=Off, 2=Off, 3=Off');
+});
+
+test('67 - SaveScenario übernimmt benannte Prozentwerte und zeigt den tatsächlichen LED-Status', () => {
+    const controller = new LightController({ outputCount: 6, scenarios: [] });
+    const output = controller.process({
+        Command: 'SaveScenario',
+        ScenarioName: 'Dinner',
+        ScenarioProperties: { 1: 50, 2: 100, 6: 70 },
+        DutyCycle: 70,
+    }, 1000);
+    assert.equal(output.Event, 'scenario_saved');
+    assert.equal(output.ScenarioName, 'Dinner');
+    assert.deepEqual(output.ScenarioProperties, { 1: 50, 2: 100, 6: 70 });
+    assert.equal(output.LedStatusText, '1=On[35%], 2=On[70%], 3=Off, 4=Off, 5=Off, 6=On[49%]');
+    assert.equal(output.ScenariosChanged, true);
+});
+
+test('68 - ListScenarios liefert Namen und Eigenschaften', () => {
+    const controller = new LightController({ outputCount: 2, scenarios: [] });
+    controller.process({ Command: 'AddScenario', ScenarioName: 'Lesen', ScenarioProperties: { 2: 40 } });
+    const output = controller.process({ Command: 'ListScenarios' });
+    assert.equal(output.Event, 'scenarios_listed');
+    assert.deepEqual(output.ScenarioList, [{
+        ScenarioName: 'Lesen',
+        ScenarioId: 'lesen',
+        ScenarioProperties: { 2: 40 },
+    }]);
+    assert.equal(output.ScenariosChanged, false);
+});
+
+test('69 - SaveScenario aktualisiert immer passend zum eindeutigen Namen', () => {
+    const controller = new LightController({ outputCount: 2, scenarios: [] });
+    controller.process({ Command: 'SaveScenario', ScenarioName: 'Abend', ScenarioProperties: { 1: 30 } });
+    const output = controller.process({ Command: 'SaveScenario', ScenarioName: 'abend', ScenarioProperties: { 2: 80 } });
+    assert.equal(output.ScenarioCount, 1);
+    assert.equal(output.ScenarioName, 'abend');
+    assert.deepEqual(output.ScenarioProperties, { 2: 80 });
+});
+
+test('70 - AddScenario verweigert doppelte Namen unabhängig von Großschreibung', () => {
+    const controller = new LightController({ scenarios: [] });
+    controller.process({ Command: 'AddScenario', ScenarioName: 'Arbeit', ScenarioProperties: { 1: 100 } });
+    assert.throws(() => controller.process({
+        Command: 'AddScenario',
+        ScenarioName: 'arbeit',
+        ScenarioProperties: { 2: 100 },
+    }), /existiert bereits/);
+});
+
+test('71 - DeleteScenario löscht ausschließlich das benannte Szenario', () => {
+    const controller = new LightController({ outputCount: 2, scenarios: [] });
+    controller.process({ Command: 'AddScenario', ScenarioName: 'A', ScenarioProperties: { 1: 100 } });
+    controller.process({ Command: 'AddScenario', ScenarioName: 'B', ScenarioProperties: { 2: 100 } });
+    const output = controller.process({ Command: 'DeleteScenario', ScenarioName: 'a' });
+    assert.equal(output.Event, 'scenario_deleted');
+    assert.deepEqual(output.ScenarioList.map((scenario) => scenario.ScenarioName), ['B']);
+});
+
+test('72 - DeleteScenario meldet einen unbekannten Namen sichtbar', () => {
+    const controller = new LightController({ scenarios: [] });
+    assert.throws(
+        () => controller.process({ Command: 'DeleteScenario', ScenarioName: 'Fehlt' }),
+        /nicht gefunden/,
+    );
+});
+
+test('73 - ClearAllScenarios leert die persistierbare Liste und schaltet aus', () => {
+    const controller = new LightController();
+    shortPress(controller);
+    const output = controller.process({ Command: 'ClearAllScenarios' });
+    assert.equal(output.Event, 'scenarios_cleared');
+    assert.equal(output.ScenarioCount, 0);
+    assert.equal(output.ScenarioIndex, -1);
+    assert.deepEqual(output.LedOutput, [0, 0, 0, 0, 0, 0]);
+});
+
+test('74 - Schalten ohne gespeicherte Szenarien bleibt sicher ausgeschaltet', () => {
+    const controller = new LightController({ scenarios: [] });
+    const output = shortPress(controller);
+    assert.equal(output.ScenarioIndex, -1);
+    assert.deepEqual(output.LedOutput, [0, 0, 0, 0, 0, 0]);
+});
+
+test('75 - ScenarioProperties prüft die einsbasierten Ausgangsnummern', () => {
+    const controller = new LightController({ outputCount: 2, scenarios: [] });
+    assert.throws(() => controller.process({
+        Command: 'SaveScenario', ScenarioName: 'Falsch', ScenarioProperties: { 3: 50 },
+    }), /ungültigen Ausgang/);
+});
+
+test('76 - ScenarioProperties prüft Prozentwerte von 0 bis 100', () => {
+    const controller = new LightController({ scenarios: [] });
+    assert.throws(() => controller.process({
+        Command: 'SaveScenario', ScenarioName: 'Falsch', ScenarioProperties: { 1: 101 },
+    }), /zwischen 0 und 100/);
+});
+
+test('77 - Szenario-Commands benötigen einen nichtleeren Namen', () => {
+    const controller = new LightController({ scenarios: [] });
+    assert.throws(() => controller.process({
+        Command: 'AddScenario', ScenarioName: ' ', ScenarioProperties: { 1: 50 },
+    }), /darf nicht leer sein/);
+});
+
+test('78 - AddScenario benötigt explizite ScenarioProperties', () => {
+    const controller = new LightController({ scenarios: [] });
+    assert.throws(
+        () => controller.process({ Command: 'AddScenario', ScenarioName: 'Leer' }),
+        /benötigt ScenarioProperties/,
+    );
+});
+
+test('79 - SaveScenario kann das aktive Szenario unter neuem Namen kopieren', () => {
+    const controller = new LightController({ scenarios: [{ id: 'work', name: 'Arbeit', outputs: [0.5] }] });
+    shortPress(controller);
+    const output = controller.process({ Command: 'SaveScenario', ScenarioName: 'Kopie' });
+    assert.equal(output.ScenarioCount, 2);
+    assert.deepEqual(output.ScenarioProperties, { 1: 50 });
+});
+
+test('80 - getConfiguration enthält die per Command gespeicherten Szenarien', () => {
+    const controller = new LightController({ outputCount: 2, scenarios: [] });
+    controller.process({ Command: 'SaveScenario', ScenarioName: 'Persistiert', ScenarioProperties: { 2: 75 } });
+    const restored = new LightController(controller.getConfiguration());
+    assert.deepEqual(restored.process({ Command: 'ListScenarios' }).ScenarioList, [{
+        ScenarioName: 'Persistiert',
+        ScenarioId: 'persistiert',
+        ScenarioProperties: { 2: 75 },
+    }]);
+});
+
+test('81 - konfigurierte Szenario-Namen müssen eindeutig sein', () => {
+    assert.throws(() => new LightController({ scenarios: [
+        { id: 'a', name: 'Abend', outputs: [1] },
+        { id: 'b', name: 'abend', outputs: [0] },
+    ] }), /Namen müssen eindeutig/);
+});
+
+test('82 - SelectScenario aktiviert ein gespeichertes Szenario ausschließlich über seinen Namen', () => {
+    const controller = new LightController({ outputCount: 3, scenarios: [
+        { id: 'work', name: 'Arbeit', outputs: [1, 0, 0] },
+        { id: 'dinner', name: 'Dinner', outputs: [0.5, 1, 0.7] },
+    ] });
+    const versionBefore = controller.configurationVersion;
+    const output = controller.process({ Command: 'SelectScenario', ScenarioName: 'dinner' });
+    assert.equal(output.Event, 'scenario_selected');
+    assert.equal(output.ScenarioName, 'Dinner');
+    assert.deepEqual(output.ScenarioProperties, { 1: 50, 2: 100, 3: 70 });
+    assert.equal(output.ScenariosChanged, false);
+    assert.equal(output.ConfigurationVersion, versionBefore);
+});
+
+test('83 - SelectScenario meldet einen unbekannten Namen sichtbar', () => {
+    const controller = new LightController({ scenarios: [] });
+    assert.throws(
+        () => controller.process({ Command: 'SelectScenario', ScenarioName: 'Fehlt' }),
+        /nicht gefunden/,
+    );
 });

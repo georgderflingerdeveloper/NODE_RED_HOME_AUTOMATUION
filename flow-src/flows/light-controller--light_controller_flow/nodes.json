@@ -24,7 +24,151 @@
     "x": 640,
     "y": 160,
     "wires": [
-      []
+      [
+        "lightcontroller_led_status"
+      ]
     ]
+  },
+  {
+    "id": "lightcontroller_test_button_on",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "TEST · Taster EIN (drücken)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"ButtonPressed\":true,\"DutyCycle\":70}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 180,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_button_off",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "TEST · Taster AUS (loslassen)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"ButtonPressed\":false,\"DutyCycle\":70}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 220,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_save_scenario",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "TEST · Szenario Testlicht speichern",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"SaveScenario\",\"ScenarioName\":\"Testlicht\",\"ScenarioProperties\":{\"1\":50,\"2\":100,\"6\":70}}",
+    "payloadType": "json",
+    "x": 240,
+    "y": 280,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_list_scenarios",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "TEST · Szenarien auflisten",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"ListScenarios\"}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 320,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_select_scenario",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "TEST · Szenario Testlicht auswählen",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"SelectScenario\",\"ScenarioName\":\"Testlicht\"}",
+    "payloadType": "json",
+    "x": 240,
+    "y": 360,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_led_status",
+    "type": "debug",
+    "z": "light_controller_flow",
+    "name": "LED-Status · 1=On[70%], 2=Off …",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload.LedStatusText",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 900,
+    "y": 220,
+    "wires": []
   }
 ]

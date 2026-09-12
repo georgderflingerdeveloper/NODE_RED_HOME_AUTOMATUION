@@ -53,6 +53,9 @@ Patch-Version `0.3.2`.
 Die generische und dynamisch konfigurierbare Lichtsteuerung bildet Version
 `0.4.0`; `LightControllerKitchen` ist ab dort ausschließlich Instanzname und
 Kompatibilitätsalias.
+Die persistente Szenarioverwaltung, die Test-Inject-Nodes und die eindeutige
+LED-Statusausgabe bilden Version `0.5.0`.
+Der namensbasierte `SelectScenario`-Befehl bildet Patch-Version `0.5.1`.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

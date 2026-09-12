@@ -96,6 +96,10 @@ Die nächste Dashboard-Erweiterung mit sichtbarem Von-bis-Zeitraum ist Version
 `0.3.2`.
 Die neue rückwärtskompatible, generische Lichtsteuerung beginnt mit Version
 `0.4.0`.
+Die persistente, namensbasierte Szenarioverwaltung mit Test-Injects und
+LED-Status beginnt mit Version `0.5.0`.
+Der direkte, nicht verändernde `SelectScenario`-Befehl bildet Patch-Version
+`0.5.1`.
 
 Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
 `NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und

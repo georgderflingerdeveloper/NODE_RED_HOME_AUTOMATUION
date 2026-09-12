@@ -7,8 +7,12 @@
 
 - `lib/functions/generated/LightController.js`: einzige Implementierung;
 - `lib/functions/generated/LightControllerKitchen.js`: kompatibler Weiterleiter;
+- `lib/functions/generated/LightControllerScenarioStore.js`: atomarer Dateispeicher;
+- `examples/light-controller-function.js`: wartbarer Node-RED-Wrapper;
 - `examples/LightController.node-red.json`: wartbarer Function-Node-Wrapper;
-- `test/LightController.test.mjs`: direkte Unit-Tests der echten Moduldatei.
+- `test/LightController.test.mjs`: direkte Unit-Tests der echten Moduldatei;
+- `test/LightControllerFlow.test.mjs`: Wrapper- und Test-Inject-Tests;
+- `test/LightControllerScenarioStore.test.mjs`: Persistenztests.
 
 ## Konfiguration
 
@@ -63,6 +67,44 @@ msg.payload = { Command: "AllLightsOff" };               // alle Ausgänge aus
 `AllLightsOn` verwendet den aktuellen `DutyCycle`. Beide Befehle sind von der
 konfigurierten Szenarioliste unabhängig.
 
+## Benannte Szenarien
+
+Ausgangsnummern in `ScenarioProperties` sind einsbasiert und Prozentwerte liegen
+zwischen `0` und `100`:
+
+```js
+msg.payload = {
+  Command: "SaveScenario",
+  ScenarioName: "Dinner",
+  ScenarioProperties: { 1: 50, 2: 100, 6: 70 }
+};
+```
+
+| Command | Wirkung |
+|---|---|
+| `SaveScenario` | Szenario nach Namen anlegen oder aktualisieren und aktivieren |
+| `AddScenario` | neues Szenario anlegen; ein vorhandener Name wird abgewiesen |
+| `SelectScenario` | vorhandenes Szenario nach Namen aktivieren, ohne es zu verändern |
+| `ListScenarios` | alle Namen und `ScenarioProperties` in `ScenarioList` ausgeben |
+| `DeleteScenario` | genau das mit `ScenarioName` bezeichnete Szenario löschen |
+| `ClearAllScenarios` | alle Szenarien löschen und sämtliche LEDs ausschalten |
+
+Namen sind ohne Beachtung der Groß-/Kleinschreibung eindeutig. `SaveScenario`
+kann ohne `ScenarioProperties` das aktuell aktive Szenario unter einem neuen
+Namen kopieren. `AddScenario` verlangt die Eigenschaften immer ausdrücklich.
+
+Jede Antwort enthält beispielsweise:
+
+```js
+msg.payload.LedStatus = ["1=On[50%]", "2=On[100%]", "3=Off"];
+msg.payload.LedStatusText = "1=On[50%], 2=On[100%], 3=Off";
+```
+
+Der mitgelieferte Debug-Node zeigt `LedStatusText`. Die Inject-Nodes
+`TEST · Taster EIN (drücken)` und `TEST · Taster AUS (loslassen)` simulieren den
+Taster. Für einen Langdruck zuerst EIN klicken, mindestens zwei Sekunden warten
+und danach AUS klicken.
+
 Dynamische Konfiguration im Küchen-Function-Node:
 
 ```js
@@ -82,8 +124,10 @@ msg.payload = {
 ```
 
 Die Konfiguration wird im Flow-Kontext unter
-`LightControllerKitchenConfiguration` gespeichert. Mit dateibasiertem
-Node-RED-Kontext bleibt sie auch nach einem Neustart erhalten.
+`LightControllerKitchenConfiguration` gespiegelt. Zusätzlich speichert der
+`LightControllerScenarioStore` sie atomar und mit privaten Dateirechten unter
+`~/.node-red/data/light-controller-scenarios/Kitchen.json`. Sie bleibt damit
+auch nach Node-RED- und Rechnerneustarts erhalten.
 
 ## Standardverhalten bei Langdruck
 
@@ -102,3 +146,4 @@ Die alte Speicherfunktion ist weiterhin mit `longAction: "save"` verfügbar.
 3. Neue Szenariofelder in `normalizeScenario()` validieren.
 4. Bestehende Ausgangsfelder nicht umbenennen.
 5. Jede Erweiterung in `test/LightController.test.mjs` absichern.
+6. Persistenz ausschließlich über `LightControllerScenarioStore` kapseln.
