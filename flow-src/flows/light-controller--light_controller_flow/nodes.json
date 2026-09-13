@@ -25,7 +25,8 @@
     "y": 160,
     "wires": [
       [
-        "lightcontroller_led_status"
+        "lightcontroller_led_status",
+        "lightcontroller_kitchen_dashboard"
       ]
     ]
   },
@@ -170,5 +171,30 @@
     "x": 900,
     "y": 220,
     "wires": []
+  },
+  {
+    "id": "lightcontroller_kitchen_dashboard",
+    "type": "ui_template",
+    "z": "light_controller_flow",
+    "group": "3dbc8c98.083aa4",
+    "name": "Kitchen · Lichtsteuerung und Szenarien",
+    "order": 1,
+    "width": 6,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 930,
+    "y": 160,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
   }
 ]

@@ -60,6 +60,9 @@ ungewollte Einzelklickaktion bilden Version `0.6.0`.
 Der exklusive Ultralangdruck ab vier Sekunden, das sofortige Ausschalten aller
 Lichter und die Commander-Ausgabe `payload.SendCommand = "CommandAllLightsOff"`
 bilden Version `0.7.0`.
+Das bidirektionale Kitchen-Testdashboard mit persistentem Szenarioeditor, sechs
+LED-Anzeigen, Push-Texten sowie Drück-, Loslass- und Dauerausgabe bildet Version
+`0.8.0`.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

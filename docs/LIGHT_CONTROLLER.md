@@ -13,6 +13,31 @@
 - `test/LightController.test.mjs`: direkte Unit-Tests der echten Moduldatei;
 - `test/LightControllerFlow.test.mjs`: Wrapper- und Test-Inject-Tests;
 - `test/LightControllerScenarioStore.test.mjs`: Persistenztests.
+- `flow-src/flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html`:
+  wartbare Oberfläche für Test, Status und Szenarioverwaltung.
+- `test/LightControllerDashboard.test.mjs`: Struktur- und Verdrahtungstests der Oberfläche.
+
+## Kitchen-Dashboard
+
+Die bestehende Dashboard-Seite **KÜCHE** enthält das Feld
+**Kitchen · Lichtsteuerung und Szenarien**. Es ist bidirektional mit derselben
+`LightControllerKitchen`-Instanz verbunden, die auch reale Eingangsnachrichten
+verarbeitet.
+
+Enthalten sind:
+
+- Licht-Testtaster mit getrenntem Drücken und Loslassen;
+- laufende und zuletzt gemessene Betätigungsdauer in Millisekunden;
+- Uhrzeit von Drücken und Loslassen;
+- verständliche Textanzeige für Kurz-, Doppel-, Lang- und Ultralangdruck;
+- sechs LED-Anzeigen mit dem tatsächlichen Prozentwert aus `LedOutput`;
+- Auswahl vorhandener Szenarien;
+- sechs Prozentfelder für `ScenarioProperties`;
+- Aktionen zum Speichern, Anlegen, Auswählen, Auflisten und Löschen.
+
+Das Dashboard sendet keine eigene Lichtlogik. Es erzeugt ausschließlich die
+dokumentierten Controller-Nachrichten. Deshalb bleiben Bedienung, Hardware und
+Automatisierungs-Flows konsistent.
 
 ## Konfiguration
 
@@ -106,6 +131,14 @@ Jede Antwort enthält beispielsweise:
 ```js
 msg.payload.LedStatus = ["1=On[50%]", "2=On[100%]", "3=Off"];
 msg.payload.LedStatusText = "1=On[50%], 2=On[100%], 3=Off";
+msg.payload.ButtonTiming = {
+  InputNumber: 1,
+  Pressed: false,
+  PressedAt: "2026-09-13T10:15:30.000Z",
+  ReleasedAt: "2026-09-13T10:15:31.250Z",
+  DurationMs: 1250,
+  CurrentDurationMs: 1250
+};
 ```
 
 Der mitgelieferte Debug-Node zeigt `LedStatusText`. Die Inject-Nodes

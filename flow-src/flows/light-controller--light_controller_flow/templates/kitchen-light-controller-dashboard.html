@@ -1,0 +1,188 @@
+<style>
+.lc-kitchen{font-family:Arial,sans-serif;color:#eef8f8;padding:4px}.lc-card{background:#173638;border:1px solid #2c777b;border-radius:10px;padding:12px;margin-bottom:10px}.lc-title{font-size:18px;font-weight:700;margin-bottom:10px}.lc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.lc-led{background:#203c3e;border-radius:8px;padding:10px;text-align:center}.lc-lamp{width:34px;height:34px;border-radius:50%;margin:0 auto 6px;background:#233;border:2px solid #658;box-shadow:inset 0 0 8px #000}.lc-led-value{font-weight:700}.lc-test-button{width:100%;min-height:58px;border:0;border-radius:9px;background:#087f88;color:#fff;font-size:17px;font-weight:700;cursor:pointer;touch-action:none;user-select:none}.lc-test-button.pressed{background:#56c271;color:#092b19;box-shadow:0 0 14px #7cf493}.lc-status{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px}.lc-status strong{color:#9df5ad}.lc-command{color:#ffd36c;font-weight:700}.lc-form-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px}.lc-input,.lc-select{min-width:0;border:1px solid #4a7476;border-radius:6px;background:#10292b;color:#fff;padding:8px}.lc-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:9px}.lc-level label{display:block;font-size:11px;color:#b9d2d3}.lc-level input{box-sizing:border-box;width:100%}.lc-actions{display:flex;flex-wrap:wrap;gap:6px}.lc-action{border:0;border-radius:6px;padding:8px 10px;background:#087f88;color:white;font-weight:600;cursor:pointer}.lc-action.warn{background:#a54232}.lc-hint{font-size:11px;color:#a9c4c5;margin-top:8px}.lc-event{font-size:15px;font-weight:700;color:#a6f5b4;margin-bottom:8px}@media(max-width:560px){.lc-grid,.lc-levels,.lc-status{grid-template-columns:repeat(2,minmax(0,1fr))}.lc-form-row{grid-template-columns:1fr}}
+</style>
+
+<div id="lc-kitchen-dashboard" class="lc-kitchen">
+  <div class="lc-card">
+    <div class="lc-title">KITCHEN · Lichttest</div>
+    <button id="lc-kitchen-test-button" class="lc-test-button" ng-class="{pressed:testButtonPressed}">
+      {{testButtonPressed ? 'TASTER GEDRÜCKT' : 'DRÜCKEN UND HALTEN'}}
+    </button>
+    <div class="lc-hint">Kurz: schalten · Doppelklick ≤500 ms: Szenario · 2–&lt;4 s: Langdruck · ≥4 s: alles aus</div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-title">Push- und Tasterstatus</div>
+    <div class="lc-event">{{pushText}}</div>
+    <div class="lc-status">
+      <span>Modus: <strong>{{state.OperatingMode || '—'}}</strong></span>
+      <span>Taster: <strong>{{state.ButtonTiming.Pressed ? 'GEDRÜCKT' : 'LOS'}}</strong></span>
+      <span>Gedrückt: {{formatTime(state.ButtonTiming.PressedAt)}}</span>
+      <span>Losgelassen: {{formatTime(state.ButtonTiming.ReleasedAt)}}</span>
+      <span>Dauer: <strong>{{displayDuration()}} ms</strong></span>
+      <span>Ereignis: {{state.Event || '—'}}</span>
+    </div>
+    <div class="lc-command" ng-if="state.SendCommand">Ausgabe: payload.SendCommand = {{state.SendCommand}}</div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-title">6 LEDs</div>
+    <div class="lc-grid">
+      <div class="lc-led" ng-repeat="index in ledIndexes track by index">
+        <div class="lc-lamp" ng-style="ledStyle(index)"></div>
+        <div class="lc-led-value">LED {{index + 1}} · {{ledPercent(index)}}%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-title">Szenarien konfigurieren</div>
+    <div class="lc-form-row">
+      <select class="lc-select" ng-model="selectedScenarioName" ng-change="loadSelectedScenario()">
+        <option value="">Szenario auswählen …</option>
+        <option ng-repeat="scenario in state.ScenarioList track by scenario.ScenarioId" value="{{scenario.ScenarioName}}">{{scenario.ScenarioName}}</option>
+      </select>
+      <button class="lc-action" ng-click="sendScenarioCommand('SelectScenario')">Auswählen</button>
+    </div>
+    <div class="lc-form-row">
+      <input class="lc-input" ng-model="scenarioName" placeholder="Eindeutiger Szenarioname">
+      <button class="lc-action" ng-click="sendScenarioCommand('ListScenarios')">Liste laden</button>
+    </div>
+    <div class="lc-levels">
+      <div class="lc-level" ng-repeat="index in ledIndexes track by index">
+        <label>LED {{index + 1}} [%]</label>
+        <input class="lc-input" type="number" min="0" max="100" step="1" ng-model="scenarioLevels[index]">
+      </div>
+    </div>
+    <div class="lc-actions">
+      <button class="lc-action" ng-click="sendScenarioCommand('SaveScenario', true)">Speichern</button>
+      <button class="lc-action" ng-click="sendScenarioCommand('AddScenario', true)">Neu anlegen</button>
+      <button class="lc-action warn" ng-click="deleteScenario()">Löschen</button>
+      <button class="lc-action warn" ng-click="clearScenarios()">Alle löschen</button>
+    </div>
+    <div class="lc-hint">Speichern aktualisiert denselben Namen. Werte sind Prozent von 0 bis 100 und bleiben nach einem Neustart erhalten.</div>
+  </div>
+</div>
+
+<script>
+(function(scope) {
+  const EMPTY_TIMING = { Pressed:false, PressedAt:null, ReleasedAt:null, DurationMs:null, CurrentDurationMs:0 };
+  const EVENT_TEXT = {
+    initialized:"Controller bereit", button_pressed:"Taster gedrückt",
+    short_press_pending:"Kurzer Klick erkannt – Doppelklickfenster offen",
+    scenario_changed:"Nächstes Licht/Szenario aktiviert",
+    scenario_double_selected:"Doppelklick – nächstes Szenario gewählt",
+    scenario_toggled_on:"Szenario eingeschaltet", scenario_toggled_off:"Szenario ausgeschaltet",
+    manual_light_toggled_on:"Einzellicht eingeschaltet", manual_light_toggled_off:"Einzellicht ausgeschaltet",
+    manual_light_mode_entered:"Langdruck – Einzellichtmodus aktiv",
+    manual_light_mode_exited:"Langdruck – Einzellichtmodus verlassen",
+    scenario_mode_exited:"Langdruck – Szenariomodus verlassen",
+    all_lights_off_command:"Ultralangdruck – alle Lichter ausgeschaltet",
+    button_released_after_ultra_long_action:"Taster nach Ultralangdruck losgelassen",
+    scenario_saved:"Szenario gespeichert", scenario_added:"Szenario angelegt",
+    scenario_selected:"Szenario ausgewählt", scenario_deleted:"Szenario gelöscht",
+    scenarios_cleared:"Alle Szenarien gelöscht", scenarios_listed:"Szenarioliste aktualisiert",
+    none:"Keine neue Tasteraktion"
+  };
+  scope.ledIndexes = [0,1,2,3,4,5];
+  scope.state = { LedOutput:[0,0,0,0,0,0], ScenarioList:[], ButtonTiming:{...EMPTY_TIMING} };
+  scope.scenarioLevels = [0,0,0,0,0,0];
+  scope.scenarioName = "";
+  scope.selectedScenarioName = "";
+  scope.testButtonPressed = false;
+  scope.localDurationMs = 0;
+  scope.pushText = "Status wird geladen …";
+  let pressStartedAt = null;
+  let durationTimer = null;
+  let buttonIsDown = false;
+
+  scope.$watch("msg", function(message) {
+    if (!message || !message.payload || typeof message.payload !== "object") return;
+    const payload = message.payload;
+    scope.state = { ...scope.state, ...payload, ButtonTiming:{...EMPTY_TIMING, ...(payload.ButtonTiming || {})} };
+    scope.pushText = payload.CommandResult || EVENT_TEXT[payload.Event] || payload.Event || "Status aktualisiert";
+    if (payload.ScenarioName) scope.selectedScenarioName = payload.ScenarioName;
+  });
+
+  scope.ledPercent = function(index) {
+    return Math.round(Number(scope.state.LedOutput?.[index] || 0) * 100);
+  };
+  scope.ledStyle = function(index) {
+    const percent = scope.ledPercent(index);
+    return percent > 0
+      ? { background:"hsl(" + (70 + percent * 0.5) + ",85%,55%)", boxShadow:"0 0 14px rgba(130,255,150,.9)" }
+      : { background:"#263638", boxShadow:"inset 0 0 8px #000" };
+  };
+  scope.formatTime = function(value) {
+    if (!value) return "—";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleTimeString("de-AT", {hour12:false});
+  };
+  scope.displayDuration = function() {
+    return scope.testButtonPressed ? scope.localDurationMs : (scope.state.ButtonTiming.DurationMs ?? 0);
+  };
+  scope.loadSelectedScenario = function() {
+    const scenario = (scope.state.ScenarioList || []).find(item => item.ScenarioName === scope.selectedScenarioName);
+    if (!scenario) return;
+    scope.scenarioName = scenario.ScenarioName;
+    scope.scenarioLevels = scope.ledIndexes.map(index => Number(scenario.ScenarioProperties?.[index + 1] || 0));
+  };
+  scope.scenarioProperties = function() {
+    const result = {};
+    scope.ledIndexes.forEach(index => { result[index + 1] = Math.max(0, Math.min(100, Number(scope.scenarioLevels[index]) || 0)); });
+    return result;
+  };
+  scope.sendScenarioCommand = function(command, includeProperties) {
+    const name = String(scope.scenarioName || scope.selectedScenarioName || "").trim();
+    if (command !== "ListScenarios" && !name) { scope.pushText = "Bitte einen Szenarionamen eingeben."; return; }
+    const payload = { Command:command };
+    if (name) payload.ScenarioName = name;
+    if (includeProperties) payload.ScenarioProperties = scope.scenarioProperties();
+    scope.send({ topic:"light-controller/dashboard", payload:payload });
+  };
+  scope.deleteScenario = function() {
+    if (window.confirm("Ausgewähltes Szenario wirklich löschen?")) scope.sendScenarioCommand("DeleteScenario");
+  };
+  scope.clearScenarios = function() {
+    if (window.confirm("Wirklich alle Szenarien löschen?")) scope.send({topic:"light-controller/dashboard",payload:{Command:"ClearAllScenarios"}});
+  };
+
+  function sendButton(pressed) {
+    scope.send({ topic:"light-controller/dashboard", payload:{ButtonPressed:pressed,DutyCycle:70} });
+  }
+  function stopDurationTimer() {
+    if (durationTimer) window.clearInterval(durationTimer);
+    durationTimer = null;
+  }
+  function buttonDown(event) {
+    if (buttonIsDown) return;
+    buttonIsDown = true;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    pressStartedAt = Date.now();
+    scope.$applyAsync(function() { scope.testButtonPressed = true; scope.localDurationMs = 0; });
+    durationTimer = window.setInterval(function() {
+      scope.$applyAsync(function() { scope.localDurationMs = Date.now() - pressStartedAt; });
+    }, 50);
+    sendButton(true);
+  }
+  function buttonUp(event) {
+    if (!buttonIsDown) return;
+    buttonIsDown = false;
+    event.preventDefault();
+    stopDurationTimer();
+    scope.$applyAsync(function() { scope.localDurationMs = Date.now() - pressStartedAt; scope.testButtonPressed = false; });
+    sendButton(false);
+  }
+  window.setTimeout(function() {
+    const button = document.getElementById("lc-kitchen-test-button");
+    if (!button) return;
+    button.addEventListener("pointerdown", buttonDown);
+    button.addEventListener("pointerup", buttonUp);
+    button.addEventListener("pointercancel", buttonUp);
+    button.addEventListener("contextmenu", event => event.preventDefault());
+    scope.send({topic:"light-controller/dashboard",payload:{Command:"ListScenarios"}});
+  }, 0);
+  scope.$on("$destroy", stopDurationTimer);
+})(scope);
+</script>

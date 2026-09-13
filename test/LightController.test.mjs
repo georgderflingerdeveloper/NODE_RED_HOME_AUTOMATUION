@@ -782,6 +782,7 @@ test('96 - Ultralangdruck schaltet sofort alles aus und sendet den Commander-Bef
     assert.equal(output.Event, 'all_lights_off_command');
     assert.equal(output.SendCommand, 'CommandAllLightsOff');
     assert.equal(output.PersistentStateChanged, true);
+    assert.equal(output.ButtonTiming.CurrentDurationMs, 4000);
     assert.deepEqual(output.LedOutput, [0, 0, 0]);
 });
 
@@ -828,4 +829,31 @@ test('101 - getConfiguration enthält Ultralangzeit und Aktion als sichere Kopie
     configuration.inputBindings[0].ultraLongAction.type = 'none';
     assert.equal(configuration.ultraHoldTimeMs, 4500);
     assert.equal(controller.getConfiguration().inputBindings[0].ultraLongAction.type, 'all-off-command');
+});
+
+test('102 - Tasterzeiten enthalten Drück-, Loslasszeit und exakte Dauer', () => {
+    const controller = new LightController();
+    const pressed = press(controller, 1000);
+    assert.deepEqual(pressed.ButtonTiming, {
+        InputNumber: 1,
+        Pressed: true,
+        PressedAt: '1970-01-01T00:00:01.000Z',
+        ReleasedAt: null,
+        DurationMs: null,
+        CurrentDurationMs: 0,
+    });
+    const held = press(controller, 1750);
+    assert.equal(held.ButtonTiming.CurrentDurationMs, 750);
+    const released = release(controller, 2200);
+    assert.equal(released.ButtonTiming.Pressed, false);
+    assert.equal(released.ButtonTiming.ReleasedAt, '1970-01-01T00:00:02.200Z');
+    assert.equal(released.ButtonTiming.DurationMs, 1200);
+});
+
+test('103 - mehrere Eingänge liefern getrennte Betätigungszeiten', () => {
+    const controller = new LightController({ inputCount: 2 });
+    press(controller, 500, 100, [false, true]);
+    const output = release(controller, 900, 100, [false, false]);
+    assert.equal(output.InputTimings[0].PressedAt, null);
+    assert.equal(output.InputTimings[1].DurationMs, 400);
 });

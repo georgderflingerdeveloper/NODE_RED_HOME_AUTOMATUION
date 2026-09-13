@@ -103,6 +103,8 @@ konfigurierbare Doppelklickauswahl bilden Version `0.6.0`. Die frühere Aktion
 `toggle-next` bleibt als explizite Kompatibilitätsaktion erhalten.
 Der exklusive Ultralangdruck ab vier Sekunden mit der Commander-Ausgabe
 `payload.SendCommand = "CommandAllLightsOff"` bildet Version `0.7.0`.
+Das bidirektionale Kitchen-Testdashboard mit Szenarioeditor, sechs LEDs,
+Push-Texten und strukturierten Tasterzeiten bildet Version `0.8.0`.
 
 Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
 `NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und
