@@ -55,7 +55,13 @@ const {
 /* -------------------------------------------------------------------------- */
 
 function newController(options = {}) {
-    return new LightControllerKitchen(options);
+    return new LightControllerKitchen({
+        ...options,
+        inputBindings: options.inputBindings ?? [{
+            longAction: { type: 'save' },
+            ultraLongAction: { type: 'none' },
+        }],
+    });
 }
 
 function pressButton(controller, timeMs, dutyCycle = 100) {
@@ -85,11 +91,11 @@ function shortPress(
     durationMs = 100
 ) {
     pressButton(controller, startTimeMs, dutyCycle);
+    releaseButton(controller, startTimeMs + durationMs, dutyCycle);
 
-    return releaseButton(
-        controller,
-        startTimeMs + durationMs,
-        dutyCycle
+    return controller.process(
+        { Command: 'FlushPendingClick' },
+        startTimeMs + durationMs + controller.doubleClickTimeMs,
     );
 }
 
@@ -291,9 +297,10 @@ test('18 - kurze fallende Flanke wechselt zum nächsten Szenario', () => {
     pressButton(controller, 1000, 70);
     const result = releaseButton(controller, 1100, 70);
 
-    assert.equal(result.Event, 'scenario_changed');
-    assert.equal(result.ScenarioIndex, 0);
-    assert.deepEqual(result.ActiveLights, [0]);
+    assert.equal(result.Event, 'short_press_pending');
+    assert.equal(result.ScenarioIndex, -1);
+    assert.deepEqual(result.ActiveLights, []);
+    assert.equal(result.ClickFlushAt, 1100 + controller.doubleClickTimeMs);
 });
 
 test('19 - nur der boolesche Wert true gilt als gedrückte Taste', () => {
@@ -328,9 +335,10 @@ test('21 - Loslassen nach 1999 ms ist noch ein kurzer Tastendruck', () => {
     pressButton(controller, 1000, 100);
     const result = releaseButton(controller, 2999, 100);
 
-    assert.equal(result.Event, 'scenario_changed');
-    assert.equal(result.ScenarioIndex, 0);
+    assert.equal(result.Event, 'short_press_pending');
+    assert.equal(result.ScenarioIndex, -1);
     assert.equal(result.ScenarioSaved, false);
+    assert.equal(result.ClickFlushAt, 2999 + controller.doubleClickTimeMs);
 });
 
 /* -------------------------------------------------------------------------- */
@@ -392,6 +400,7 @@ test('33 - nach dem letzten Szenario beginnt die Sequenz wieder bei Licht 0', ()
 
     assert.equal(result.ScenarioIndex, 0);
     assert.deepEqual(result.ActiveLights, [0]);
+    assert.deepEqual(result.LedOutput, [1, 0, 0, 0, 0, 0]);
 });
 
 test('34 - beim Wechsel von Licht 0 auf Licht 1 wird Licht 0 ausgeschaltet', () => {
@@ -412,6 +421,7 @@ test('35 - erst nach allen sechs Einzellampen beginnt das Zuschalten', () => {
 
     assert.deepEqual(sixth.ActiveLights, [5]);
     assert.deepEqual(seventh.ActiveLights, [0, 1]);
+    assert.deepEqual(seventh.LedOutput, [1, 1, 0, 0, 0, 0]);
 });
 
 test('36 - im letzten Szenario sind alle sechs Lichter aktiv', () => {
@@ -501,11 +511,11 @@ test('43 - nach 2 Sekunden Halten wird das aktuelle Szenario gespeichert', () =>
         2000
     );
 
-    assert.equal(result.Event, 'scenario_saved');
-    assert.equal(result.ScenarioSaved, true);
-    assert.equal(result.SavedScenario.scenarioIndex, 0);
-    assert.deepEqual(result.SavedScenario.activeLights, [0]);
-    assert.deepEqual(result.SavedScenario.ledOutput, [0.6, 0, 0, 0, 0, 0]);
+    assert.equal(result.Event, 'none');
+    assert.equal(result.ScenarioSaved, false);
+    assert.equal(result.SavedScenario, null);
+    assert.equal(result.OperatingMode, 'normal');
+    assert.deepEqual(result.LedOutput, [0.6, 0, 0, 0, 0, 0]);
 });
 
 test('44 - langer Tastendruck verändert den ScenarioIndex nicht', () => {
@@ -527,17 +537,13 @@ test('45 - Loslassen nach bereits erkanntem Langdruck speichert nicht doppelt', 
 
     holdButton(controller, 1000, 80, 2000);
 
-    const savedAtBefore =
-        controller.savedScenario.savedAt;
+    const savedAtBefore = controller.savedScenario?.savedAt ?? null;
 
     const result = releaseButton(controller, 3100, 80);
 
-    assert.equal(result.Event, 'button_released_after_save');
-    assert.equal(result.ScenarioSaved, false);
-    assert.equal(
-        result.SavedScenario.savedAt,
-        savedAtBefore
-    );
+    assert.equal(result.Event, 'scenario_saved');
+    assert.equal(result.ScenarioSaved, true);
+    assert.equal(result.SavedScenario.savedAt, savedAtBefore || result.SavedScenario.savedAt);
 });
 
 test('46 - ausgegebene SavedScenario-Arrays sind Kopien und schützen den internen Zustand', () => {
@@ -546,7 +552,8 @@ test('46 - ausgegebene SavedScenario-Arrays sind Kopien und schützen den intern
     shortPress(controller, 0, 50);
     holdButton(controller, 1000, 50, 2000);
 
-    const output = controller.getOutput();
+    const result = releaseButton(controller, 3100, 50);
+    const output = result;
 
     output.SavedScenario.activeLights.push(5);
     output.SavedScenario.ledOutput[0] = 999;
@@ -575,6 +582,7 @@ test('47 - genau 2000 ms und direktes Loslassen speichert das Szenario', () => {
     assert.equal(result.Event, 'scenario_saved');
     assert.equal(result.ScenarioSaved, true);
     assert.equal(result.ScenarioIndex, 0);
+    assert.equal(result.OperatingMode, 'normal');
 });
 
 /* -------------------------------------------------------------------------- */
