@@ -53,9 +53,13 @@ Patch-Version `0.3.2`.
 Die generische und dynamisch konfigurierbare Lichtsteuerung bildet Version
 `0.4.0`; `LightControllerKitchen` ist ab dort ausschließlich Instanzname und
 Kompatibilitätsalias.
-Die persistente Szenarioverwaltung, die Test-Inject-Nodes und die eindeutige
-LED-Statusausgabe bilden Version `0.5.0`.
-Der namensbasierte `SelectScenario`-Befehl bildet Patch-Version `0.5.1`.
+Die persistente Szenarioverwaltung bildet Version `0.5.0`, der namensbasierte
+`SelectScenario`-Befehl Patch-Version `0.5.1`.
+Die persistenten Betriebsmodi und die Szenarioauswahl per Doppelklick ohne
+ungewollte Einzelklickaktion bilden Version `0.6.0`.
+Der exklusive Ultralangdruck ab vier Sekunden, das sofortige Ausschalten aller
+Lichter und die Commander-Ausgabe `payload.SendCommand = "CommandAllLightsOff"`
+bilden Version `0.7.0`.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

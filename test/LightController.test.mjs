@@ -18,6 +18,8 @@ const {
     DEFAULT_INPUT_COUNT,
     DEFAULT_OUTPUT_COUNT,
     DEFAULT_HOLD_TIME_MS,
+    DEFAULT_DOUBLE_CLICK_TIME_MS,
+    DEFAULT_ULTRA_HOLD_TIME_MS,
 } = require(modulePath);
 
 function press(controller, at = 0, dutyCycle = 100, inputs = undefined) {
@@ -37,11 +39,15 @@ function shortPress(controller, at = 0, dutyCycle = 100, inputIndex = 0) {
         ? Array.from({ length: controller.inputCount }, (_, index) => index === inputIndex)
         : undefined;
     press(controller, at, dutyCycle, inputs);
-    return release(
+    release(
         controller,
         at + 100,
         dutyCycle,
         inputs && Array(controller.inputCount).fill(false),
+    );
+    return controller.process(
+        { Command: 'FlushPendingClick' },
+        at + 100 + controller.doubleClickTimeMs,
     );
 }
 
@@ -61,11 +67,13 @@ test('02 - bisheriger Klassenname bleibt als Alias verfügbar', () => {
     assert.equal(LightControllerKitchen, LightController);
 });
 
-test('03 - Standardwerte bleiben 6 Ausgänge, 1 Eingang und 2000 ms', () => {
+test('03 - Standardwerte enthalten 500 ms Doppel-, 2000 ms Lang- und 4000 ms Ultralangdruck', () => {
     assert.equal(LIGHT_COUNT, 6);
     assert.equal(DEFAULT_OUTPUT_COUNT, 6);
     assert.equal(DEFAULT_INPUT_COUNT, 1);
     assert.equal(DEFAULT_HOLD_TIME_MS, 2000);
+    assert.equal(DEFAULT_DOUBLE_CLICK_TIME_MS, 500);
+    assert.equal(DEFAULT_ULTRA_HOLD_TIME_MS, 4000);
 });
 
 test('04 - ungültige Helligkeit fällt auf 100 Prozent zurück', () => {
@@ -167,22 +175,21 @@ test('27 - langer Tastendruck speichert das Szenario', () => {
     const controller = new LightController({ inputBindings: [{ longAction: 'save' }] });
     shortPress(controller, 0, 60);
     press(controller, 1000, 60);
-    const output = press(controller, 3000, 60);
+    const output = release(controller, 3000, 60);
     assert.equal(output.Event, 'scenario_saved');
     assert.equal(output.ScenarioSaved, true);
     assert.deepEqual(output.SavedScenario.ledOutput, [0.6, 0, 0, 0, 0, 0]);
 });
 
-test('28 - Loslassen nach erkanntem Langdruck speichert nicht doppelt', () => {
+test('28 - Halten bei zwei Sekunden führt vor dem Loslassen keine Aktion aus', () => {
     const controller = new LightController({ inputBindings: [{ longAction: 'save' }] });
     shortPress(controller);
     press(controller, 1000);
-    press(controller, 3000);
-    const savedAt = controller.savedScenario.savedAt;
+    const held = press(controller, 3000);
+    assert.equal(held.Event, 'none');
     const output = release(controller, 3100);
-    assert.equal(output.Event, 'button_released_after_save');
-    assert.equal(output.ScenarioSaved, false);
-    assert.equal(output.SavedScenario.savedAt, savedAt);
+    assert.equal(output.Event, 'scenario_saved');
+    assert.equal(output.ScenarioSaved, true);
 });
 
 test('29 - dynamisches Array-Szenario bestimmt aktive Ausgänge', () => {
@@ -308,13 +315,15 @@ test('46 - Aktion none verändert kein Szenario', () => {
 test('47 - ungültige Aktionsart wird beim Ausführen sichtbar abgewiesen', () => {
     const controller = new LightController({ inputBindings: [{ shortAction: 'unknown' }] });
     press(controller);
-    assert.throws(() => release(controller), RangeError);
+    release(controller);
+    assert.throws(() => controller.process({ Command: 'FlushPendingClick' }, 600), RangeError);
 });
 
 test('48 - mehrere Eingänge werden getrennt ausgewertet', () => {
     const controller = new LightController({ inputCount: 2 });
     press(controller, 0, 100, [true, true]);
-    const output = release(controller, 100, 100, [false, false]);
+    release(controller, 100, 100, [false, false]);
+    const output = controller.process({ Command: 'FlushPendingClick' }, 600);
     assert.equal(output.Events.length, 2);
     assert.equal(output.ScenarioIndex, 1);
 });
@@ -366,54 +375,52 @@ test('55 - alte LightControllerKitchen-Datei lädt das generische Modul', () => 
 });
 
 test('56 - Langdruck schaltet ein aktives Szenario aus', () => {
-    const controller = new LightController();
+    const controller = new LightController({ inputBindings: [{ longAction: 'toggle-next' }] });
     shortPress(controller);
     press(controller, 1000);
-    const output = press(controller, 3000);
+    const output = release(controller, 3000);
     assert.equal(output.Event, 'lights_off');
     assert.equal(output.ScenarioIndex, -1);
     assert.deepEqual(output.LedOutput, [0, 0, 0, 0, 0, 0]);
 });
 
 test('57 - nächster Langdruck aktiviert das folgende Szenario', () => {
-    const controller = new LightController();
+    const controller = new LightController({ inputBindings: [{ longAction: 'toggle-next' }] });
     shortPress(controller);
     press(controller, 1000);
-    press(controller, 3000);
-    release(controller, 3100);
+    release(controller, 3000);
     press(controller, 4000);
-    const output = press(controller, 6000);
+    const output = release(controller, 6000);
     assert.equal(output.Event, 'scenario_changed');
     assert.equal(output.ScenarioIndex, 1);
     assert.deepEqual(output.ActiveLights, [1]);
 });
 
 test('58 - Langdruck aus dem Startzustand aktiviert das erste Szenario', () => {
-    const controller = new LightController();
+    const controller = new LightController({ inputBindings: [{ longAction: 'toggle-next' }] });
     press(controller, 0);
-    const output = press(controller, 2000);
+    const output = release(controller, 2000);
     assert.equal(output.ScenarioIndex, 0);
     assert.deepEqual(output.ActiveLights, [0]);
 });
 
-test('59 - Halten löst toggle-next nur einmal aus', () => {
-    const controller = new LightController();
+test('59 - Halten ab zwei Sekunden löst die Langdruckaktion noch nicht vorzeitig aus', () => {
+    const controller = new LightController({ inputBindings: [{ longAction: 'toggle-next' }] });
     shortPress(controller);
     press(controller, 1000);
-    press(controller, 3000);
-    const output = press(controller, 5000);
+    const output = press(controller, 3000);
     assert.equal(output.Event, 'none');
-    assert.equal(output.ScenarioIndex, -1);
+    assert.equal(output.ScenarioIndex, 0);
 });
 
-test('60 - Loslassen nach toggle-next löst keine zweite Aktion aus', () => {
-    const controller = new LightController();
+test('60 - Loslassen zwischen zwei und vier Sekunden löst toggle-next genau einmal aus', () => {
+    const controller = new LightController({ inputBindings: [{ longAction: 'toggle-next' }] });
     shortPress(controller);
     press(controller, 1000);
-    press(controller, 3000);
     const output = release(controller, 3100);
-    assert.equal(output.Event, 'button_released_after_long_action');
+    assert.equal(output.Event, 'lights_off');
     assert.equal(output.ScenarioIndex, -1);
+    assert.equal(release(controller, 3200).Event, 'none');
 });
 
 test('61 - Command AllLightsOn aktiviert alle konfigurierten Ausgänge', () => {
@@ -435,22 +442,27 @@ test('62 - Command AllLightsOff schaltet alle Ausgänge aus', () => {
 });
 
 test('63 - Langdruck nach AllLightsOn schaltet alle Ausgänge aus', () => {
-    const controller = new LightController({ outputCount: 2 });
+    const controller = new LightController({
+        outputCount: 2,
+        inputBindings: [{ longAction: 'toggle-next' }],
+    });
     controller.process({ Command: 'AllLightsOn' });
     press(controller, 0);
-    const output = press(controller, 2000);
+    const output = release(controller, 2000);
     assert.equal(output.Event, 'lights_off');
     assert.deepEqual(output.LedOutput, [0, 0]);
 });
 
 test('64 - weiterer Langdruck nach AllLightsOn und Aus aktiviert ein Szenario', () => {
-    const controller = new LightController({ outputCount: 2 });
+    const controller = new LightController({
+        outputCount: 2,
+        inputBindings: [{ longAction: 'toggle-next' }],
+    });
     controller.process({ Command: 'AllLightsOn' });
     press(controller, 0);
-    press(controller, 2000);
-    release(controller, 2100);
+    release(controller, 2000);
     press(controller, 3000);
-    const output = press(controller, 5000);
+    const output = release(controller, 5000);
     assert.equal(output.Event, 'scenario_changed');
     assert.equal(output.ScenarioIndex, 0);
     assert.deepEqual(output.ActiveLights, [0]);
@@ -625,4 +637,195 @@ test('83 - SelectScenario meldet einen unbekannten Namen sichtbar', () => {
         () => controller.process({ Command: 'SelectScenario', ScenarioName: 'Fehlt' }),
         /nicht gefunden/,
     );
+});
+
+test('84 - SelectScenario öffnet den persistenten Szenariomodus', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'normal', name: 'Normal', outputs: [1, 0] },
+        { id: 'dinner', name: 'Dinner', outputs: [0.5, 1] },
+    ] });
+    shortPress(controller);
+    const output = controller.process({ Command: 'SelectScenario', ScenarioName: 'Dinner' });
+    assert.equal(output.OperatingMode, 'scenario');
+    assert.equal(output.PersistentStateChanged, true);
+    assert.deepEqual(output.LedOutput.slice(0, 2), [0.5, 1]);
+});
+
+test('85 - erster kurzer Klick wartet ohne unerwünschte Schaltaktion', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'dinner', name: 'Dinner', outputs: [1] },
+    ] });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Dinner' });
+    press(controller, 0);
+    const output = release(controller, 100);
+    assert.equal(output.Event, 'short_press_pending');
+    assert.equal(output.ClickFlushAt, 600);
+    assert.equal(output.ModeOutputEnabled, true);
+    assert.deepEqual(output.ActiveLights, [0]);
+});
+
+test('86 - einzelner Klick schaltet das ausgewählte Szenario nach 500 ms persistent aus', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'dinner', name: 'Dinner', outputs: [1] },
+    ] });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Dinner' });
+    press(controller, 0);
+    release(controller, 100);
+    const output = controller.process({ Command: 'FlushPendingClick' }, 600);
+    assert.equal(output.Event, 'scenario_toggled_off');
+    assert.equal(output.ModeOutputEnabled, false);
+    assert.equal(output.PersistentStateChanged, true);
+});
+
+test('87 - Doppelklick wählt das nächste Szenario ohne vorherige Einzelklickwirkung', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'one', name: 'Eins', outputs: [1, 0] },
+        { id: 'two', name: 'Zwei', outputs: [0, 1] },
+    ] });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Eins' });
+    press(controller, 0);
+    const firstRelease = release(controller, 100);
+    press(controller, 300);
+    const secondRelease = release(controller, 400);
+    assert.equal(firstRelease.ModeOutputEnabled, true);
+    assert.equal(secondRelease.Event, 'scenario_double_selected');
+    assert.equal(secondRelease.ScenarioName, 'Zwei');
+    assert.deepEqual(secondRelease.ActiveLights, [1]);
+    assert.equal(secondRelease.ClickFlushAt, null);
+});
+
+test('88 - wiederholte Doppelklicks durchlaufen die Szenarien zyklisch', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'one', name: 'Eins', outputs: [1, 0] },
+        { id: 'two', name: 'Zwei', outputs: [0, 1] },
+    ] });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Eins' });
+    press(controller, 0); release(controller, 50); press(controller, 200); release(controller, 250);
+    press(controller, 1000); release(controller, 1050); press(controller, 1200);
+    const output = release(controller, 1250);
+    assert.equal(output.ScenarioName, 'Eins');
+});
+
+test('89 - Langdruck verlässt den Szenariomodus und stellt den Normalbetrieb wieder her', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'normal', name: 'Normal', outputs: [1, 0] },
+        { id: 'dinner', name: 'Dinner', outputs: [0, 1] },
+    ] });
+    shortPress(controller);
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Dinner' });
+    press(controller, 1000);
+    const output = release(controller, 3000);
+    assert.equal(output.Event, 'scenario_mode_exited');
+    assert.equal(output.OperatingMode, 'normal');
+    assert.equal(output.ScenarioName, 'Normal');
+});
+
+test('90 - Langdruck im Normalbetrieb übernimmt das aktuell gewählte Einzellicht', () => {
+    const controller = new LightController();
+    shortPress(controller);
+    press(controller, 1000);
+    const output = release(controller, 3000);
+    assert.equal(output.Event, 'manual_light_mode_entered');
+    assert.equal(output.OperatingMode, 'manual-light');
+    assert.equal(output.ManualLightNumber, 1);
+});
+
+test('91 - manueller Ein-Aus-Zustand und Modus überleben eine neue Instanz', () => {
+    const controller = new LightController();
+    shortPress(controller);
+    press(controller, 1000); press(controller, 3000); release(controller, 3100);
+    shortPress(controller, 4000);
+    const restored = new LightController(controller.getConfiguration()).getOutput();
+    assert.equal(restored.OperatingMode, 'manual-light');
+    assert.equal(restored.ManualLightNumber, 1);
+    assert.equal(restored.ModeOutputEnabled, false);
+});
+
+test('92 - ausgeschalteter Szenariomodus überlebt eine neue Instanz', () => {
+    const controller = new LightController({ scenarios: [
+        { id: 'dinner', name: 'Dinner', outputs: [0.5, 1] },
+    ] });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Dinner' });
+    shortPress(controller);
+    const restored = new LightController(controller.getConfiguration()).getOutput();
+    assert.equal(restored.OperatingMode, 'scenario');
+    assert.equal(restored.ScenarioName, 'Dinner');
+    assert.equal(restored.ModeOutputEnabled, false);
+});
+
+test('93 - Doppelklickzeit ist konfigurierbar', () => {
+    const controller = new LightController({ doubleClickTimeMs: 350 });
+    press(controller, 0);
+    assert.equal(release(controller, 100).ClickFlushAt, 450);
+    assert.equal(controller.getConfiguration().doubleClickTimeMs, 350);
+});
+
+test('94 - gedrückter Taster kündigt den Ultralang-Termin an', () => {
+    const controller = new LightController();
+    const output = press(controller, 1000);
+    assert.equal(output.UltraLongFlushAt, 5000);
+});
+
+test('95 - Ultralang-Flush vor vier Sekunden bleibt wirkungslos', () => {
+    const controller = new LightController();
+    press(controller, 0);
+    const output = controller.process({ Command: 'FlushUltraLongPress' }, 3999);
+    assert.equal(output.Event, 'none');
+    assert.equal(output.SendCommand, null);
+});
+
+test('96 - Ultralangdruck schaltet sofort alles aus und sendet den Commander-Befehl', () => {
+    const controller = new LightController({ outputCount: 3 });
+    controller.process({ Command: 'AllLightsOn' });
+    press(controller, 0);
+    const output = controller.process({ Command: 'FlushUltraLongPress' }, 4000);
+    assert.equal(output.Event, 'all_lights_off_command');
+    assert.equal(output.SendCommand, 'CommandAllLightsOff');
+    assert.equal(output.PersistentStateChanged, true);
+    assert.deepEqual(output.LedOutput, [0, 0, 0]);
+});
+
+test('97 - Ultralangdruck verlässt einen ausgewählten Szenariomodus', () => {
+    const controller = new LightController({ outputCount: 2, scenarios: [
+        { id: 'dinner', name: 'Dinner', outputs: [0.5, 1] },
+    ] });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Dinner' });
+    press(controller, 0);
+    const output = controller.process({ Command: 'FlushUltraLongPress' }, 4000);
+    assert.equal(output.OperatingMode, 'normal');
+    assert.equal(output.ScenarioName, null);
+    assert.deepEqual(output.LedOutput, [0, 0]);
+});
+
+test('98 - Loslassen nach Ultralangdruck sendet den Commander-Befehl nicht doppelt', () => {
+    const controller = new LightController();
+    press(controller, 0);
+    controller.process({ Command: 'FlushUltraLongPress' }, 4000);
+    const output = release(controller, 4100);
+    assert.equal(output.Event, 'button_released_after_ultra_long_action');
+    assert.equal(output.SendCommand, null);
+});
+
+test('99 - Loslassen nach mehr als vier Sekunden ist ein sicherer Timer-Fallback', () => {
+    const controller = new LightController();
+    press(controller, 0);
+    const output = release(controller, 4100);
+    assert.equal(output.Event, 'all_lights_off_command');
+    assert.equal(output.SendCommand, 'CommandAllLightsOff');
+});
+
+test('100 - Ultralangzeit ist konfigurierbar und bleibt größer als die Langdruckzeit', () => {
+    const controller = new LightController({ holdTimeMs: 3000, ultraHoldTimeMs: 2500 });
+    assert.equal(controller.ultraHoldTimeMs, 3001);
+});
+
+test('101 - getConfiguration enthält Ultralangzeit und Aktion als sichere Kopien', () => {
+    const controller = new LightController({
+        ultraHoldTimeMs: 4500,
+        inputBindings: [{ ultraLongAction: { type: 'all-off-command' } }],
+    });
+    const configuration = controller.getConfiguration();
+    configuration.inputBindings[0].ultraLongAction.type = 'none';
+    assert.equal(configuration.ultraHoldTimeMs, 4500);
+    assert.equal(controller.getConfiguration().inputBindings[0].ultraLongAction.type, 'all-off-command');
 });

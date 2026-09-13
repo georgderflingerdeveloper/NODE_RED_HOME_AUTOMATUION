@@ -23,10 +23,11 @@ function runWrapper(msg, { flow = storage(), context = storage() } = {}) {
     const node = {
         status(value) { statuses.push(value); },
         error(value) { errors.push(value); },
+        send() {},
     };
     const nodeGlobal = { get: () => controllerModule };
     const execute = new vm.Script(`(function (msg, node, context, flow, global) {\n${functionSource}\n})`)
-        .runInNewContext();
+        .runInNewContext({ setTimeout: () => ({ scheduled: true }), clearTimeout: () => {} });
     const result = execute(msg, node, context, flow, nodeGlobal);
     return { result, flow, context, statuses, errors };
 }
@@ -86,4 +87,40 @@ test('Neue Function-Instanz liest persistierte Szenarien wieder ein', () => {
     assert.ok(execution.result.payload.ScenarioList.some(
         (scenario) => scenario.ScenarioName === 'Nacht' && scenario.ScenarioProperties['6'] === 20,
     ));
+});
+
+test('Function-Wrapper persistiert den Ein-Aus-Zustand eines ausgewählten Szenarios', () => {
+    const flow = storage();
+    const context = storage();
+    runWrapper({ payload: {
+        Command: 'SaveScenario', ScenarioName: 'Dinner', ScenarioProperties: { 1: 50, 2: 100 },
+    } }, { flow, context });
+    runWrapper({ payload: { Command: 'SelectScenario', ScenarioName: 'Dinner' } }, { flow, context });
+    runWrapper({ payload: { ButtonPressed: true, NowMs: 0 } }, { flow, context });
+    runWrapper({ payload: { ButtonPressed: false, NowMs: 100 } }, { flow, context });
+    const switchedOff = runWrapper({ payload: {
+        Command: 'FlushPendingClick', NowMs: 600,
+    } }, { flow, context });
+    assert.equal(switchedOff.result.payload.Event, 'scenario_toggled_off');
+    assert.equal(flow.get('LightControllerKitchenConfiguration').runtimeState.modeOutputEnabled, false);
+    const afterRestart = runWrapper({ payload: {} }, { flow, context: storage() });
+    assert.equal(afterRestart.result.payload.OperatingMode, 'scenario');
+    assert.equal(afterRestart.result.payload.ScenarioName, 'Dinner');
+    assert.deepEqual(afterRestart.result.payload.LedOutput, [0, 0, 0, 0, 0, 0]);
+});
+
+test('Function-Wrapper enthält Timer und 500-ms-Doppelklickaktion', () => {
+    assert.match(functionSource, /doubleClickTimeMs: 500/);
+    assert.match(functionSource, /doubleAction: "next-scenario"/);
+    assert.match(functionSource, /Command: "FlushPendingClick"/);
+});
+
+test('Function-Wrapper plant den 4-s-Ultralangdruck und den Commander-Befehl', () => {
+    assert.match(functionSource, /ultraHoldTimeMs: 4000/);
+    assert.match(functionSource, /ultraLongAction: "all-off-command"/);
+    assert.match(functionSource, /Command: "FlushUltraLongPress"/);
+    const controller = new controllerModule.LightController();
+    controller.process({ ButtonPressed: true }, 0);
+    const output = controller.process({ Command: 'FlushUltraLongPress' }, 4000);
+    assert.equal(output.SendCommand, 'CommandAllLightsOff');
 });
