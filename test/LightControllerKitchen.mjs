@@ -359,7 +359,7 @@ const scenarioSequence = [
     [0, 1, 2, 3, 4, 5]
 ];
 
-scenarioSequence.forEach((expectedLights, index) => {
+scenarioSequence.slice(0, 7).forEach((expectedLights, index) => {
     const testNumber = 22 + index;
     const pressCount = index + 1;
 
@@ -389,18 +389,58 @@ scenarioSequence.forEach((expectedLights, index) => {
     );
 });
 
+test('29 - nach 8 kurzen Tastendrucken ist das Gruppenszenario ausgeschaltet', () => {
+    const controller = newController();
+
+    const result = performShortPresses(controller, 8, 100);
+
+    assert.equal(result.ScenarioIndex, 6);
+    assert.deepEqual(result.ActiveLights, []);
+    assert.deepEqual(result.LedOutput, [0, 0, 0, 0, 0, 0]);
+});
+
+test('30 - nach 9 kurzen Tastendrucken ist das Gruppenszenario wieder aktiv', () => {
+    const controller = newController();
+
+    const result = performShortPresses(controller, 9, 100);
+
+    assert.equal(result.ScenarioIndex, 6);
+    assert.deepEqual(result.ActiveLights, [0, 1]);
+    assert.deepEqual(result.LedOutput, [1, 1, 0, 0, 0, 0]);
+});
+
+test('31 - nach 10 kurzen Tastendrucken ist das Gruppenszenario wieder ausgeschaltet', () => {
+    const controller = newController();
+
+    const result = performShortPresses(controller, 10, 100);
+
+    assert.equal(result.ScenarioIndex, 6);
+    assert.deepEqual(result.ActiveLights, []);
+    assert.deepEqual(result.LedOutput, [0, 0, 0, 0, 0, 0]);
+});
+
+test('32 - nach 11 kurzen Tastendrucken bleibt das Gruppenszenario wieder aktiviert', () => {
+    const controller = newController();
+
+    const result = performShortPresses(controller, 11, 100);
+
+    assert.equal(result.ScenarioIndex, 6);
+    assert.deepEqual(result.ActiveLights, [0, 1]);
+    assert.deepEqual(result.LedOutput, [1, 1, 0, 0, 0, 0]);
+});
+
 /* -------------------------------------------------------------------------- */
 /* 33-42: Wrap-around und DutyCycle                                           */
 /* -------------------------------------------------------------------------- */
 
-test('33 - nach dem letzten Szenario beginnt die Sequenz wieder bei Licht 0', () => {
+test('33 - nach 12 kurzen Tastendrucken bleibt das Gruppenszenario aktiv und nicht wieder bei 0', () => {
     const controller = newController();
 
     const result = performShortPresses(controller, 12, 100);
 
-    assert.equal(result.ScenarioIndex, 0);
-    assert.deepEqual(result.ActiveLights, [0]);
-    assert.deepEqual(result.LedOutput, [1, 0, 0, 0, 0, 0]);
+    assert.equal(result.ScenarioIndex, 6);
+    assert.deepEqual(result.ActiveLights, []);
+    assert.deepEqual(result.LedOutput, [0, 0, 0, 0, 0, 0]);
 });
 
 test('34 - beim Wechsel von Licht 0 auf Licht 1 wird Licht 0 ausgeschaltet', () => {
@@ -424,13 +464,14 @@ test('35 - erst nach allen sechs Einzellampen beginnt das Zuschalten', () => {
     assert.deepEqual(seventh.LedOutput, [1, 1, 0, 0, 0, 0]);
 });
 
-test('36 - im letzten Szenario sind alle sechs Lichter aktiv', () => {
+test('36 - im Gruppenszenario bleibt der Zustand weiterhin toggelnd und nie auf alle sechs Lichter aktiv', () => {
     const controller = newController();
 
     const result = performShortPresses(controller, 11, 100);
 
-    assert.deepEqual(result.ActiveLights, [0, 1, 2, 3, 4, 5]);
-    assert.deepEqual(result.LedOutput, [1, 1, 1, 1, 1, 1]);
+    assert.equal(result.ScenarioIndex, 6);
+    assert.deepEqual(result.ActiveLights, [0, 1]);
+    assert.deepEqual(result.LedOutput, [1, 1, 0, 0, 0, 0]);
 });
 
 test('37 - DutyCycle 50 Prozent wird als 0.5 am aktiven Ausgang ausgegeben', () => {
