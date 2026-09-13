@@ -1,188 +1,188 @@
 [
-    {
-        "id": "lightcontrollerkitchen",
-        "type": "function",
-        "z": "",
-        "name": "LightControllerKitchen",
-        "func": "// Generische Klasse, raumspezifische Instanz.\nconst INSTANCE_NAME = \"Kitchen\";\nconst CONFIGURATION_KEY = \"LightControllerKitchenConfiguration\";\nconst CONTROLLER_KEY = \"lightControllerKitchen\";\nconst FINGERPRINT_KEY = \"lightControllerKitchenConfigurationFingerprint\";\nconst CLICK_TIMER_KEY = \"lightControllerKitchenClickTimer\";\nconst ULTRA_TIMER_KEY = \"lightControllerKitchenUltraLongTimer\";\nconst controllerModule = global.get(\"LightControllerModule\") || global.get(\"LightControllerKitchenModule\");\nconst Controller = controllerModule && (controllerModule.LightController || controllerModule.LightControllerKitchen);\nconst storeModule = global.get(\"LightControllerScenarioStoreModule\");\nconst ScenarioStore = storeModule && storeModule.LightControllerScenarioStore;\n\nif (typeof Controller !== \"function\") {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"LightController-Modul fehlt\" });\n    node.error(\"LightController ist nicht geladen. settings.js und Moduldatei prüfen.\", msg);\n    return null;\n}\n\nconst defaultConfiguration = {\n    instanceName: INSTANCE_NAME,\n    inputCount: 1,\n    outputCount: 6,\n    holdTimeMs: 2000,\n    doubleClickTimeMs: 500,\n    ultraHoldTimeMs: 4000,\n    inputBindings: [{\n        shortAction: \"next\",\n        doubleAction: \"next-scenario\",\n        longAction: \"toggle-mode\",\n        ultraLongAction: \"all-off-command\"\n    }]\n};\n\nlet scenarioStore = context.get(\"lightControllerKitchenScenarioStore\");\nif (!scenarioStore && typeof ScenarioStore === \"function\") {\n    scenarioStore = new ScenarioStore();\n    context.set(\"lightControllerKitchenScenarioStore\", scenarioStore);\n}\nlet persistedConfiguration = null;\nif (scenarioStore) {\n    try {\n        persistedConfiguration = scenarioStore.load(INSTANCE_NAME);\n    } catch (error) {\n        node.warn(`Persistierte LightController-Konfiguration konnte nicht gelesen werden: ${error.message}`);\n    }\n}\nlet configuration = persistedConfiguration || flow.get(CONFIGURATION_KEY) || defaultConfiguration;\nif (!configuration.runtimeState) {\n    configuration = {\n        ...configuration,\n        inputBindings: (configuration.inputBindings || defaultConfiguration.inputBindings).map((binding) => ({\n            ...binding,\n            doubleAction: binding.doubleAction || \"next-scenario\",\n            ultraLongAction: binding.ultraLongAction || \"all-off-command\",\n            longAction: binding.longAction === \"toggle-next\"\n                ? \"toggle-mode\"\n                : binding.longAction && binding.longAction.type === \"toggle-next\"\n                    ? { ...binding.longAction, type: \"toggle-mode\" }\n                    : binding.longAction\n        }))\n    };\n}\nconfiguration = { ...configuration, instanceName: INSTANCE_NAME };\nlet fingerprint = JSON.stringify(configuration);\nlet controller = context.get(CONTROLLER_KEY);\nconst previousFingerprint = context.get(FINGERPRINT_KEY);\n\nif (!controller || typeof controller.process !== \"function\" || fingerprint !== previousFingerprint) {\n    controller = new Controller(configuration);\n    context.set(CONTROLLER_KEY, controller);\n    context.set(FINGERPRINT_KEY, fingerprint);\n}\n\nif (msg.topic === \"light-controller/configure\") {\n    configuration = { ...configuration, ...(msg.payload || {}), instanceName: INSTANCE_NAME };\n    controller = new Controller(configuration);\n    context.set(CONTROLLER_KEY, controller);\n    msg.payload = controller.getOutput({ event: \"configuration_changed\" });\n    msg.payload.ScenariosChanged = true;\n} else {\n    msg.payload = controller.process(msg.payload || {});\n}\n\nfunction persistControllerState(output) {\n    if (!output.ScenariosChanged && !output.PersistentStateChanged) return;\n    configuration = controller.getConfiguration();\n    fingerprint = JSON.stringify(configuration);\n    flow.set(CONFIGURATION_KEY, configuration);\n    if (scenarioStore) {\n        try {\n            scenarioStore.save(INSTANCE_NAME, configuration);\n        } catch (error) {\n            node.error(`LightController-Szenarien konnten nicht gespeichert werden: ${error.message}`, msg);\n        }\n    }\n    context.set(CONTROLLER_KEY, controller);\n    context.set(FINGERPRINT_KEY, fingerprint);\n}\npersistControllerState(msg.payload);\n\nconst oldClickTimer = context.get(CLICK_TIMER_KEY);\nif (oldClickTimer) clearTimeout(oldClickTimer);\nif (Number.isFinite(msg.payload.ClickFlushAt)) {\n    const delayMs = Math.max(0, msg.payload.ClickFlushAt - Date.now()) + 5;\n    const clickTimer = setTimeout(() => {\n        const delayedOutput = controller.process({ Command: \"FlushPendingClick\" });\n        persistControllerState(delayedOutput);\n        context.set(CLICK_TIMER_KEY, null);\n        node.send({ topic: \"light-controller/status\", payload: delayedOutput });\n    }, delayMs);\n    context.set(CLICK_TIMER_KEY, clickTimer);\n} else {\n    context.set(CLICK_TIMER_KEY, null);\n}\n\nconst oldUltraTimer = context.get(ULTRA_TIMER_KEY);\nif (oldUltraTimer) clearTimeout(oldUltraTimer);\nif (Number.isFinite(msg.payload.UltraLongFlushAt)) {\n    const delayMs = Math.max(0, msg.payload.UltraLongFlushAt - Date.now()) + 5;\n    const ultraTimer = setTimeout(() => {\n        const delayedOutput = controller.process({ Command: \"FlushUltraLongPress\" });\n        persistControllerState(delayedOutput);\n        context.set(ULTRA_TIMER_KEY, null);\n        node.send({ topic: \"light-controller/status\", payload: delayedOutput });\n    }, delayMs);\n    context.set(ULTRA_TIMER_KEY, ultraTimer);\n} else {\n    context.set(ULTRA_TIMER_KEY, null);\n}\n\nmsg.topic = \"light-controller/status\";\nif (msg.payload.CommandResult) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: msg.payload.CommandResult });\n} else if (msg.payload.LedStatus.some(status => status.includes(\"=On[\"))) {\n    node.status({ fill: \"green\", shape: \"dot\", text: msg.payload.LedStatusText });\n} else {\n    node.status({ fill: \"grey\", shape: \"ring\", text: msg.payload.LedStatusText });\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 600,
-        "y": 220,
-        "wires": [
-            [
-                "lightcontroller_led_status",
-                "lightcontroller_kitchen_dashboard"
-            ]
-        ]
-    },
-    {
-        "id": "lightcontroller_test_button_on",
-        "type": "inject",
-        "z": "",
-        "name": "TEST · Taster EIN (drücken)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"ButtonPressed\":true,\"DutyCycle\":70}",
-        "payloadType": "json",
-        "x": 220,
-        "y": 180,
-        "wires": [
-            [
-                "lightcontrollerkitchen"
-            ]
-        ]
-    },
-    {
-        "id": "lightcontroller_test_button_off",
-        "type": "inject",
-        "z": "",
-        "name": "TEST · Taster AUS (loslassen)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"ButtonPressed\":false,\"DutyCycle\":70}",
-        "payloadType": "json",
-        "x": 220,
-        "y": 220,
-        "wires": [
-            [
-                "lightcontrollerkitchen"
-            ]
-        ]
-    },
-    {
-        "id": "lightcontroller_test_save_scenario",
-        "type": "inject",
-        "z": "",
-        "name": "TEST · Szenario Testlicht speichern",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"Command\":\"SaveScenario\",\"ScenarioName\":\"Testlicht\",\"ScenarioProperties\":{\"1\":50,\"2\":100,\"6\":70}}",
-        "payloadType": "json",
-        "x": 240,
-        "y": 280,
-        "wires": [
-            [
-                "lightcontrollerkitchen"
-            ]
-        ]
-    },
-    {
-        "id": "lightcontroller_test_list_scenarios",
-        "type": "inject",
-        "z": "",
-        "name": "TEST · Szenarien auflisten",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"Command\":\"ListScenarios\"}",
-        "payloadType": "json",
-        "x": 220,
-        "y": 320,
-        "wires": [
-            [
-                "lightcontrollerkitchen"
-            ]
-        ]
-    },
-    {
-        "id": "lightcontroller_test_select_scenario",
-        "type": "inject",
-        "z": "",
-        "name": "TEST · Szenario Testlicht auswählen",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"Command\":\"SelectScenario\",\"ScenarioName\":\"Testlicht\"}",
-        "payloadType": "json",
-        "x": 240,
-        "y": 360,
-        "wires": [
-            [
-                "lightcontrollerkitchen"
-            ]
-        ]
-    },
-    {
-        "id": "lightcontroller_led_status",
-        "type": "debug",
-        "z": "",
-        "name": "LED-Status · 1=On[70%], 2=Off …",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload.LedStatusText",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 900,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "lightcontroller_kitchen_dashboard",
-        "type": "ui_template",
-        "z": "light_controller_flow",
-        "group": "3dbc8c98.083aa4",
-        "name": "Kitchen · Lichtsteuerung und Szenarien",
-        "order": 1,
-        "width": 6,
-        "height": 0,
-        "format": "<style>\n.lc-kitchen{font-family:Arial,sans-serif;color:#eef8f8;padding:4px}.lc-card{background:#173638;border:1px solid #2c777b;border-radius:10px;padding:12px;margin-bottom:10px}.lc-title{font-size:18px;font-weight:700;margin-bottom:10px}.lc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.lc-led{background:#203c3e;border-radius:8px;padding:10px;text-align:center}.lc-lamp{width:34px;height:34px;border-radius:50%;margin:0 auto 6px;background:#233;border:2px solid #658;box-shadow:inset 0 0 8px #000}.lc-led-value{font-weight:700}.lc-test-button{width:100%;min-height:58px;border:0;border-radius:9px;background:#087f88;color:#fff;font-size:17px;font-weight:700;cursor:pointer;touch-action:none;user-select:none}.lc-test-button.pressed{background:#56c271;color:#092b19;box-shadow:0 0 14px #7cf493}.lc-status{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px}.lc-status strong{color:#9df5ad}.lc-command{color:#ffd36c;font-weight:700}.lc-form-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px}.lc-input,.lc-select{min-width:0;border:1px solid #4a7476;border-radius:6px;background:#10292b;color:#fff;padding:8px}.lc-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:9px}.lc-level label{display:block;font-size:11px;color:#b9d2d3}.lc-level input{box-sizing:border-box;width:100%}.lc-actions{display:flex;flex-wrap:wrap;gap:6px}.lc-action{border:0;border-radius:6px;padding:8px 10px;background:#087f88;color:white;font-weight:600;cursor:pointer}.lc-action.warn{background:#a54232}.lc-hint{font-size:11px;color:#a9c4c5;margin-top:8px}.lc-event{font-size:15px;font-weight:700;color:#a6f5b4;margin-bottom:8px}@media(max-width:560px){.lc-grid,.lc-levels,.lc-status{grid-template-columns:repeat(2,minmax(0,1fr))}.lc-form-row{grid-template-columns:1fr}}\n</style>\n\n<div id=\"lc-kitchen-dashboard\" class=\"lc-kitchen\">\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">KITCHEN · Lichttest</div>\n    <button id=\"lc-kitchen-test-button\" class=\"lc-test-button\" ng-class=\"{pressed:testButtonPressed}\">\n      {{testButtonPressed ? 'TASTER GEDRÜCKT' : 'DRÜCKEN UND HALTEN'}}\n    </button>\n    <div class=\"lc-hint\">Kurz: schalten · Doppelklick ≤500 ms: Szenario · 2–&lt;4 s: Langdruck · ≥4 s: alles aus</div>\n  </div>\n\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">Push- und Tasterstatus</div>\n    <div class=\"lc-event\">{{pushText}}</div>\n    <div class=\"lc-status\">\n      <span>Modus: <strong>{{state.OperatingMode || '—'}}</strong></span>\n      <span>Taster: <strong>{{state.ButtonTiming.Pressed ? 'GEDRÜCKT' : 'LOS'}}</strong></span>\n      <span>Gedrückt: {{formatTime(state.ButtonTiming.PressedAt)}}</span>\n      <span>Losgelassen: {{formatTime(state.ButtonTiming.ReleasedAt)}}</span>\n      <span>Dauer: <strong>{{displayDuration()}} ms</strong></span>\n      <span>Ereignis: {{state.Event || '—'}}</span>\n    </div>\n    <div class=\"lc-command\" ng-if=\"state.SendCommand\">Ausgabe: payload.SendCommand = {{state.SendCommand}}</div>\n  </div>\n\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">6 LEDs</div>\n    <div class=\"lc-grid\">\n      <div class=\"lc-led\" ng-repeat=\"index in ledIndexes track by index\">\n        <div class=\"lc-lamp\" ng-style=\"ledStyle(index)\"></div>\n        <div class=\"lc-led-value\">LED {{index + 1}} · {{ledPercent(index)}}%</div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">Szenarien konfigurieren</div>\n    <div class=\"lc-form-row\">\n      <select class=\"lc-select\" ng-model=\"selectedScenarioName\" ng-change=\"loadSelectedScenario()\">\n        <option value=\"\">Szenario auswählen …</option>\n        <option ng-repeat=\"scenario in state.ScenarioList track by scenario.ScenarioId\" value=\"{{scenario.ScenarioName}}\">{{scenario.ScenarioName}}</option>\n      </select>\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('SelectScenario')\">Auswählen</button>\n    </div>\n    <div class=\"lc-form-row\">\n      <input class=\"lc-input\" ng-model=\"scenarioName\" placeholder=\"Eindeutiger Szenarioname\">\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('ListScenarios')\">Liste laden</button>\n    </div>\n    <div class=\"lc-levels\">\n      <div class=\"lc-level\" ng-repeat=\"index in ledIndexes track by index\">\n        <label>LED {{index + 1}} [%]</label>\n        <input class=\"lc-input\" type=\"number\" min=\"0\" max=\"100\" step=\"1\" ng-model=\"scenarioLevels[index]\">\n      </div>\n    </div>\n    <div class=\"lc-actions\">\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('SaveScenario', true)\">Speichern</button>\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('AddScenario', true)\">Neu anlegen</button>\n      <button class=\"lc-action warn\" ng-click=\"deleteScenario()\">Löschen</button>\n      <button class=\"lc-action warn\" ng-click=\"clearScenarios()\">Alle löschen</button>\n    </div>\n    <div class=\"lc-hint\">Speichern aktualisiert denselben Namen. Werte sind Prozent von 0 bis 100 und bleiben nach einem Neustart erhalten.</div>\n  </div>\n</div>\n\n<script>\n(function(scope) {\n  const EMPTY_TIMING = { Pressed:false, PressedAt:null, ReleasedAt:null, DurationMs:null, CurrentDurationMs:0 };\n  const EVENT_TEXT = {\n    initialized:\"Controller bereit\", button_pressed:\"Taster gedrückt\",\n    short_press_pending:\"Kurzer Klick erkannt – Doppelklickfenster offen\",\n    scenario_changed:\"Nächstes Licht/Szenario aktiviert\",\n    scenario_double_selected:\"Doppelklick – nächstes Szenario gewählt\",\n    scenario_toggled_on:\"Szenario eingeschaltet\", scenario_toggled_off:\"Szenario ausgeschaltet\",\n    manual_light_toggled_on:\"Einzellicht eingeschaltet\", manual_light_toggled_off:\"Einzellicht ausgeschaltet\",\n    manual_light_mode_entered:\"Langdruck – Einzellichtmodus aktiv\",\n    manual_light_mode_exited:\"Langdruck – Einzellichtmodus verlassen\",\n    scenario_mode_exited:\"Langdruck – Szenariomodus verlassen\",\n    all_lights_off_command:\"Ultralangdruck – alle Lichter ausgeschaltet\",\n    button_released_after_ultra_long_action:\"Taster nach Ultralangdruck losgelassen\",\n    scenario_saved:\"Szenario gespeichert\", scenario_added:\"Szenario angelegt\",\n    scenario_selected:\"Szenario ausgewählt\", scenario_deleted:\"Szenario gelöscht\",\n    scenarios_cleared:\"Alle Szenarien gelöscht\", scenarios_listed:\"Szenarioliste aktualisiert\",\n    none:\"Keine neue Tasteraktion\"\n  };\n  scope.ledIndexes = [0,1,2,3,4,5];\n  scope.state = { LedOutput:[0,0,0,0,0,0], ScenarioList:[], ButtonTiming:{...EMPTY_TIMING} };\n  scope.scenarioLevels = [0,0,0,0,0,0];\n  scope.scenarioName = \"\";\n  scope.selectedScenarioName = \"\";\n  scope.testButtonPressed = false;\n  scope.localDurationMs = 0;\n  scope.pushText = \"Status wird geladen …\";\n  let pressStartedAt = null;\n  let durationTimer = null;\n  let buttonIsDown = false;\n\n  scope.$watch(\"msg\", function(message) {\n    if (!message || !message.payload || typeof message.payload !== \"object\") return;\n    const payload = message.payload;\n    scope.state = { ...scope.state, ...payload, ButtonTiming:{...EMPTY_TIMING, ...(payload.ButtonTiming || {})} };\n    scope.pushText = payload.CommandResult || EVENT_TEXT[payload.Event] || payload.Event || \"Status aktualisiert\";\n    if (payload.ScenarioName) scope.selectedScenarioName = payload.ScenarioName;\n  });\n\n  scope.ledPercent = function(index) {\n    return Math.round(Number(scope.state.LedOutput?.[index] || 0) * 100);\n  };\n  scope.ledStyle = function(index) {\n    const percent = scope.ledPercent(index);\n    return percent > 0\n      ? { background:\"hsl(\" + (70 + percent * 0.5) + \",85%,55%)\", boxShadow:\"0 0 14px rgba(130,255,150,.9)\" }\n      : { background:\"#263638\", boxShadow:\"inset 0 0 8px #000\" };\n  };\n  scope.formatTime = function(value) {\n    if (!value) return \"—\";\n    const date = new Date(value);\n    return Number.isNaN(date.getTime()) ? \"—\" : date.toLocaleTimeString(\"de-AT\", {hour12:false});\n  };\n  scope.displayDuration = function() {\n    return scope.testButtonPressed ? scope.localDurationMs : (scope.state.ButtonTiming.DurationMs ?? 0);\n  };\n  scope.loadSelectedScenario = function() {\n    const scenario = (scope.state.ScenarioList || []).find(item => item.ScenarioName === scope.selectedScenarioName);\n    if (!scenario) return;\n    scope.scenarioName = scenario.ScenarioName;\n    scope.scenarioLevels = scope.ledIndexes.map(index => Number(scenario.ScenarioProperties?.[index + 1] || 0));\n  };\n  scope.scenarioProperties = function() {\n    const result = {};\n    scope.ledIndexes.forEach(index => { result[index + 1] = Math.max(0, Math.min(100, Number(scope.scenarioLevels[index]) || 0)); });\n    return result;\n  };\n  scope.sendScenarioCommand = function(command, includeProperties) {\n    const name = String(scope.scenarioName || scope.selectedScenarioName || \"\").trim();\n    if (command !== \"ListScenarios\" && !name) { scope.pushText = \"Bitte einen Szenarionamen eingeben.\"; return; }\n    const payload = { Command:command };\n    if (name) payload.ScenarioName = name;\n    if (includeProperties) payload.ScenarioProperties = scope.scenarioProperties();\n    scope.send({ topic:\"light-controller/dashboard\", payload:payload });\n  };\n  scope.deleteScenario = function() {\n    if (window.confirm(\"Ausgewähltes Szenario wirklich löschen?\")) scope.sendScenarioCommand(\"DeleteScenario\");\n  };\n  scope.clearScenarios = function() {\n    if (window.confirm(\"Wirklich alle Szenarien löschen?\")) scope.send({topic:\"light-controller/dashboard\",payload:{Command:\"ClearAllScenarios\"}});\n  };\n\n  function sendButton(pressed) {\n    scope.send({ topic:\"light-controller/dashboard\", payload:{ButtonPressed:pressed,DutyCycle:70} });\n  }\n  function stopDurationTimer() {\n    if (durationTimer) window.clearInterval(durationTimer);\n    durationTimer = null;\n  }\n  function buttonDown(event) {\n    if (buttonIsDown) return;\n    buttonIsDown = true;\n    event.preventDefault();\n    event.currentTarget.setPointerCapture?.(event.pointerId);\n    pressStartedAt = Date.now();\n    scope.$applyAsync(function() { scope.testButtonPressed = true; scope.localDurationMs = 0; });\n    durationTimer = window.setInterval(function() {\n      scope.$applyAsync(function() { scope.localDurationMs = Date.now() - pressStartedAt; });\n    }, 50);\n    sendButton(true);\n  }\n  function buttonUp(event) {\n    if (!buttonIsDown) return;\n    buttonIsDown = false;\n    event.preventDefault();\n    stopDurationTimer();\n    scope.$applyAsync(function() { scope.localDurationMs = Date.now() - pressStartedAt; scope.testButtonPressed = false; });\n    sendButton(false);\n  }\n  window.setTimeout(function() {\n    const button = document.getElementById(\"lc-kitchen-test-button\");\n    if (!button) return;\n    button.addEventListener(\"pointerdown\", buttonDown);\n    button.addEventListener(\"pointerup\", buttonUp);\n    button.addEventListener(\"pointercancel\", buttonUp);\n    button.addEventListener(\"contextmenu\", event => event.preventDefault());\n    scope.send({topic:\"light-controller/dashboard\",payload:{Command:\"ListScenarios\"}});\n  }, 0);\n  scope.$on(\"$destroy\", stopDurationTimer);\n})(scope);\n</script>",
-        "storeOutMessages": true,
-        "fwdInMessages": false,
-        "resendOnRefresh": true,
-        "templateScope": "local",
-        "className": "",
-        "x": 930,
-        "y": 160,
-        "wires": [
-            [
-                "lightcontrollerkitchen"
-            ]
-        ]
-    }
+  {
+    "id": "lightcontrollerkitchen",
+    "type": "function",
+    "z": "",
+    "name": "LightControllerKitchen",
+    "func": "// Generische Klasse, raumspezifische Instanz.\nconst INSTANCE_NAME = \"Kitchen\";\nconst CONFIGURATION_KEY = \"LightControllerKitchenConfiguration\";\nconst CONTROLLER_KEY = \"lightControllerKitchen\";\nconst FINGERPRINT_KEY = \"lightControllerKitchenConfigurationFingerprint\";\nconst CLICK_TIMER_KEY = \"lightControllerKitchenClickTimer\";\nconst ULTRA_TIMER_KEY = \"lightControllerKitchenUltraLongTimer\";\nconst controllerModule = global.get(\"LightControllerModule\") || global.get(\"LightControllerKitchenModule\");\nconst Controller = controllerModule && (controllerModule.LightController || controllerModule.LightControllerKitchen);\nconst storeModule = global.get(\"LightControllerScenarioStoreModule\");\nconst ScenarioStore = storeModule && storeModule.LightControllerScenarioStore;\n\nif (typeof Controller !== \"function\") {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"LightController-Modul fehlt\" });\n    node.error(\"LightController ist nicht geladen. settings.js und Moduldatei prüfen.\", msg);\n    return null;\n}\n\nconst defaultConfiguration = {\n    instanceName: INSTANCE_NAME,\n    inputCount: 1,\n    outputCount: 6,\n    holdTimeMs: 2000,\n    doubleClickTimeMs: 500,\n    ultraHoldTimeMs: 4000,\n    inputBindings: [{\n        shortAction: \"next\",\n        doubleAction: \"next-scenario\",\n        longAction: \"toggle-mode\",\n        ultraLongAction: \"all-off-command\"\n    }]\n};\n\nlet scenarioStore = context.get(\"lightControllerKitchenScenarioStore\");\nif (!scenarioStore && typeof ScenarioStore === \"function\") {\n    scenarioStore = new ScenarioStore();\n    context.set(\"lightControllerKitchenScenarioStore\", scenarioStore);\n}\nlet persistedConfiguration = null;\nif (scenarioStore) {\n    try {\n        persistedConfiguration = scenarioStore.load(INSTANCE_NAME);\n    } catch (error) {\n        node.warn(`Persistierte LightController-Konfiguration konnte nicht gelesen werden: ${error.message}`);\n    }\n}\nlet configuration = persistedConfiguration || flow.get(CONFIGURATION_KEY) || defaultConfiguration;\nif (!configuration.runtimeState) {\n    configuration = {\n        ...configuration,\n        inputBindings: (configuration.inputBindings || defaultConfiguration.inputBindings).map((binding) => ({\n            ...binding,\n            doubleAction: binding.doubleAction || \"next-scenario\",\n            ultraLongAction: binding.ultraLongAction || \"all-off-command\",\n            longAction: binding.longAction === \"toggle-next\"\n                ? \"toggle-mode\"\n                : binding.longAction && binding.longAction.type === \"toggle-next\"\n                    ? { ...binding.longAction, type: \"toggle-mode\" }\n                    : binding.longAction\n        }))\n    };\n}\nconfiguration = { ...configuration, instanceName: INSTANCE_NAME };\nlet fingerprint = JSON.stringify(configuration);\nlet controller = context.get(CONTROLLER_KEY);\nconst previousFingerprint = context.get(FINGERPRINT_KEY);\n\nif (!controller || typeof controller.process !== \"function\" || fingerprint !== previousFingerprint) {\n    controller = new Controller(configuration);\n    context.set(CONTROLLER_KEY, controller);\n    context.set(FINGERPRINT_KEY, fingerprint);\n}\n\nif (msg.topic === \"light-controller/configure\") {\n    configuration = { ...configuration, ...(msg.payload || {}), instanceName: INSTANCE_NAME };\n    controller = new Controller(configuration);\n    context.set(CONTROLLER_KEY, controller);\n    msg.payload = controller.getOutput({ event: \"configuration_changed\" });\n    msg.payload.ScenariosChanged = true;\n} else {\n    msg.payload = controller.process(msg.payload || {});\n}\n\nfunction persistControllerState(output) {\n    if (!output.ScenariosChanged && !output.PersistentStateChanged) return;\n    configuration = controller.getConfiguration();\n    fingerprint = JSON.stringify(configuration);\n    flow.set(CONFIGURATION_KEY, configuration);\n    if (scenarioStore) {\n        try {\n            scenarioStore.save(INSTANCE_NAME, configuration);\n        } catch (error) {\n            node.error(`LightController-Szenarien konnten nicht gespeichert werden: ${error.message}`, msg);\n        }\n    }\n    context.set(CONTROLLER_KEY, controller);\n    context.set(FINGERPRINT_KEY, fingerprint);\n}\npersistControllerState(msg.payload);\n\nconst oldClickTimer = context.get(CLICK_TIMER_KEY);\nif (oldClickTimer) clearTimeout(oldClickTimer);\nif (Number.isFinite(msg.payload.ClickFlushAt)) {\n    const delayMs = Math.max(0, msg.payload.ClickFlushAt - Date.now()) + 5;\n    const clickTimer = setTimeout(() => {\n        const delayedOutput = controller.process({ Command: \"FlushPendingClick\" });\n        persistControllerState(delayedOutput);\n        context.set(CLICK_TIMER_KEY, null);\n        node.send({ topic: \"light-controller/status\", payload: delayedOutput });\n    }, delayMs);\n    context.set(CLICK_TIMER_KEY, clickTimer);\n} else {\n    context.set(CLICK_TIMER_KEY, null);\n}\n\nconst oldUltraTimer = context.get(ULTRA_TIMER_KEY);\nif (oldUltraTimer) clearTimeout(oldUltraTimer);\nif (Number.isFinite(msg.payload.UltraLongFlushAt)) {\n    const delayMs = Math.max(0, msg.payload.UltraLongFlushAt - Date.now()) + 5;\n    const ultraTimer = setTimeout(() => {\n        const delayedOutput = controller.process({ Command: \"FlushUltraLongPress\" });\n        persistControllerState(delayedOutput);\n        context.set(ULTRA_TIMER_KEY, null);\n        node.send({ topic: \"light-controller/status\", payload: delayedOutput });\n    }, delayMs);\n    context.set(ULTRA_TIMER_KEY, ultraTimer);\n} else {\n    context.set(ULTRA_TIMER_KEY, null);\n}\n\nmsg.topic = \"light-controller/status\";\nif (msg.payload.CommandResult) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: msg.payload.CommandResult });\n} else if (msg.payload.LedStatus.some(status => status.includes(\"=On[\"))) {\n    node.status({ fill: \"green\", shape: \"dot\", text: msg.payload.LedStatusText });\n} else {\n    node.status({ fill: \"grey\", shape: \"ring\", text: msg.payload.LedStatusText });\n}\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 600,
+    "y": 220,
+    "wires": [
+      [
+        "lightcontroller_led_status",
+        "lightcontroller_kitchen_dashboard"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_button_on",
+    "type": "inject",
+    "z": "",
+    "name": "TEST · Taster EIN (drücken)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"ButtonPressed\":true,\"DutyCycle\":70}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 180,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_button_off",
+    "type": "inject",
+    "z": "",
+    "name": "TEST · Taster AUS (loslassen)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"ButtonPressed\":false,\"DutyCycle\":70}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 220,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_save_scenario",
+    "type": "inject",
+    "z": "",
+    "name": "TEST · Szenario Testlicht speichern",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"SaveScenario\",\"ScenarioName\":\"Testlicht\",\"ScenarioProperties\":{\"1\":50,\"2\":100,\"6\":70}}",
+    "payloadType": "json",
+    "x": 240,
+    "y": 280,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_list_scenarios",
+    "type": "inject",
+    "z": "",
+    "name": "TEST · Szenarien auflisten",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"ListScenarios\"}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 320,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_test_select_scenario",
+    "type": "inject",
+    "z": "",
+    "name": "TEST · Szenario Testlicht auswählen",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"SelectScenario\",\"ScenarioName\":\"Testlicht\"}",
+    "payloadType": "json",
+    "x": 240,
+    "y": 360,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lightcontroller_led_status",
+    "type": "debug",
+    "z": "",
+    "name": "LED-Status · 1=On[70%], 2=Off …",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload.LedStatusText",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 900,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "lightcontroller_kitchen_dashboard",
+    "type": "ui_template",
+    "z": "light_controller_flow",
+    "group": "3dbc8c98.083aa4",
+    "name": "Kitchen · Lichtsteuerung und Szenarien",
+    "order": 1,
+    "width": 6,
+    "height": 0,
+    "format": "<style>\n.lc-kitchen{font-family:Arial,sans-serif;color:#eef8f8;padding:4px}.lc-card{background:#173638;border:1px solid #2c777b;border-radius:10px;padding:12px;margin-bottom:10px}.lc-title{font-size:18px;font-weight:700;margin-bottom:10px}.lc-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.lc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.lc-led{background:#203c3e;border-radius:8px;padding:10px;text-align:center}.lc-lamp{width:34px;height:34px;border-radius:50%;margin:0 auto 6px;background:#233;border:2px solid #658;box-shadow:inset 0 0 8px #000}.lc-led-value{font-weight:700}.lc-test-button{width:100%;min-height:58px;border:0;border-radius:9px;background:#087f88;color:#fff;font-size:17px;font-weight:700;cursor:pointer;touch-action:none;user-select:none}.lc-test-button.pressed{background:#56c271;color:#092b19;box-shadow:0 0 14px #7cf493}.lc-status{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px}.lc-status strong{color:#9df5ad}.lc-command{color:#ffd36c;font-weight:700}.lc-form-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px}.lc-input,.lc-select{min-width:0;border:1px solid #4a7476;border-radius:6px;background:#10292b;color:#fff;padding:8px}.lc-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:9px}.lc-level label{display:block;font-size:11px;color:#b9d2d3}.lc-level input{box-sizing:border-box;width:100%}.lc-actions{display:flex;flex-wrap:wrap;gap:6px}.lc-action{border:0;border-radius:6px;padding:8px 10px;background:#087f88;color:white;font-weight:600;cursor:pointer}.lc-action:disabled{opacity:.45;cursor:not-allowed}.lc-action.warn{background:#a54232}.lc-add-led{font-size:18px;min-width:42px}.lc-hint{font-size:11px;color:#a9c4c5;margin-top:8px}.lc-event{font-size:15px;font-weight:700;color:#a6f5b4;margin-bottom:8px}@media(max-width:700px){.lc-grid,.lc-levels{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.lc-status{grid-template-columns:repeat(2,minmax(0,1fr))}.lc-form-row{grid-template-columns:1fr}}\n</style>\n\n<div id=\"lc-kitchen-dashboard\" class=\"lc-kitchen\">\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">KITCHEN · Lichttest</div>\n    <button id=\"lc-kitchen-test-button\" class=\"lc-test-button\" ng-class=\"{pressed:testButtonPressed}\">\n      {{testButtonPressed ? 'TASTER GEDRÜCKT' : 'DRÜCKEN UND HALTEN'}}\n    </button>\n    <div class=\"lc-hint\">Kurz: schalten · Doppelklick ≤500 ms: Szenario · 2–&lt;4 s: Langdruck · ≥4 s: alles aus</div>\n  </div>\n\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">Push- und Tasterstatus</div>\n    <div class=\"lc-event\">{{pushText}}</div>\n    <div class=\"lc-status\">\n      <span>Modus: <strong>{{state.OperatingMode || '—'}}</strong></span>\n      <span>Taster: <strong>{{state.ButtonTiming.Pressed ? 'GEDRÜCKT' : 'LOS'}}</strong></span>\n      <span>Gedrückt: {{formatTime(state.ButtonTiming.PressedAt)}}</span>\n      <span>Losgelassen: {{formatTime(state.ButtonTiming.ReleasedAt)}}</span>\n      <span>Dauer: <strong>{{displayDuration()}} ms</strong></span>\n      <span>Ereignis: {{state.Event || '—'}}</span>\n    </div>\n    <div class=\"lc-command\" ng-if=\"state.SendCommand\">Ausgabe: payload.SendCommand = {{state.SendCommand}}</div>\n  </div>\n\n  <div class=\"lc-card\">\n    <div class=\"lc-title-row\">\n      <div class=\"lc-title\">{{ledIndexes.length}} LEDs</div>\n      <button class=\"lc-action lc-add-led\" ng-click=\"addLed()\" ng-disabled=\"ledIndexes.length >= maxOutputCount\" title=\"LED hinzufügen (maximal 16)\">+</button>\n    </div>\n    <div class=\"lc-grid\">\n      <div class=\"lc-led\" ng-repeat=\"index in ledIndexes track by index\">\n        <div class=\"lc-lamp\" ng-style=\"ledStyle(index)\"></div>\n        <div class=\"lc-led-value\">LED {{index + 1}} · {{ledPercent(index)}}%</div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"lc-card\">\n    <div class=\"lc-title\">Szenarien konfigurieren</div>\n    <div class=\"lc-form-row\">\n      <select class=\"lc-select\" ng-model=\"selectedScenarioName\" ng-change=\"loadSelectedScenario()\">\n        <option value=\"\">Szenario auswählen …</option>\n        <option ng-repeat=\"scenario in state.ScenarioList track by scenario.ScenarioId\" value=\"{{scenario.ScenarioName}}\">{{scenario.ScenarioName}}</option>\n      </select>\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('SelectScenario')\">Auswählen</button>\n    </div>\n    <div class=\"lc-form-row\">\n      <input class=\"lc-input\" ng-model=\"scenarioName\" placeholder=\"Eindeutiger Szenarioname\">\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('ListScenarios')\">Liste laden</button>\n    </div>\n    <div class=\"lc-levels\">\n      <div class=\"lc-level\" ng-repeat=\"index in ledIndexes track by index\">\n        <label>LED {{index + 1}} [%]</label>\n        <input class=\"lc-input\" type=\"number\" min=\"0\" max=\"100\" step=\"1\" ng-model=\"scenarioLevels[index]\">\n      </div>\n    </div>\n    <div class=\"lc-actions\">\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('SaveScenario', true)\">Speichern</button>\n      <button class=\"lc-action\" ng-click=\"sendScenarioCommand('AddScenario', true)\">Neu anlegen</button>\n      <button class=\"lc-action warn\" ng-click=\"deleteScenario()\">Löschen</button>\n      <button class=\"lc-action warn\" ng-click=\"clearScenarios()\">Alle löschen</button>\n    </div>\n    <div class=\"lc-hint\">Speichern aktualisiert denselben Namen. Werte sind Prozent von 0 bis 100 und bleiben nach einem Neustart erhalten.</div>\n  </div>\n</div>\n\n<script>\n(function(scope) {\n  const EMPTY_TIMING = { Pressed:false, PressedAt:null, ReleasedAt:null, DurationMs:null, CurrentDurationMs:0 };\n  const EVENT_TEXT = {\n    initialized:\"Controller bereit\", button_pressed:\"Taster gedrückt\",\n    short_press_pending:\"Kurzer Klick erkannt – Doppelklickfenster offen\",\n    scenario_changed:\"Nächstes Licht/Szenario aktiviert\",\n    scenario_group_selected:\"Lichtgruppe fest ausgewählt – kurzer Druck toggelt die Gruppe\",\n    scenario_double_selected:\"Doppelklick – nächstes Szenario gewählt\",\n    scenario_toggled_on:\"Szenario eingeschaltet\", scenario_toggled_off:\"Szenario ausgeschaltet\",\n    manual_light_toggled_on:\"Einzellicht eingeschaltet\", manual_light_toggled_off:\"Einzellicht ausgeschaltet\",\n    manual_light_mode_entered:\"Langdruck – Einzellichtmodus aktiv\",\n    manual_light_mode_exited:\"Langdruck – Einzellichtmodus verlassen\",\n    scenario_mode_exited:\"Langdruck – Szenariomodus verlassen\",\n    all_lights_off_command:\"Ultralangdruck – alle Lichter ausgeschaltet\",\n    button_released_after_ultra_long_action:\"Taster nach Ultralangdruck losgelassen\",\n    scenario_saved:\"Szenario gespeichert\", scenario_added:\"Szenario angelegt\",\n    scenario_selected:\"Szenario ausgewählt\", scenario_deleted:\"Szenario gelöscht\",\n    scenarios_cleared:\"Alle Szenarien gelöscht\", scenarios_listed:\"Szenarioliste aktualisiert\",\n    output_count_changed:\"LED hinzugefügt und Konfiguration gespeichert\",\n    output_limit_reached:\"Maximal 16 LEDs möglich\",\n    none:\"Keine neue Tasteraktion\"\n  };\n  scope.ledIndexes = [0,1,2,3,4,5];\n  scope.maxOutputCount = 16;\n  scope.state = { OutputCount:6, MaxOutputCount:16, LedOutput:[0,0,0,0,0,0], ScenarioList:[], ButtonTiming:{...EMPTY_TIMING} };\n  scope.scenarioLevels = [0,0,0,0,0,0];\n  scope.scenarioName = \"\";\n  scope.selectedScenarioName = \"\";\n  scope.testButtonPressed = false;\n  scope.localDurationMs = 0;\n  scope.pushText = \"Status wird geladen …\";\n  let pressStartedAt = null;\n  let durationTimer = null;\n  let buttonIsDown = false;\n\n  scope.$watch(\"msg\", function(message) {\n    if (!message || !message.payload || typeof message.payload !== \"object\") return;\n    const payload = message.payload;\n    scope.state = { ...scope.state, ...payload, ButtonTiming:{...EMPTY_TIMING, ...(payload.ButtonTiming || {})} };\n    const outputCount = Math.max(1, Math.min(16, Number(payload.OutputCount || scope.state.OutputCount || 6)));\n    scope.maxOutputCount = Number(payload.MaxOutputCount || 16);\n    scope.ledIndexes = Array.from({length:outputCount}, (_, index) => index);\n    scope.scenarioLevels = scope.ledIndexes.map(index => Number(scope.scenarioLevels[index] || 0));\n    scope.pushText = payload.CommandResult || EVENT_TEXT[payload.Event] || payload.Event || \"Status aktualisiert\";\n    if (payload.ScenarioName) scope.selectedScenarioName = payload.ScenarioName;\n  });\n\n  scope.ledPercent = function(index) {\n    return Math.round(Number(scope.state.LedOutput?.[index] || 0) * 100);\n  };\n  scope.ledStyle = function(index) {\n    const percent = scope.ledPercent(index);\n    return percent > 0\n      ? { background:\"hsl(\" + (70 + percent * 0.5) + \",85%,55%)\", boxShadow:\"0 0 14px rgba(130,255,150,.9)\" }\n      : { background:\"#263638\", boxShadow:\"inset 0 0 8px #000\" };\n  };\n  scope.formatTime = function(value) {\n    if (!value) return \"—\";\n    const date = new Date(value);\n    return Number.isNaN(date.getTime()) ? \"—\" : date.toLocaleTimeString(\"de-AT\", {hour12:false});\n  };\n  scope.displayDuration = function() {\n    return scope.testButtonPressed ? scope.localDurationMs : (scope.state.ButtonTiming.DurationMs ?? 0);\n  };\n  scope.loadSelectedScenario = function() {\n    const scenario = (scope.state.ScenarioList || []).find(item => item.ScenarioName === scope.selectedScenarioName);\n    if (!scenario) return;\n    scope.scenarioName = scenario.ScenarioName;\n    scope.scenarioLevels = scope.ledIndexes.map(index => Number(scenario.ScenarioProperties?.[index + 1] || 0));\n  };\n  scope.scenarioProperties = function() {\n    const result = {};\n    scope.ledIndexes.forEach(index => { result[index + 1] = Math.max(0, Math.min(100, Number(scope.scenarioLevels[index]) || 0)); });\n    return result;\n  };\n  scope.sendScenarioCommand = function(command, includeProperties) {\n    const name = String(scope.scenarioName || scope.selectedScenarioName || \"\").trim();\n    if (command !== \"ListScenarios\" && !name) { scope.pushText = \"Bitte einen Szenarionamen eingeben.\"; return; }\n    const payload = { Command:command };\n    if (name) payload.ScenarioName = name;\n    if (includeProperties) payload.ScenarioProperties = scope.scenarioProperties();\n    scope.send({ topic:\"light-controller/dashboard\", payload:payload });\n  };\n  scope.deleteScenario = function() {\n    if (window.confirm(\"Ausgewähltes Szenario wirklich löschen?\")) scope.sendScenarioCommand(\"DeleteScenario\");\n  };\n  scope.clearScenarios = function() {\n    if (window.confirm(\"Wirklich alle Szenarien löschen?\")) scope.send({topic:\"light-controller/dashboard\",payload:{Command:\"ClearAllScenarios\"}});\n  };\n  scope.addLed = function() {\n    if (scope.ledIndexes.length >= scope.maxOutputCount) return;\n    scope.send({topic:\"light-controller/dashboard\",payload:{Command:\"AddOutput\"}});\n  };\n\n  function sendButton(pressed) {\n    scope.send({ topic:\"light-controller/dashboard\", payload:{ButtonPressed:pressed,DutyCycle:70} });\n  }\n  function stopDurationTimer() {\n    if (durationTimer) window.clearInterval(durationTimer);\n    durationTimer = null;\n  }\n  function buttonDown(event) {\n    if (buttonIsDown) return;\n    buttonIsDown = true;\n    event.preventDefault();\n    event.currentTarget.setPointerCapture?.(event.pointerId);\n    pressStartedAt = Date.now();\n    scope.$applyAsync(function() { scope.testButtonPressed = true; scope.localDurationMs = 0; });\n    durationTimer = window.setInterval(function() {\n      scope.$applyAsync(function() { scope.localDurationMs = Date.now() - pressStartedAt; });\n    }, 50);\n    sendButton(true);\n  }\n  function buttonUp(event) {\n    if (!buttonIsDown) return;\n    buttonIsDown = false;\n    event.preventDefault();\n    stopDurationTimer();\n    scope.$applyAsync(function() { scope.localDurationMs = Date.now() - pressStartedAt; scope.testButtonPressed = false; });\n    sendButton(false);\n  }\n  window.setTimeout(function() {\n    const button = document.getElementById(\"lc-kitchen-test-button\");\n    if (!button) return;\n    button.addEventListener(\"pointerdown\", buttonDown);\n    button.addEventListener(\"pointerup\", buttonUp);\n    button.addEventListener(\"pointercancel\", buttonUp);\n    button.addEventListener(\"contextmenu\", event => event.preventDefault());\n    scope.send({topic:\"light-controller/dashboard\",payload:{Command:\"ListScenarios\"}});\n  }, 0);\n  scope.$on(\"$destroy\", stopDurationTimer);\n})(scope);\n</script>",
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 930,
+    "y": 160,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  }
 ]

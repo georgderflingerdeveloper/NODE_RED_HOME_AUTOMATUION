@@ -109,6 +109,19 @@ test('Function-Wrapper persistiert den Ein-Aus-Zustand eines ausgewählten Szena
     assert.deepEqual(afterRestart.result.payload.LedOutput, [0, 0, 0, 0, 0, 0]);
 });
 
+test('Function-Wrapper persistiert eine über AddOutput hinzugefügte LED', () => {
+    const flow = storage();
+    const context = storage();
+    const added = runWrapper({ payload: { Command: 'AddOutput' } }, { flow, context });
+    assert.equal(added.result.payload.OutputCount, 7);
+    assert.equal(flow.get('LightControllerKitchenConfiguration').outputCount, 7);
+    const afterRestart = runWrapper({ payload: { Command: 'ListScenarios' } }, {
+        flow, context: storage(),
+    });
+    assert.equal(afterRestart.result.payload.OutputCount, 7);
+    assert.equal(afterRestart.result.payload.LedOutput.length, 7);
+});
+
 test('Function-Wrapper enthält Timer und 500-ms-Doppelklickaktion', () => {
     assert.match(functionSource, /doubleClickTimeMs: 500/);
     assert.match(functionSource, /doubleAction: "next-scenario"/);

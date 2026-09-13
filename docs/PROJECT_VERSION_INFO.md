@@ -63,6 +63,11 @@ bilden Version `0.7.0`.
 Das bidirektionale Kitchen-Testdashboard mit persistentem Szenarioeditor, sechs
 LED-Anzeigen, Push-Texten sowie Drück-, Loslass- und Dauerausgabe bildet Version
 `0.8.0`.
+Das automatische Festhalten von Gruppenszenarien, ihr gemeinsames Toggeln per
+Kurzdruck und das Verlassen erst per Langdruck über zwei Sekunden bilden
+Patch-Version `0.8.1`.
+Die dynamische, persistente LED-Anzahl von 1 bis 16 und der `+`-Button im
+Kitchen-Dashboard bilden Patch-Version `0.8.2`.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

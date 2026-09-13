@@ -39,10 +39,18 @@ test('Dashboard-Taster sendet getrennte Drücken- und Loslassen-Nachrichten', ()
     assert.match(template, /ReleasedAt/);
 });
 
-test('Dashboard zeigt sechs LED-Ausgänge mit Prozentwerten', () => {
+test('Dashboard zeigt dynamische LED-Ausgänge mit Prozentwerten', () => {
     assert.match(template, /scope\.ledIndexes = \[0,1,2,3,4,5\]/);
+    assert.match(template, /Array\.from\(\{length:outputCount\}/);
     assert.match(template, /state\.LedOutput/);
     assert.match(template, /LED \{\{index \+ 1\}\}/);
+});
+
+test('Dashboard kann LEDs persistent bis zum Maximum 16 hinzufügen', () => {
+    assert.match(template, /ng-click="addLed\(\)"/);
+    assert.match(template, /Command:"AddOutput"/);
+    assert.match(template, /maxOutputCount/);
+    assert.match(template, /Maximal 16 LEDs/);
 });
 
 test('Szenariomenü unterstützt alle persistenten Verwaltungsbefehle', () => {

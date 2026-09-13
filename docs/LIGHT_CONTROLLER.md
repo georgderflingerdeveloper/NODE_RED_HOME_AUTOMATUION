@@ -30,9 +30,10 @@ Enthalten sind:
 - laufende und zuletzt gemessene Betätigungsdauer in Millisekunden;
 - Uhrzeit von Drücken und Loslassen;
 - verständliche Textanzeige für Kurz-, Doppel-, Lang- und Ultralangdruck;
-- sechs LED-Anzeigen mit dem tatsächlichen Prozentwert aus `LedOutput`;
+- dynamisch 1 bis 16 LED-Anzeigen mit dem tatsächlichen Prozentwert aus `LedOutput`;
+- `+`-Button zum persistenten Hinzufügen weiterer LEDs;
 - Auswahl vorhandener Szenarien;
-- sechs Prozentfelder für `ScenarioProperties`;
+- automatisch passende Prozentfelder für `ScenarioProperties`;
 - Aktionen zum Speichern, Anlegen, Auswählen, Auflisten und Löschen.
 
 Das Dashboard sendet keine eigene Lichtlogik. Es erzeugt ausschließlich die
@@ -97,6 +98,18 @@ msg.payload = { Command: "AllLightsOn", DutyCycle: 70 }; // alle Ausgänge ein
 msg.payload = { Command: "AllLightsOff" };               // alle Ausgänge aus
 ```
 
+LED-Anzahl dynamisch ändern (maximal 16):
+
+```js
+msg.payload = { Command: "AddOutput" };                 // eine LED hinzufügen
+msg.payload = { Command: "SetOutputCount", OutputCount: 12 };
+```
+
+Die vorhandenen Szenarien werden beim Erweitern verlustfrei mit ausgeschalteten
+Ausgängen ergänzt. Für jede neue LED entsteht zusätzlich ein einzeln schaltbares
+Standardszenario. Die vollständige Konfiguration wird über denselben atomaren
+Szenariospeicher persistiert.
+
 `AllLightsOn` verwendet den aktuellen `DutyCycle`. Beide Befehle sind von der
 konfigurierten Szenarioliste unabhängig.
 
@@ -155,6 +168,13 @@ nicht erforderlich.
 | `normal` | nächstes Licht/Szenario | nächstes Szenario auswählen | aktuelles Einzellicht persistent übernehmen | alle Lichter aus, Commander-Befehl senden |
 | `scenario` | gewähltes Szenario persistent Ein/Aus | nächstes Szenario auswählen | Szenariomodus verlassen, Normalbetrieb fortsetzen | alle Lichter aus, Modus verlassen, Commander-Befehl senden |
 | `manual-light` | gewähltes Einzellicht persistent Ein/Aus | nächstes Szenario auswählen | Einzellichtmodus verlassen, Normalbetrieb fortsetzen | alle Lichter aus, Modus verlassen, Commander-Befehl senden |
+
+Sobald die normale Schaltfolge nach den Einzellichtern ein Szenario mit mehreren
+aktiven Ausgängen erreicht, wird diese Gruppe automatisch im Modus `scenario`
+festgehalten. Jeder kurze Druck unter zwei Sekunden toggelt dann alle Ausgänge
+der Gruppe gemeinsam, ohne zum nächsten Szenario zu springen. Erst ein
+Langdruck über zwei und unter vier Sekunden verlässt den Gruppenbetrieb. Der
+nächste kurze Druck setzt anschließend die normale Folge fort.
 
 Der erste kurze Klick wird während `doubleClickTimeMs` nur vorgemerkt. Trifft
 der zweite Klick rechtzeitig ein, wird die vorgemerkte Einzelklickaktion

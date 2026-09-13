@@ -105,6 +105,10 @@ Der exklusive Ultralangdruck ab vier Sekunden mit der Commander-Ausgabe
 `payload.SendCommand = "CommandAllLightsOff"` bildet Version `0.7.0`.
 Das bidirektionale Kitchen-Testdashboard mit Szenarioeditor, sechs LEDs,
 Push-Texten und strukturierten Tasterzeiten bildet Version `0.8.0`.
+Das Festhalten und gemeinsame Toggeln von Gruppenszenarien bis zum Langdruck
+über zwei Sekunden bildet Patch-Version `0.8.1`.
+Die dynamische, persistente Erweiterung der Kitchen-LEDs über den Dashboard-
+`+`-Button bis maximal 16 Ausgänge bildet Patch-Version `0.8.2`.
 
 Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
 `NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und
