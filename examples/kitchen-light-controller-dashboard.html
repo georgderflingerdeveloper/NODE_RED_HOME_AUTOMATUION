@@ -102,17 +102,35 @@
   let pressStartedAt = null;
   let durationTimer = null;
   let buttonIsDown = false;
+  let scenarioListFingerprint = JSON.stringify(scope.state.ScenarioList);
 
   scope.$watch("msg", function(message) {
     if (!message || !message.payload || typeof message.payload !== "object") return;
     const payload = message.payload;
-    scope.state = { ...scope.state, ...payload, ButtonTiming:{...EMPTY_TIMING, ...(payload.ButtonTiming || {})} };
-    const outputCount = Math.max(1, Math.min(16, Number(payload.OutputCount || scope.state.OutputCount || 6)));
+    const previousOutputCount = scope.ledIndexes.length;
+    const outputCount = Math.max(1, Math.min(16, Number(payload.OutputCount || previousOutputCount || 6)));
+    const incomingScenarioList = Array.isArray(payload.ScenarioList) ? payload.ScenarioList : null;
+    const incomingFingerprint = incomingScenarioList === null
+      ? scenarioListFingerprint : JSON.stringify(incomingScenarioList);
+
+    Object.keys(payload).forEach(function(key) {
+      if (key !== "ScenarioList" && key !== "ButtonTiming") scope.state[key] = payload[key];
+    });
+    scope.state.ButtonTiming = {...EMPTY_TIMING, ...(payload.ButtonTiming || {})};
+    if (incomingScenarioList !== null && incomingFingerprint !== scenarioListFingerprint) {
+      scope.state.ScenarioList = incomingScenarioList;
+      scenarioListFingerprint = incomingFingerprint;
+    }
     scope.maxOutputCount = Number(payload.MaxOutputCount || 16);
-    scope.ledIndexes = Array.from({length:outputCount}, (_, index) => index);
-    scope.scenarioLevels = scope.ledIndexes.map(index => Number(scope.scenarioLevels[index] || 0));
+    if (outputCount !== previousOutputCount) {
+      scope.ledIndexes = Array.from({length:outputCount}, (_, index) => index);
+      scope.scenarioLevels = scope.ledIndexes.map(index => Number(scope.scenarioLevels[index] || 0));
+    }
     scope.pushText = payload.CommandResult || EVENT_TEXT[payload.Event] || payload.Event || "Status aktualisiert";
-    if (payload.ScenarioName) scope.selectedScenarioName = payload.ScenarioName;
+    if (["scenario_selected", "scenario_added", "scenario_saved"].includes(payload.Event)
+        && payload.ScenarioName) {
+      scope.selectedScenarioName = payload.ScenarioName;
+    }
   });
 
   scope.ledPercent = function(index) {
