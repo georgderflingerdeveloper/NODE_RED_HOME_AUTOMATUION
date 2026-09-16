@@ -152,10 +152,11 @@ msg.payload = {
 |---|---|
 | `SaveScenario` | Szenario nach Namen anlegen oder aktualisieren und aktivieren |
 | `AddScenario` | neues Szenario anlegen; ein vorhandener Name wird abgewiesen |
-| `SelectScenario` | vorhandenes Szenario nach Namen aktivieren, ohne es zu verändern |
+| `SelectScenario` | kompatibler Befehl: vorhandenes Szenario nach Namen aktivieren |
+| `ScenarioApply` | gespeichertes Szenario nach Namen ausdrücklich anwenden; das Dashboard nutzt diesen Befehl auch beim Wechsel im Dropdown |
 | `ListScenarios` | alle Namen und `ScenarioProperties` in `ScenarioList` ausgeben |
 | `DeleteScenario` | genau das mit `ScenarioName` bezeichnete Szenario löschen |
-| `ClearAllScenarios` | alle Szenarien löschen und sämtliche LEDs ausschalten |
+| `ClearAllScenarios` | eigene Szenarien löschen und die bedienbare Grundfolge wiederherstellen |
 
 Namen sind ohne Beachtung der Groß-/Kleinschreibung eindeutig. `SaveScenario`
 kann ohne `ScenarioProperties` das aktuell aktive Szenario unter einem neuen
@@ -295,8 +296,21 @@ Gesamthelligkeit. Nur endliche Zahlen von 0 bis 100 sind erlaubt; 0 ist gültig.
 Szenariodefinitionen werden dabei nicht verändert.
 
 Dropdown-Auswahl und aktive Szene sind unabhängig vom bearbeiteten Entwurf.
-Auswählen/Löschen verwenden den Dropdown-Namen, Speichern/Anlegen den Formularnamen.
-Grundszenarien bleiben geschützt: abweichende Werte unter einem eigenen Namen
-anlegen und danach im Dropdown auswählen. Statusmeldungen überschreiben keine Entwürfe.
+`ScenarioApply` verwendet den Dropdown-Namen; ein Wechsel im Dropdown lädt das
+gespeicherte Szenario und wendet es sofort an. Speichern/Anlegen verwenden den
+Formularnamen. Ab v0.8.10 dürfen auch die internen Grundszenarien in ihren
+LED-Prozentwerten angepasst werden; Löschen bleibt gesperrt, damit die Tasterfolge
+immer bedienbar bleibt. Beim Erweitern oder Verkleinern der LED-Anzahl werden
+konfigurierte Grundszenarien rollenbasiert in die neue Einzel-/Gruppenfolge übernommen.
+Statusmeldungen überschreiben keine Entwürfe.
 Anpassungspunkte: Dashboard `sendButton`, `applyDutyCycle`, `sendScenarioCommand`;
-Controller `process` für SetDutyCycle und `getLedOutput` für die Skalierung.
+Controller `process` für SetDutyCycle/ScenarioApply und `getLedOutput` für die Skalierung.
+
+# v0.8.10 – Szenario anwenden und Grundszenarien konfigurieren
+
+Das Dashboard besitzt den expliziten Befehl `ScenarioApply` und den Button
+„Anwenden“. Beim Wechsel des Dropdown-Szenarios erfolgt die Anwendung automatisch.
+`SaveScenario` darf jetzt auch `Szenario 1 ... n` aktualisieren und aktiviert die
+gespeicherten Werte sofort. Interne Grundszenarien können weiterhin nicht gelöscht
+werden. Die dynamische LED-Erweiterung erhält konfigurierte Prozentwerte und baut
+die Einzel- und Gruppenszenarien weiterhin vollständig auf.

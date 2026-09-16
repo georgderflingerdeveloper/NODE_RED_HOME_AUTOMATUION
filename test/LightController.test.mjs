@@ -1077,14 +1077,20 @@ test('119 - RemoveOutput schützt die Mindestanzahl von einer LED', () => {
     assert.equal(output.OutputCount, 1);
 });
 
-test('120 - interne Schaltszenarien können nicht gelöscht oder überschrieben werden', () => {
+test('120 - interne Schaltszenarien sind konfigurierbar, aber nicht löschbar', () => {
     const controller = new LightController();
     assert.throws(() => controller.process({
         Command: 'DeleteScenario', ScenarioName: 'Szenario 1',
     }), /Internes Schaltszenario/);
-    assert.throws(() => controller.process({
-        Command: 'SaveScenario', ScenarioName: 'Szenario 1', ScenarioProperties: { 2: 100 },
-    }), /Internes Schaltszenario/);
+    const saved = controller.process({
+        Command: 'SaveScenario', ScenarioName: 'Szenario 1', ScenarioProperties: { 2: 40 },
+    });
+    assert.equal(saved.Event, 'scenario_saved');
+    assert.deepEqual(saved.ScenarioProperties, { 2: 40 });
+    assert.deepEqual(saved.LedOutput, [0, 0.4, 0, 0, 0, 0]);
+    assert.equal(saved.ScenarioList[0].ScenarioType, 'system');
+    const restored = new LightController(controller.getConfiguration()).getOutput();
+    assert.deepEqual(restored.ScenarioList[0].ScenarioProperties, { 2: 40 });
 });
 
 test('121 - ClearAllScenarios erhält die dynamische 7-LED-Grundfolge', () => {
@@ -1176,3 +1182,34 @@ test('127 - fehlendes persistiertes Szenario wird sicher verlassen und der Taste
     assert.equal(restored.ScenarioIndex, -1);
     assert.deepEqual(shortPress(controller).ActiveLights, [0]);
 });
+
+test('128 - ScenarioApply aktiviert das aktuell ausgewählte gespeicherte Szenario', () => {
+    const controller = new LightController({ outputCount: 3 });
+    controller.process({
+        Command: 'AddScenario', ScenarioName: 'Arbeit', ScenarioProperties: { 1: 25, 3: 80 },
+    });
+    controller.process({ Command: 'AllLightsOff' });
+    const applied = controller.process({ Command: 'ScenarioApply', ScenarioName: 'Arbeit' });
+    assert.equal(applied.Event, 'scenario_applied');
+    assert.equal(applied.ScenarioName, 'Arbeit');
+    assert.equal(applied.OperatingMode, 'scenario');
+    assert.deepEqual(applied.LedOutput, [0.25, 0, 0.8]);
+    assert.equal(applied.PersistentStateChanged, true);
+    const missing = controller.process({ Command: 'ScenarioApply', ScenarioName: 'Fehlt' });
+    assert.equal(missing.Event, 'scenario_not_found');
+});
+
+test('129 - konfigurierte Grundszenarien bleiben beim Erweitern der LEDs erhalten', () => {
+    const controller = new LightController({ outputCount: 6 });
+    controller.process({
+        Command: 'SaveScenario', ScenarioName: 'Szenario 7', ScenarioProperties: { 2: 25, 6: 60 },
+    });
+    const expanded = controller.process({ Command: 'AddOutput' });
+    assert.equal(expanded.OutputCount, 7);
+    assert.equal(expanded.ScenarioCount, 13);
+    assert.deepEqual(expanded.ScenarioList[6].ScenarioProperties, { 7: 100 });
+    assert.deepEqual(expanded.ScenarioList[7].ScenarioProperties, { 2: 25, 6: 60 });
+    const restored = new LightController(controller.getConfiguration()).getOutput();
+    assert.deepEqual(restored.ScenarioList[7].ScenarioProperties, { 2: 25, 6: 60 });
+});
+

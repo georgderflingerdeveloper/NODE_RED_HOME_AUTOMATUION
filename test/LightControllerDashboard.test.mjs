@@ -46,7 +46,7 @@ test('Echter Dashboard-Taster erhält Szenarioprozentwerte bei 100, 40 und 0 Pro
     }
 });
 
-test('Auswählen und Löschen verwenden Dropdown, Speichern den Entwurfsnamen; Status erhält Entwurf', () => {
+test('Anwenden und Löschen verwenden Dropdown, Speichern den Entwurfsnamen; Status erhält Entwurf', () => {
     const ui = dashboardHarness();
     ui.scope.selectedScenarioName = 'Arbeit';
     ui.scope.scenarioName = 'Entwurf';
@@ -56,26 +56,46 @@ test('Auswählen und Löschen verwenden Dropdown, Speichern den Entwurfsnamen; S
     assert.equal(ui.scope.selectedScenarioName, 'Arbeit');
     assert.equal(ui.scope.scenarioName, 'Entwurf');
     assert.equal(ui.scope.dutyCycleDraft, 33);
-    ui.scope.sendScenarioCommand('SelectScenario');
+    ui.scope.sendScenarioCommand('ScenarioApply');
     ui.scope.deleteScenario();
     ui.scope.sendScenarioCommand('SaveScenario', true);
     assert.deepEqual(ui.sent.map(x => x.ScenarioName), ['Arbeit', 'Arbeit', 'Entwurf']);
+    assert.equal(ui.sent[0].Command, 'ScenarioApply');
     assert.equal(ui.sent[2].ScenarioProperties[1], 55);
 });
 
-test('Grundszenarien und ungültige Dimmerwerte werden im Editor geschützt', () => {
+test('Dropdown-Wechsel lädt das Szenario und wendet es sofort an', () => {
+    const ui = dashboardHarness();
+    ui.update({ ScenarioList: [{
+        ScenarioName: 'Szenario 11', ScenarioId: 'scenario-11', ScenarioType: 'system',
+        ScenarioProperties: { 1: 20, 4: 65, 7: 100 },
+    }], OutputCount: 7 });
+    ui.scope.selectedScenarioName = 'Szenario 11';
+    ui.scope.selectAndApplyScenario();
+    assert.equal(ui.scope.scenarioName, 'Szenario 11');
+    assert.deepEqual(Array.from(ui.scope.scenarioLevels), [20, 0, 0, 65, 0, 0, 100]);
+    assert.deepEqual(ui.sent, [{ Command: 'ScenarioApply', ScenarioName: 'Szenario 11' }]);
+});
+
+test('Grundszenarien sind speicherbar, Löschen bleibt geschützt und Dimmerwerte werden geprüft', () => {
     const ui = dashboardHarness();
     ui.update({ DutyCycle: 70, ScenarioList: [{ ScenarioName: 'System', ScenarioType: 'system' }] });
     assert.equal(ui.scope.dutyCycleDraft, 70);
     ui.scope.scenarioName = 'System';
+    ui.scope.scenarioLevels[0] = 35;
     ui.scope.sendScenarioCommand('SaveScenario', true);
+    assert.equal(ui.sent.length, 1);
+    assert.equal(ui.sent[0].Command, 'SaveScenario');
+    assert.equal(ui.sent[0].ScenarioProperties[1], 35);
+    ui.scope.selectedScenarioName = 'System';
+    ui.scope.deleteScenario();
     for (const value of [null, undefined, -1, 101, NaN]) {
         ui.scope.dutyCycleDraft = value; ui.scope.applyDutyCycle();
         const controller = new LightController();
         controller.process({ Command: 'SetDutyCycle', DutyCycle: 45 });
         assert.equal(controller.process({ Command: 'SetDutyCycle', DutyCycle: value }).DutyCycle, 45);
     }
-    assert.equal(ui.sent.length, 0);
+    assert.equal(ui.sent.length, 1);
 });
 
 const nodes = JSON.parse(fs.readFileSync(
@@ -200,7 +220,7 @@ test('Taster- und Statusaktualisierungen verändern die Dashboard-Geometrie nich
 
 test('Szenariomenü unterstützt alle persistenten Verwaltungsbefehle', () => {
     for (const command of [
-        'SaveScenario', 'AddScenario', 'SelectScenario', 'ListScenarios',
+        'SaveScenario', 'AddScenario', 'SelectScenario', 'ScenarioApply', 'ListScenarios',
         'DeleteScenario', 'ClearAllScenarios',
     ]) {
         assert.match(template, new RegExp(command));
@@ -209,9 +229,13 @@ test('Szenariomenü unterstützt alle persistenten Verwaltungsbefehle', () => {
     assert.match(template, /Eindeutiger Szenarioname/);
 });
 
-test('Szenariomenü schützt interne Schaltszenarien beim Löschen', () => {
+test('Szenariomenü wendet beim Wechsel an und schützt interne Schaltszenarien nur beim Löschen', () => {
+    assert.match(template, /ng-change="selectAndApplyScenario\(\)"/);
+    assert.match(template, /sendScenarioCommand\('ScenarioApply'\)/);
+    assert.match(template, />Anwenden<\/button>/);
     assert.match(template, /selected\?\.ScenarioType === "system"/);
     assert.match(template, /Interne Schaltszenarien können nicht gelöscht werden/);
+    assert.doesNotMatch(template, /Grundszenario geschützt/);
     assert.match(template, />Eigene löschen</);
 });
 

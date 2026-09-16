@@ -54,11 +54,11 @@
   <div class="lc-card">
     <div class="lc-title">Szenarien konfigurieren</div>
     <div class="lc-form-row">
-      <select class="lc-select" ng-model="selectedScenarioName" ng-change="loadSelectedScenario()">
+      <select class="lc-select" ng-model="selectedScenarioName" ng-change="selectAndApplyScenario()">
         <option value="">Szenario auswählen …</option>
         <option ng-repeat="scenario in state.ScenarioList track by scenario.ScenarioId" value="{{scenario.ScenarioName}}">{{scenario.ScenarioName}}</option>
       </select>
-      <button class="lc-action" ng-click="sendScenarioCommand('SelectScenario')">Auswählen</button>
+      <button class="lc-action" ng-click="sendScenarioCommand('ScenarioApply')">Anwenden</button>
     </div>
     <div class="lc-form-row">
       <input class="lc-input" ng-model="scenarioName" placeholder="Eindeutiger Szenarioname">
@@ -76,7 +76,7 @@
       <button class="lc-action warn" ng-click="deleteScenario()">Löschen</button>
       <button class="lc-action warn" ng-click="clearScenarios()">Eigene löschen</button>
     </div>
-    <div class="lc-hint">Bearbeitung und aktive Szene sind getrennt. Speichern aktualisiert ein eigenes Szenario; Grundszenarien bitte unter neuem Namen anlegen. Vorgaben von 0 bis 100 % bleiben nach einem Neustart erhalten. Auswählen aktiviert die gespeicherten Werte, nicht den Entwurf.</div>
+    <div class="lc-hint">Beim Wechsel im Auswahlfeld wird das gespeicherte Szenario sofort angewandt. Speichern übernimmt die eingestellten LED-Werte dauerhaft und aktiviert das Szenario ebenfalls. Anwenden aktiviert die zuletzt gespeicherten Werte nochmals. Vorgaben von 0 bis 100 % bleiben nach einem Neustart erhalten.</div>
   </div>
 </div>
 
@@ -98,7 +98,7 @@
     all_lights_off_command:"Ultralangdruck – alle Lichter ausgeschaltet",
     button_released_after_ultra_long_action:"Taster nach Ultralangdruck losgelassen",
     scenario_saved:"Szenario gespeichert", scenario_added:"Szenario angelegt",
-    scenario_selected:"Szenario ausgewählt", scenario_deleted:"Szenario gelöscht",
+    scenario_selected:"Szenario ausgewählt", scenario_applied:"Szenario angewandt", scenario_deleted:"Szenario gelöscht",
     scenario_not_found:"Szenario nicht gefunden – Normalbetrieb bleibt bedienbar",
     scenario_selection_recovered:"Ungültige Auswahl – normale Schaltfolge fortgesetzt",
     input_action_recovered:"Ungültige Tasteraktion – normale Schaltfolge fortgesetzt",
@@ -172,9 +172,14 @@
   };
   scope.loadSelectedScenario = function() {
     const scenario = (scope.state.ScenarioList || []).find(item => item.ScenarioName === scope.selectedScenarioName);
-    if (!scenario) return;
+    if (!scenario) return false;
     scope.scenarioName = scenario.ScenarioName;
     scope.scenarioLevels = scope.ledIndexes.map(index => Number(scenario.ScenarioProperties?.[index + 1] || 0));
+    return true;
+  };
+  scope.selectAndApplyScenario = function() {
+    if (!scope.loadSelectedScenario()) return;
+    scope.sendScenarioCommand("ScenarioApply");
   };
   scope.scenarioProperties = function() {
     const result = {};
@@ -182,13 +187,9 @@
     return result;
   };
   scope.sendScenarioCommand = function(command, includeProperties) {
-    const usesSelection = command === "SelectScenario" || command === "DeleteScenario";
+    const usesSelection = command === "SelectScenario" || command === "ScenarioApply" || command === "DeleteScenario";
     const name = String((usesSelection ? scope.selectedScenarioName : scope.scenarioName) || "").trim();
     if (command !== "ListScenarios" && !name) { scope.pushText = "Bitte einen Szenarionamen eingeben."; return; }
-    if (includeProperties && scope.state.ScenarioList.some(item => item.ScenarioName === name && item.ScenarioType === "system")) {
-      scope.pushText = "Grundszenario geschützt – bitte einen neuen Namen eingeben und neu anlegen.";
-      return;
-    }
     const payload = { Command:command };
     if (name) payload.ScenarioName = name;
     if (includeProperties) payload.ScenarioProperties = scope.scenarioProperties();
