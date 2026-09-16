@@ -122,6 +122,130 @@ test('Function-Wrapper persistiert eine über AddOutput hinzugefügte LED', () =
     assert.equal(afterRestart.result.payload.LedOutput.length, 7);
 });
 
+test('Function-Wrapper erreicht LED 7 aus einer persistierten alten 7-LED-Konfiguration', () => {
+    const legacyScenarios = controllerModule.createScenarios(6).map((activeLights, index) => ({
+        id: `scenario-${index + 1}`,
+        name: `Szenario ${index + 1}`,
+        activeLights,
+    }));
+    legacyScenarios.push({ id: 'led-7', name: 'LED 7', activeLights: [6] });
+    const flow = storage(new Map([['LightControllerKitchenConfiguration', {
+        instanceName: 'Kitchen', inputCount: 1, outputCount: 7, scenarios: legacyScenarios,
+    }]]));
+    const context = storage();
+    let result;
+    for (let index = 0; index < 7; index += 1) {
+        const start = index * 1000;
+        runWrapper({ payload: { ButtonPressed: true, NowMs: start } }, { flow, context });
+        runWrapper({ payload: { ButtonPressed: false, NowMs: start + 100 } }, { flow, context });
+        result = runWrapper({ payload: { Command: 'FlushPendingClick', NowMs: start + 600 } }, {
+            flow, context,
+        }).result;
+    }
+    assert.equal(result.payload.OutputCount, 7);
+    assert.equal(result.payload.ScenarioIndex, 6);
+    assert.deepEqual(result.payload.ActiveLights, [6]);
+});
+
+test('Function-Wrapper persistiert RemoveOutput und behält eine funktionsfähige Grundfolge', () => {
+    const flow = storage();
+    const context = storage();
+    runWrapper({ payload: { Command: 'SetOutputCount', OutputCount: 8 } }, { flow, context });
+    const removed = runWrapper({ payload: { Command: 'RemoveOutput' } }, { flow, context });
+    assert.equal(removed.result.payload.OutputCount, 7);
+    assert.equal(flow.get('LightControllerKitchenConfiguration').outputCount, 7);
+    const restarted = runWrapper({ payload: { Command: 'ListScenarios' } }, {
+        flow, context: storage(),
+    });
+    assert.equal(restarted.result.payload.OutputCount, 7);
+    assert.equal(restarted.result.payload.ScenarioCount, 13);
+});
+
+test('Function-Wrapper kann nach ClearAllScenarios weiterhin alle sieben LEDs durchschalten', () => {
+    const flow = storage();
+    const context = storage();
+    runWrapper({ payload: { Command: 'SetOutputCount', OutputCount: 7 } }, { flow, context });
+    runWrapper({ payload: {
+        Command: 'AddScenario', ScenarioName: 'Eigene Szene', ScenarioProperties: { 7: 30 },
+    } }, { flow, context });
+    const cleared = runWrapper({ payload: { Command: 'ClearAllScenarios' } }, { flow, context });
+    assert.equal(cleared.result.payload.ScenarioCount, 13);
+    let result;
+    for (let index = 0; index < 7; index += 1) {
+        const start = index * 1000;
+        runWrapper({ payload: { ButtonPressed: true, NowMs: start } }, { flow, context });
+        runWrapper({ payload: { ButtonPressed: false, NowMs: start + 100 } }, { flow, context });
+        result = runWrapper({ payload: { Command: 'FlushPendingClick', NowMs: start + 600 } }, {
+            flow, context,
+        }).result;
+    }
+    assert.deepEqual(result.payload.ActiveLights, [6]);
+});
+
+test('Function-Wrapper hält eine Gruppe erst per Langdruck und setzt danach die Folge fort', () => {
+    const flow = storage();
+    const context = storage();
+    runWrapper({ payload: { Command: 'SetOutputCount', OutputCount: 7 } }, { flow, context });
+
+    let result;
+    for (let index = 0; index < 8; index += 1) {
+        const start = index * 1000;
+        runWrapper({ payload: { ButtonPressed: true, NowMs: start } }, { flow, context });
+        runWrapper({ payload: { ButtonPressed: false, NowMs: start + 100 } }, { flow, context });
+        result = runWrapper({ payload: { Command: 'FlushPendingClick', NowMs: start + 600 } }, {
+            flow, context,
+        }).result;
+    }
+    assert.deepEqual(result.payload.ActiveLights, [0, 1]);
+    assert.equal(result.payload.OperatingMode, 'normal');
+
+    runWrapper({ payload: { ButtonPressed: true, NowMs: 9000 } }, { flow, context });
+    result = runWrapper({ payload: { ButtonPressed: false, NowMs: 11100 } }, {
+        flow, context,
+    }).result;
+    assert.equal(result.payload.Event, 'scenario_mode_entered');
+    assert.equal(result.payload.OperatingMode, 'scenario');
+
+    runWrapper({ payload: { ButtonPressed: true, NowMs: 12000 } }, { flow, context });
+    runWrapper({ payload: { ButtonPressed: false, NowMs: 12100 } }, { flow, context });
+    result = runWrapper({ payload: { Command: 'FlushPendingClick', NowMs: 12600 } }, {
+        flow, context,
+    }).result;
+    assert.deepEqual(result.payload.LedOutput, [0, 0, 0, 0, 0, 0, 0]);
+
+    runWrapper({ payload: { ButtonPressed: true, NowMs: 13000 } }, { flow, context });
+    result = runWrapper({ payload: { ButtonPressed: false, NowMs: 15100 } }, {
+        flow, context,
+    }).result;
+    assert.equal(result.payload.Event, 'scenario_mode_exited');
+    assert.equal(result.payload.OperatingMode, 'normal');
+
+    runWrapper({ payload: { ButtonPressed: true, NowMs: 16000 } }, { flow, context });
+    runWrapper({ payload: { ButtonPressed: false, NowMs: 16100 } }, { flow, context });
+    result = runWrapper({ payload: { Command: 'FlushPendingClick', NowMs: 16600 } }, {
+        flow, context,
+    }).result;
+    assert.deepEqual(result.payload.ActiveLights, [0, 1, 2]);
+});
+
+test('Unbekanntes externes Szenario blockiert auch im Function-Wrapper keinen Taster', () => {
+    const flow = storage();
+    const context = storage();
+    const rejected = runWrapper({ payload: {
+        Command: 'SelectScenario', ScenarioName: 'Nicht vorhanden',
+    } }, { flow, context });
+    assert.equal(rejected.result.payload.Event, 'scenario_not_found');
+    assert.equal(rejected.errors.length, 0);
+
+    runWrapper({ payload: { ButtonPressed: true, NowMs: 0 } }, { flow, context });
+    runWrapper({ payload: { ButtonPressed: false, NowMs: 100 } }, { flow, context });
+    const result = runWrapper({ payload: { Command: 'FlushPendingClick', NowMs: 600 } }, {
+        flow, context,
+    }).result;
+    assert.deepEqual(result.payload.ActiveLights, [0]);
+    assert.equal(result.payload.OperatingMode, 'normal');
+});
+
 test('Function-Wrapper enthält Timer und 500-ms-Doppelklickaktion', () => {
     assert.match(functionSource, /doubleClickTimeMs: 500/);
     assert.match(functionSource, /doubleAction: "next-scenario"/);

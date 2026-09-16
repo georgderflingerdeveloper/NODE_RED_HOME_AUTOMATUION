@@ -109,6 +109,25 @@ Das Festhalten und gemeinsame Toggeln von Gruppenszenarien bis zum Langdruck
 über zwei Sekunden bildet Patch-Version `0.8.1`.
 Die dynamische, persistente Erweiterung der Kitchen-LEDs über den Dashboard-
 `+`-Button bis maximal 16 Ausgänge bildet Patch-Version `0.8.2`.
+Der vollständige dynamische Neuaufbau der Einzel- und Gruppenschaltfolge nach
+einer Erweiterung bildet Korrekturversion `0.8.3`.
+Die zustandserhaltende, inkrementelle Dashboard-Aktualisierung bildet
+Patch-Version `0.8.4`.
+Die automatische Migration bereits persistierter, dynamisch erweiterter
+LED-Schaltfolgen beim Laden, die geometrisch stabile Tasteranzeige, das
+persistente Verkleinern und die geschützte Grundfolge bilden Korrekturversion
+`0.8.5`.
+Die eindeutige Trennung zwischen normalem Weiterschalten und per Langdruck
+festgehaltenem Szenario, die vollständige Gruppenumschaltung sowie die sichere
+Rückkehr aus leeren, gelöschten oder ungültigen Szenariozuständen bilden
+Korrekturversion `0.8.6`.
+Die konfliktfreie Übernahme der erklärenden Kommentare aus dem tatsächlichen
+Georg-Projektstand in die geprüfte, dynamische 1-bis-16-LED-Logik bildet
+Korrekturversion `0.8.7`.
+Das Installationspaket mit allen elf tatsächlich eingesandten Projektdateien
+als exakter Dreiwege-Mergebasisstand bildet Korrekturversion `0.8.8`. Damit
+werden neben dem Controller auch eigene Tests und Dokumentationsstände ohne
+falsch angenommene Ausgangsversion abgeglichen.
 
 Ist der Node-RED-Editor mit `adminAuth` geschützt, verwendet das Deploy-Skript
 `NODE_RED_ACCESS_TOKEN` oder fordert über `NODE_RED_USERNAME` und

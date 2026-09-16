@@ -40,6 +40,25 @@ Das Dashboard sendet keine eigene Lichtlogik. Es erzeugt ausschließlich die
 dokumentierten Controller-Nachrichten. Deshalb bleiben Bedienung, Hardware und
 Automatisierungs-Flows konsistent.
 
+Live-Statusmeldungen aktualisieren die Zustandsfelder inkrementell. Die
+Szenarioliste wird nur ersetzt, wenn sich ihr Inhalt geändert hat, und die
+LED-Eingabefelder nur bei einer tatsächlichen Änderung der Ausgangszahl. Eine
+laufende Visualisierung schließt dadurch keine Auswahl und verwirft keine noch
+nicht gespeicherten Benutzereingaben.
+
+Beim Laden einer älteren persistenten Konfiguration werden nachträglich ergänzte
+LEDs automatisch vor den Gruppenszenarien einsortiert. Die Schaltfolge erreicht
+dadurch jeden Ausgang bis zur konfigurierten Obergrenze von 16.
+
+Taster, Ereignistext, Statusraster und Commander-Ausgabe reservieren feste
+Anzeigeflächen. Live-Tasterwerte ändern dadurch weder Kartenhöhe noch
+Scrollposition des Dashboards.
+
+Die LED-Anzahl kann mit `+` und `−` persistent zwischen 1 und 16 geändert
+werden. `ClearAllScenarios` entfernt nur Benutzerszenarien und stellt die
+dynamische interne Einzel- und Gruppenfolge wieder her. Interne Schaltszenarien
+können weder gelöscht noch versehentlich überschrieben werden.
+
 ## Konfiguration
 
 ```js
@@ -105,10 +124,13 @@ msg.payload = { Command: "AddOutput" };                 // eine LED hinzufügen
 msg.payload = { Command: "SetOutputCount", OutputCount: 12 };
 ```
 
-Die vorhandenen Szenarien werden beim Erweitern verlustfrei mit ausgeschalteten
-Ausgängen ergänzt. Für jede neue LED entsteht zusätzlich ein einzeln schaltbares
-Standardszenario. Die vollständige Konfiguration wird über denselben atomaren
-Szenariospeicher persistiert.
+Die Standardschaltfolge wird beim Erweitern vollständig aus der aktuellen
+Ausgangszahl aufgebaut: zuerst jedes Licht einzeln, danach die Gruppen von zwei
+bis zu allen konfigurierten LEDs. Dadurch werden neue LEDs sowohl einzeln als
+auch in den Gruppenszenarien berücksichtigt. Eigene Szenarien bleiben dabei
+unverändert erhalten und werden nur mit ausgeschalteten neuen Ausgängen ergänzt.
+Die vollständige Konfiguration wird über denselben atomaren Szenariospeicher
+persistiert.
 
 `AllLightsOn` verwendet den aktuellen `DutyCycle`. Beide Befehle sind von der
 konfigurierten Szenarioliste unabhängig.
@@ -165,16 +187,21 @@ nicht erforderlich.
 
 | `OperatingMode` | Kurzer Klick | Doppelklick innerhalb 500 ms | Langdruck 2 bis <4 s | Ultralangdruck ab 4 s |
 |---|---|---|---|---|
-| `normal` | nächstes Licht/Szenario | nächstes Szenario auswählen | aktuelles Einzellicht persistent übernehmen | alle Lichter aus, Commander-Befehl senden |
+| `normal` | nächstes Licht/Szenario | nächstes Szenario auswählen | aktuelles Licht oder komplette Gruppe persistent festhalten | alle Lichter aus, Commander-Befehl senden |
 | `scenario` | gewähltes Szenario persistent Ein/Aus | nächstes Szenario auswählen | Szenariomodus verlassen, Normalbetrieb fortsetzen | alle Lichter aus, Modus verlassen, Commander-Befehl senden |
 | `manual-light` | gewähltes Einzellicht persistent Ein/Aus | nächstes Szenario auswählen | Einzellichtmodus verlassen, Normalbetrieb fortsetzen | alle Lichter aus, Modus verlassen, Commander-Befehl senden |
 
-Sobald die normale Schaltfolge nach den Einzellichtern ein Szenario mit mehreren
-aktiven Ausgängen erreicht, wird diese Gruppe automatisch im Modus `scenario`
-festgehalten. Jeder kurze Druck unter zwei Sekunden toggelt dann alle Ausgänge
-der Gruppe gemeinsam, ohne zum nächsten Szenario zu springen. Erst ein
-Langdruck über zwei und unter vier Sekunden verlässt den Gruppenbetrieb. Der
-nächste kurze Druck setzt anschließend die normale Folge fort.
+Im Normalbetrieb durchlaufen kurze Klicks zuerst alle konfigurierten Einzellichter
+und danach die kumulativen Gruppen. Die Folge bleibt dabei immer im Modus
+`normal`. Ein Langdruck über zwei und unter vier Sekunden hält das gerade aktive
+Einzellicht oder die komplette Gruppe im Modus `scenario` fest. Kurze Klicks
+schalten anschließend genau dieses Szenario gemeinsam aus und ein. Der nächste
+Langdruck verlässt den Szenariomodus; ein weiterer kurzer Klick setzt die normale
+Folge beim nächsten Eintrag fort.
+
+`manual-light` bleibt ausschließlich zur Wiederherstellung älterer persistierter
+Zustände kompatibel. Neue Langdruckaktionen verwenden einheitlich den Modus
+`scenario`, auch für ein einzelnes Licht.
 
 Der erste kurze Klick wird während `doubleClickTimeMs` nur vorgemerkt. Trifft
 der zweite Klick rechtzeitig ein, wird die vorgemerkte Einzelklickaktion
@@ -185,6 +212,11 @@ weiter. Der Standardwert ist `500` ms und kann konfiguriert werden.
 Ein/Aus-Zustand, Einzellichtnummer und `DutyCycle` werden in `runtimeState`
 gespeichert. Auch ein ausgeschaltetes Szenario bleibt daher nach einem Neustart
 ausgeschaltet.
+
+Eine leere Szenarioliste, ein gelöschtes oder unbekanntes extern ausgewähltes
+Szenario und eine ungültige Tasteraktion werden auf eine bedienbare dynamische
+Grundfolge zurückgeführt. Dadurch bleibt bei jeder Ausgangszahl von 1 bis 16
+mindestens LED 1 erreichbar.
 
 Der Ultralangdruck ist gegenüber dem normalen Langdruck exklusiv: Die
 2-Sekunden-Aktion wird erst beim Loslassen vor Ablauf der 4-Sekunden-Grenze

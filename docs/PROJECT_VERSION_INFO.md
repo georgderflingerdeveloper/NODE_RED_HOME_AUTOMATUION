@@ -68,6 +68,24 @@ Kurzdruck und das Verlassen erst per Langdruck über zwei Sekunden bilden
 Patch-Version `0.8.1`.
 Die dynamische, persistente LED-Anzahl von 1 bis 16 und der `+`-Button im
 Kitchen-Dashboard bilden Patch-Version `0.8.2`.
+Die Berücksichtigung aller dynamisch hinzugefügten LEDs in der normalen Einzel-
+und Gruppenschaltfolge bildet Patch-Version `0.8.3`.
+Die Live-Aktualisierung ohne Zurücksetzen geöffneter Auswahl- oder Eingabefelder
+bildet Patch-Version `0.8.4`.
+Die automatische Reparatur alter, hinter den 6er-Gruppen einsortierter
+Zusatz-LEDs beim Laden, die bewegungsfreie Tasteranzeige, der `−`-Button und die
+gegen Löschen geschützte dynamische Grundfolge bilden Patch-Version `0.8.5`.
+Das kontrollierte Festhalten des aktuellen Einzel- oder Gruppenszenarios erst
+durch Langdruck, das anschließende gemeinsame Toggeln und die selbstheilende
+Rückkehr aus ungültigen oder gelöschten Szenariozuständen bilden Patch-Version
+`0.8.6`.
+Die auf Georgs tatsächlich eingesandter Controllerdatei basierende
+Zusammenführung erhält alle erklärenden Kommentare, verwirft jedoch die darin
+noch enthaltene ältere LED-Erweiterungslogik. Dieser geprüfte Stand bildet
+Patch-Version `0.8.7`.
+Die vollständige, aus allen elf eingesandten Projektdateien aufgebaute
+Dreiwege-Mergebasis beseitigt auch Konflikte in Tests und Dokumentation und
+bildet Patch-Version `0.8.8`.
 
 Jeder ausgelieferte Commit oder Patch erhöht die Version genau einmal. Dafür
 stehen `npm run version:patch`, `npm run version:minor` und

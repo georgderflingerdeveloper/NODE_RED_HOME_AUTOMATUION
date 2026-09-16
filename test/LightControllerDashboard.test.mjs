@@ -58,6 +58,12 @@ test('Dashboard kann LEDs persistent bis zum Maximum 16 hinzufügen', () => {
     assert.match(template, /Maximal 16 LEDs/);
 });
 
+test('Dashboard kann die LED-Anzahl persistent bis zum Minimum eins verkleinern', () => {
+    assert.match(template, /ng-click="removeLed\(\)"/);
+    assert.match(template, /Command:"RemoveOutput"/);
+    assert.match(template, /ledIndexes\.length <= 1/);
+});
+
 test('Live-Aktualisierung erhält Auswahl und Eingabefelder der Visualisierung', () => {
     assert.match(template, /scenarioListFingerprint/);
     assert.match(template, /incomingFingerprint !== scenarioListFingerprint/);
@@ -107,6 +113,16 @@ test('Live-Status verändert im ausgeführten Dashboard weder Formular noch List
     assert.equal(scope.state.LedOutput[6], 0.8);
 });
 
+test('Taster- und Statusaktualisierungen verändern die Dashboard-Geometrie nicht', () => {
+    assert.match(template, /\.lc-kitchen\{[^}]*overflow-anchor:none/);
+    assert.match(template, /\.lc-test-button\{[^}]*height:58px/);
+    assert.match(template, /\.lc-status-card\{min-height:158px\}/);
+    assert.match(template, /\.lc-event\{height:38px/);
+    assert.match(template, /\.lc-command\{min-height:18px/);
+    assert.match(template, /ng-class="\{hidden:!state\.SendCommand\}"/);
+    assert.doesNotMatch(template, /ng-if="state\.SendCommand"/);
+});
+
 test('Szenariomenü unterstützt alle persistenten Verwaltungsbefehle', () => {
     for (const command of [
         'SaveScenario', 'AddScenario', 'SelectScenario', 'ListScenarios',
@@ -118,10 +134,18 @@ test('Szenariomenü unterstützt alle persistenten Verwaltungsbefehle', () => {
     assert.match(template, /Eindeutiger Szenarioname/);
 });
 
+test('Szenariomenü schützt interne Schaltszenarien beim Löschen', () => {
+    assert.match(template, /selected\?\.ScenarioType === "system"/);
+    assert.match(template, /Interne Schaltszenarien können nicht gelöscht werden/);
+    assert.match(template, />Eigene löschen</);
+});
+
 test('Push-Anzeige kennt Kurz-, Doppel-, Lang- und Ultralangdruck', () => {
     assert.match(template, /short_press_pending/);
     assert.match(template, /scenario_double_selected/);
-    assert.match(template, /manual_light_mode_entered/);
+    assert.match(template, /scenario_mode_entered/);
+    assert.match(template, /scenario_not_found/);
+    assert.match(template, /input_action_recovered/);
     assert.match(template, /all_lights_off_command/);
     assert.match(template, /payload\.SendCommand/);
 });

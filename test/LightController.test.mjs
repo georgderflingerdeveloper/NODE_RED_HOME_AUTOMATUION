@@ -155,14 +155,14 @@ test('23 - nur boolesches true gilt als gedrückt', () => {
     assert.equal(output.ButtonPressed, false);
 });
 
-test('24 - Schaltfolge hält die erste Gruppe nach den Einzellichtern fest', () => {
+test('24 - Schaltfolge läuft nach den Einzellichtern ohne automatisches Festhalten weiter', () => {
     const controller = new LightController({ outputCount: 2 });
     const group = shortPresses(controller, 3);
     assert.deepEqual(group.ActiveLights, [0, 1]);
-    assert.equal(group.OperatingMode, 'scenario');
-    const switchedOff = shortPress(controller, 2000);
-    assert.equal(switchedOff.ScenarioIndex, 2);
-    assert.deepEqual(switchedOff.ActiveLights, []);
+    assert.equal(group.OperatingMode, 'normal');
+    const wrapped = shortPress(controller, 2000);
+    assert.equal(wrapped.ScenarioIndex, 0);
+    assert.deepEqual(wrapped.ActiveLights, [0]);
 });
 
 test('25 - DutyCycle skaliert das aktive Szenario', () => {
@@ -240,9 +240,10 @@ test('36 - doppelte Szenario-IDs werden abgewiesen', () => {
     assert.throws(() => new LightController({ scenarios: [{ id: 'same' }, { id: 'same' }] }), RangeError);
 });
 
-test('37 - leere Szenarioliste ist für ClearAllScenarios zulässig', () => {
+test('37 - leere externe Szenarioliste stellt die bedienbare Grundfolge wieder her', () => {
     const controller = new LightController({ scenarios: [] });
-    assert.equal(controller.getOutput().ScenarioCount, 0);
+    assert.equal(controller.getOutput().ScenarioCount, 11);
+    assert.deepEqual(shortPress(controller).ActiveLights, [0]);
 });
 
 test('38 - setScenarios ersetzt Szenarien zur Laufzeit', () => {
@@ -317,11 +318,15 @@ test('46 - Aktion none verändert kein Szenario', () => {
     assert.equal(shortPress(controller).ScenarioIndex, -1);
 });
 
-test('47 - ungültige Aktionsart wird beim Ausführen sichtbar abgewiesen', () => {
+test('47 - ungültige Aktionsart fällt sichtbar auf bedienbares Weiterschalten zurück', () => {
     const controller = new LightController({ inputBindings: [{ shortAction: 'unknown' }] });
     press(controller);
     release(controller);
-    assert.throws(() => controller.process({ Command: 'FlushPendingClick' }, 600), RangeError);
+    const recovered = controller.process({ Command: 'FlushPendingClick' }, 600);
+    assert.equal(recovered.Event, 'input_action_recovered');
+    assert.deepEqual(recovered.ActiveLights, [0]);
+    assert.equal(recovered.ButtonPressed, false);
+    assert.deepEqual(shortPress(controller, 1000).ActiveLights, [1]);
 });
 
 test('48 - mehrere Eingänge werden getrennt ausgewertet', () => {
@@ -506,9 +511,10 @@ test('68 - ListScenarios liefert Namen und Eigenschaften', () => {
     controller.process({ Command: 'AddScenario', ScenarioName: 'Lesen', ScenarioProperties: { 2: 40 } });
     const output = controller.process({ Command: 'ListScenarios' });
     assert.equal(output.Event, 'scenarios_listed');
-    assert.deepEqual(output.ScenarioList, [{
+    assert.deepEqual(output.ScenarioList.filter((scenario) => scenario.ScenarioType === 'user'), [{
         ScenarioName: 'Lesen',
         ScenarioId: 'lesen',
+        ScenarioType: 'user',
         ScenarioProperties: { 2: 40 },
     }]);
     assert.equal(output.ScenariosChanged, false);
@@ -518,7 +524,7 @@ test('69 - SaveScenario aktualisiert immer passend zum eindeutigen Namen', () =>
     const controller = new LightController({ outputCount: 2, scenarios: [] });
     controller.process({ Command: 'SaveScenario', ScenarioName: 'Abend', ScenarioProperties: { 1: 30 } });
     const output = controller.process({ Command: 'SaveScenario', ScenarioName: 'abend', ScenarioProperties: { 2: 80 } });
-    assert.equal(output.ScenarioCount, 1);
+    assert.equal(output.ScenarioList.filter((scenario) => scenario.ScenarioType === 'user').length, 1);
     assert.equal(output.ScenarioName, 'abend');
     assert.deepEqual(output.ScenarioProperties, { 2: 80 });
 });
@@ -539,7 +545,9 @@ test('71 - DeleteScenario löscht ausschließlich das benannte Szenario', () => 
     controller.process({ Command: 'AddScenario', ScenarioName: 'B', ScenarioProperties: { 2: 100 } });
     const output = controller.process({ Command: 'DeleteScenario', ScenarioName: 'a' });
     assert.equal(output.Event, 'scenario_deleted');
-    assert.deepEqual(output.ScenarioList.map((scenario) => scenario.ScenarioName), ['B']);
+    assert.deepEqual(output.ScenarioList
+        .filter((scenario) => scenario.ScenarioType === 'user')
+        .map((scenario) => scenario.ScenarioName), ['B']);
 });
 
 test('72 - DeleteScenario meldet einen unbekannten Namen sichtbar', () => {
@@ -550,21 +558,26 @@ test('72 - DeleteScenario meldet einen unbekannten Namen sichtbar', () => {
     );
 });
 
-test('73 - ClearAllScenarios leert die persistierbare Liste und schaltet aus', () => {
+test('73 - ClearAllScenarios löscht eigene Szenarien und stellt die Grundfolge wieder her', () => {
     const controller = new LightController();
+    controller.process({
+        Command: 'AddScenario', ScenarioName: 'Eigene Szene', ScenarioProperties: { 3: 70 },
+    });
     shortPress(controller);
     const output = controller.process({ Command: 'ClearAllScenarios' });
     assert.equal(output.Event, 'scenarios_cleared');
-    assert.equal(output.ScenarioCount, 0);
+    assert.equal(output.ScenarioCount, 11);
+    assert.ok(output.ScenarioList.every((scenario) => scenario.ScenarioType === 'system'));
     assert.equal(output.ScenarioIndex, -1);
     assert.deepEqual(output.LedOutput, [0, 0, 0, 0, 0, 0]);
+    assert.deepEqual(shortPress(controller, 1000).ActiveLights, [0]);
 });
 
-test('74 - Schalten ohne gespeicherte Szenarien bleibt sicher ausgeschaltet', () => {
+test('74 - Schalten nach leerer externer Szenarioliste aktiviert wieder LED 1', () => {
     const controller = new LightController({ scenarios: [] });
     const output = shortPress(controller);
-    assert.equal(output.ScenarioIndex, -1);
-    assert.deepEqual(output.LedOutput, [0, 0, 0, 0, 0, 0]);
+    assert.equal(output.ScenarioIndex, 0);
+    assert.deepEqual(output.LedOutput, [1, 0, 0, 0, 0, 0]);
 });
 
 test('75 - ScenarioProperties prüft die einsbasierten Ausgangsnummern', () => {
@@ -608,9 +621,11 @@ test('80 - getConfiguration enthält die per Command gespeicherten Szenarien', (
     const controller = new LightController({ outputCount: 2, scenarios: [] });
     controller.process({ Command: 'SaveScenario', ScenarioName: 'Persistiert', ScenarioProperties: { 2: 75 } });
     const restored = new LightController(controller.getConfiguration());
-    assert.deepEqual(restored.process({ Command: 'ListScenarios' }).ScenarioList, [{
+    assert.deepEqual(restored.process({ Command: 'ListScenarios' }).ScenarioList
+        .filter((scenario) => scenario.ScenarioType === 'user'), [{
         ScenarioName: 'Persistiert',
         ScenarioId: 'persistiert',
+        ScenarioType: 'user',
         ScenarioProperties: { 2: 75 },
     }]);
 });
@@ -638,10 +653,10 @@ test('82 - SelectScenario aktiviert ein gespeichertes Szenario ausschließlich �
 
 test('83 - SelectScenario meldet einen unbekannten Namen sichtbar', () => {
     const controller = new LightController({ scenarios: [] });
-    assert.throws(
-        () => controller.process({ Command: 'SelectScenario', ScenarioName: 'Fehlt' }),
-        /nicht gefunden/,
-    );
+    const missing = controller.process({ Command: 'SelectScenario', ScenarioName: 'Fehlt' });
+    assert.equal(missing.Event, 'scenario_not_found');
+    assert.match(missing.CommandResult, /nicht gefunden/);
+    assert.deepEqual(shortPress(controller).ActiveLights, [0]);
 });
 
 test('84 - SelectScenario öffnet den persistenten Szenariomodus', () => {
@@ -725,24 +740,25 @@ test('89 - Langdruck verlässt den Szenariomodus und stellt den Normalbetrieb wi
     assert.equal(output.ScenarioName, 'Normal');
 });
 
-test('90 - Langdruck im Normalbetrieb übernimmt das aktuell gewählte Einzellicht', () => {
+test('90 - Langdruck im Normalbetrieb hält das komplette aktuelle Szenario fest', () => {
     const controller = new LightController();
     shortPress(controller);
     press(controller, 1000);
     const output = release(controller, 3000);
-    assert.equal(output.Event, 'manual_light_mode_entered');
-    assert.equal(output.OperatingMode, 'manual-light');
-    assert.equal(output.ManualLightNumber, 1);
+    assert.equal(output.Event, 'scenario_mode_entered');
+    assert.equal(output.OperatingMode, 'scenario');
+    assert.equal(output.ManualLightNumber, null);
+    assert.deepEqual(output.ActiveLights, [0]);
 });
 
-test('91 - manueller Ein-Aus-Zustand und Modus überleben eine neue Instanz', () => {
+test('91 - festgehaltener Ein-Aus-Zustand und Szenariomodus überleben eine neue Instanz', () => {
     const controller = new LightController();
     shortPress(controller);
     press(controller, 1000); press(controller, 3000); release(controller, 3100);
     shortPress(controller, 4000);
     const restored = new LightController(controller.getConfiguration()).getOutput();
-    assert.equal(restored.OperatingMode, 'manual-light');
-    assert.equal(restored.ManualLightNumber, 1);
+    assert.equal(restored.OperatingMode, 'scenario');
+    assert.equal(restored.ScenarioIndex, 0);
     assert.equal(restored.ModeOutputEnabled, false);
 });
 
@@ -863,47 +879,52 @@ test('103 - mehrere Eingänge liefern getrennte Betätigungszeiten', () => {
     assert.equal(output.InputTimings[1].DurationMs, 400);
 });
 
-test('104 - Szenario 7 hält die erste Lichtgruppe im Szenariobetrieb fest', () => {
+test('104 - Szenario 7 bleibt bis zu einem Langdruck im Normalbetrieb', () => {
     const controller = new LightController();
     let output;
     for (let index = 0; index < 7; index += 1) output = shortPress(controller, index * 1000);
     assert.equal(output.ScenarioIndex, 6);
-    assert.equal(output.Event, 'scenario_group_selected');
-    assert.equal(output.OperatingMode, 'scenario');
+    assert.equal(output.Event, 'scenario_changed');
+    assert.equal(output.OperatingMode, 'normal');
     assert.deepEqual(output.ActiveLights, [0, 1]);
 });
 
-test('105 - kurzer Druck toggelt die ganze Gruppe statt weiterzuwandern', () => {
+test('105 - kurzer Druck schaltet nach der ersten Gruppe die nächste Gruppe weiter', () => {
     const controller = new LightController();
     for (let index = 0; index < 7; index += 1) shortPress(controller, index * 1000);
-    const switchedOff = shortPress(controller, 8000);
-    assert.equal(switchedOff.Event, 'scenario_toggled_off');
-    assert.equal(switchedOff.ScenarioIndex, 6);
-    assert.deepEqual(switchedOff.LedOutput, [0, 0, 0, 0, 0, 0]);
-    const switchedOn = shortPress(controller, 9000);
-    assert.equal(switchedOn.Event, 'scenario_toggled_on');
-    assert.equal(switchedOn.ScenarioIndex, 6);
-    assert.deepEqual(switchedOn.ActiveLights, [0, 1]);
+    const nextGroup = shortPress(controller, 8000);
+    assert.equal(nextGroup.Event, 'scenario_changed');
+    assert.equal(nextGroup.ScenarioIndex, 7);
+    assert.equal(nextGroup.OperatingMode, 'normal');
+    assert.deepEqual(nextGroup.ActiveLights, [0, 1, 2]);
 });
 
-test('106 - Langdruck über zwei Sekunden verlässt die Gruppe und Normalbetrieb setzt fort', () => {
+test('106 - Langdruck hält Gruppe fest, Kurzdruck toggelt und weiterer Langdruck setzt fort', () => {
     const controller = new LightController();
     for (let index = 0; index < 7; index += 1) shortPress(controller, index * 1000);
     press(controller, 8000);
-    const exited = release(controller, 10001);
+    const entered = release(controller, 10001);
+    assert.equal(entered.Event, 'scenario_mode_entered');
+    assert.equal(entered.OperatingMode, 'scenario');
+    const switchedOff = shortPress(controller, 11000);
+    assert.equal(switchedOff.Event, 'scenario_toggled_off');
+    assert.deepEqual(switchedOff.ActiveLights, []);
+    press(controller, 12000);
+    const exited = release(controller, 14001);
     assert.equal(exited.Event, 'scenario_mode_exited');
     assert.equal(exited.OperatingMode, 'normal');
     assert.equal(exited.ScenarioIndex, 6);
-    const next = shortPress(controller, 11000);
+    const next = shortPress(controller, 15000);
     assert.equal(next.ScenarioIndex, 7);
-    assert.equal(next.OperatingMode, 'scenario');
+    assert.equal(next.OperatingMode, 'normal');
     assert.deepEqual(next.ActiveLights, [0, 1, 2]);
 });
 
-test('107 - ausgeschaltete Gruppe bleibt nach Neustart fest ausgewählt und aus', () => {
+test('107 - per Langdruck festgehaltene ausgeschaltete Gruppe bleibt nach Neustart aus', () => {
     const controller = new LightController();
     for (let index = 0; index < 7; index += 1) shortPress(controller, index * 1000);
-    shortPress(controller, 8000);
+    press(controller, 8000); release(controller, 10001);
+    shortPress(controller, 11000);
     const restored = new LightController(controller.getConfiguration()).getOutput();
     assert.equal(restored.OperatingMode, 'scenario');
     assert.equal(restored.ScenarioIndex, 6);
@@ -930,7 +951,8 @@ test('109 - dynamische LED-Anzahl und Szenarien überleben eine neue Instanz', (
     const restored = new LightController(controller.getConfiguration()).getOutput();
     assert.equal(restored.OutputCount, 7);
     assert.equal(restored.LedOutput.length, 7);
-    assert.ok(restored.ScenarioList.some((item) => item.ScenarioName === 'LED 7'));
+    assert.ok(restored.ScenarioList.some((item) =>
+        item.ScenarioName === 'Szenario 7' && item.ScenarioProperties['7'] === 100));
 });
 
 test('110 - LED-Anzahl ist konsistent auf maximal 16 begrenzt', () => {
@@ -939,4 +961,218 @@ test('110 - LED-Anzahl ist konsistent auf maximal 16 begrenzt', () => {
     assert.equal(output.Event, 'output_limit_reached');
     assert.equal(output.OutputCount, 16);
     assert.throws(() => new LightController({ outputCount: 17 }), /höchstens 16/);
+});
+
+test('111 - neue LED liegt vor allen Gruppenszenarien in der normalen Schaltfolge', () => {
+    const controller = new LightController();
+    controller.process({ Command: 'AddOutput' });
+    let output;
+    for (let index = 0; index < 7; index += 1) output = shortPress(controller, index * 1000);
+    assert.equal(output.ScenarioIndex, 6);
+    assert.equal(output.ScenarioName, 'Szenario 7');
+    assert.deepEqual(output.ActiveLights, [6]);
+    assert.equal(output.OperatingMode, 'normal');
+});
+
+test('112 - dynamische Gruppenszenarien berücksichtigen auch die hinzugefügte LED', () => {
+    const controller = new LightController();
+    const output = controller.process({ Command: 'AddOutput' });
+    assert.equal(output.ScenarioCount, 13);
+    assert.deepEqual(output.ScenarioList.at(-1).ScenarioProperties,
+        { 1: 100, 2: 100, 3: 100, 4: 100, 5: 100, 6: 100, 7: 100 });
+});
+
+test('113 - wiederholtes Erweitern baut die Schaltfolge bis 16 vollständig dynamisch', () => {
+    const controller = new LightController();
+    for (let count = 7; count <= 16; count += 1) controller.process({ Command: 'AddOutput' });
+    const output = controller.getOutput();
+    assert.equal(output.OutputCount, 16);
+    assert.equal(output.ScenarioCount, 31);
+    for (let index = 0; index < 16; index += 1) {
+        const scenario = output.ScenarioList[index];
+        assert.deepEqual(scenario.ScenarioProperties, { [index + 1]: 100 });
+    }
+    assert.equal(Object.keys(output.ScenarioList.at(-1).ScenarioProperties).length, 16);
+});
+
+test('114 - eigene Szenarien bleiben beim dynamischen Neuaufbau unverändert', () => {
+    const controller = new LightController();
+    controller.process({
+        Command: 'AddScenario', ScenarioName: 'Arbeit', ScenarioProperties: { 2: 30, 6: 80 },
+    });
+    const output = controller.process({ Command: 'AddOutput' });
+    assert.deepEqual(output.ScenarioList.find((item) => item.ScenarioName === 'Arbeit').ScenarioProperties,
+        { 2: 30, 6: 80 });
+});
+
+test('115 - gespeicherter v0.8.2-Stand wird beim nächsten Hinzufügen automatisch korrigiert', () => {
+    const oldScenarios = createScenarios(6).map((activeLights, index) => ({
+        id: `scenario-${index + 1}`,
+        name: `Szenario ${index + 1}`,
+        activeLights,
+    }));
+    oldScenarios.splice(6, 0, { id: 'led-7', name: 'LED 7', activeLights: [6] });
+    const controller = new LightController({ outputCount: 7, scenarios: oldScenarios });
+    const output = controller.process({ Command: 'AddOutput' });
+    assert.equal(output.OutputCount, 8);
+    assert.equal(output.ScenarioCount, 15);
+    assert.deepEqual(output.ScenarioList[7].ScenarioProperties, { 8: 100 });
+    assert.equal(Object.keys(output.ScenarioList.at(-1).ScenarioProperties).length, 8);
+});
+
+test('116 - gespeicherter 7-LED-Altstand wird bereits beim Laden vollständig neu sortiert', () => {
+    const legacyScenarios = createScenarios(6).map((activeLights, index) => ({
+        id: `scenario-${index + 1}`,
+        name: `Szenario ${index + 1}`,
+        activeLights,
+    }));
+    legacyScenarios.push({ id: 'led-7', name: 'LED 7', activeLights: [6] });
+    const controller = new LightController({ outputCount: 7, scenarios: legacyScenarios });
+    let output;
+    for (let index = 0; index < 7; index += 1) output = shortPress(controller, index * 1000);
+    assert.equal(output.ScenarioIndex, 6);
+    assert.deepEqual(output.ActiveLights, [6]);
+    assert.equal(output.ScenarioCount, 13);
+});
+
+test('117 - Migration erhält das aktive alte Gruppenszenario anhand seiner Ausgänge', () => {
+    const legacyScenarios = createScenarios(6).map((activeLights, index) => ({
+        id: `scenario-${index + 1}`,
+        name: `Szenario ${index + 1}`,
+        activeLights,
+    }));
+    legacyScenarios.push({ id: 'led-7', name: 'LED 7', activeLights: [6] });
+    const controller = new LightController({
+        outputCount: 7,
+        scenarios: legacyScenarios,
+        runtimeState: {
+            operatingMode: 'scenario',
+            modeOutputEnabled: true,
+            scenarioId: 'scenario-7',
+            normalScenarioId: 'scenario-7',
+        },
+    });
+    const output = controller.getOutput();
+    assert.deepEqual(output.ActiveLights, [0, 1]);
+    assert.equal(output.ScenarioId, 'scenario-8');
+    assert.equal(output.OperatingMode, 'scenario');
+});
+
+test('118 - RemoveOutput verkleinert LEDs und Gruppen dynamisch und persistent', () => {
+    const controller = new LightController({ outputCount: 8 });
+    const output = controller.process({ Command: 'RemoveOutput' });
+    assert.equal(output.OutputCount, 7);
+    assert.equal(output.ScenarioCount, 13);
+    assert.deepEqual(output.ScenarioList[6].ScenarioProperties, { 7: 100 });
+    assert.equal(Object.keys(output.ScenarioList.at(-1).ScenarioProperties).length, 7);
+    const restored = new LightController(controller.getConfiguration()).getOutput();
+    assert.equal(restored.OutputCount, 7);
+    assert.equal(restored.ScenarioCount, 13);
+});
+
+test('119 - RemoveOutput schützt die Mindestanzahl von einer LED', () => {
+    const controller = new LightController({ outputCount: 1 });
+    const output = controller.process({ Command: 'RemoveOutput' });
+    assert.equal(output.Event, 'output_minimum_reached');
+    assert.equal(output.OutputCount, 1);
+});
+
+test('120 - interne Schaltszenarien können nicht gelöscht oder überschrieben werden', () => {
+    const controller = new LightController();
+    assert.throws(() => controller.process({
+        Command: 'DeleteScenario', ScenarioName: 'Szenario 1',
+    }), /Internes Schaltszenario/);
+    assert.throws(() => controller.process({
+        Command: 'SaveScenario', ScenarioName: 'Szenario 1', ScenarioProperties: { 2: 100 },
+    }), /Internes Schaltszenario/);
+});
+
+test('121 - ClearAllScenarios erhält die dynamische 7-LED-Grundfolge', () => {
+    const controller = new LightController({ outputCount: 7 });
+    controller.process({
+        Command: 'AddScenario', ScenarioName: 'Benutzer', ScenarioProperties: { 7: 25 },
+    });
+    const cleared = controller.process({ Command: 'ClearAllScenarios' });
+    assert.equal(cleared.ScenarioCount, 13);
+    let output;
+    for (let index = 0; index < 7; index += 1) output = shortPress(controller, index * 1000);
+    assert.deepEqual(output.ActiveLights, [6]);
+});
+
+test('122 - Normalbetrieb durchläuft für jede LED-Anzahl 1 bis 16 alle Einzel- und Gruppenszenarien', () => {
+    for (let outputCount = 1; outputCount <= 16; outputCount += 1) {
+        const controller = new LightController({ outputCount });
+        const expectedSequence = createScenarios(outputCount);
+        expectedSequence.forEach((activeLights, scenarioIndex) => {
+            const output = shortPress(controller, scenarioIndex * 1000);
+            assert.equal(output.OperatingMode, 'normal', `${outputCount} LEDs, Schritt ${scenarioIndex}`);
+            assert.equal(output.ScenarioIndex, scenarioIndex, `${outputCount} LEDs, Schritt ${scenarioIndex}`);
+            assert.deepEqual(output.ActiveLights, activeLights,
+                `${outputCount} LEDs, Schritt ${scenarioIndex}`);
+        });
+        const wrapped = shortPress(controller, expectedSequence.length * 1000);
+        assert.equal(wrapped.ScenarioIndex, 0, `${outputCount} LEDs, Rücksprung`);
+        assert.deepEqual(wrapped.ActiveLights, [0], `${outputCount} LEDs, Rücksprung`);
+    }
+});
+
+test('123 - Langdruck hält jedes aktuelle Szenario vollständig statt nur dessen erste LED', () => {
+    const controller = new LightController({ outputCount: 4 });
+    for (let index = 0; index < 5; index += 1) shortPress(controller, index * 1000);
+    assert.deepEqual(controller.getOutput().ActiveLights, [0, 1]);
+    press(controller, 6000);
+    const entered = release(controller, 8001);
+    assert.equal(entered.OperatingMode, 'scenario');
+    assert.deepEqual(entered.ActiveLights, [0, 1]);
+    assert.equal(shortPress(controller, 9000).ModeOutputEnabled, false);
+    assert.deepEqual(controller.getOutput().ActiveLights, []);
+});
+
+test('124 - unbekanntes externes Szenario verändert den Zustand nicht und blockiert den Taster nie', () => {
+    const controller = new LightController({ outputCount: 3 });
+    const missing = controller.process({ Command: 'SelectScenario', ScenarioName: 'Nicht vorhanden' });
+    assert.equal(missing.Event, 'scenario_not_found');
+    assert.equal(missing.OperatingMode, 'normal');
+    assert.deepEqual(shortPress(controller, 1000).ActiveLights, [0]);
+    assert.deepEqual(shortPress(controller, 2000).ActiveLights, [1]);
+});
+
+test('125 - ungültige externe Select-Aktion fällt auf die normale Schaltfolge zurück', () => {
+    const controller = new LightController({
+        outputCount: 3,
+        inputBindings: [{ shortAction: { type: 'select', scenarioId: 'fehlt' } }],
+    });
+    const first = shortPress(controller);
+    assert.equal(first.Event, 'scenario_selection_recovered');
+    assert.deepEqual(first.ActiveLights, [0]);
+    assert.equal(first.ButtonPressed, false);
+    assert.deepEqual(shortPress(controller, 1000).ActiveLights, [1]);
+});
+
+test('126 - gelöschte eigene Szenarien hinterlassen immer eine bedienbare Grundfolge', () => {
+    const controller = new LightController({ outputCount: 4 });
+    controller.process({
+        Command: 'AddScenario', ScenarioName: 'Extern', ScenarioProperties: { 2: 40, 4: 80 },
+    });
+    controller.process({ Command: 'SelectScenario', ScenarioName: 'Extern' });
+    const cleared = controller.process({ Command: 'ClearAllScenarios' });
+    assert.equal(cleared.OperatingMode, 'normal');
+    assert.equal(cleared.ScenarioCount, 7);
+    assert.deepEqual(shortPress(controller, 1000).ActiveLights, [0]);
+});
+
+test('127 - fehlendes persistiertes Szenario wird sicher verlassen und der Taster bleibt bedienbar', () => {
+    const controller = new LightController({
+        outputCount: 3,
+        runtimeState: {
+            operatingMode: 'scenario',
+            modeOutputEnabled: false,
+            scenarioId: 'geloescht',
+            normalScenarioId: 'ebenfalls-geloescht',
+        },
+    });
+    const restored = controller.getOutput();
+    assert.equal(restored.OperatingMode, 'normal');
+    assert.equal(restored.ScenarioIndex, -1);
+    assert.deepEqual(shortPress(controller).ActiveLights, [0]);
 });
