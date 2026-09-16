@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "d87c8bac99e23f98a47ac9d98cb634d627af6563d9f02f9683299e7867b81f99",
+  "flowSha256": "0a01413abe200c91f69884df8e5076d30c469e15617e193dcb4bd5d1bb31dc03",
   "formatting": {
     "indent": 4,
     "trailingNewline": false
@@ -1193,7 +1193,7 @@
     "flows/light-bath-all--3486c1a7.a51b3e/nodes.json": "281f4eaba0e17e9f3105d3c9ec6d1af4a2b5d3396e1c6db979a8ca0cabb45803",
     "flows/light-controller--light_controller_flow/functions/light-controller-kitchen.js": "992d9016869ea0c218e05fe8e96cf7a2bcaa1149818ed830953071033eeb6fe1",
     "flows/light-controller--light_controller_flow/nodes.json": "90bf925dee188cfba7f9891c9ffdcb746c65f724326ecc26bad764d4a6f6a6e8",
-    "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": "258e23e570ac782ad9d84adc4558b82202483eabf3a9f3f76f04d667ed6e58e0",
+    "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": "c5427c52923596e43ca7631e3c9f9b064dd6e1c652bdf7402c5b167a36998280",
     "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left.js": "ea2970dc0b72fb1a23dc7de6ac4e514c234fb35357c66f63e700594b879cb5a3",
     "flows/light-door-entry-left--58c186d2.cc7718/nodes.json": "20de83c18832f21a31c0c37019b20034fed28194cbcb027a0ba158f6389cc388",
     "flows/light-gallery-down--1976d7f.0dd9028/functions/light-command-gallery-down.js": "ba8473de1243f513e91db46cbdaca85eeea00ca7eed0eb783feec7d7bae96763",

@@ -42,6 +42,16 @@
   </div>
 
   <div class="lc-card">
+    <div class="lc-title">Gesamthelligkeit</div>
+    <div>Aktiv: {{state.ScenarioName || '—'}} · Dimmer: {{state.DutyCycle !== undefined ? state.DutyCycle : '—'}} %</div>
+    <div class="lc-form-row">
+      <input class="lc-input" aria-label="Gesamthelligkeit Prozent" type="number" min="0" max="100" ng-model="dutyCycleDraft" ng-change="dutyCycleDirty = true">
+      <button class="lc-action" ng-click="applyDutyCycle()">Übernehmen</button>
+    </div>
+    <div class="lc-hint">LED-Ausgabe = Szenariovorgabe × Gesamthelligkeit. 100 % übernimmt die Vorgaben unverändert. 0 % schaltet dunkel. Der Taster verändert diesen Wert nicht.</div>
+  </div>
+
+  <div class="lc-card">
     <div class="lc-title">Szenarien konfigurieren</div>
     <div class="lc-form-row">
       <select class="lc-select" ng-model="selectedScenarioName" ng-change="loadSelectedScenario()">
@@ -66,7 +76,7 @@
       <button class="lc-action warn" ng-click="deleteScenario()">Löschen</button>
       <button class="lc-action warn" ng-click="clearScenarios()">Eigene löschen</button>
     </div>
-    <div class="lc-hint">Speichern aktualisiert denselben Namen. Werte sind Prozent von 0 bis 100 und bleiben nach einem Neustart erhalten.</div>
+    <div class="lc-hint">Bearbeitung und aktive Szene sind getrennt. Speichern aktualisiert ein eigenes Szenario; Grundszenarien bitte unter neuem Namen anlegen. Vorgaben von 0 bis 100 % bleiben nach einem Neustart erhalten. Auswählen aktiviert die gespeicherten Werte, nicht den Entwurf.</div>
   </div>
 </div>
 
@@ -75,6 +85,7 @@
   const EMPTY_TIMING = { Pressed:false, PressedAt:null, ReleasedAt:null, DurationMs:null, CurrentDurationMs:0 };
   const EVENT_TEXT = {
     initialized:"Controller bereit", button_pressed:"Taster gedrückt",
+    duty_cycle_changed:"Gesamthelligkeit gespeichert", duty_cycle_invalid:"Gesamthelligkeit muss 0 bis 100 % sein",
     short_press_pending:"Kurzer Klick erkannt – Doppelklickfenster offen",
     scenario_changed:"Nächstes Licht/Szenario aktiviert",
     scenario_mode_entered:"Langdruck – aktuelles Licht/Szenario festgehalten",
@@ -103,6 +114,8 @@
   scope.scenarioLevels = [0,0,0,0,0,0];
   scope.scenarioName = "";
   scope.selectedScenarioName = "";
+  scope.dutyCycleDraft = null;
+  scope.dutyCycleDirty = false;
   scope.testButtonPressed = false;
   scope.localDurationMs = 0;
   scope.pushText = "Status wird geladen …";
@@ -134,9 +147,9 @@
       scope.scenarioLevels = scope.ledIndexes.map(index => Number(scope.scenarioLevels[index] || 0));
     }
     scope.pushText = payload.CommandResult || EVENT_TEXT[payload.Event] || payload.Event || "Status aktualisiert";
-    if (["scenario_selected", "scenario_added", "scenario_saved"].includes(payload.Event)
-        && payload.ScenarioName) {
-      scope.selectedScenarioName = payload.ScenarioName;
+    // Status darf weder Auswahl noch ungespeicherte Formularwerte überschreiben.
+    if (!scope.dutyCycleDirty && Number.isFinite(payload.DutyCycle)) {
+      scope.dutyCycleDraft = payload.DutyCycle;
     }
   });
 
@@ -169,8 +182,13 @@
     return result;
   };
   scope.sendScenarioCommand = function(command, includeProperties) {
-    const name = String(scope.scenarioName || scope.selectedScenarioName || "").trim();
+    const usesSelection = command === "SelectScenario" || command === "DeleteScenario";
+    const name = String((usesSelection ? scope.selectedScenarioName : scope.scenarioName) || "").trim();
     if (command !== "ListScenarios" && !name) { scope.pushText = "Bitte einen Szenarionamen eingeben."; return; }
+    if (includeProperties && scope.state.ScenarioList.some(item => item.ScenarioName === name && item.ScenarioType === "system")) {
+      scope.pushText = "Grundszenario geschützt – bitte einen neuen Namen eingeben und neu anlegen.";
+      return;
+    }
     const payload = { Command:command };
     if (name) payload.ScenarioName = name;
     if (includeProperties) payload.ScenarioProperties = scope.scenarioProperties();
@@ -196,8 +214,17 @@
     scope.send({topic:"light-controller/dashboard",payload:{Command:"RemoveOutput"}});
   };
 
+  scope.applyDutyCycle = function() {
+    const value = scope.dutyCycleDraft;
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100) {
+      scope.pushText = "Bitte Gesamthelligkeit zwischen 0 und 100 % eingeben.";
+      return;
+    }
+    scope.send({topic:"light-controller/dashboard",payload:{Command:"SetDutyCycle",DutyCycle:value}});
+    scope.dutyCycleDirty = false;
+  };
   function sendButton(pressed) {
-    scope.send({ topic:"light-controller/dashboard", payload:{ButtonPressed:pressed,DutyCycle:70} });
+    scope.send({ topic:"light-controller/dashboard", payload:{ButtonPressed:pressed} });
   }
   function stopDurationTimer() {
     if (durationTimer) window.clearInterval(durationTimer);

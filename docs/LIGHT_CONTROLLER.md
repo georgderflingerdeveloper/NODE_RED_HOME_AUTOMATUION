@@ -284,3 +284,19 @@ Die alte Speicherfunktion ist weiterhin mit `longAction: "save"` verfügbar.
 4. Bestehende Ausgangsfelder nicht umbenennen.
 5. Jede Erweiterung in `test/LightController.test.mjs` absichern.
 6. Persistenz ausschließlich über `LightControllerScenarioStore` kapseln.
+# v0.8.9 – Szenariovorgaben und Gesamthelligkeit
+
+Der Dashboard-Taster sendet nur ButtonPressed; er überschreibt keine Helligkeit mehr.
+Die Ausgabe ist Szenarioprozent × Gesamthelligkeit / 100. Im neuen Feld
+„Gesamthelligkeit“ 100 eintragen und „Übernehmen“ wählen, um die Szenariovorgaben
+unverändert auszugeben. Bestehende Dimmung bleibt beim Update absichtlich erhalten.
+`payload = { Command: 'SetDutyCycle', DutyCycle: 100 }` setzt und persistiert die
+Gesamthelligkeit. Nur endliche Zahlen von 0 bis 100 sind erlaubt; 0 ist gültig.
+Szenariodefinitionen werden dabei nicht verändert.
+
+Dropdown-Auswahl und aktive Szene sind unabhängig vom bearbeiteten Entwurf.
+Auswählen/Löschen verwenden den Dropdown-Namen, Speichern/Anlegen den Formularnamen.
+Grundszenarien bleiben geschützt: abweichende Werte unter einem eigenen Namen
+anlegen und danach im Dropdown auswählen. Statusmeldungen überschreiben keine Entwürfe.
+Anpassungspunkte: Dashboard `sendButton`, `applyDutyCycle`, `sendScenarioCommand`;
+Controller `process` für SetDutyCycle und `getLedOutput` für die Skalierung.

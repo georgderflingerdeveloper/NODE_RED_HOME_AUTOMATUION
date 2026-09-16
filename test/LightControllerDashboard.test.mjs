@@ -2,6 +2,81 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import { createRequire } from 'node:module';
+const { LightController } = createRequire(import.meta.url)('../lib/functions/generated/LightController.js');
+
+function dashboardHarness() {
+    let watcher;
+    const sent = [], handlers = {};
+    const scope = { $watch(_, cb) { watcher = cb; }, $on() {}, $applyAsync(cb) { cb(); },
+        send(msg) { sent.push(JSON.parse(JSON.stringify(msg.payload))); } };
+    const button = { addEventListener(name, cb) { handlers[name] = cb; } };
+    vm.runInNewContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], {
+        scope, document: { getElementById() { return button; } },
+        window: { setTimeout(cb) { cb(); }, setInterval() { return 1; }, clearInterval() {}, confirm() { return true; } },
+    });
+    sent.length = 0;
+    return { scope, sent, update(payload) { watcher({ payload }); },
+        press() { handlers.pointerdown({ preventDefault() {}, currentTarget: {} }); },
+        release() { handlers.pointerup({ preventDefault() {} }); } };
+}
+
+test('Echter Dashboard-Taster erhält Szenarioprozentwerte bei 100, 40 und 0 Prozent Gesamthelligkeit', () => {
+    for (const duty of [100, 40, 0]) {
+        const controller = new LightController();
+        controller.process({ Command: 'AddScenario', ScenarioName: 'Arbeit', ScenarioProperties: { 1: 50, 2: 100, 6: 70 } });
+        controller.process({ Command: 'SelectScenario', ScenarioName: 'Arbeit' });
+        const ui = dashboardHarness();
+        ui.scope.dutyCycleDraft = duty;
+        ui.scope.applyDutyCycle();
+        const dimmed = controller.process(ui.sent.pop());
+        assert.equal(dimmed.PersistentStateChanged, true);
+        dimmed.LedOutput.forEach((value, index) => assert.ok(Math.abs(value - [0.5, 1, 0, 0, 0, 0.7][index] * duty / 100) < 1e-12));
+        const restored = new LightController(controller.getConfiguration());
+        assert.equal(restored.getOutput().DutyCycle, duty);
+        for (let click = 0; click < 2; click++) {
+            ui.press(); ui.release();
+            assert.deepEqual(ui.sent.slice(-2), [{ ButtonPressed: true }, { ButtonPressed: false }]);
+            restored.process(ui.sent.at(-2), 1000 + click * 1000);
+            restored.process(ui.sent.at(-1), 1100 + click * 1000);
+            restored.process({ Command: 'FlushPendingClick' }, 1700 + click * 1000);
+        }
+        assert.equal(restored.getOutput().DutyCycle, duty);
+        assert.deepEqual(restored.getOutput().LedOutput, dimmed.LedOutput);
+    }
+});
+
+test('Auswählen und Löschen verwenden Dropdown, Speichern den Entwurfsnamen; Status erhält Entwurf', () => {
+    const ui = dashboardHarness();
+    ui.scope.selectedScenarioName = 'Arbeit';
+    ui.scope.scenarioName = 'Entwurf';
+    ui.scope.scenarioLevels[0] = 55;
+    ui.scope.dutyCycleDraft = 33; ui.scope.dutyCycleDirty = true;
+    ui.update({ Event: 'scenario_selected', ScenarioName: 'Extern', DutyCycle: 70 });
+    assert.equal(ui.scope.selectedScenarioName, 'Arbeit');
+    assert.equal(ui.scope.scenarioName, 'Entwurf');
+    assert.equal(ui.scope.dutyCycleDraft, 33);
+    ui.scope.sendScenarioCommand('SelectScenario');
+    ui.scope.deleteScenario();
+    ui.scope.sendScenarioCommand('SaveScenario', true);
+    assert.deepEqual(ui.sent.map(x => x.ScenarioName), ['Arbeit', 'Arbeit', 'Entwurf']);
+    assert.equal(ui.sent[2].ScenarioProperties[1], 55);
+});
+
+test('Grundszenarien und ungültige Dimmerwerte werden im Editor geschützt', () => {
+    const ui = dashboardHarness();
+    ui.update({ DutyCycle: 70, ScenarioList: [{ ScenarioName: 'System', ScenarioType: 'system' }] });
+    assert.equal(ui.scope.dutyCycleDraft, 70);
+    ui.scope.scenarioName = 'System';
+    ui.scope.sendScenarioCommand('SaveScenario', true);
+    for (const value of [null, undefined, -1, 101, NaN]) {
+        ui.scope.dutyCycleDraft = value; ui.scope.applyDutyCycle();
+        const controller = new LightController();
+        controller.process({ Command: 'SetDutyCycle', DutyCycle: 45 });
+        assert.equal(controller.process({ Command: 'SetDutyCycle', DutyCycle: value }).DutyCycle, 45);
+    }
+    assert.equal(ui.sent.length, 0);
+});
 
 const nodes = JSON.parse(fs.readFileSync(
     'flow-src/flows/light-controller--light_controller_flow/nodes.json',

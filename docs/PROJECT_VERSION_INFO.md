@@ -114,3 +114,7 @@ Neue Metadaten werden zuerst in
 `nodes/home-automation-project-info-core.cjs` ergänzt. Die Darstellung bleibt in
 `flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html`.
 Für jede neue Erkennung ist ein Test in `test/home-automation-project-info.test.mjs` hinzuzufügen.
+# 0.8.9
+
+Dashboard-Taster ohne versteckte 70-%-Dimmung; explizite persistente Gesamthelligkeit,
+konsistente Szenarionamen und unveränderte Formularentwürfe. Regressionstests ergänzt.
