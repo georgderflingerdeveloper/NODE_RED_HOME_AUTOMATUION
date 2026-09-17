@@ -194,6 +194,13 @@
         "env": []
     },
     {
+        "id": "f1a0phidgetworker",
+        "type": "tab",
+        "label": "WORKER - Phidget HUB5000 IO",
+        "disabled": false,
+        "info": "HUB5000 + DAQ1301 (16 DI) + REL1101 (16 DO). Annahme: DAQ1301 an VINT Port 0, REL1101 an VINT Port 1."
+    },
+    {
         "id": "f6dd1fca.6c306",
         "type": "subflow",
         "name": "SUB_ANTEROOM_MAIN_LIGHT",
@@ -10606,8 +10613,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 900,
-        "y": 220,
+        "x": 920,
+        "y": 260,
         "wires": []
     },
     {
@@ -10674,6 +10681,1286 @@
         "wires": [
             [
                 "lightcontrollerkitchen"
+            ]
+        ]
+    },
+    {
+        "id": "inject_config_scenario_1",
+        "type": "inject",
+        "z": "light_controller_flow",
+        "name": "CONFIG: Szenario 1 = LED 1-6 @ 50%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"Command\":\"SaveScenario\",\"ScenarioName\":\"Szenario 1\",\"ScenarioProperties\":{\"1\":50,\"2\":50,\"3\":50,\"4\":50,\"5\":50,\"6\":50}}",
+        "payloadType": "json",
+        "x": 230,
+        "y": 100,
+        "wires": [
+            [
+                "lightcontrollerkitchen"
+            ]
+        ]
+    },
+    {
+        "id": "inject_apply_scenario_1",
+        "type": "inject",
+        "z": "light_controller_flow",
+        "name": "APPLY: Szenario 1",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"Command\":\"ScenarioApply\",\"ScenarioName\":\"Szenario 1\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 160,
+        "wires": [
+            [
+                "lightcontrollerkitchen"
+            ]
+        ]
+    },
+    {
+        "id": "cmt_cfg",
+        "type": "comment",
+        "z": "f1a0phidgetworker",
+        "name": "HUB5000: IP im Connect-Node setzen | DAQ1301 Port 0 | REL1101 Port 1",
+        "info": "",
+        "x": 410,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "f1a0connect",
+        "type": "phidget22-connect",
+        "z": "f1a0phidgetworker",
+        "name": "",
+        "port": "5661",
+        "hostname": "HUB5000-IP",
+        "debug": true,
+        "retry": false,
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "dbg_conn",
+                "di_00",
+                "di_01",
+                "di_02",
+                "di_03",
+                "di_04",
+                "di_05",
+                "di_06",
+                "di_07",
+                "di_08",
+                "di_09",
+                "di_10",
+                "di_11",
+                "di_12",
+                "di_13",
+                "di_14",
+                "di_15",
+                "do_00",
+                "do_01",
+                "do_02",
+                "do_03",
+                "do_04",
+                "do_05",
+                "do_06",
+                "do_07",
+                "do_08",
+                "do_09",
+                "do_10",
+                "do_11",
+                "do_12",
+                "do_13",
+                "do_14",
+                "do_15"
+            ]
+        ]
+    },
+    {
+        "id": "dbg_conn",
+        "type": "debug",
+        "z": "f1a0phidgetworker",
+        "name": "HUB5000 Verbindung",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "link_out_inputs",
+        "type": "link out",
+        "z": "f1a0phidgetworker",
+        "name": "HW INPUTS -> LOGIC",
+        "mode": "link",
+        "links": [],
+        "x": 1035,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "dbg_inputs",
+        "type": "debug",
+        "z": "f1a0phidgetworker",
+        "name": "Inputs[0..15]",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "link_in_outputs",
+        "type": "link in",
+        "z": "f1a0phidgetworker",
+        "name": "LOGIC -> HW OUTPUTS",
+        "links": [],
+        "x": 105,
+        "y": 760,
+        "wires": [
+            [
+                "route_outputs"
+            ]
+        ]
+    },
+    {
+        "id": "route_outputs",
+        "type": "function",
+        "z": "f1a0phidgetworker",
+        "name": "LedOutput -> 16 Phidget DO",
+        "func": "// Akzeptiert:\n//   msg.LedOutput = [0..1, ...]\n//   msg.payload.LedOutput = [0..1, ...]\n//   msg.payload = [0..1, ...]\n//\n// Nur vorhandene Werte werden geschrieben.\n// Nicht genannte Hardware-Kanäle bleiben unverändert.\n\nlet values = null;\n\nif (Array.isArray(msg.LedOutput)) {\n    values = msg.LedOutput;\n} else if (Array.isArray(msg.payload?.LedOutput)) {\n    values = msg.payload.LedOutput;\n} else if (Array.isArray(msg.payload)) {\n    values = msg.payload;\n}\n\nif (!values) {\n    node.warn(\"Kein LedOutput-Array gefunden\");\n    return null;\n}\n\nconst out = Array(16).fill(null);\n\nfor (let i = 0; i < Math.min(16, values.length); i++) {\n    const n = Number(values[i]);\n    const dutyCycle = Number.isFinite(n)\n        ? Math.max(0, Math.min(1, n))\n        : 0;\n\n    out[i] = {\n        topic: \"setDutyCycle\",\n        payload: { dutyCycle },\n        outputIndex: i,\n        source: \"PhidgetWorker\"\n    };\n}\n\nnode.status({\n    fill: \"green\",\n    shape: \"dot\",\n    text: values.slice(0, 16)\n        .map((v, i) => `${i + 1}=${Math.round(Number(v || 0) * 100)}%`)\n        .join(\" \")\n});\n\nreturn out;",
+        "outputs": 16,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 760,
+        "wires": [
+            [
+                "do_00"
+            ],
+            [
+                "do_01"
+            ],
+            [
+                "do_02"
+            ],
+            [
+                "do_03"
+            ],
+            [
+                "do_04"
+            ],
+            [
+                "do_05"
+            ],
+            [
+                "do_06"
+            ],
+            [
+                "do_07"
+            ],
+            [
+                "do_08"
+            ],
+            [
+                "do_09"
+            ],
+            [
+                "do_10"
+            ],
+            [
+                "do_11"
+            ],
+            [
+                "do_12"
+            ],
+            [
+                "do_13"
+            ],
+            [
+                "do_14"
+            ],
+            [
+                "do_15"
+            ]
+        ]
+    },
+    {
+        "id": "aggregate_inputs",
+        "type": "function",
+        "z": "f1a0phidgetworker",
+        "name": "16 DI -> Inputs[]",
+        "func": "// Nur echte Zustandsänderungen übernehmen.\nif (msg.topic !== \"StateChange\") return null;\nif (!Number.isInteger(msg.inputIndex)) return null;\n\nconst state = msg.payload?.state === true;\nlet inputs = flow.get(\"phidgetInputs\");\n\nif (!Array.isArray(inputs) || inputs.length !== 16) {\n    inputs = Array(16).fill(false);\n}\n\ninputs[msg.inputIndex] = state;\nflow.set(\"phidgetInputs\", inputs);\n\nnode.status({\n    fill: state ? \"green\" : \"grey\",\n    shape: \"dot\",\n    text: `DI${msg.inputIndex + 1}=${state ? \"ON\" : \"OFF\"}`\n});\n\nreturn {\n    topic: \"phidget/inputs\",\n    payload: {\n        Inputs: [...inputs],\n        ButtonPressed: inputs[0],\n        ChangedInput: msg.inputIndex,\n        State: state\n    }\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 300,
+        "wires": [
+            [
+                "link_out_inputs",
+                "dbg_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_00",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI01",
+        "channel": 0,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "tag_di_00"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_00",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI01 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 180,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_01",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI02",
+        "channel": 1,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 208,
+        "wires": [
+            [
+                "tag_di_01"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_01",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI02 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "1",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 208,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_02",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI03",
+        "channel": 2,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 236,
+        "wires": [
+            [
+                "tag_di_02"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_02",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI03 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "2",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 236,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_03",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI04",
+        "channel": 3,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 264,
+        "wires": [
+            [
+                "tag_di_03"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_03",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI04 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "3",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 264,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_04",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI05",
+        "channel": 4,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 292,
+        "wires": [
+            [
+                "tag_di_04"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_04",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI05 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "4",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 292,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_05",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI06",
+        "channel": 5,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 320,
+        "wires": [
+            [
+                "tag_di_05"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_05",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI06 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "5",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 320,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_06",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI07",
+        "channel": 6,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 348,
+        "wires": [
+            [
+                "tag_di_06"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_06",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI07 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "6",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 348,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_07",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI08",
+        "channel": 7,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 376,
+        "wires": [
+            [
+                "tag_di_07"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_07",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI08 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "7",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 376,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_08",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI09",
+        "channel": 8,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 404,
+        "wires": [
+            [
+                "tag_di_08"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_08",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI09 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "8",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 404,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_09",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI10",
+        "channel": 9,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 432,
+        "wires": [
+            [
+                "tag_di_09"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_09",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI10 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "9",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 432,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_10",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI11",
+        "channel": 10,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 460,
+        "wires": [
+            [
+                "tag_di_10"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_10",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI11 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "10",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 460,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_11",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI12",
+        "channel": 11,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 488,
+        "wires": [
+            [
+                "tag_di_11"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_11",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI12 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "11",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 488,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_12",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI13",
+        "channel": 12,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 516,
+        "wires": [
+            [
+                "tag_di_12"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_12",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI13 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "12",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 516,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_13",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI14",
+        "channel": 13,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 544,
+        "wires": [
+            [
+                "tag_di_13"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_13",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI14 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "13",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 544,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_14",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI15",
+        "channel": 14,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 572,
+        "wires": [
+            [
+                "tag_di_14"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_14",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI15 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "14",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 572,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "di_15",
+        "type": "phidget22-digitalinput",
+        "z": "f1a0phidgetworker",
+        "name": "DAQ1301 DI16",
+        "channel": 15,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 0,
+        "debug": false,
+        "x": 330,
+        "y": 600,
+        "wires": [
+            [
+                "tag_di_15"
+            ]
+        ]
+    },
+    {
+        "id": "tag_di_15",
+        "type": "change",
+        "z": "f1a0phidgetworker",
+        "name": "DI16 tag",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inputIndex",
+                "pt": "msg",
+                "to": "15",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 600,
+        "wires": [
+            [
+                "aggregate_inputs"
+            ]
+        ]
+    },
+    {
+        "id": "do_00",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO01",
+        "channel": 0,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_01",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO02",
+        "channel": 1,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 648,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_02",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO03",
+        "channel": 2,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 676,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_03",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO04",
+        "channel": 3,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 704,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_04",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO05",
+        "channel": 4,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 732,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_05",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO06",
+        "channel": 5,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_06",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO07",
+        "channel": 6,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 788,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_07",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO08",
+        "channel": 7,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 816,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_08",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO09",
+        "channel": 8,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 844,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_09",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO10",
+        "channel": 9,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 872,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_10",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO11",
+        "channel": 10,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_11",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO12",
+        "channel": 11,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 928,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_12",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO13",
+        "channel": 12,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 956,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_13",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO14",
+        "channel": 13,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 984,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_14",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO15",
+        "channel": 14,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 1012,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "do_15",
+        "type": "phidget22-digitaloutput",
+        "z": "f1a0phidgetworker",
+        "name": "REL1101 DO16",
+        "channel": 15,
+        "deviceSerialNumber": -1,
+        "isHubPortDevice": false,
+        "hubPort": 1,
+        "debug": false,
+        "x": 760,
+        "y": 1040,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_6x50",
+        "type": "inject",
+        "z": "f1a0phidgetworker",
+        "name": "TEST DO1-6 = 50%",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[0.5,0.5,0.5,0.5,0.5,0.5]",
+        "payloadType": "json",
+        "x": 90,
+        "y": 640,
+        "wires": [
+            [
+                "route_outputs"
+            ]
+        ]
+    },
+    {
+        "id": "inj_6off",
+        "type": "inject",
+        "z": "f1a0phidgetworker",
+        "name": "TEST DO1-6 = AUS",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[0,0,0,0,0,0]",
+        "payloadType": "json",
+        "x": 90,
+        "y": 820,
+        "wires": [
+            [
+                "route_outputs"
             ]
         ]
     }
