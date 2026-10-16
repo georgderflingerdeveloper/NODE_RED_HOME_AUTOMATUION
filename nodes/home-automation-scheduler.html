@@ -1,0 +1,5 @@
+<script type="text/javascript">
+RED.nodes.registerType('home-automation-scheduler', {category:'function', color:'#89bfa8', defaults:{name:{value:'Schedulers · Verwaltung'}}, inputs:1, outputs:3, icon:'timer.svg', label:function(){return this.name;}, outputLabels:['Link-Befehle','Cron-plus-Verwaltung','Dashboard-Status']});
+</script>
+<script type="text/html" data-template-name="home-automation-scheduler"><div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name"></div></script>
+<script type="text/html" data-help-name="home-automation-scheduler"><p>Persistente, geräteunabhängige Scheduler-Verwaltung. Ausgabe 1 an Link Out, Ausgabe 2 an einen eigenen Cron-plus, Ausgabe 3 ans Scheduler-Dashboard. Dokumentation: docs/SCHEDULERS.md.</p></script>

@@ -196,9 +196,17 @@
     {
         "id": "f1a0phidgetworker",
         "type": "tab",
-        "label": "WORKER - Phidget HUB5000 IO",
+        "label": "SECTION_KITCHEN_WORKER - Phidget HUB5000 IO",
         "disabled": false,
         "info": "HUB5000 + DAQ1301 (16 DI) + REL1101 (16 DO). Annahme: DAQ1301 an VINT Port 0, REL1101 an VINT Port 1."
+    },
+    {
+        "id": "schedulers_flow",
+        "type": "tab",
+        "label": "SCHEDULERS",
+        "disabled": false,
+        "info": "Zeitpläne, Dashboard und geräteunabhängiger Link-Bus. Anleitung: docs/SCHEDULERS.md",
+        "env": []
     },
     {
         "id": "f6dd1fca.6c306",
@@ -2339,7 +2347,9 @@
             "48611f94.4d494"
         ],
         "x": 339,
-        "y": 19
+        "y": 19,
+        "w": 577,
+        "h": 222
     },
     {
         "id": "e045aa73.92a308",
@@ -2881,6 +2891,25 @@
         "width": "18",
         "collapse": false,
         "className": ""
+    },
+    {
+        "id": "schedulers_ui_tab",
+        "type": "ui_tab",
+        "name": "Schedulers",
+        "icon": "schedule",
+        "order": 20,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "schedulers_ui_group",
+        "type": "ui_group",
+        "name": "Zeitsteuerung",
+        "tab": "schedulers_ui_tab",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false
     },
     {
         "id": "a952ee58.75f5b",
@@ -10015,8 +10044,8 @@
         "topic": "system/project/info/request",
         "payload": "",
         "payloadType": "date",
-        "x": 245,
-        "y": 100,
+        "x": 220,
+        "y": 60,
         "wires": [
             [
                 "system_project_info_node"
@@ -10053,6 +10082,86 @@
         "className": "",
         "x": 825,
         "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "phidget_dashboard_test",
+        "type": "inject",
+        "z": "system_dashboard_flow",
+        "name": "TEST · Phidget Hardware",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"phidgets\":[{\"name\":\"VINT HUB 5000\",\"deviceClass\":\"Hub\",\"deviceID\":\"HUB5000\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":null,\"channel\":null,\"attached\":true,\"lastSeen\":0},{\"name\":\"Digital Output 0\",\"deviceClass\":\"DigitalOutput\",\"deviceID\":\"DIGITALOUTPUT_1002\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":0,\"channel\":0,\"attached\":true,\"value\":0,\"lastSeen\":0},{\"name\":\"Digital Output 1\",\"deviceClass\":\"DigitalOutput\",\"deviceID\":\"DIGITALOUTPUT_1002\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":1,\"channel\":0,\"attached\":true,\"value\":1,\"lastSeen\":0},{\"name\":\"Digital Input 0\",\"deviceClass\":\"DigitalInput\",\"deviceID\":\"DIGITALINPUT_1001\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":2,\"channel\":0,\"attached\":false,\"value\":0,\"lastSeen\":0}]}",
+        "payloadType": "json",
+        "x": 290,
+        "y": 420,
+        "wires": [
+            [
+                "phidget_dashboard_normalize"
+            ]
+        ]
+    },
+    {
+        "id": "phidget_dashboard_link_in",
+        "type": "link in",
+        "z": "system_dashboard_flow",
+        "name": "Phidget Status vom Worker",
+        "links": [],
+        "x": 205,
+        "y": 380,
+        "wires": [
+            [
+                "phidget_dashboard_normalize"
+            ]
+        ]
+    },
+    {
+        "id": "phidget_dashboard_normalize",
+        "type": "function",
+        "z": "system_dashboard_flow",
+        "name": "Phidget Daten für Dashboard",
+        "func": "const payload = msg.payload || {};\n\nlet source;\n\nif (Array.isArray(payload.phidgets)) {\n    source = payload.phidgets;\n} else if (Array.isArray(payload.devices)) {\n    source = payload.devices;\n} else if (Array.isArray(payload)) {\n    source = payload;\n} else if (payload && typeof payload === \"object\") {\n    source = [payload];\n} else {\n    source = [];\n}\n\nconst now = Date.now();\n\nconst phidgets = source.map((item, index) => {\n    const attached =\n        item.attached === true ||\n        item.isAttached === true ||\n        item.connected === true ||\n        item.state === \"online\" ||\n        item.state === \"connected\";\n\n    let state = attached ? \"online\" : \"offline\";\n\n    if (item.state === \"waiting\" || item.state === \"connecting\") {\n        state = \"waiting\";\n    }\n\n    return {\n        name: item.name || item.deviceName || item.productName || (\"Phidget \" + (index + 1)),\n        deviceClass: item.deviceClass || item.className || item.channelClassName || \"—\",\n        deviceID: item.deviceID ?? item.deviceId ?? item.id ?? \"—\",\n        deviceSerialNumber:\n            item.deviceSerialNumber ??\n            item.serialNumber ??\n            item.serial ??\n            \"—\",\n        hubSerialNumber:\n            item.hubSerialNumber ??\n            item.hubSerial ??\n            item.deviceSerialNumber ??\n            \"—\",\n        hubPort: item.hubPort ?? item.port ?? \"—\",\n        channel: item.channel ?? item.channelNumber ?? \"—\",\n        value: item.value ?? item.stateValue ?? null,\n        state,\n        attached,\n        lastSeen: item.lastSeen || item.updatedAt || now,\n        firmwareVersion: item.firmwareVersion || item.version || \"—\"\n    };\n});\n\nconst hubSerials = new Set(\n    phidgets\n        .map(p => p.hubSerialNumber)\n        .filter(v => v !== \"—\" && v !== null && v !== undefined)\n);\n\nconst online = phidgets.filter(p => p.state === \"online\").length;\nconst offline = phidgets.filter(p => p.state === \"offline\").length;\n\nmsg.payload = {\n    summary: {\n        hardware: phidgets.length,\n        hubs: hubSerials.size,\n        online,\n        offline,\n        updatedAt: now\n    },\n    phidgets\n};\n\nnode.status({\n    fill: offline > 0 ? \"yellow\" : \"green\",\n    shape: \"dot\",\n    text: `${online}/${phidgets.length} verbunden`\n});\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 340,
+        "wires": [
+            [
+                "phidget_dashboard_template"
+            ]
+        ]
+    },
+    {
+        "id": "phidget_dashboard_template",
+        "type": "ui_template",
+        "z": "system_dashboard_flow",
+        "group": "system_dashboard_group",
+        "name": "PHIDGETS · Hardware und Verbindungen",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n.phg-card { width:100%; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; margin-top:6px; }\n.phg-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin:22px 0 10px; }\n.phg-header h3 { margin:0; color:#fff; font-size:18px; }\n.phg-subtitle { color:#a9c4c6; font-size:12px; margin-top:3px; }\n.phg-summary { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:10px; margin-bottom:12px; }\n.phg-kpi { padding:12px 14px; border-radius:12px; background:#1d3c41; }\n.phg-kpi-label { color:#b7ced0; font-size:10px; text-transform:uppercase; }\n.phg-kpi-value { margin-top:5px; color:#fff; font-size:21px; font-weight:700; }\n.phg-panel { border:1px solid #405b5f; border-radius:13px; background:#1d2d2f; overflow:hidden; }\n.phg-table-wrap { width:100%; overflow-x:auto; }\n.phg-table { width:100%; min-width:1000px; border-collapse:collapse; }\n.phg-table th { padding:10px 11px; background:#0b5960; color:#fff; text-align:left; font-size:11px; }\n.phg-table td { padding:10px 11px; border-top:1px solid #395357; font-size:12px; vertical-align:middle; }\n.phg-name { font-weight:700; color:#fff; }\n.phg-muted { color:#91afb2; font-size:10px; }\n.phg-id { font-family:monospace; color:#bfe8ea; }\n.phg-badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; background:#405055; }\n.phg-badge.online { background:#14613f; color:#b9ffdc; }\n.phg-badge.offline { background:#71342d; color:#ffd1c7; }\n.phg-badge.waiting { background:#66551c; color:#fff1ad; }\n.phg-value { font-family:monospace; font-weight:700; color:#ffe6a8; }\n.phg-empty { padding:22px; color:#9bb5b8; text-align:center; }\n@media(max-width:900px){.phg-summary{grid-template-columns:repeat(2,1fr);}}\n</style>\n\n<script>\n(function(scope){\n    var empty = {\n        summary:{hardware:null,hubs:null,online:null,offline:null,updatedAt:null},\n        phidgets:[]\n    };\n\n    scope.phg = angular.copy(empty);\n\n    scope.stateClass = function(state){\n        if(state === 'online') return 'online';\n        if(state === 'offline') return 'offline';\n        return 'waiting';\n    };\n\n    scope.stateLabel = function(state){\n        if(state === 'online') return 'verbunden';\n        if(state === 'offline') return 'getrennt';\n        return 'wartet';\n    };\n\n    scope.displayValue = function(device){\n        if(device.value === null || device.value === undefined) return '—';\n        if(device.value === true || device.value === 1) return '1 / EIN';\n        if(device.value === false || device.value === 0) return '0 / AUS';\n        return device.value;\n    };\n\n    scope.$watch('msg',function(msg){\n        if(!msg || !msg.payload) return;\n\n        scope.phg = {\n            summary: angular.extend({},empty.summary,msg.payload.summary || {}),\n            phidgets: Array.isArray(msg.payload.phidgets) ? msg.payload.phidgets : []\n        };\n    });\n})(scope);\n</script>\n\n<div class=\"phg-card\">\n    <div class=\"phg-header\">\n        <div>\n            <h3>PHIDGETS · Hardware</h3>\n            <div class=\"phg-subtitle\">VINT Hubs, angeschlossene Geräte, Kanäle, IDs und Verbindungszustände</div>\n        </div>\n        <div class=\"phg-subtitle\">\n            Aktualisiert: {{phg.summary.updatedAt ? (phg.summary.updatedAt | date:'HH:mm:ss') : '—'}}\n        </div>\n    </div>\n\n    <div class=\"phg-summary\">\n        <div class=\"phg-kpi\">\n            <div class=\"phg-kpi-label\">Hardware / Kanäle</div>\n            <div class=\"phg-kpi-value\">{{phg.summary.hardware === null ? '—' : phg.summary.hardware}}</div>\n        </div>\n        <div class=\"phg-kpi\">\n            <div class=\"phg-kpi-label\">VINT Hubs</div>\n            <div class=\"phg-kpi-value\">{{phg.summary.hubs === null ? '—' : phg.summary.hubs}}</div>\n        </div>\n        <div class=\"phg-kpi\">\n            <div class=\"phg-kpi-label\">Verbunden</div>\n            <div class=\"phg-kpi-value\">{{phg.summary.online === null ? '—' : phg.summary.online}}</div>\n        </div>\n        <div class=\"phg-kpi\">\n            <div class=\"phg-kpi-label\">Getrennt</div>\n            <div class=\"phg-kpi-value\">{{phg.summary.offline === null ? '—' : phg.summary.offline}}</div>\n        </div>\n    </div>\n\n    <div class=\"phg-panel phg-table-wrap\" ng-if=\"phg.phidgets.length\">\n        <table class=\"phg-table\">\n            <thead>\n                <tr>\n                    <th>Phidget</th>\n                    <th>Klasse</th>\n                    <th>Device-ID</th>\n                    <th>Device Serial</th>\n                    <th>Hub Serial</th>\n                    <th>Hub Port</th>\n                    <th>Channel</th>\n                    <th>Wert</th>\n                    <th>Status</th>\n                    <th>Letzte Meldung</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr ng-repeat=\"device in phg.phidgets track by $index\">\n                    <td class=\"phg-name\">{{device.name}}</td>\n                    <td>{{device.deviceClass}}</td>\n                    <td class=\"phg-id\">{{device.deviceID}}</td>\n                    <td class=\"phg-id\">{{device.deviceSerialNumber}}</td>\n                    <td class=\"phg-id\">{{device.hubSerialNumber}}</td>\n                    <td>{{device.hubPort}}</td>\n                    <td>{{device.channel}}</td>\n                    <td class=\"phg-value\">{{displayValue(device)}}</td>\n                    <td><span class=\"phg-badge\" ng-class=\"stateClass(device.state)\">{{stateLabel(device.state)}}</span></td>\n                    <td>{{device.lastSeen ? (device.lastSeen | date:'HH:mm:ss') : '—'}}</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n\n    <div class=\"phg-panel phg-empty\" ng-if=\"!phg.phidgets.length\">\n        Noch keine Phidget-Hardware erkannt.\n    </div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 860,
+        "y": 340,
         "wires": [
             []
         ]
@@ -10596,7 +10705,8 @@
         "wires": [
             [
                 "lightcontroller_led_status",
-                "lightcontroller_kitchen_dashboard"
+                "lightcontroller_kitchen_dashboard",
+                "scheduler_kitchen_status"
             ]
         ]
     },
@@ -10728,6 +10838,107 @@
         "payloadType": "json",
         "x": 180,
         "y": 160,
+        "wires": [
+            [
+                "lightcontrollerkitchen"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_kitchen_commands",
+        "type": "link in",
+        "z": "light_controller_flow",
+        "name": "Küche ← Scheduler-Befehle",
+        "links": [
+            "scheduler_commands_out"
+        ],
+        "x": 170,
+        "y": 660,
+        "wires": [
+            [
+                "scheduler_kitchen_adapter"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_kitchen_adapter",
+        "type": "function",
+        "z": "light_controller_flow",
+        "name": "Scheduler · Küchenbefehle prüfen",
+        "func": "// Adapter: ausschließlich typisierte Scheduler-Befehle für diese Instanz.\n// Neue Räume erhalten einen eigenen Adapter mit eigener TARGET_ID.\nconst TARGET_ID = \"kitchen-light\";\nconst request = msg.payload;\nif (msg.topic !== \"scheduler/command\" || request?.schemaVersion !== 1 || request.targetId !== TARGET_ID) return null;\nconst action = request.action || {};\nlet payload;\nif (action.type === \"brightness\" && typeof action.value === \"number\" && Number.isFinite(action.value) && action.value >= 0 && action.value <= 100) {\n    payload = { Command: \"SetDutyCycle\", DutyCycle: action.value };\n} else if (action.type === \"on\") payload = { Command: \"AllLightsOn\" };\nelse if (action.type === \"off\") payload = { Command: \"AllLightsOff\" };\nelse if (action.type === \"scenario\" && typeof action.value === \"string\" && action.value.trim()) payload = { Command: \"SelectScenario\", ScenarioName: action.value };\nelse {\n    return [null, { topic:\"scheduler/ack\", payload:{requestId:request.requestId,targetId:TARGET_ID,ok:false,text:\"Nicht unterstützte Aktion\"} }];\n}\n// Die vorhandene Controller-Function reicht eigene Message-Felder durch.\nreturn [{ topic:\"scheduler/kitchen\", schedulerRequest:request, payload }, null];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 660,
+        "wires": [
+            [
+                "lightcontrollerkitchen"
+            ],
+            [
+                "scheduler_kitchen_feedback"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_kitchen_status",
+        "type": "function",
+        "z": "light_controller_flow",
+        "name": "Scheduler · Küche registrieren / bestätigen",
+        "func": "const TARGET_ID = \"kitchen-light\";\nconst output = msg.payload;\nif (!output || !Array.isArray(output.ScenarioList)) return null;\nconst messages = [{ topic:\"scheduler/register\", payload:{\n    id:TARGET_ID, name:\"Küche · Lichtsteuerung\", room:\"kitchen\", kind:\"light\", groups:[\"indoor\"],\n    actions:[\"brightness\",\"on\",\"off\",\"scenario\"],\n    scenarios:output.ScenarioList.map(scenario => scenario.ScenarioName)\n} }];\nif (msg.schedulerRequest) {\n    const request = msg.schedulerRequest;\n    const expected = {brightness:\"duty_cycle_changed\",on:\"all_lights_on\",off:\"all_lights_off\",scenario:\"scenario_selected\"};\n    const ok = output.Event === expected[request.action.type];\n    messages.push({topic:\"scheduler/ack\",payload:{requestId:request.requestId,targetId:TARGET_ID,ok,\n        text:ok ? \"Controller bestätigt: \" + output.Event : \"Controller meldet: \" + output.Event}});\n}\nreturn [messages];\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 740,
+        "wires": [
+            [
+                "scheduler_kitchen_feedback"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_kitchen_feedback",
+        "type": "link out",
+        "z": "light_controller_flow",
+        "name": "Küche → Scheduler-Rückmeldung",
+        "mode": "link",
+        "links": [
+            "scheduler_feedback_in"
+        ],
+        "x": 1010,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "scheduler_kitchen_register",
+        "type": "inject",
+        "z": "light_controller_flow",
+        "name": "Küche anmelden · Start / 60 s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 3,
+        "topic": "scheduler/kitchen/register",
+        "payload": "{\"Command\":\"ListScenarios\"}",
+        "payloadType": "json",
+        "x": 320,
+        "y": 580,
         "wires": [
             [
                 "lightcontrollerkitchen"
@@ -11668,6 +11879,8 @@
         "isHubPortDevice": false,
         "hubPort": 1,
         "debug": false,
+        "LEDCurrentLimit": "",
+        "openTimeout": "",
         "x": 760,
         "y": 620,
         "wires": [
@@ -11684,6 +11897,8 @@
         "isHubPortDevice": false,
         "hubPort": 1,
         "debug": false,
+        "LEDCurrentLimit": "",
+        "openTimeout": "",
         "x": 760,
         "y": 648,
         "wires": [
@@ -11961,6 +12176,174 @@
         "wires": [
             [
                 "route_outputs"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_engine",
+        "type": "home-automation-scheduler",
+        "z": "schedulers_flow",
+        "name": "Zeitpläne · speichern und entscheiden",
+        "x": 530,
+        "y": 260,
+        "wires": [
+            [
+                "scheduler_commands_out"
+            ],
+            [
+                "scheduler_cron"
+            ],
+            [
+                "scheduler_dashboard"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_cron",
+        "type": "cronplus",
+        "z": "schedulers_flow",
+        "name": "Zeitgeber · Europe/Vienna",
+        "outputField": "payload",
+        "timeZone": "Europe/Vienna",
+        "storeName": "",
+        "commandResponseMsgOutput": "output2",
+        "outputs": 2,
+        "options": [
+            {
+                "name": "scheduler-watchdog",
+                "topic": "scheduler/tick",
+                "payloadType": "default",
+                "expressionType": "cron",
+                "expression": "*/15 * * * * *"
+            }
+        ],
+        "x": 540,
+        "y": 40,
+        "wires": [
+            [
+                "scheduler_engine"
+            ],
+            [
+                "scheduler_engine"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_start",
+        "type": "inject",
+        "z": "schedulers_flow",
+        "name": "Start · Zeitpläne wiederherstellen",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 2,
+        "topic": "scheduler/start",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 160,
+        "wires": [
+            [
+                "scheduler_engine"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_commands_out",
+        "type": "link out",
+        "z": "schedulers_flow",
+        "name": "Scheduler → Gerätebefehle",
+        "mode": "link",
+        "links": [
+            "scheduler_kitchen_commands"
+        ],
+        "x": 915,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "scheduler_feedback_in",
+        "type": "link in",
+        "z": "schedulers_flow",
+        "name": "Scheduler ← Registrierung / Bestätigung",
+        "links": [
+            "scheduler_kitchen_feedback"
+        ],
+        "x": 215,
+        "y": 260,
+        "wires": [
+            [
+                "scheduler_engine"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_dashboard",
+        "type": "ui_template",
+        "z": "schedulers_flow",
+        "group": "schedulers_ui_group",
+        "name": "Schedulers · Dashboard",
+        "order": 1,
+        "width": 18,
+        "height": 0,
+        "format": "<style>\n.ha-scheduler{color:#eaf8f3;padding:8px;overflow-anchor:none}.ha-scheduler *{box-sizing:border-box}.ha-scheduler .sc-card{background:#183b3d;border:1px solid #32777a;border-radius:9px;padding:14px;margin-bottom:12px}.ha-scheduler h3{margin:0 0 12px}.ha-scheduler .sc-row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.ha-scheduler label{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px;margin-bottom:10px}.ha-scheduler input,.ha-scheduler select{background:#102a2c;color:#fff;border:1px solid #548789;border-radius:5px;padding:8px;width:100%}.ha-scheduler input[type=checkbox]{width:auto}.ha-scheduler button{background:#087e87;color:white;border:0;border-radius:5px;padding:9px;cursor:pointer}.ha-scheduler .sc-notice{min-height:42px;color:#ffe49c;white-space:normal}.ha-scheduler .sc-muted{font-size:12px;color:#bbd5ce}.ha-scheduler .sc-good{color:#a5f2af;font-weight:bold}.ha-scheduler .sc-bad{color:#ffbc9c}.ha-scheduler .sc-table{overflow-x:auto}.ha-scheduler table{width:100%;border-collapse:collapse}.ha-scheduler td,.ha-scheduler th{padding:9px;text-align:left;border-bottom:1px solid #416265;vertical-align:top}.ha-scheduler .sc-days label{flex:0;min-width:38px;align-items:center}.ha-scheduler .sc-title{display:flex;gap:10px;justify-content:space-between;align-items:center}.ha-scheduler .sc-small{max-width:140px}\n</style>\n<div class=\"ha-scheduler\">\n <div class=\"sc-card\">\n  <div class=\"sc-title\"><h3>Schedulers · Zeitsteuerung</h3><button ng-click=\"setEnabled(!status.enabled)\">{{status.enabled ? 'Automatik pausieren' : 'Automatik aktivieren'}}</button></div>\n  <div>Zeitzone: {{status.timeZone || 'Europe/Vienna'}} · <strong>{{status.enabled ? 'Automatik aktiv' : 'Automatik pausiert'}}</strong></div>\n  <div class=\"sc-notice\" role=\"status\">{{notice}}</div>\n  <div class=\"sc-bad\" ng-repeat=\"error in status.errors track by $index\">{{error}}</div>\n  <div class=\"sc-row\"><button ng-click=\"newPlan()\">+ Zeitplan</button><button ng-click=\"refresh()\">Liste laden</button></div>\n </div>\n <div class=\"sc-card sc-table\">\n  <h3>Zeitpläne</h3>\n  <table><thead><tr><th>Name / Ziel</th><th>Regel / Aktion</th><th>Nächste Ausführung</th><th></th></tr></thead><tbody>\n   <tr ng-repeat=\"plan in status.plans track by plan.id\"><td><strong>{{plan.name}}</strong><br>{{plan.enabled ? 'Aktiv' : 'Deaktiviert'}} · Priorität {{plan.priority}}<br>{{targetLabel(plan.target)}}<br><span ng-class=\"{'sc-bad':!plan.matchedTargets}\">{{plan.matchedTargets}} passende Empfänger</span></td><td>{{describe(plan)}}<br>{{plan.action.type}} {{plan.action.value}}</td><td>{{formatDate(plan.next)}}</td><td><button ng-click=\"editPlan(plan)\">Bearbeiten</button></td></tr>\n  </tbody></table>\n </div>\n <div class=\"sc-card\" ng-if=\"draft\">\n  <h3>Zeitplan bearbeiten</h3>\n  <p class=\"sc-muted\">Änderungen werden erst mit „Speichern“ wirksam. Live-Status verändert deinen Entwurf nicht.</p>\n  <div class=\"sc-row\"><label>Name<input ng-model=\"draft.name\" maxlength=\"100\"></label><label class=\"sc-small\">Aktiv<input type=\"checkbox\" ng-model=\"draft.enabled\"></label><label class=\"sc-small\">Priorität (0–100)<input type=\"number\" min=\"0\" max=\"100\" ng-model=\"draft.priority\"></label></div>\n  <div class=\"sc-row\">\n   <label>Zielbereich<select ng-model=\"draft.target.scope\" ng-change=\"targetScopeChanged()\"><option value=\"device\">Einzelgerät</option><option value=\"room\">Raum</option><option value=\"group\">Raumgruppe</option><option value=\"all\">Alle Räume</option></select></label>\n   <label ng-if=\"draft.target.scope !== 'all'\">Ziel<select ng-model=\"draft.target.id\" ng-options=\"item.id as item.name for item in targetOptions()\"></select></label>\n   <label>Geräteart<select ng-model=\"draft.target.kind\"><option value=\"light\">Licht</option><option value=\"socket\">Steckdose</option><option value=\"*\">Alle passenden Arten</option><option ng-repeat=\"kind in extraKinds() track by kind\" value=\"{{kind}}\">{{kind}}</option></select></label>\n  </div>\n  <div class=\"sc-row\">\n   <label>Zeitregel<select ng-model=\"draft.type\" ng-change=\"typeChanged()\"><option value=\"window\">Helligkeitsfenster (Nacht/Tag)</option><option value=\"weekly\">Wochentage / Uhrzeit</option><option value=\"once\">Einmaltermin</option><option value=\"interval\">Intervall</option><option value=\"solar\">Sonnenauf-/untergang</option></select></label>\n   <label>Aktion<select ng-model=\"draft.action.type\"><option value=\"brightness\">Gesamthelligkeit</option><option value=\"on\" ng-if=\"draft.type !== 'window'\">Alle Lichter / Gerät einschalten</option><option value=\"off\" ng-if=\"draft.type !== 'window'\">Ausschalten</option><option value=\"scenario\" ng-if=\"draft.type !== 'window'\">Szenario auswählen</option></select></label>\n   <label ng-if=\"draft.action.type === 'brightness'\">Helligkeit (%)<input type=\"number\" min=\"0\" max=\"100\" ng-model=\"draft.action.value\"></label>\n   <label ng-if=\"draft.action.type === 'scenario'\">Szenarioname<input ng-model=\"draft.action.value\" placeholder=\"Exakter gespeicherter Name\"></label>\n  </div>\n  <div class=\"sc-row\">\n   <label ng-if=\"draft.type === 'window' || draft.type === 'weekly'\">Beginn (HH:MM)<input ng-model=\"draft.start\" placeholder=\"21:00\"></label>\n   <label ng-if=\"draft.type === 'window'\">Ende (HH:MM)<input ng-model=\"draft.end\" placeholder=\"06:00\"></label>\n   <label ng-if=\"draft.type === 'window'\">Außerhalb (%)<input type=\"number\" min=\"0\" max=\"100\" ng-model=\"draft.outsideValue\"></label>\n   <label ng-if=\"draft.type === 'once'\">Termin mit Zeitzone<input ng-model=\"draft.at\" placeholder=\"2026-10-05T21:00:00+02:00\"></label>\n   <label ng-if=\"draft.type === 'interval'\">Alle … Minuten<input type=\"number\" min=\"1\" max=\"1440\" ng-model=\"draft.intervalMinutes\"></label>\n  </div>\n  <div class=\"sc-row\" ng-if=\"draft.type === 'solar'\"><label>Ereignis<select ng-model=\"draft.solarEvent\"><option value=\"sunrise\">Sonnenaufgang</option><option value=\"sunset\">Sonnenuntergang</option></select></label><label>Breitengrad<input type=\"number\" step=\"any\" ng-model=\"draft.latitude\"></label><label>Längengrad<input type=\"number\" step=\"any\" ng-model=\"draft.longitude\"></label><label>Versatz (Minuten)<input type=\"number\" ng-model=\"draft.offsetMinutes\"></label></div>\n  <div class=\"sc-row sc-days\" ng-if=\"draft.type === 'window' || draft.type === 'weekly' || draft.type === 'solar'\"><label ng-repeat=\"day in weekdays track by day.id\">{{day.name}}<input type=\"checkbox\" ng-checked=\"draft.days.indexOf(day.id) >= 0\" ng-click=\"toggleDay(day.id)\"></label></div>\n  <div class=\"sc-row\"><label>Gültig ab (optional)<input ng-model=\"draft.validFrom\" placeholder=\"JJJJ-MM-TT\"></label><label>Gültig bis (optional)<input ng-model=\"draft.validUntil\" placeholder=\"JJJJ-MM-TT\"></label></div>\n  <p class=\"sc-muted\">Nachtfenster: Wochentage beziehen sich auf den Beginn. Außerhalb gilt der zweite Prozentwert. 100 % = gespeicherte Szenariovorgabe; ausgeschaltetes Licht bleibt aus. Ereignisse werden nach Ausfall nicht nachgeholt. Nur registrierte, passende Empfänger erhalten Befehle.</p>\n  <div class=\"sc-row\"><button ng-click=\"savePlan()\">Speichern</button><button ng-click=\"deletePlan()\">Löschen</button><button ng-click=\"closeEditor()\">Editor schließen</button></div>\n </div>\n <div class=\"sc-card\"><h3>Registrierte Empfänger</h3>\n  <p ng-if=\"!status.targets.length\">Warte auf Registrierung der Küchen-Lichtsteuerung …</p>\n  <div ng-repeat=\"target in status.targets track by target.id\">\n   <strong>{{target.name}}</strong> · <span ng-class=\"target.online ? 'sc-good' : 'sc-bad'\">{{target.online ? 'Online' : 'Keine aktuelle Registrierung'}}</span>\n   <p class=\"sc-muted\">{{target.room}} / {{target.kind}} · Aktionen: {{target.actions.join(', ')}}<br>Szenarien: {{target.scenarios.join(', ') || '—'}}</p>\n   <p ng-if=\"target.effective\">Fenstervorgabe: {{target.effective.value}} % · {{target.effective.plan}}</p>\n   <p>{{target.feedback.text || 'Noch kein Scheduler-Befehl'}} <span class=\"sc-bad\" ng-if=\"target.feedback.ok === false\">⚠</span></p>\n   <p ng-if=\"target.pausedUntil > status.now\">Pausiert bis {{formatDate(target.pausedUntil)}}</p>\n   <div class=\"sc-row\"><button ng-click=\"targetCommand('PauseTarget', target.id)\">60 Minuten manuell</button><button ng-click=\"targetCommand('ResumeTarget', target.id)\">Automatik fortsetzen</button></div><hr>\n  </div>\n  <p class=\"sc-muted\">„Bestätigt“ bezeichnet die Controller-Rückmeldung, keine elektrische Messung. Pausieren, Deaktivieren und Löschen verändern den aktuellen Ausgang nicht.</p>\n </div>\n</div>\n<script>\n(function(scope) {\n  scope.status = {plans:[],targets:[],errors:[],enabled:false};\n  scope.notice = 'Status wird geladen …';\n  scope.draft = null;\n  scope.weekdays = ['Mo','Di','Mi','Do','Fr','Sa','So'].map(function(name,index){return {id:index+1,name:name};});\n  let editRevision = 0;\n  let saveToken = null;\n  function send(payload) { scope.send({topic:'scheduler/manage',payload:payload}); }\n  scope.$watch('msg', function(message) {\n    if (!message || !message.payload) return;\n    const p = message.payload;\n    if (Array.isArray(p.plans)) scope.status = p;\n    if (p.notice) scope.notice = p.notice;\n    else if (!scope.draft) scope.notice = 'Zeitpläne und Einstellungen werden dauerhaft gespeichert.';\n    if (p.ack && p.ack.token === saveToken && scope.draft && p.ack.id === scope.draft.id) {\n      editRevision = p.ack.revision;\n      saveToken = null;\n    }\n    // Entwurf und seine Revision werden ausschließlich durch explizites Laden verändert.\n  });\n  scope.newPlan = function() {\n    scope.draft = {id:'plan-'+Date.now().toString(36),name:'Neuer Zeitplan',enabled:false,priority:10,type:'window',target:{scope:'device',id:'kitchen-light',kind:'light'},action:{type:'brightness',value:30},start:'21:00',end:'06:00',outsideValue:100,days:[1,2,3,4,5,6,7],intervalMinutes:60,solarEvent:'sunset',offsetMinutes:0};\n    editRevision = scope.status.revision;\n  };\n  scope.editPlan = function(plan) { scope.draft = JSON.parse(JSON.stringify(plan)); delete scope.draft.next; delete scope.draft.matchedTargets; editRevision = scope.status.revision; scope.notice = 'Entwurf geladen: '+plan.name; };\n  scope.closeEditor = function() { scope.draft = null; };\n  scope.savePlan = function() { saveToken='save-'+Date.now();send({command:'Save',revision:editRevision,plan:JSON.parse(JSON.stringify(scope.draft)),token:saveToken}); };\n  scope.deletePlan = function() { if(window.confirm('Diesen Zeitplan löschen?')) send({command:'Delete',revision:editRevision,id:scope.draft.id}); };\n  scope.refresh = function() { send({command:'List'}); };\n  scope.setEnabled = function(value) { send({command:'Enable',revision:scope.status.revision,enabled:value}); };\n  scope.targetCommand = function(command,id) { send({command:command,id:id}); };\n  scope.toggleDay = function(day) { const index=scope.draft.days.indexOf(day); if(index<0)scope.draft.days.push(day);else scope.draft.days.splice(index,1); };\n  scope.typeChanged = function() { if(scope.draft.type==='window')scope.draft.action={type:'brightness',value:30}; };\n  scope.targetScopeChanged = function() { scope.draft.target.id = ''; };\n  scope.targetOptions = function() {\n    if(!scope.draft)return [];\n    const type=scope.draft.target.scope;\n    if(type==='device')return scope.status.targets;\n    const ids=[];scope.status.targets.forEach(function(t){(type==='room'?[t.room]:t.groups).forEach(function(id){if(ids.indexOf(id)<0)ids.push(id);});});\n    return ids.map(function(id){return {id:id,name:id};});\n  };\n  scope.extraKinds = function() { return scope.status.targets.map(function(t){return t.kind;}).filter(function(kind,index,list){return kind!=='light'&&kind!=='socket'&&list.indexOf(kind)===index;}); };\n  scope.targetLabel = function(t) { return t.scope+' · '+(t.id||'alle')+' · '+t.kind; };\n  scope.describe = function(p) { return p.type==='window'?p.start+' → '+p.end+' / '+p.outsideValue+' % außerhalb':p.type==='weekly'?p.start:p.type==='once'?p.at:p.type==='interval'?'Alle '+p.intervalMinutes+' Minuten':p.solarEvent+' '+p.offsetMinutes+' min'; };\n  scope.formatDate = function(value) { if(!value)return '—';return new Date(value).toLocaleString('de-AT',{timeZone:'Europe/Vienna'}); };\n  scope.refresh();\n})(scope);\n</script>\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 510,
+        "y": 420,
+        "wires": [
+            [
+                "scheduler_engine"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_catch",
+        "type": "catch",
+        "z": "schedulers_flow",
+        "name": "Cron-Fehler sichtbar machen",
+        "scope": [
+            "scheduler_cron"
+        ],
+        "uncaught": false,
+        "x": 200,
+        "y": 700,
+        "wires": [
+            [
+                "scheduler_error_topic"
+            ]
+        ]
+    },
+    {
+        "id": "scheduler_error_topic",
+        "type": "change",
+        "z": "schedulers_flow",
+        "name": "Zeitgeberfehler",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "scheduler/cron-error",
+                "tot": "str"
+            }
+        ],
+        "x": 500,
+        "y": 720,
+        "wires": [
+            [
+                "scheduler_engine"
             ]
         ]
     }

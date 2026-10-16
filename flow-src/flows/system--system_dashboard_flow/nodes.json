@@ -114,8 +114,8 @@
     "topic": "system/project/info/request",
     "payload": "",
     "payloadType": "date",
-    "x": 245,
-    "y": 100,
+    "x": 220,
+    "y": 60,
     "wires": [
       [
         "system_project_info_node"
@@ -154,6 +154,90 @@
     "className": "",
     "x": 825,
     "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "phidget_dashboard_test",
+    "type": "inject",
+    "z": "system_dashboard_flow",
+    "name": "TEST · Phidget Hardware",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"phidgets\":[{\"name\":\"VINT HUB 5000\",\"deviceClass\":\"Hub\",\"deviceID\":\"HUB5000\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":null,\"channel\":null,\"attached\":true,\"lastSeen\":0},{\"name\":\"Digital Output 0\",\"deviceClass\":\"DigitalOutput\",\"deviceID\":\"DIGITALOUTPUT_1002\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":0,\"channel\":0,\"attached\":true,\"value\":0,\"lastSeen\":0},{\"name\":\"Digital Output 1\",\"deviceClass\":\"DigitalOutput\",\"deviceID\":\"DIGITALOUTPUT_1002\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":1,\"channel\":0,\"attached\":true,\"value\":1,\"lastSeen\":0},{\"name\":\"Digital Input 0\",\"deviceClass\":\"DigitalInput\",\"deviceID\":\"DIGITALINPUT_1001\",\"deviceSerialNumber\":745321,\"hubSerialNumber\":745321,\"hubPort\":2,\"channel\":0,\"attached\":false,\"value\":0,\"lastSeen\":0}]}",
+    "payloadType": "json",
+    "x": 290,
+    "y": 420,
+    "wires": [
+      [
+        "phidget_dashboard_normalize"
+      ]
+    ]
+  },
+  {
+    "id": "phidget_dashboard_link_in",
+    "type": "link in",
+    "z": "system_dashboard_flow",
+    "name": "Phidget Status vom Worker",
+    "links": [],
+    "x": 205,
+    "y": 380,
+    "wires": [
+      [
+        "phidget_dashboard_normalize"
+      ]
+    ]
+  },
+  {
+    "id": "phidget_dashboard_normalize",
+    "type": "function",
+    "z": "system_dashboard_flow",
+    "name": "Phidget Daten für Dashboard",
+    "func": {
+      "$flowSource": "flows/system--system_dashboard_flow/functions/phidget-daten-fur-dashboard.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 520,
+    "y": 340,
+    "wires": [
+      [
+        "phidget_dashboard_template"
+      ]
+    ]
+  },
+  {
+    "id": "phidget_dashboard_template",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "system_dashboard_group",
+    "name": "PHIDGETS · Hardware und Verbindungen",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 860,
+    "y": 340,
     "wires": [
       []
     ]

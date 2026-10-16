@@ -216,3 +216,8 @@ Tests in `test/home-automation-credential-vault-core.test.mjs` und
 Die Herkunft von App-Version, aktivem Projekt, Branch und Commit sowie die
 Regeln zur Erweiterung stehen in
 [`PROJECT_VERSION_INFO.md`](PROJECT_VERSION_INFO.md).
+
+## Schedulers 0.9.1
+Eigener Scheduler-Flow mit Link-Anbindung der Küche. Dokumentation: SCHEDULERS.md.
+Integration auf Georgs Stand 0.8.10 einschließlich eingesandtem Stash; vorhandene
+Controllerlogik und Kommentare bleiben erhalten.

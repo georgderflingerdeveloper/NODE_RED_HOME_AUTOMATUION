@@ -178,6 +178,37 @@
     "env": []
   },
   {
+    "id": "energy_forecast_flow",
+    "type": "tab",
+    "label": "ENERGY_FORECAST",
+    "disabled": false,
+    "info": "Provider-neutral energy price forecast and global automation state EnergyForecastData.",
+    "env": []
+  },
+  {
+    "id": "light_controller_flow",
+    "type": "tab",
+    "label": "LIGHT_CONTROLLER",
+    "disabled": false,
+    "info": "Generische Lichtsteuerungen; nur die Instanznamen sind raumspezifisch.",
+    "env": []
+  },
+  {
+    "id": "f1a0phidgetworker",
+    "type": "tab",
+    "label": "SECTION_KITCHEN_WORKER - Phidget HUB5000 IO",
+    "disabled": false,
+    "info": "HUB5000 + DAQ1301 (16 DI) + REL1101 (16 DO). Annahme: DAQ1301 an VINT Port 0, REL1101 an VINT Port 1."
+  },
+  {
+    "id": "schedulers_flow",
+    "type": "tab",
+    "label": "SCHEDULERS",
+    "disabled": false,
+    "info": "Zeitpläne, Dashboard und geräteunabhängiger Link-Bus. Anleitung: docs/SCHEDULERS.md",
+    "env": []
+  },
+  {
     "id": "f6dd1fca.6c306",
     "type": "subflow",
     "name": "SUB_ANTEROOM_MAIN_LIGHT",
@@ -2450,11 +2481,22 @@
     "className": ""
   },
   {
-    "id": "energy_forecast_flow",
-    "type": "tab",
-    "label": "ENERGY_FORECAST",
+    "id": "schedulers_ui_tab",
+    "type": "ui_tab",
+    "name": "Schedulers",
+    "icon": "schedule",
+    "order": 20,
     "disabled": false,
-    "info": "Provider-neutral energy price forecast and global automation state EnergyForecastData.",
-    "env": []
+    "hidden": false
+  },
+  {
+    "id": "schedulers_ui_group",
+    "type": "ui_group",
+    "name": "Zeitsteuerung",
+    "tab": "schedulers_ui_tab",
+    "order": 1,
+    "disp": true,
+    "width": "18",
+    "collapse": false
   }
 ]

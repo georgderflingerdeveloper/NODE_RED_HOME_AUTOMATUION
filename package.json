@@ -1,7 +1,7 @@
 {
     "name": "node-red-project",
     "description": "GEORGSHOME Home Automation",
-    "version": "0.8.10",
+    "version": "0.10.1",
     "private": true,
     "homeAutomation": {
         "branchPurposes": {
@@ -48,13 +48,15 @@
         "node-red-contrib-publishflows": "0.0.2",
         "node-red-contrib-simple-gate": "~0.3.1",
         "node-red-contrib-simpletime": "~2.8.1",
-        "node-red-contrib-telegrambot": "~7.1.1"
+        "node-red-contrib-telegrambot": "~7.1.1",
+        "node-red-contrib-cron-plus": "3.2.0"
     },
     "node-red": {
         "nodes": {
             "home-automation-history": "nodes/home-automation-history.js",
             "home-automation-credential-vault": "nodes/home-automation-credential-vault.js",
-            "home-automation-project-info": "nodes/home-automation-project-info.js"
+            "home-automation-project-info": "nodes/home-automation-project-info.js",
+            "home-automation-scheduler": "nodes/home-automation-scheduler.js"
         },
         "settings": {
             "flowFile": "flows.json",

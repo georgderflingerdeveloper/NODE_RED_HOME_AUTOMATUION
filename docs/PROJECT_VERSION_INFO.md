@@ -125,3 +125,14 @@ Regressionstests für Anwendung, Speichern und LED-Erweiterung ergänzt.
 
 Dashboard-Taster ohne versteckte 70-%-Dimmung; explizite persistente Gesamthelligkeit,
 konsistente Szenarionamen und unveränderte Formularentwürfe. Regressionstests ergänzt.
+
+# 0.10.0
+
+Scheduler-Ampel mit Fehler/Warnung/Läuft/Idle, Erkennung veralteter Rückmeldungen,
+Persistenztests sowie freie Raum-Links für Kinderzimmer, Bad und Wohnzimmer.
+Aktueller Laufzeit-Flow und wartbare Quellen synchronisiert; Küchensteuerung unverändert.
+
+# 0.10.1
+
+Aktualisierte flows.json von Georg integriert: Node-Positionen und vom Editor
+ergänzte Cron-plus-Einstellungen erhalten. Installer auf diese Basis abgestimmt.

@@ -1,0 +1,132 @@
+<style>
+.phg-card { width:100%; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; margin-top:6px; }
+.phg-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin:22px 0 10px; }
+.phg-header h3 { margin:0; color:#fff; font-size:18px; }
+.phg-subtitle { color:#a9c4c6; font-size:12px; margin-top:3px; }
+.phg-summary { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:10px; margin-bottom:12px; }
+.phg-kpi { padding:12px 14px; border-radius:12px; background:#1d3c41; }
+.phg-kpi-label { color:#b7ced0; font-size:10px; text-transform:uppercase; }
+.phg-kpi-value { margin-top:5px; color:#fff; font-size:21px; font-weight:700; }
+.phg-panel { border:1px solid #405b5f; border-radius:13px; background:#1d2d2f; overflow:hidden; }
+.phg-table-wrap { width:100%; overflow-x:auto; }
+.phg-table { width:100%; min-width:1000px; border-collapse:collapse; }
+.phg-table th { padding:10px 11px; background:#0b5960; color:#fff; text-align:left; font-size:11px; }
+.phg-table td { padding:10px 11px; border-top:1px solid #395357; font-size:12px; vertical-align:middle; }
+.phg-name { font-weight:700; color:#fff; }
+.phg-muted { color:#91afb2; font-size:10px; }
+.phg-id { font-family:monospace; color:#bfe8ea; }
+.phg-badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; background:#405055; }
+.phg-badge.online { background:#14613f; color:#b9ffdc; }
+.phg-badge.offline { background:#71342d; color:#ffd1c7; }
+.phg-badge.waiting { background:#66551c; color:#fff1ad; }
+.phg-value { font-family:monospace; font-weight:700; color:#ffe6a8; }
+.phg-empty { padding:22px; color:#9bb5b8; text-align:center; }
+@media(max-width:900px){.phg-summary{grid-template-columns:repeat(2,1fr);}}
+</style>
+
+<script>
+(function(scope){
+    var empty = {
+        summary:{hardware:null,hubs:null,online:null,offline:null,updatedAt:null},
+        phidgets:[]
+    };
+
+    scope.phg = angular.copy(empty);
+
+    scope.stateClass = function(state){
+        if(state === 'online') return 'online';
+        if(state === 'offline') return 'offline';
+        return 'waiting';
+    };
+
+    scope.stateLabel = function(state){
+        if(state === 'online') return 'verbunden';
+        if(state === 'offline') return 'getrennt';
+        return 'wartet';
+    };
+
+    scope.displayValue = function(device){
+        if(device.value === null || device.value === undefined) return '—';
+        if(device.value === true || device.value === 1) return '1 / EIN';
+        if(device.value === false || device.value === 0) return '0 / AUS';
+        return device.value;
+    };
+
+    scope.$watch('msg',function(msg){
+        if(!msg || !msg.payload) return;
+
+        scope.phg = {
+            summary: angular.extend({},empty.summary,msg.payload.summary || {}),
+            phidgets: Array.isArray(msg.payload.phidgets) ? msg.payload.phidgets : []
+        };
+    });
+})(scope);
+</script>
+
+<div class="phg-card">
+    <div class="phg-header">
+        <div>
+            <h3>PHIDGETS · Hardware</h3>
+            <div class="phg-subtitle">VINT Hubs, angeschlossene Geräte, Kanäle, IDs und Verbindungszustände</div>
+        </div>
+        <div class="phg-subtitle">
+            Aktualisiert: {{phg.summary.updatedAt ? (phg.summary.updatedAt | date:'HH:mm:ss') : '—'}}
+        </div>
+    </div>
+
+    <div class="phg-summary">
+        <div class="phg-kpi">
+            <div class="phg-kpi-label">Hardware / Kanäle</div>
+            <div class="phg-kpi-value">{{phg.summary.hardware === null ? '—' : phg.summary.hardware}}</div>
+        </div>
+        <div class="phg-kpi">
+            <div class="phg-kpi-label">VINT Hubs</div>
+            <div class="phg-kpi-value">{{phg.summary.hubs === null ? '—' : phg.summary.hubs}}</div>
+        </div>
+        <div class="phg-kpi">
+            <div class="phg-kpi-label">Verbunden</div>
+            <div class="phg-kpi-value">{{phg.summary.online === null ? '—' : phg.summary.online}}</div>
+        </div>
+        <div class="phg-kpi">
+            <div class="phg-kpi-label">Getrennt</div>
+            <div class="phg-kpi-value">{{phg.summary.offline === null ? '—' : phg.summary.offline}}</div>
+        </div>
+    </div>
+
+    <div class="phg-panel phg-table-wrap" ng-if="phg.phidgets.length">
+        <table class="phg-table">
+            <thead>
+                <tr>
+                    <th>Phidget</th>
+                    <th>Klasse</th>
+                    <th>Device-ID</th>
+                    <th>Device Serial</th>
+                    <th>Hub Serial</th>
+                    <th>Hub Port</th>
+                    <th>Channel</th>
+                    <th>Wert</th>
+                    <th>Status</th>
+                    <th>Letzte Meldung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="device in phg.phidgets track by $index">
+                    <td class="phg-name">{{device.name}}</td>
+                    <td>{{device.deviceClass}}</td>
+                    <td class="phg-id">{{device.deviceID}}</td>
+                    <td class="phg-id">{{device.deviceSerialNumber}}</td>
+                    <td class="phg-id">{{device.hubSerialNumber}}</td>
+                    <td>{{device.hubPort}}</td>
+                    <td>{{device.channel}}</td>
+                    <td class="phg-value">{{displayValue(device)}}</td>
+                    <td><span class="phg-badge" ng-class="stateClass(device.state)">{{stateLabel(device.state)}}</span></td>
+                    <td>{{device.lastSeen ? (device.lastSeen | date:'HH:mm:ss') : '—'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="phg-panel phg-empty" ng-if="!phg.phidgets.length">
+        Noch keine Phidget-Hardware erkannt.
+    </div>
+</div>

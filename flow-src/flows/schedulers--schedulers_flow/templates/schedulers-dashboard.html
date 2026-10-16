@@ -1,0 +1,123 @@
+<style>
+.ha-scheduler{color:#eaf8f3;padding:8px;overflow-anchor:none}.ha-scheduler *{box-sizing:border-box}.ha-scheduler .sc-card{background:#183b3d;border:1px solid #32777a;border-radius:9px;padding:14px;margin-bottom:12px}.ha-scheduler h3{margin:0 0 12px}.ha-scheduler .sc-row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.ha-scheduler label{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px;margin-bottom:10px}.ha-scheduler input,.ha-scheduler select{background:#102a2c;color:#fff;border:1px solid #548789;border-radius:5px;padding:8px;width:100%}.ha-scheduler input[type=checkbox]{width:auto}.ha-scheduler button{background:#087e87;color:white;border:0;border-radius:5px;padding:9px;cursor:pointer}.ha-scheduler .sc-notice{min-height:42px;color:#ffe49c;white-space:normal}.ha-scheduler .sc-muted{font-size:12px;color:#bbd5ce}.ha-scheduler .sc-good{color:#a5f2af;font-weight:bold}.ha-scheduler .sc-bad{color:#ffbc9c}.ha-scheduler .sc-table{overflow-x:auto}.ha-scheduler table{width:100%;border-collapse:collapse}.ha-scheduler td,.ha-scheduler th{padding:9px;text-align:left;border-bottom:1px solid #416265;vertical-align:top}.ha-scheduler .sc-days label{flex:0;min-width:38px;align-items:center}.ha-scheduler .sc-title{display:flex;gap:10px;justify-content:space-between;align-items:center}.ha-scheduler .sc-small{max-width:140px}
+/* Ampelfarben hier anpassen. Feste Höhe verhindert Sprünge bei Statuswechseln. */
+.ha-scheduler .sc-health{display:flex;align-items:center;gap:8px;height:32px;min-height:32px}
+.ha-scheduler .sc-lamp{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid #fff;flex:none;background:#92989e}
+.ha-scheduler .sc-lamp.running{background:#9bea78}.ha-scheduler .sc-lamp.warning{background:#ffd65a}.ha-scheduler .sc-lamp.error{background:#ff6262}
+.ha-scheduler .sc-health-detail{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+</style>
+<div class="ha-scheduler">
+ <div class="sc-card">
+  <div class="sc-title"><h3>Schedulers · Zeitsteuerung</h3><button ng-click="setEnabled(!status.enabled)">{{status.enabled ? 'Automatik pausieren' : 'Automatik aktivieren'}}</button></div>
+  <div class="sc-health" role="status" title="{{health.reasons.join(' · ')}}"><span class="sc-lamp" ng-class="health.state" aria-hidden="true"></span><strong>{{health.label}}</strong><span class="sc-health-detail">{{health.reasons.join(' · ')}}</span></div>
+  <div>Zeitzone: {{status.timeZone || 'Europe/Vienna'}} · <strong>{{status.enabled ? 'Automatik aktiv' : 'Automatik pausiert'}}</strong></div>
+  <div class="sc-notice" role="status">{{notice}}</div>
+  <div class="sc-bad" ng-repeat="error in status.errors track by $index">{{error}}</div>
+  <div class="sc-row"><button ng-click="newPlan()">+ Zeitplan</button><button ng-click="refresh()">Liste laden</button></div>
+ </div>
+ <div class="sc-card sc-table">
+  <h3>Zeitpläne</h3>
+  <table><thead><tr><th>Name / Ziel</th><th>Regel / Aktion</th><th>Nächste Ausführung</th><th></th></tr></thead><tbody>
+   <tr ng-repeat="plan in status.plans track by plan.id"><td><strong>{{plan.name}}</strong><br>{{plan.enabled ? 'Aktiv' : 'Deaktiviert'}} · Priorität {{plan.priority}}<br>{{targetLabel(plan.target)}}<br><span ng-class="{'sc-bad':!plan.matchedTargets}">{{plan.matchedTargets}} passende Empfänger</span></td><td>{{describe(plan)}}<br>{{plan.action.type}} {{plan.action.value}}</td><td>{{formatDate(plan.next)}}</td><td><button ng-click="editPlan(plan)">Bearbeiten</button></td></tr>
+  </tbody></table>
+ </div>
+ <div class="sc-card" ng-if="draft">
+  <h3>Zeitplan bearbeiten</h3>
+  <p class="sc-muted">Änderungen werden erst mit „Speichern“ wirksam. Live-Status verändert deinen Entwurf nicht.</p>
+  <div class="sc-row"><label>Name<input ng-model="draft.name" maxlength="100"></label><label class="sc-small">Aktiv<input type="checkbox" ng-model="draft.enabled"></label><label class="sc-small">Priorität (0–100)<input type="number" min="0" max="100" ng-model="draft.priority"></label></div>
+  <div class="sc-row">
+   <label>Zielbereich<select ng-model="draft.target.scope" ng-change="targetScopeChanged()"><option value="device">Einzelgerät</option><option value="room">Raum</option><option value="group">Raumgruppe</option><option value="all">Alle Räume</option></select></label>
+   <label ng-if="draft.target.scope !== 'all'">Ziel<select ng-model="draft.target.id" ng-options="item.id as item.name for item in targetOptions()"></select></label>
+   <label>Geräteart<select ng-model="draft.target.kind"><option value="light">Licht</option><option value="socket">Steckdose</option><option value="*">Alle passenden Arten</option><option ng-repeat="kind in extraKinds() track by kind" value="{{kind}}">{{kind}}</option></select></label>
+  </div>
+  <div class="sc-row">
+   <label>Zeitregel<select ng-model="draft.type" ng-change="typeChanged()"><option value="window">Helligkeitsfenster (Nacht/Tag)</option><option value="weekly">Wochentage / Uhrzeit</option><option value="once">Einmaltermin</option><option value="interval">Intervall</option><option value="solar">Sonnenauf-/untergang</option></select></label>
+   <label>Aktion<select ng-model="draft.action.type"><option value="brightness">Gesamthelligkeit</option><option value="on" ng-if="draft.type !== 'window'">Alle Lichter / Gerät einschalten</option><option value="off" ng-if="draft.type !== 'window'">Ausschalten</option><option value="scenario" ng-if="draft.type !== 'window'">Szenario auswählen</option></select></label>
+   <label ng-if="draft.action.type === 'brightness'">Helligkeit (%)<input type="number" min="0" max="100" ng-model="draft.action.value"></label>
+   <label ng-if="draft.action.type === 'scenario'">Szenarioname<input ng-model="draft.action.value" placeholder="Exakter gespeicherter Name"></label>
+  </div>
+  <div class="sc-row">
+   <label ng-if="draft.type === 'window' || draft.type === 'weekly'">Beginn (HH:MM)<input ng-model="draft.start" placeholder="21:00"></label>
+   <label ng-if="draft.type === 'window'">Ende (HH:MM)<input ng-model="draft.end" placeholder="06:00"></label>
+   <label ng-if="draft.type === 'window'">Außerhalb (%)<input type="number" min="0" max="100" ng-model="draft.outsideValue"></label>
+   <label ng-if="draft.type === 'once'">Termin mit Zeitzone<input ng-model="draft.at" placeholder="2026-10-05T21:00:00+02:00"></label>
+   <label ng-if="draft.type === 'interval'">Alle … Minuten<input type="number" min="1" max="1440" ng-model="draft.intervalMinutes"></label>
+  </div>
+  <div class="sc-row" ng-if="draft.type === 'solar'"><label>Ereignis<select ng-model="draft.solarEvent"><option value="sunrise">Sonnenaufgang</option><option value="sunset">Sonnenuntergang</option></select></label><label>Breitengrad<input type="number" step="any" ng-model="draft.latitude"></label><label>Längengrad<input type="number" step="any" ng-model="draft.longitude"></label><label>Versatz (Minuten)<input type="number" ng-model="draft.offsetMinutes"></label></div>
+  <div class="sc-row sc-days" ng-if="draft.type === 'window' || draft.type === 'weekly' || draft.type === 'solar'"><label ng-repeat="day in weekdays track by day.id">{{day.name}}<input type="checkbox" ng-checked="draft.days.indexOf(day.id) >= 0" ng-click="toggleDay(day.id)"></label></div>
+  <div class="sc-row"><label>Gültig ab (optional)<input ng-model="draft.validFrom" placeholder="JJJJ-MM-TT"></label><label>Gültig bis (optional)<input ng-model="draft.validUntil" placeholder="JJJJ-MM-TT"></label></div>
+  <p class="sc-muted">Nachtfenster: Wochentage beziehen sich auf den Beginn. Außerhalb gilt der zweite Prozentwert. 100 % = gespeicherte Szenariovorgabe; ausgeschaltetes Licht bleibt aus. Ereignisse werden nach Ausfall nicht nachgeholt. Nur registrierte, passende Empfänger erhalten Befehle.</p>
+  <div class="sc-row"><button ng-click="savePlan()">Speichern</button><button ng-click="deletePlan()">Löschen</button><button ng-click="closeEditor()">Editor schließen</button></div>
+ </div>
+ <div class="sc-card"><h3>Registrierte Empfänger</h3>
+  <p ng-if="!status.targets.length">Warte auf Registrierung der Küchen-Lichtsteuerung …</p>
+  <div ng-repeat="target in status.targets track by target.id">
+   <strong>{{target.name}}</strong> · <span ng-class="target.online ? 'sc-good' : 'sc-bad'">{{target.online ? 'Online' : 'Keine aktuelle Registrierung'}}</span>
+   <p class="sc-muted">{{target.room}} / {{target.kind}} · Aktionen: {{target.actions.join(', ')}}<br>Szenarien: {{target.scenarios.join(', ') || '—'}}</p>
+   <p ng-if="target.effective">Fenstervorgabe: {{target.effective.value}} % · {{target.effective.plan}}</p>
+   <p>{{target.feedback.text || 'Noch kein Scheduler-Befehl'}} <span class="sc-bad" ng-if="target.feedback.ok === false">⚠</span></p>
+   <p ng-if="target.pausedUntil > status.now">Pausiert bis {{formatDate(target.pausedUntil)}}</p>
+   <div class="sc-row"><button ng-click="targetCommand('PauseTarget', target.id)">60 Minuten manuell</button><button ng-click="targetCommand('ResumeTarget', target.id)">Automatik fortsetzen</button></div><hr>
+  </div>
+  <p class="sc-muted">„Bestätigt“ bezeichnet die Controller-Rückmeldung, keine elektrische Messung. Pausieren, Deaktivieren und Löschen verändern den aktuellen Ausgang nicht.</p>
+ </div>
+</div>
+<script>
+(function(scope) {
+  scope.status = {plans:[],targets:[],errors:[],enabled:false};
+  scope.notice = 'Status wird geladen …';
+  scope.health = {state:'idle',label:'Idle',reasons:['Status wird geladen …']};
+  let lastStatusAt = Date.now();
+  // Unabhängig vom Zeitgeber: bei abgerissener Verbindung niemals altes Grün behalten.
+  const healthTimer = window.setInterval(function() {
+    if (Date.now() - lastStatusAt > 60000 && scope.health.state !== 'error') {
+      scope.$evalAsync(function() { scope.health = {state:'warning',label:'Warnung',reasons:['Seit 60 s kein aktueller Scheduler-Status.']}; });
+    }
+  }, 5000);
+  scope.$on('$destroy', function() { window.clearInterval(healthTimer); });
+  scope.draft = null;
+  scope.weekdays = ['Mo','Di','Mi','Do','Fr','Sa','So'].map(function(name,index){return {id:index+1,name:name};});
+  let editRevision = 0;
+  let saveToken = null;
+  function send(payload) { scope.send({topic:'scheduler/manage',payload:payload}); }
+  scope.$watch('msg', function(message) {
+    if (!message || !message.payload) return;
+    const p = message.payload;
+    if (p.health) { scope.health = p.health; lastStatusAt = Date.now(); }
+    if (Array.isArray(p.plans)) scope.status = p;
+    if (p.notice) scope.notice = p.notice;
+    else if (!scope.draft) scope.notice = 'Zeitpläne und Einstellungen werden dauerhaft gespeichert.';
+    if (p.ack && p.ack.token === saveToken && scope.draft && p.ack.id === scope.draft.id) {
+      editRevision = p.ack.revision;
+      saveToken = null;
+    }
+    // Entwurf und seine Revision werden ausschließlich durch explizites Laden verändert.
+  });
+  scope.newPlan = function() {
+    scope.draft = {id:'plan-'+Date.now().toString(36),name:'Neuer Zeitplan',enabled:false,priority:10,type:'window',target:{scope:'device',id:'kitchen-light',kind:'light'},action:{type:'brightness',value:30},start:'21:00',end:'06:00',outsideValue:100,days:[1,2,3,4,5,6,7],intervalMinutes:60,solarEvent:'sunset',offsetMinutes:0};
+    editRevision = scope.status.revision;
+  };
+  scope.editPlan = function(plan) { scope.draft = JSON.parse(JSON.stringify(plan)); delete scope.draft.next; delete scope.draft.matchedTargets; editRevision = scope.status.revision; scope.notice = 'Entwurf geladen: '+plan.name; };
+  scope.closeEditor = function() { scope.draft = null; };
+  scope.savePlan = function() { saveToken='save-'+Date.now();send({command:'Save',revision:editRevision,plan:JSON.parse(JSON.stringify(scope.draft)),token:saveToken}); };
+  scope.deletePlan = function() { if(window.confirm('Diesen Zeitplan löschen?')) send({command:'Delete',revision:editRevision,id:scope.draft.id}); };
+  scope.refresh = function() { send({command:'List'}); };
+  scope.setEnabled = function(value) { send({command:'Enable',revision:scope.status.revision,enabled:value}); };
+  scope.targetCommand = function(command,id) { send({command:command,id:id}); };
+  scope.toggleDay = function(day) { const index=scope.draft.days.indexOf(day); if(index<0)scope.draft.days.push(day);else scope.draft.days.splice(index,1); };
+  scope.typeChanged = function() { if(scope.draft.type==='window')scope.draft.action={type:'brightness',value:30}; };
+  scope.targetScopeChanged = function() { scope.draft.target.id = ''; };
+  scope.targetOptions = function() {
+    if(!scope.draft)return [];
+    const type=scope.draft.target.scope;
+    if(type==='device')return scope.status.targets;
+    const ids=[];scope.status.targets.forEach(function(t){(type==='room'?[t.room]:t.groups).forEach(function(id){if(ids.indexOf(id)<0)ids.push(id);});});
+    return ids.map(function(id){return {id:id,name:id};});
+  };
+  scope.extraKinds = function() { return scope.status.targets.map(function(t){return t.kind;}).filter(function(kind,index,list){return kind!=='light'&&kind!=='socket'&&list.indexOf(kind)===index;}); };
+  scope.targetLabel = function(t) { return t.scope+' · '+(t.id||'alle')+' · '+t.kind; };
+  scope.describe = function(p) { return p.type==='window'?p.start+' → '+p.end+' / '+p.outsideValue+' % außerhalb':p.type==='weekly'?p.start:p.type==='once'?p.at:p.type==='interval'?'Alle '+p.intervalMinutes+' Minuten':p.solarEvent+' '+p.offsetMinutes+' min'; };
+  scope.formatDate = function(value) { if(!value)return '—';return new Date(value).toLocaleString('de-AT',{timeZone:'Europe/Vienna'}); };
+  scope.refresh();
+})(scope);
+</script>

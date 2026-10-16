@@ -1,0 +1,298 @@
+[
+  {
+    "id": "scheduler_engine",
+    "type": "home-automation-scheduler",
+    "z": "schedulers_flow",
+    "name": "Zeitpläne · speichern und entscheiden",
+    "x": 530,
+    "y": 260,
+    "wires": [
+      [
+        "scheduler_commands_out",
+        "scheduler_room_router"
+      ],
+      [
+        "scheduler_cron"
+      ],
+      [
+        "scheduler_dashboard"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_cron",
+    "type": "cronplus",
+    "z": "schedulers_flow",
+    "name": "Zeitgeber · Europe/Vienna",
+    "outputField": "payload",
+    "timeZone": "Europe/Vienna",
+    "storeName": "",
+    "commandResponseMsgOutput": "output2",
+    "outputs": 2,
+    "options": [
+      {
+        "name": "scheduler-watchdog",
+        "topic": "scheduler/tick",
+        "payloadType": "default",
+        "payload": "",
+        "expressionType": "cron",
+        "expression": "*/15 * * * * *",
+        "location": "",
+        "offset": "0",
+        "lunarType": "all",
+        "lunarEvents": "rise,set",
+        "solarType": "all",
+        "solarEvents": "sunrise,sunset"
+      }
+    ],
+    "x": 540,
+    "y": 40,
+    "wires": [
+      [
+        "scheduler_engine"
+      ],
+      [
+        "scheduler_engine"
+      ]
+    ],
+    "defaultLocationType": "default",
+    "defaultLocation": ""
+  },
+  {
+    "id": "scheduler_start",
+    "type": "inject",
+    "z": "schedulers_flow",
+    "name": "Start · Zeitpläne wiederherstellen",
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      },
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 2,
+    "topic": "scheduler/start",
+    "payload": "{}",
+    "payloadType": "json",
+    "x": 180,
+    "y": 160,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_commands_out",
+    "type": "link out",
+    "z": "schedulers_flow",
+    "name": "Scheduler → Gerätebefehle",
+    "mode": "link",
+    "links": [
+      "scheduler_kitchen_commands"
+    ],
+    "x": 915,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "scheduler_feedback_in",
+    "type": "link in",
+    "z": "schedulers_flow",
+    "name": "Scheduler ← Registrierung / Bestätigung",
+    "links": [
+      "scheduler_kitchen_feedback"
+    ],
+    "x": 215,
+    "y": 260,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_dashboard",
+    "type": "ui_template",
+    "z": "schedulers_flow",
+    "group": "schedulers_ui_group",
+    "name": "Schedulers · Dashboard",
+    "order": 1,
+    "width": 18,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "x": 510,
+    "y": 420,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_catch",
+    "type": "catch",
+    "z": "schedulers_flow",
+    "name": "Cron-Fehler sichtbar machen",
+    "scope": [
+      "scheduler_cron"
+    ],
+    "uncaught": false,
+    "x": 200,
+    "y": 700,
+    "wires": [
+      [
+        "scheduler_error_topic"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_error_topic",
+    "type": "change",
+    "z": "schedulers_flow",
+    "name": "Zeitgeberfehler",
+    "rules": [
+      {
+        "t": "set",
+        "p": "topic",
+        "pt": "msg",
+        "to": "scheduler/cron-error",
+        "tot": "str"
+      }
+    ],
+    "x": 500,
+    "y": 720,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_room_router",
+    "type": "switch",
+    "z": "schedulers_flow",
+    "name": "Erweiterungen nach roomId",
+    "property": "payload.roomId",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "kinderzimmer",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "bad",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "wohnzimmer",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 3,
+    "x": 820,
+    "y": 460,
+    "wires": [
+      [
+        "scheduler_kinderzimmer_out"
+      ],
+      [
+        "scheduler_bad_out"
+      ],
+      [
+        "scheduler_wohnzimmer_out"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_kinderzimmer_out",
+    "type": "link out",
+    "z": "schedulers_flow",
+    "name": "Kinderzimmer → Gerätebefehle (hier verbinden)",
+    "mode": "link",
+    "links": [],
+    "x": 1080,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "scheduler_kinderzimmer_in",
+    "type": "link in",
+    "z": "schedulers_flow",
+    "name": "Kinderzimmer ← Registrierung / Bestätigung (hier verbinden)",
+    "links": [],
+    "x": 220,
+    "y": 460,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_bad_out",
+    "type": "link out",
+    "z": "schedulers_flow",
+    "name": "Bad → Gerätebefehle (hier verbinden)",
+    "mode": "link",
+    "links": [],
+    "x": 1080,
+    "y": 520,
+    "wires": []
+  },
+  {
+    "id": "scheduler_bad_in",
+    "type": "link in",
+    "z": "schedulers_flow",
+    "name": "Bad ← Registrierung / Bestätigung (hier verbinden)",
+    "links": [],
+    "x": 220,
+    "y": 520,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_wohnzimmer_out",
+    "type": "link out",
+    "z": "schedulers_flow",
+    "name": "Wohnzimmer → Gerätebefehle (hier verbinden)",
+    "mode": "link",
+    "links": [],
+    "x": 1080,
+    "y": 580,
+    "wires": []
+  },
+  {
+    "id": "scheduler_wohnzimmer_in",
+    "type": "link in",
+    "z": "schedulers_flow",
+    "name": "Wohnzimmer ← Registrierung / Bestätigung (hier verbinden)",
+    "links": [],
+    "x": 220,
+    "y": 580,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  }
+]

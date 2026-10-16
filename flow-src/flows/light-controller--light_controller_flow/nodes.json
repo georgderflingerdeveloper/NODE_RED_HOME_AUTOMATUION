@@ -1,13 +1,5 @@
 [
   {
-    "id": "light_controller_flow",
-    "type": "tab",
-    "label": "LIGHT_CONTROLLER",
-    "disabled": false,
-    "info": "Generische Lichtsteuerungen; nur die Instanznamen sind raumspezifisch.",
-    "env": []
-  },
-  {
     "id": "lightcontrollerkitchen",
     "type": "function",
     "z": "light_controller_flow",
@@ -26,132 +18,8 @@
     "wires": [
       [
         "lightcontroller_led_status",
-        "lightcontroller_kitchen_dashboard"
-      ]
-    ]
-  },
-  {
-    "id": "lightcontroller_test_button_on",
-    "type": "inject",
-    "z": "light_controller_flow",
-    "name": "TEST · Taster EIN (drücken)",
-    "props": [
-      {
-        "p": "payload"
-      }
-    ],
-    "repeat": "",
-    "crontab": "",
-    "once": false,
-    "onceDelay": 0.1,
-    "topic": "",
-    "payload": "{\"ButtonPressed\":true,\"DutyCycle\":70}",
-    "payloadType": "json",
-    "x": 220,
-    "y": 180,
-    "wires": [
-      [
-        "lightcontrollerkitchen"
-      ]
-    ]
-  },
-  {
-    "id": "lightcontroller_test_button_off",
-    "type": "inject",
-    "z": "light_controller_flow",
-    "name": "TEST · Taster AUS (loslassen)",
-    "props": [
-      {
-        "p": "payload"
-      }
-    ],
-    "repeat": "",
-    "crontab": "",
-    "once": false,
-    "onceDelay": 0.1,
-    "topic": "",
-    "payload": "{\"ButtonPressed\":false,\"DutyCycle\":70}",
-    "payloadType": "json",
-    "x": 220,
-    "y": 220,
-    "wires": [
-      [
-        "lightcontrollerkitchen"
-      ]
-    ]
-  },
-  {
-    "id": "lightcontroller_test_save_scenario",
-    "type": "inject",
-    "z": "light_controller_flow",
-    "name": "TEST · Szenario Testlicht speichern",
-    "props": [
-      {
-        "p": "payload"
-      }
-    ],
-    "repeat": "",
-    "crontab": "",
-    "once": false,
-    "onceDelay": 0.1,
-    "topic": "",
-    "payload": "{\"Command\":\"SaveScenario\",\"ScenarioName\":\"Testlicht\",\"ScenarioProperties\":{\"1\":50,\"2\":100,\"6\":70}}",
-    "payloadType": "json",
-    "x": 240,
-    "y": 280,
-    "wires": [
-      [
-        "lightcontrollerkitchen"
-      ]
-    ]
-  },
-  {
-    "id": "lightcontroller_test_list_scenarios",
-    "type": "inject",
-    "z": "light_controller_flow",
-    "name": "TEST · Szenarien auflisten",
-    "props": [
-      {
-        "p": "payload"
-      }
-    ],
-    "repeat": "",
-    "crontab": "",
-    "once": false,
-    "onceDelay": 0.1,
-    "topic": "",
-    "payload": "{\"Command\":\"ListScenarios\"}",
-    "payloadType": "json",
-    "x": 220,
-    "y": 320,
-    "wires": [
-      [
-        "lightcontrollerkitchen"
-      ]
-    ]
-  },
-  {
-    "id": "lightcontroller_test_select_scenario",
-    "type": "inject",
-    "z": "light_controller_flow",
-    "name": "TEST · Szenario Testlicht auswählen",
-    "props": [
-      {
-        "p": "payload"
-      }
-    ],
-    "repeat": "",
-    "crontab": "",
-    "once": false,
-    "onceDelay": 0.1,
-    "topic": "",
-    "payload": "{\"Command\":\"SelectScenario\",\"ScenarioName\":\"Testlicht\"}",
-    "payloadType": "json",
-    "x": 240,
-    "y": 360,
-    "wires": [
-      [
-        "lightcontrollerkitchen"
+        "lightcontroller_kitchen_dashboard",
+        "scheduler_kitchen_status"
       ]
     ]
   },
@@ -168,8 +36,8 @@
     "targetType": "msg",
     "statusVal": "",
     "statusType": "auto",
-    "x": 900,
-    "y": 220,
+    "x": 920,
+    "y": 260,
     "wires": []
   },
   {
@@ -191,6 +59,205 @@
     "className": "",
     "x": 930,
     "y": 160,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "lc_test_button_inject",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "TEST: Button kurz drücken",
+    "props": [],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 230,
+    "y": 280,
+    "wires": [
+      [
+        "lc_test_button_trigger"
+      ]
+    ]
+  },
+  {
+    "id": "lc_test_button_trigger",
+    "type": "trigger",
+    "z": "light_controller_flow",
+    "name": "Button Press → Release",
+    "op1": "{\"ButtonPressed\":true}",
+    "op2": "{\"ButtonPressed\":false}",
+    "op1type": "json",
+    "op2type": "json",
+    "duration": "150",
+    "extend": false,
+    "overrideDelay": false,
+    "units": "ms",
+    "reset": "",
+    "bytopic": "all",
+    "topic": "topic",
+    "outputs": 1,
+    "x": 490,
+    "y": 280,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "inject_config_scenario_1",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "CONFIG: Szenario 1 = LED 1-6 @ 50%",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"SaveScenario\",\"ScenarioName\":\"Szenario 1\",\"ScenarioProperties\":{\"1\":50,\"2\":50,\"3\":50,\"4\":50,\"5\":50,\"6\":50}}",
+    "payloadType": "json",
+    "x": 230,
+    "y": 100,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "inject_apply_scenario_1",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "APPLY: Szenario 1",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"Command\":\"ScenarioApply\",\"ScenarioName\":\"Szenario 1\"}",
+    "payloadType": "json",
+    "x": 180,
+    "y": 160,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_kitchen_commands",
+    "type": "link in",
+    "z": "light_controller_flow",
+    "name": "Küche ← Scheduler-Befehle",
+    "links": [
+      "scheduler_commands_out"
+    ],
+    "x": 170,
+    "y": 660,
+    "wires": [
+      [
+        "scheduler_kitchen_adapter"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_kitchen_adapter",
+    "type": "function",
+    "z": "light_controller_flow",
+    "name": "Scheduler · Küchenbefehle prüfen",
+    "func": {
+      "$flowSource": "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-command.js"
+    },
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 410,
+    "y": 660,
+    "wires": [
+      [
+        "lightcontrollerkitchen"
+      ],
+      [
+        "scheduler_kitchen_feedback"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_kitchen_status",
+    "type": "function",
+    "z": "light_controller_flow",
+    "name": "Scheduler · Küche registrieren / bestätigen",
+    "func": {
+      "$flowSource": "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-status.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 750,
+    "y": 740,
+    "wires": [
+      [
+        "scheduler_kitchen_feedback"
+      ]
+    ]
+  },
+  {
+    "id": "scheduler_kitchen_feedback",
+    "type": "link out",
+    "z": "light_controller_flow",
+    "name": "Küche → Scheduler-Rückmeldung",
+    "mode": "link",
+    "links": [
+      "scheduler_feedback_in"
+    ],
+    "x": 1010,
+    "y": 740,
+    "wires": []
+  },
+  {
+    "id": "scheduler_kitchen_register",
+    "type": "inject",
+    "z": "light_controller_flow",
+    "name": "Küche anmelden · Start / 60 s",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "60",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 3,
+    "topic": "scheduler/kitchen/register",
+    "payload": "{\"Command\":\"ListScenarios\"}",
+    "payloadType": "json",
+    "x": 320,
+    "y": 580,
     "wires": [
       [
         "lightcontrollerkitchen"
