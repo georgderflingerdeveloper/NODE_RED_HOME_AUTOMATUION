@@ -10865,7 +10865,7 @@
         "type": "function",
         "z": "light_controller_flow",
         "name": "Scheduler · Küchenbefehle prüfen",
-        "func": "// Adapter: ausschließlich typisierte Scheduler-Befehle für diese Instanz.\n// Neue Räume erhalten einen eigenen Adapter mit eigener TARGET_ID.\nconst TARGET_ID = \"kitchen-light\";\nconst request = msg.payload;\nif (msg.topic !== \"scheduler/command\" || request?.schemaVersion !== 1 || request.targetId !== TARGET_ID) return null;\nconst action = request.action || {};\nlet payload;\nif (action.type === \"brightness\" && typeof action.value === \"number\" && Number.isFinite(action.value) && action.value >= 0 && action.value <= 100) {\n    payload = { Command: \"SetDutyCycle\", DutyCycle: action.value };\n} else if (action.type === \"on\") payload = { Command: \"AllLightsOn\" };\nelse if (action.type === \"off\") payload = { Command: \"AllLightsOff\" };\nelse if (action.type === \"scenario\" && typeof action.value === \"string\" && action.value.trim()) payload = { Command: \"SelectScenario\", ScenarioName: action.value };\nelse {\n    return [null, { topic:\"scheduler/ack\", payload:{requestId:request.requestId,targetId:TARGET_ID,ok:false,text:\"Nicht unterstützte Aktion\"} }];\n}\n// Die vorhandene Controller-Function reicht eigene Message-Felder durch.\nreturn [{ topic:\"scheduler/kitchen\", schedulerRequest:request, payload }, null];\n",
+        "func": "\n/**\n * Scheduler → Kitchen LightController\n *\n * Übersetzt Scheduler-Befehle in Controller-Kommandos.\n *\n * Ausgang 1: Befehl an LightController\n * Ausgang 2: Fehler-ACK an Scheduler\n *\n * Unterstützte Aktionen:\n *   brightness: 0–100 %\n *   on:         Alle Lichter einschalten\n *   off:        Alle Lichter ausschalten\n *   scenario:   Gespeichertes Szenario aktivieren\n */\n\n// =====================================================\n// 1. KONFIGURATION\n// =====================================================\n\nconst CONFIG = {\n    targetId: \"kitchen-light\",\n    schemaVersion: 1,\n    outputTopic: \"scheduler/kitchen\",\n\n    brightness: {\n        min: 0,\n        max: 100\n    }\n};\n\n// =====================================================\n// 2. HILFSFUNKTIONEN\n// =====================================================\n\nfunction isValidRequest(request) {\n    return (\n        request !== null &&\n        typeof request === \"object\" &&\n        !Array.isArray(request) &&\n        request.schemaVersion === CONFIG.schemaVersion &&\n        request.targetId === CONFIG.targetId\n    );\n}\n\nfunction isValidBrightness(value) {\n    return (\n        typeof value === \"number\" &&\n        Number.isFinite(value) &&\n        value >= CONFIG.brightness.min &&\n        value <= CONFIG.brightness.max\n    );\n}\n\nfunction isValidScenario(value) {\n    return (\n        typeof value === \"string\" &&\n        value.trim().length > 0\n    );\n}\n\n/**\n * Übersetzt eine Scheduler-Aktion.\n * Gibt null bei ungültiger Aktion zurück.\n */\nfunction translateAction(action) {\n\n    if (!action || typeof action !== \"object\") {\n        return null;\n    }\n\n    switch (action.type) {\n\n        case \"brightness\":\n            if (!isValidBrightness(action.value)) {\n                return null;\n            }\n\n            return {\n                Command: \"SetDutyCycle\",\n                DutyCycle: action.value\n            };\n\n        case \"on\":\n            return {\n                Command: \"AllLightsOn\"\n            };\n\n        case \"off\":\n            return {\n                Command: \"AllLightsOff\"\n            };\n\n        case \"scenario\":\n            if (!isValidScenario(action.value)) {\n                return null;\n            }\n\n            return {\n                Command: \"SelectScenario\",\n                ScenarioName: action.value\n            };\n\n        default:\n            return null;\n    }\n}\n\n/**\n * Erstellt eine negative Scheduler-Bestätigung.\n */\nfunction createErrorAck(request, errorText) {\n    return {\n        topic: \"scheduler/ack\",\n        payload: {\n            requestId: request.requestId,\n            targetId: CONFIG.targetId,\n            ok: false,\n            text: errorText\n        }\n    };\n}\n\n// =====================================================\n// 3. EINGANGSPRÜFUNG\n// =====================================================\n\n// Nur Scheduler-Kommandos bearbeiten.\nif (msg.topic !== \"scheduler/command\") {\n    return null;\n}\n\nconst request = msg.payload;\n\n// Fremde oder ungültige Befehle ignorieren.\nif (!isValidRequest(request)) {\n    return null;\n}\n\n// =====================================================\n// 4. BEFEHL ÜBERSETZEN\n// =====================================================\n\nconst controllerPayload = translateAction(request.action);\n\nif (controllerPayload === null) {\n\n    node.warn(\n        `Scheduler: Ungültige Aktion für ${CONFIG.targetId}`\n    );\n\n    return [\n        null,\n        createErrorAck(request, \"Nicht unterstützte Aktion\")\n    ];\n}\n\n// =====================================================\n// 5. BEFEHL AN CONTROLLER SENDEN\n// =====================================================\n\nconst controllerMessage = {\n    topic: CONFIG.outputTopic,\n\n    // Wird für die spätere Bestätigung benötigt.\n    schedulerRequest: request,\n\n    payload: controllerPayload\n};\n\nreturn [controllerMessage, null];\n\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -10888,15 +10888,15 @@
         "type": "function",
         "z": "light_controller_flow",
         "name": "Scheduler · Küche registrieren / bestätigen",
-        "func": "const TARGET_ID = \"kitchen-light\";\nconst output = msg.payload;\nif (!output || !Array.isArray(output.ScenarioList)) return null;\nconst messages = [{ topic:\"scheduler/register\", payload:{\n    id:TARGET_ID, name:\"Küche · Lichtsteuerung\", room:\"kitchen\", kind:\"light\", groups:[\"indoor\"],\n    actions:[\"brightness\",\"on\",\"off\",\"scenario\"],\n    scenarios:output.ScenarioList.map(scenario => scenario.ScenarioName)\n} }];\nif (msg.schedulerRequest) {\n    const request = msg.schedulerRequest;\n    const expected = {brightness:\"duty_cycle_changed\",on:\"all_lights_on\",off:\"all_lights_off\",scenario:\"scenario_selected\"};\n    const ok = output.Event === expected[request.action.type];\n    messages.push({topic:\"scheduler/ack\",payload:{requestId:request.requestId,targetId:TARGET_ID,ok,\n        text:ok ? \"Controller bestätigt: \" + output.Event : \"Controller meldet: \" + output.Event}});\n}\nreturn [messages];\n",
+        "func": "const TARGET_ID = \"kitchen-light\";\nconst output = msg.payload || {};\n\nconst messages = [];\n\n// Controller beim Scheduler registrieren\nif (Array.isArray(output.ScenarioList)) {\n    messages.push({\n        topic: \"scheduler/register\",\n        payload: {\n            id: TARGET_ID,\n            name: \"Küche · Lichtsteuerung\",\n            room: \"kitchen\",\n            kind: \"light\",\n            groups: [\"indoor\"],\n            actions: [\"brightness\", \"on\", \"off\", \"scenario\"],\n            scenarios: output.ScenarioList.map(\n                scenario => scenario.ScenarioName\n            )\n        }\n    });\n}\n\n// Scheduler-Anfrage bestätigen\nif (msg.schedulerRequest) {\n\n    const request = msg.schedulerRequest;\n\n    const expected = {\n        brightness: \"duty_cycle_changed\",\n        on: \"all_lights_on\",\n        off: \"all_lights_off\",\n        scenario: \"scenario_selected\"\n    };\n\n    const actionType = request.action?.type;\n    const expectedEvent = expected[actionType];\n\n    const ok = Boolean(expectedEvent) &&\n               output.Event === expectedEvent;\n\n    messages.push({\n        topic: \"scheduler/ack\",\n        payload: {\n            requestId: request.requestId,\n            targetId: TARGET_ID,\n            ok: ok,\n            text: ok\n                ? \"Controller bestätigt: \" + output.Event\n                : \"Controller meldet: \" + (output.Event || \"Kein Event\")\n        }\n    });\n}\n\nreturn messages.length > 0 ? [messages] : null;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 740,
+        "x": 810,
+        "y": 580,
         "wires": [
             [
                 "scheduler_kitchen_feedback"
@@ -12208,6 +12208,8 @@
         "timeZone": "Europe/Vienna",
         "storeName": "",
         "commandResponseMsgOutput": "output2",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
         "outputs": 2,
         "options": [
             {
@@ -12234,9 +12236,7 @@
             [
                 "scheduler_engine"
             ]
-        ],
-        "defaultLocationType": "default",
-        "defaultLocation": ""
+        ]
     },
     {
         "id": "scheduler_start",
