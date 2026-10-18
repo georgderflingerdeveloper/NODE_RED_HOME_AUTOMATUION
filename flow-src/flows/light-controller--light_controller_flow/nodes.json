@@ -214,8 +214,8 @@
     "initialize": "",
     "finalize": "",
     "libs": [],
-    "x": 750,
-    "y": 740,
+    "x": 810,
+    "y": 580,
     "wires": [
       [
         "scheduler_kitchen_feedback"

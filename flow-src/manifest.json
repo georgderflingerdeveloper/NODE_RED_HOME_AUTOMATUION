@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "32cbee8a5c7f3841112205b73033d82f3df764c5048155a8e835e5c26f35ed8f",
+  "flowSha256": "d573656c34002c7300a2daf12afd0165e32acebad6938cb3fc341bbb8c55cc2f",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1251,8 +1251,8 @@
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
     "light-bath-all/light-command-bathroom-all.js": "9e29a2a2c99c414cbe6f7e65ecbd8af29381e849a14b5e5b67960fc35c7a26a5",
     "light-controller/lightcontrollerkitchen.js": "2b30ba7f679dc045af28b8c3a333681234b2e8b07d2ab4c0c6d3be4959f6c290",
-    "light-controller/scheduler-kuche-registrieren-bestatigen.js": "dd69b0d500732d8db44db9b7d06b0f375b83082893b55e35499b9ad1207c7ef2",
-    "light-controller/scheduler-kuchenbefehle-prufen.js": "41b9b55feabf1bc90cb2619a544aa81cf66ff7020b4220f8fbd465cc1c6c73c1",
+    "light-controller/scheduler-kuche-registrieren-bestatigen.js": "778384d7ea949d5897a29e3fd409f86f7160b00e6cbfdaa6dad55c723875837d",
+    "light-controller/scheduler-kuchenbefehle-prufen.js": "fdeb9d9079528f20568f32e8190598503c1804bcdd7ce448b5a1ed4d258f041a",
     "light-door-entry-left/light-door-entry-left.js": "f07f19c6e2298302ccbbbebca9f92d354f78ec6d793c1f3750e7c8c80513dd34",
     "light-gallery-down-1/light-command-gallery-down-1.js": "2afd0dc7137c5d18166d2365a021123c52763adf04da032e7d4070b452232ece",
     "light-gallery-down-2/light-command-gallery-down-2.js": "028ffdae5b8482d74d85d4654beef34cbd7bcec53f415cf59efa0df000b9b7fc",
@@ -1321,7 +1321,7 @@
     "wetter/sicherer-ausfall-wetterwerte-auf-0.js": "f88b550a99104d84e9bce8b89e8a853463d56236420fcc2a01b420d40a8b50d8",
     "wetter/wetter-konfiguration-reindlmuhl.js": "3ffae26fdd99af845485decf12772f6602a36c6790b16f19afe0190942174616",
     "wetter/wetterdaten-fur-automatisierung-bereitstellen.js": "2a0533430c7b45a32a28f94b8f14e75e5257b560c7751bc0db18c06440abe8e7",
-    "wetter/wetterdaten-prufen-und-payload-aufbauen.js": "d6201c66112321c8d7ed3f324f29e59ec105f7f176da08b406438e54c74dfab3",
+    "wetter/wetterdaten-prufen-und-payload-aufbauen.js": "fab20298278c834ed785f8493bb7e8f646371a5bd789cf845797bcb3d60b10fa",
     "wetter/wetterdaten-veroffentlichen.js": "cd66297f65a7f1a8061402c0b662379927d629eb288c4cb26f3209906cb6520e",
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
@@ -1367,9 +1367,9 @@
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",
     "flows/light-bath-all--3486c1a7.a51b3e/nodes.json": "281f4eaba0e17e9f3105d3c9ec6d1af4a2b5d3396e1c6db979a8ca0cabb45803",
     "flows/light-controller--light_controller_flow/functions/light-controller-kitchen.js": "992d9016869ea0c218e05fe8e96cf7a2bcaa1149818ed830953071033eeb6fe1",
-    "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-command.js": "7233175d1cae53c3735fe850d498ed152c270b366e0ac66f7da345e32c10fd2a",
-    "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-status.js": "af199b56be289ef48d3c1c76e6a3ad88d62ed6efdc49db0170aaac96f1b1be45",
-    "flows/light-controller--light_controller_flow/nodes.json": "44f2103e2aa008f98ba0e34010cbe9d1ffbe2536e259dcde71ec62080d250aa7",
+    "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-command.js": "5a8d2f8af401bd745d14398316787bb77effc4a47f33d7af48fa15a4e02ab47e",
+    "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-status.js": "a2bbfdbedfb53c7de42b634317caec08d1c2804f247f58848751a69599f5249b",
+    "flows/light-controller--light_controller_flow/nodes.json": "4533f549ed0e8b4a4ab8e72a39b62ae50ae828b8f151797064daaccd83876d2f",
     "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": "aec0f3346158529548f4dcc668ede0440c820b5b43a2ec0ba503938b519ad853",
     "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left.js": "ea2970dc0b72fb1a23dc7de6ac4e514c234fb35357c66f63e700594b879cb5a3",
     "flows/light-door-entry-left--58c186d2.cc7718/nodes.json": "20de83c18832f21a31c0c37019b20034fed28194cbcb027a0ba158f6389cc388",
@@ -1444,7 +1444,7 @@
     "flows/scenarios--77dda60a.d7efe8/functions/make-adventure.js": "8f0bf09640d018ba9ac3e3d341526667fa9a8add762639a1f91056265625cabd",
     "flows/scenarios--77dda60a.d7efe8/functions/make-dimm.js": "7c3a09f59f959190433f3541814115ff3621b0ca40862d0392f9e871a40daaf7",
     "flows/scenarios--77dda60a.d7efe8/nodes.json": "cca181e9c1013062ded56492464b95552e6bfb961979271704db6c0b1892ec91",
-    "flows/schedulers--schedulers_flow/nodes.json": "6cea18e8cb99ce28f800de3fbcb598e5f8423782ed1a8ce9c9e5cefc0e349340",
+    "flows/schedulers--schedulers_flow/nodes.json": "71a5dd9dc3721a4a3e14c69463ac860f7a69b0f933f3ebc4048709bc4ae05cb7",
     "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "6ddef75336f15a6bbb2aa90994ab7e85ed211e51ce42a354c2f8fe3f195f560d",
     "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung.js": "e0e40830c27ae870adf8bd8c2c2b724d9ef1e405660772515e853652b23fd521",
     "flows/se-grid-power--tab_read_feedin/functions/parse-solaredge-meter-energy-totals.js": "67cd7e0fce08aa4b84f10d61ff8457ca5edec53d604995417a72a7451fe1128f",
@@ -1507,10 +1507,10 @@
     "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js": "9fbf0f524194d90c025a73cefb0cad7ffc43c7ea3360e66c69e0cf513a2e7d82",
     "flows/wetter--weather_flow/functions/wetter-konfiguration-reindlmuhl.js": "2c93ea37934b3416c84d89c75fe9cf5f257c245f079011d7a10f644faf4d4bc4",
     "flows/wetter--weather_flow/functions/wetterdaten-fur-automatisierung-bereitstellen.js": "11349f9adf4b841d68609382322c429b9535509232c02733726b43b15147a7b1",
-    "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js": "70e43e8df00a3d5ae138197333c9ec942cd106d0536eda34f324fcecd7f163c9",
+    "flows/wetter--weather_flow/functions/wetterdaten-prufen-und-payload-aufbauen.js": "1bd13d20d1efc4e88d52d82d26acbae26e0e2189293d60a4110a9d8381185733",
     "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js": "40d6f42311f34803356593deb4795ecca26bde3146bdf4b152632c54b46309d1",
     "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren.js": "98bb02159f606f37629187b4ada352c19011e289664abee734e17e64b191978a",
     "flows/wetter--weather_flow/nodes.json": "71c52b11a6626ed1bc16c783c3bc13cb3ee452a1e51c6b412fad1898a5ba5c6d",
-    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "d9bd2f7b6e1676cc8bef75747ed390695cfa4f39a8acf607b5ff6b54774e434d"
+    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "da563dfaaf27b592ffd0f4b267a3cf0acac44b50f73a6dfa0fc82a702e9af00e"
   }
 }

@@ -28,6 +28,8 @@
     "timeZone": "Europe/Vienna",
     "storeName": "",
     "commandResponseMsgOutput": "output2",
+    "defaultLocation": "",
+    "defaultLocationType": "default",
     "outputs": 2,
     "options": [
       {
@@ -54,9 +56,7 @@
       [
         "scheduler_engine"
       ]
-    ],
-    "defaultLocationType": "default",
-    "defaultLocation": ""
+    ]
   },
   {
     "id": "scheduler_start",

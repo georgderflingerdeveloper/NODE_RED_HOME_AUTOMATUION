@@ -186,10 +186,10 @@
     · {{msg.payload.ErrorReason}}
   </div>
   <div class="weather-kpis">
-    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ActualSunshineLastHour + ' %' : '—'}}</b><span>Sonne letzte Stunde</span></div>
-    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNextHour + ' %' : '—'}}</b><span>Sonne nächste Stunde</span>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ActualSunshineLastHour + ' %' : '—'}}</b><span>Sonnendauer letzte Stunde (Modell)</span></div>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNextHour + ' %' : '—'}}</b><span>Sonnendauer {{msg.payload.CurrentForecastIntervalLabel || "laufende Stunde"}}</span>
     </div>
-    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNext6Hours + ' %' : '—'}}</b><span>Ø nächste 6 Stunden</span>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNext6Hours + ' %' : '—'}}</b><span>Ø {{msg.payload.ForecastIntervalCount || 6}} angezeigte Stunden</span>
     </div>
     <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? (msg.payload.Current.TemperatureC | number:1) + ' °C' : '—'}}</b><span>Aktuelle Temperatur</span>
     </div>
@@ -199,9 +199,9 @@
       <thead>
         <tr>
           <th>Zeit</th>
-          <th>Sonne</th>
-          <th>Temperatur</th>
-          <th>Wolken</th>
+          <th>Sonnendauer</th>
+          <th>Temperatur am Ende</th>
+          <th>Wolken am Ende</th>
           <th>Regenrisiko</th>
         </tr>
       </thead>
@@ -209,7 +209,7 @@
         <tr ng-repeat="hour in msg.payload.ForecastNext6Hours track by $index"
           ng-class="{'night-row': !hour.IsDaylight}">
           <td>{{hour.TimeLabel}}<span class="night-label" ng-if="!hour.IsDaylight">Nacht</span></td>
-          <td class="sun-cell">{{hour.SunshinePercent}} %</td>
+          <td class="sun-cell">{{hour.SunshinePercent}} % · {{hour.SunshineMinutes | number:1}} min</td>
           <td>{{hour.TemperatureC | number:1}} °C</td>
           <td>{{hour.CloudCoverPercent}} %</td>
           <td>{{hour.PrecipitationProbabilityPercent}} %</td>
@@ -217,6 +217,9 @@
       </tbody>
     </table>
   </div>
+  <p style="font-size:12px;color:#546e7a">Sonnendauer = Anteil der vollen Stunde (60 Minuten).
+    Wolken = bedeckter Himmelsanteil am Stundenende. Beide Werte ergänzen sich nicht zu 100 %.
+    Die erste Zeile zeigt das laufende Stundenintervall; alle Sonnenwerte sind Modellwerte, keine Messung der PV-Leistung.</p>
   <div class="weather-legend">
     <span><i class="legend-dot legend-yellow"></i>Sonnenstunden vorhanden</span><span><i class="legend-dot legend-grey"></i>wenig bis keine Sonne</span>
   </div>

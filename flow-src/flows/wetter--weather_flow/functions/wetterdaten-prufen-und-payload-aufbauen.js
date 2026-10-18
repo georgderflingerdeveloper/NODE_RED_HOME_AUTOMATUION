@@ -64,12 +64,10 @@ const daylightSecondsForInterval = timeValue => {
     return Math.max(0, Math.round((overlapEnd - overlapStart) / 1000));
 };
 
-// Convert sunshine duration into a percentage of the actual daylight period.
-const sunshinePercent = (seconds, timeValue) => {
-    const daylightSeconds = daylightSecondsForInterval(timeValue);
-    if (daylightSeconds <= 0) return 0;
-    return clampPercent(((Number(seconds) || 0) / daylightSeconds) * 100);
-};
+// Sonnenscheindauer ist eine Stundensumme, keine Gegenwahrscheinlichkeit zur Bewölkung.
+// Immer durch 3600 teilen: 20 Minuten Sonne ergeben 33 %, auch vor Sonnenuntergang.
+const sunshineSeconds = (seconds, timeValue) => Math.min(Number(seconds), daylightSecondsForInterval(timeValue), 3600);
+const sunshinePercent = (seconds, timeValue) => clampPercent(sunshineSeconds(seconds, timeValue) / 3600 * 100);
 
 // Determine the current hour as the reference point for historical and future forecasts.
 const now = new Date(data.current?.time || Date.now());
@@ -96,6 +94,12 @@ if (lastHourIndex < 0 || futureIndexes.length < 1) {
     return [null, { payload: { reason: "Keine passende Stundenprognose" } }];
 }
 
+// Fehlende/ungültige Sonnendauer nicht als wolkenlosen Himmel oder 0 % ausgeben.
+const selectedIndexes = [lastHourIndex, ...futureIndexes.map(item => item.index)];
+if (selectedIndexes.some(index => typeof sunshine[index] !== "number" || !Number.isFinite(sunshine[index]) || sunshine[index] < 0 || sunshine[index] > 3600)) {
+    return [null, { payload: { reason: "Ungültige oder fehlende Sonnenscheindauer" } }];
+}
+
 // Use the first future hour as the main decision point for solar expectations.
 const nextHourIndex = futureIndexes[0].index;
 const nextMorningIndex = parsedTimes.findIndex(time => time > now && time.getHours() === 6);
@@ -107,6 +111,8 @@ const estimatedTemperatureNextMorning = nextMorningIndex >= 0 && Number.isFinite
 const forecastNext6Hours = futureIndexes.map(item => ({
     Time: times[item.index],
     TimeLabel: intervalLabel(times[item.index]),
+    SunshineSeconds: sunshineSeconds(sunshine[item.index], times[item.index]),
+    SunshineMinutes: Math.round(sunshineSeconds(sunshine[item.index], times[item.index]) / 60 * 10) / 10,
     SunshinePercent: sunshinePercent(sunshine[item.index], times[item.index]),
     DaylightSeconds: daylightSecondsForInterval(times[item.index]),
     IsDaylight: daylightSecondsForInterval(times[item.index]) > 0,
@@ -115,7 +121,7 @@ const forecastNext6Hours = futureIndexes.map(item => ({
     PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),
     WeatherCode: Number(weatherCodes[item.index]) || 0
 }));
-const expectedNext6Hours = Math.round(forecastNext6Hours.reduce((sum, item) => sum + item.SunshinePercent, 0) / forecastNext6Hours.length);
+const expectedNext6Hours = clampPercent(forecastNext6Hours.reduce((sum, item) => sum + item.SunshineSeconds, 0) / (forecastNext6Hours.length * 3600) * 100);
 const expectedThresholdPercent = 10;
 const sunPowerExpected = expectedNextHour >= expectedThresholdPercent;
 const activeFlag = true;
@@ -124,6 +130,10 @@ flow.set("WeatherRetryCount", 0);
 msg.payload = {
     SchemaVersion: 1,
     WeatherService: "Open-Meteo",
+    SunshinePercentageBasis: "full-hour",
+    CloudCoverTimeBasis: "interval-end",
+    CurrentForecastIntervalLabel: intervalLabel(times[nextHourIndex]),
+    ForecastIntervalCount: forecastNext6Hours.length,
     WeatherServiceStatusText: "AKTIV",
     ActiveFlag: activeFlag,
     ActiveFlagf: activeFlag,
@@ -150,7 +160,7 @@ msg.payload = {
     ExpectetPercentSunshineNextHour: expectedNextHour,
     ExpectedPercentSunshineNext6Hours: expectedNext6Hours,
     SunPowerExpected: sunPowerExpected,
-    SunPowerExpectedText: sunPowerExpected ? "JA · nächste Stunde" : "NEIN",
+    SunPowerExpectedText: sunPowerExpected ? "JA · laufendes Stundenintervall" : "NEIN",
     SunPowerExpectedForHours: 1,
     SunPowerExpectedUntil: times[nextHourIndex],
     ExpectedSunshineThresholdPercent: expectedThresholdPercent,
@@ -162,9 +172,9 @@ msg.payload = {
 msg.payload.DashboardText =
     "Standort: Reindlmühl | Dienst: " + msg.payload.WeatherServiceStatusText +
     " | Temperatur: " + msg.payload.Current.TemperatureC + " Grad C" +
-    " | Sonne letzte Stunde: " + msg.payload.ActualSunshineLastHour + "%" +
-    " | Sonne nächste Stunde: " + msg.payload.ExpectedPercentSunshineNextHour + "%" +
-    " | Sonne nächste 6 Stunden: " + msg.payload.ExpectedPercentSunshineNext6Hours + "%" +
-    " | Solarleistung erwartet: " + msg.payload.SunPowerExpectedText +
+    " | Sonnenscheindauer letzte Modellstunde: " + msg.payload.ActualSunshineLastHour + "%" +
+    " | Sonnenscheindauer laufende Stunde: " + msg.payload.ExpectedPercentSunshineNextHour + "%" +
+    " | Sonnenscheindauer angezeigte Intervalle: " + msg.payload.ExpectedPercentSunshineNext6Hours + "%" +
+    " | Sonnenschein erwartet (keine PV-Leistungsprognose): " + msg.payload.SunPowerExpectedText +
     " | Aktualisiert: " + msg.payload.UpdatedAtText;
 return [msg, null];

@@ -1,0 +1,437 @@
+[33mcommit 006fb8b550e6ee92d0fcfe34c3716bcac45b24db[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mhome-automation-solar-workspace[m[33m)[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Fri Oct 16 10:36:10 2026 +0200
+
+    scheduler
+
+[33mcommit 132be5fa2486060132feb3c629003053ad148d81[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 17 22:16:35 2026 +0200
+
+    phidget worker flow
+
+[33mcommit 751fae7324ebac0387fb0905b8f73d3ef441d9f1[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 17 19:47:44 2026 +0200
+
+    commenting
+
+[33mcommit 508e0061078e325e544ba031f514a9f19e54f54d[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 17 19:40:44 2026 +0200
+
+    inject node zum schalten testen
+
+[33mcommit 35edde30b01163f7c5933a43306a19b7ebc74406[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 16 19:08:22 2026 +0200
+
+    commenting
+
+[33mcommit 04af636a63778cfaa5d9ba8a12305fa3cf96aa2d[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 16 18:45:22 2026 +0200
+
+    Fix Kitchen test expectations for generated light sequence
+
+[33mcommit 259b6d03219ac5602ef2fa4c46b10a818717c3f6[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 16 17:34:50 2026 +0200
+
+    Add ScenarioApply and editable base scenarios v0.8.10
+
+[33mcommit aab52c463f7650a6a322688821badf9ff7576879[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 16 17:11:21 2026 +0200
+
+    Fix scenario editor and explicit persistent dimming v0.8.9
+
+[33mcommit 6cb90d5590583054a33124a8e555c95d66ef0f78[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 16 16:45:57 2026 +0200
+
+    Install exact Georg LightController merge base v0.8.8
+
+[33mcommit 80f94e012f044a3e3d1fea25b9f01eeb7feb24f5[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sun Sep 13 20:49:47 2026 +0200
+
+    Fix dynamic LightController sequence and stable dashboard v0.8.4
+
+[33mcommit 1a562ca75cc35f08707ddd0b9a110b56cf28abb4[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sun Sep 13 16:04:24 2026 +0200
+
+    docs: improve light controller comments and align kitchen tests
+
+[33mcommit d44f0c32b47ac0efaeb8f0ccad40736e548084b4[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sun Sep 13 15:31:23 2026 +0200
+
+    Extend persistent Kitchen LightController LEDs v0.8.2
+
+[33mcommit 5323f57f120f8fa5dd6e20750f1155aa297785cd[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sun Sep 13 15:09:56 2026 +0200
+
+    fixed unit tests
+
+[33mcommit 6f70152c3c72b5d6b85a4c3ade81a026322a00e8[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sun Sep 13 14:17:38 2026 +0200
+
+    Add Kitchen LightController dashboard v0.8.0
+
+[33mcommit bf82bf9262ece2ebcc64ee96a31e8a95dbbbb828[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sun Sep 13 13:52:04 2026 +0200
+
+    Add LightController ultra-long all-off command v0.7.0
+
+[33mcommit 0604dff98047eb662d6a73844c823680435e9457[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sat Sep 12 21:40:18 2026 +0200
+
+    Add configurable generic LightController v0.5.1
+
+[33mcommit f9db5c0108c86da72ca0ce4810a18c4c916d92ee[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sat Sep 12 20:18:23 2026 +0200
+
+    Add configurable generic LightController v0.4.0
+
+[33mcommit be77e85937a6e526f9ac3da9f6aed6f1fdfa081c[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sat Sep 12 20:18:14 2026 +0200
+
+    Synchronize maintainable flow source before LightController
+
+[33mcommit 4d57c9b10e811a7f07ea13b6b4f9cc023e89fef4[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Sat Sep 12 20:16:54 2026 +0200
+
+    Save project state before LightController v0.4.0
+
+[33mcommit 63287673a8a53b0fa1377dd665ed81148692e1a5[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Fri Sep 11 22:03:26 2026 +0200
+
+    kitchen scenarios
+
+[33mcommit f3d9a22e873c2763ee30522dd6b14906d8642155[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 21:24:50 2026 +0200
+
+    prepare to fix scan
+
+[33mcommit 19bae37cf639050e8c0561ec3141617363b52042[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 19:42:26 2026 +0200
+
+    Show dashboard date range in release 0.3.2
+
+[33mcommit 26136ce99e6001f5dcc76e41b69b89e4cad01b92[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 19:33:37 2026 +0200
+
+    Fix provider-neutral energy forecast installer v0.3.1
+
+[33mcommit e3a9375de12da34aeb9f9b6f2a54b390056b0f59[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 18:25:33 2026 +0200
+
+    fix: synchronize flow-source and generated library
+
+[33mcommit 6803d9ba2750d6c099d46023bb818230c3f459aa[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 18:20:46 2026 +0200
+
+    Add house power color scale in release 0.2.2
+
+[33mcommit 1c8f6c545754f11ec6896e1b1bd95051547439be[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 15:54:23 2026 +0200
+
+    Highlight current cost hour in release 0.2.1
+
+[33mcommit 96950c62b5f2d94f536b7fe54aa2bfb3e6ace36c[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 15:45:10 2026 +0200
+
+    Release 0.2.0 with reliable dashboard versioning
+
+[33mcommit e04df2e4c3240dbd9cbf6fa16945ae3ebedc1644[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 15:23:53 2026 +0200
+
+    Verbessere Kommentierung der Wetterautomationsdaten
+
+[33mcommit 1060ccd82e75929274684762aea8cf0b99b6915f[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Sep 10 15:19:17 2026 +0200
+
+    Fix live power display and preserve expanded rows
+
+[33mcommit 5843f82ad685a0a4615e7ddf2b9b9b0150fa0c4e[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 22:22:18 2026 +0200
+
+    Sync weather function source and library
+
+[33mcommit f9a2711c5d1282fbdbc3b0cc4e3e70c140b2dc99[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 21:15:23 2026 +0200
+
+    Add English comments to weather payload function
+
+[33mcommit 03efb09d84c50f9ee00fbc5345fc45be2f46c4ac[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 21:01:14 2026 +0200
+
+    Sort daily dashboard rows chronologically
+
+[33mcommit 16efdf4821dc03afba1b6e6bca25e78e1a9bda68[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 20:45:31 2026 +0200
+
+    Add complete local SolarEdge daily energy balance
+
+[33mcommit b60eb82ba699cedc5b56e54f5be6383f58ab26cb[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 20:45:22 2026 +0200
+
+    Save current Node-RED runtime flow state
+
+[33mcommit d1333247778a3ffab19bd41d79b5ce900dee70a2[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 19:52:54 2026 +0200
+
+    Repair SolarEdge daily energy reconciliation installation
+
+[33mcommit b86d158f14a39017fed8efde5cf3b7066a16088e[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 19:15:38 2026 +0200
+
+    Add SolarEdge daily energy reconciliation
+
+[33mcommit d2cfe8ba96d4a099949e8425fd985efff5a164c2[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 18:50:48 2026 +0200
+
+    Make cost dashboard full-height and mobile responsive
+
+[33mcommit 95118a75f54b338737bbc96cfcea8d24b2b6a88f[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 11:05:06 2026 +0200
+
+    Globale Wetterdaten für Automatisierungen ergänzen
+
+[33mcommit e78c5b4beae59114cc82ea72c7e3ae7b3e843412[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Sep 9 10:59:20 2026 +0200
+
+    Aktuelle Node-RED-Nodepositionen sichern
+
+[33mcommit da1eed6c7fa031c3372ae2503684c201ba883d0d[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Sep 8 19:13:11 2026 +0200
+
+    Projektregeln für agentengestützte Entwicklung ergänzen
+
+[33mcommit 1b7b9e324d522445cc7eda54b24c77c11d1c1f52[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Sep 8 18:51:29 2026 +0200
+
+    Projektstatusleiste formatieren und Hash ausblenden
+
+[33mcommit ffdae344b5a38c82d88a33794dbdb84c98e01476[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Sep 8 18:26:33 2026 +0200
+
+    Wetterkorrektur in Node-RED synchronisieren
+
+[33mcommit 7fd928853436cb88ea0e20cee8e9818a4769131b[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Sep 8 18:26:17 2026 +0200
+
+    Aktuellen Node-RED Flowstand sichern
+
+[33mcommit ff53b9a5336299a297b296d4177101cf2cdb25ef[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Mon Sep 7 09:55:46 2026 -0700
+
+    Fix global dashboard project information
+
+[33mcommit ad345e37eb3944e87f3f248e18727d0fb5a0a748[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Mon Sep 7 09:39:14 2026 -0700
+
+    Place branch information in dashboard toolbar
+
+[33mcommit ae1713ab6405db291c09f7d4bc11eae7d94f3599[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Mon Sep 7 09:24:51 2026 -0700
+
+    Show app version branch and project overview
+
+[33mcommit 020772ad949fdb7ff14ab8ee8a53bd3237a155e2[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Mon Sep 7 09:06:50 2026 -0700
+
+    Add maintainable encrypted system credential vault
+
+[33mcommit 84397675b759f6074c36a97f549ac4759aaa69ce[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Mon Sep 7 08:01:05 2026 -0700
+
+    Fix Ubuntu system participant connections
+
+[33mcommit 54f3ed77887bffde9c2eee130c1195f2572b2e4f[m[33m ([m[1;31morigin/home-automation-solar-workspace[m[33m)[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Jul 30 13:12:05 2026 +0200
+
+    Add live system network monitoring
+
+[33mcommit 2af7bcf689387d4f449a2979f6f7559193351ac5[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Jul 30 12:21:30 2026 +0200
+
+    Improve solar costs and weather resilience
+
+[33mcommit 1a8c1ac3bd587383c219eddeb46d2631e1c76dca[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Jul 30 10:59:38 2026 +0200
+
+    Add SQLite history and cost dashboard
+
+[33mcommit 64dfb4df4b9df83d653e1a12a791d1cd3ae002e0[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Jul 30 09:39:04 2026 +0200
+
+    Add cost dashboard tab
+
+[33mcommit 058f5fd06b2d0936980a399478ae4fafbc1c1335[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Jul 30 09:25:11 2026 +0200
+
+    Add aWATTar cost flow
+
+[33mcommit e7780b8d2c695e50b008ab5f78acff377283529d[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Thu Jul 30 08:44:47 2026 +0200
+
+    Add Home Automation dashboard launcher
+
+[33mcommit 0b9f3ee31e7368e9db4540cc9fffde9eeb9f8312[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Jul 29 23:11:59 2026 +0200
+
+    added
+
+[33mcommit 625e7d521a8b51c392dd846f7eb7d6104171636b[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Jul 29 22:30:32 2026 +0200
+
+    Function-Bibliothek verständlich benennen
+
+[33mcommit b0419a12f2c505e6c6ce0bbf47a521418ec606c0[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Jul 29 22:18:42 2026 +0200
+
+    Node-RED Flow-Quellen und JS-Tests strukturieren
+
+[33mcommit 66e48a259db6e98dc83540f6c044d1a852f6329c[m
+Author: test <georgderflinger@gmail.com>
+Date:   Wed Jul 29 21:52:30 2026 +0200
+
+    restruct
+
+[33mcommit 18994f18b1345770c53d2ae738e61fd990be65df[m
+Author: test <georgderflinger@gmail.com>
+Date:   Wed Jul 29 21:51:15 2026 +0200
+
+    restruct
+
+[33mcommit 4dcd79b9159dc2fd33b75047d6af0a17e47afd9b[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Wed Jul 29 21:45:42 2026 +0200
+
+    Wetterübersicht nach Dashboard-Reconnect vollständig laden
+
+[33mcommit 781cbdd77ac10ec508a54b73bafefbb6cb5b99cf[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 22:38:34 2026 +0200
+
+    Solarleistungsanzeigen dynamisch hervorheben
+
+[33mcommit 619cd93bcbb6ca5be72234c0841087faf3d50d1b[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 22:28:21 2026 +0200
+
+    SolarEdge Reconnect stabilisieren und Serverneustart ergänzen
+
+[33mcommit 86fdaebddf908edfa25d8c61f57d565867a3dfdc[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 22:13:52 2026 +0200
+
+    Dashboard-Reconnect mit neuer Socket-Sitzung absichern
+
+[33mcommit 32904c15511aaf95a59f19e322ba6adefdc1cc2e[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 22:07:40 2026 +0200
+
+    Dashboard-Reconnect global und routenfest machen
+
+[33mcommit bf376abc785c5443a33e3472422958b948304faa[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 22:02:33 2026 +0200
+
+    Dashboard nach Netzwerkwechsel automatisch verbinden
+
+[33mcommit 63d131bf021a97a62b751a0fcae7093e08dc6f9e[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 21:58:18 2026 +0200
+
+    SolarEdge Verbindung automatisch synchronisieren
+
+[33mcommit 175824398ea2d7926b6703f2be5534fc2333f95a[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 21:51:09 2026 +0200
+
+    SolarEdge Livewerte und Offlinebehandlung korrigieren
+
+[33mcommit 781791a5019ff4f0e56300c4be97767fc8562390[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 21:35:47 2026 +0200
+
+    SolarEdge Offlinezustand sicher behandeln
+
+[33mcommit 3ede6f9f26077b29d1862a1d247ad8a4c654f4b0[m
+Author: test <georgderflinger@gmail.com>
+Date:   Tue Jul 28 21:23:05 2026 +0200
+
+    arrange
+
+[33mcommit a95c0b6624ce60f8af0e589a4c7dca8549aeb800[m[33m ([m[1;33mtag: [m[1;33mweather-radiation-v1[m[33m)[m
+Author: georgderflinger <georgderflinger@gmail.com>
+Date:   Tue Jul 28 21:14:31 2026 +0200
+
+    Wetterprognose um Sonneneinstrahlung erweitern
+
+[33mcommit b352f4defaf4e3a5756c75ed5e1af33e19a87f76[m
+Author: test <georgderflinger@gmail.com>
+Date:   Tue Jul 28 19:16:13 2026 +0200
+
+    Sonnenzeiten berücksichtigen und Wetteransicht verbreitern
+
+[33mcommit 2ae95d4487fc1527e3ff90065871ca8afee1c288[m
+Author: test <georgderflinger@gmail.com>
+Date:   Tue Jul 28 19:08:56 2026 +0200
+
+    Wetter-Dashboard mit Tabelle und Sonnenampel
+
+[33mcommit fdbcc7ffcfea3767451e181d0e588eb83cddb786[m
+Author: PAPA <papa@Laptop-von-Christian-2.local>
+Date:   Tue Aug 26 13:59:19 2025 +0200
+
+    Fresh start: no node_modules, no *.pem; add .gitignore
