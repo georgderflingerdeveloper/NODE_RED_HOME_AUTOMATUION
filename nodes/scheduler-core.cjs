@@ -80,7 +80,7 @@ class Scheduler {
         this.state.plans = this.state.plans.map(validatePlan);
         check(new Set(this.state.plans.map(p => p.id)).size === this.state.plans.length, 'Doppelte Zeitplan-ID.');
         localTime(Date.now(), this.state.timeZone); // Zeitzone sofort prüfen.
-        this.live = { seen: {}, applied: {}, pending: {}, feedback: {}, cronStatus: [], errors: [], lastTick: null };
+        this.live = { seen: {}, applied: {}, pending: {}, planCommands: {}, feedback: {}, cronStatus: [], errors: [], lastTick: null };
     }
     online(id, now) { return this.live.seen[id] !== undefined && now - this.live.seen[id] < 180000; }
     paused(id, now) { return Number(this.state.pauses[id] || 0) > now; }
@@ -94,7 +94,8 @@ class Scheduler {
     command(plan, device, action, now) {
         const requestId = `scheduler-${++this.state.sequence}`;
         const message = { topic: 'scheduler/command', payload: { schemaVersion: VERSION, requestId, scheduleId: plan.id, targetId: device.id, roomId: device.room, action: clone(action), issuedAt: new Date(now).toISOString() } };
-        this.live.pending[requestId] = { targetId: device.id, at: now };
+        this.live.pending[requestId] = { targetId: device.id, scheduleId: plan.id, at: now };
+        this.live.planCommands[plan.id] = {at:now, targetId:device.id, action:clone(action), requestId, ok:null};
         this.live.feedback[device.id] = { at: now, ok: null, text: `Gesendet: ${action.type} ${action.value ?? ''}`, requestId };
         return message;
     }
@@ -112,6 +113,8 @@ class Scheduler {
         for (const [id, request] of Object.entries(this.live.pending)) {
             if (now - request.at > 15000) {
                 this.live.feedback[request.targetId] = { at: now, ok: false, text: 'Keine Controller-Bestätigung innerhalb 15 s.', requestId: id };
+                const last = this.live.planCommands[request.scheduleId];
+                if (last?.requestId === id) last.ok = false;
                 delete this.live.pending[id]; // Keine blinde Wiederholung von Schaltbefehlen.
             }
         }
@@ -177,6 +180,8 @@ class Scheduler {
             const pending = this.live.pending[p.requestId];
             if (pending && pending.targetId === p.targetId) {
                 this.live.feedback[p.targetId] = { at: now, ok: p.ok === true, text: String(p.text || '').slice(0, 240), requestId: p.requestId };
+                const last = this.live.planCommands[pending.scheduleId];
+                if (last?.requestId === p.requestId) last.ok = p.ok === true;
                 delete this.live.pending[p.requestId];
             }
         } else if (message.topic === 'scheduler/cron-error') {
@@ -272,9 +277,36 @@ class Scheduler {
         if (warnings.length) return result('warning', 'Warnung', 'yellow', warnings);
         return result('running', 'Läuft', 'green', ['Zeitsteuerung bereit; Empfänger erreichbar.']);
     }
+    // Anzeige ist aus Konfiguration und frischen Laufzeitdaten abgeleitet, kein gespeichertes Grün.
+    planStatus(plan, now) {
+        const result = (state, reason) => ({state, label:state === 'running' ? 'Läuft' : state === 'error' ? 'Fehler' : 'Idle', reason});
+        const targets = this.state.targets.filter(t => matches(plan.target,t) && supports(t,plan.action));
+        const dates = this.live.cronStatus.filter(s => s.config?.name === `schedule-${plan.id}` ||
+            (plan.type === 'window' && [`schedule-${plan.id}-start`,`schedule-${plan.id}-end`].includes(s.config?.name)))
+            .map(s => Date.parse(s.status?.nextDate)).filter(t => Number.isFinite(t) && t > now && inValidity(plan,localTime(t,this.state.timeZone)));
+        const next = dates.length ? new Date(Math.min(...dates)).toISOString() : null;
+        let health;
+        try { validatePlan(plan); } catch(error) { health=result('error',error.message); }
+        if (!health && (!this.state.enabled || !plan.enabled)) health=result('idle','Deaktiviert / Automatik pausiert.');
+        if (!health && !inValidity(plan,localTime(now,this.state.timeZone))) health=result('idle','Außerhalb der Gültigkeit.');
+        if (!health && plan.type === 'once' && (this.state.fired[plan.id] === 'once' || Date.parse(plan.at)<=now)) health=result('idle','Einmaltermin abgeschlossen / vergangen.');
+        if (!health && this.live.errors.length) health=result('error',this.live.errors.join(' · '));
+        if (!health && !targets.length) health=result('error','Kein passender Empfänger konfiguriert / registriert.');
+        if (!health && targets.some(t=>!this.online(t.id,now))) health=result('error','Empfänger ohne aktuelle Registrierung.');
+        if (!health && targets.every(t=>this.paused(t.id,now))) health=result('idle','Alle passenden Empfänger pausiert.');
+        if (!health && (this.live.lastTick===null || now-this.live.lastTick>45000)) health=result('error','Zeitgeber-Rückmeldung fehlt (45 s).');
+        if (!health && this.live.planCommands[plan.id]?.ok===false) health=result('error','Letzter Befehl fehlgeschlagen / nicht bestätigt.');
+        if (!health && plan.type==='window' && targets.every(t=>this.windows(t,now)[0]?.plan.id!==plan.id)) health=result('idle','Durch höher priorisierten Zeitplan übersteuert.');
+        if (!health && !next) health=result('error','Kein zukünftiger Trigger vom Zeitgeber gemeldet.');
+        if (!health) health=result('running','Zeitplan bereit.');
+        return {health,next, matchedTargets:targets.length,
+            lastCommand:clone(this.live.planCommands[plan.id] || null),
+            currentAction:plan.type==='window' ? {type:'brightness',value:windowValue(plan,localTime(now,this.state.timeZone)).value} : clone(plan.action),
+            cycleText:plan.type==='window' ? 'Prüfung alle 15 s; Versand bei Änderung' : plan.type==='interval' ? `Befehl alle ${plan.intervalMinutes} min` : 'Befehl zum geplanten Termin'};
+    }
     status(now, notice = '') {
         return { revision: this.state.revision, enabled: this.state.enabled, timeZone: this.state.timeZone,
-            plans: this.state.plans.map(p => ({...clone(p), matchedTargets:this.state.targets.filter(t => matches(p.target,t) && supports(t,p.action)).length, next: this.live.cronStatus.filter(s => s.config?.name === `schedule-${p.id}` || (p.type === 'window' && [`schedule-${p.id}-start`, `schedule-${p.id}-end`].includes(s.config?.name))).map(s => s.status?.nextDate).filter(Boolean).filter(date => inValidity(p,localTime(Date.parse(date),this.state.timeZone))).sort()[0] || null})), targets: this.state.targets.map(t => ({ ...clone(t), online: this.online(t.id, now), pausedUntil: this.state.pauses[t.id] || 0, feedback: this.live.feedback[t.id] || null,
+            plans: this.state.plans.map(p => ({...clone(p), ...this.planStatus(p,now)})), targets: this.state.targets.map(t => ({ ...clone(t), online: this.online(t.id, now), pausedUntil: this.state.pauses[t.id] || 0, feedback: this.live.feedback[t.id] || null,
                 effective: this.windows(t, now)[0] ? { plan: this.windows(t, now)[0].plan.name, value: this.windows(t, now)[0].value } : null })),
             now, notice, health: this.health(now), errors: clone(this.live.errors), cronStatus: clone(this.live.cronStatus) };
     }

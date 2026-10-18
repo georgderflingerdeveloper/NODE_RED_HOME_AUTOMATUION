@@ -37,3 +37,11 @@ test('Verbindungsverlust wird gelb, Rückkehr wird grün und Timer endet beim Ve
  update({health});assert.equal(scope.health.state,'running');
  destroy();advance(60001);tick();assert.equal(scope.health.state,'running');
 });
+
+test('Countdown läuft ohne Senden und bewahrt Entwurf; veralteter Status wird rot',()=>{
+ const {scope,update,tick,advance,sent}=ui();
+ const plan={id:'p',type:'window',next:new Date(11000).toISOString(),health:{state:'running',label:'Läuft'}};
+ update({now:1000,plans:[plan],targets:[],health:{state:'running'}});scope.newPlan();scope.draft.name='Bleibt';const count=sent.length;
+ assert.equal(scope.countdown(plan),'Umschalten in 00:00:10');advance(1000);tick();assert.equal(scope.countdown(plan),'Umschalten in 00:00:09');assert.equal(sent.length,count);assert.equal(scope.draft.name,'Bleibt');
+ advance(60000);tick();assert.equal(scope.planHealth(plan).state,'error');assert.equal(scope.countdown(plan),'—');
+});

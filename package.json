@@ -1,11 +1,11 @@
 {
     "name": "node-red-project",
     "description": "GEORGSHOME Home Automation",
-    "version": "0.10.3",
+    "version": "0.11.0",
     "private": true,
     "homeAutomation": {
         "branchPurposes": {
-            "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand für Solar, Wetter, Kosten, Systemüberwachung, Netzwerk-Teilnehmer und verschlüsselte Zugangsdaten.",
+            "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand f\u00fcr Solar, Wetter, Kosten, System\u00fcberwachung, Netzwerk-Teilnehmer und verschl\u00fcsselte Zugangsdaten.",
             "SOLAR_clean_start": "Stabiler Ausgangsstand der Solar- und Hausautomations-Flows."
         }
     },

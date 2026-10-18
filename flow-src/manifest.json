@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "d573656c34002c7300a2daf12afd0165e32acebad6938cb3fc341bbb8c55cc2f",
+  "flowSha256": "6506265146aea01c96e8fdaf44e4fa4e213f156605c1ac5dcf35f904a7393beb",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1445,7 +1445,7 @@
     "flows/scenarios--77dda60a.d7efe8/functions/make-dimm.js": "7c3a09f59f959190433f3541814115ff3621b0ca40862d0392f9e871a40daaf7",
     "flows/scenarios--77dda60a.d7efe8/nodes.json": "cca181e9c1013062ded56492464b95552e6bfb961979271704db6c0b1892ec91",
     "flows/schedulers--schedulers_flow/nodes.json": "71a5dd9dc3721a4a3e14c69463ac860f7a69b0f933f3ebc4048709bc4ae05cb7",
-    "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "6ddef75336f15a6bbb2aa90994ab7e85ed211e51ce42a354c2f8fe3f195f560d",
+    "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "6e4335ae47b91cc7d1cd381e668405e04f0c54e4907425cc7bf5fc94121d4a99",
     "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung.js": "e0e40830c27ae870adf8bd8c2c2b724d9ef1e405660772515e853652b23fd521",
     "flows/se-grid-power--tab_read_feedin/functions/parse-solaredge-meter-energy-totals.js": "67cd7e0fce08aa4b84f10d61ff8457ca5edec53d604995417a72a7451fe1128f",
     "flows/se-grid-power--tab_read_feedin/functions/solaredge-meter-offline-sichere-nullwerte.js": "4389b20908d64a47af787541c3b2b0f38510d1cf773058b257cab7a6554ae762",
