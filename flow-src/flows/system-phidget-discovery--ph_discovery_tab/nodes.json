@@ -1,0 +1,46 @@
+[
+  {
+    "id": "ph_discovery_node",
+    "type": "home-automation-phidget-discovery",
+    "z": "ph_discovery_tab",
+    "name": "Hausnetz · Phidget-Server und Geräte",
+    "interval": 60,
+    "x": 430,
+    "y": 160,
+    "wires": [
+      [
+        "ph_discovery_result_out"
+      ]
+    ]
+  },
+  {
+    "id": "ph_discovery_request_in",
+    "type": "link in",
+    "z": "ph_discovery_tab",
+    "name": "Scan / Status / Netzscanner",
+    "links": [
+      "ph_discovery_request_out",
+      "ph_discovery_network_out"
+    ],
+    "x": 180,
+    "y": 160,
+    "wires": [
+      [
+        "ph_discovery_node"
+      ]
+    ]
+  },
+  {
+    "id": "ph_discovery_result_out",
+    "type": "link out",
+    "z": "ph_discovery_tab",
+    "name": "Inventar → Systemdashboard",
+    "mode": "link",
+    "links": [
+      "ph_discovery_result_in"
+    ],
+    "x": 720,
+    "y": 160,
+    "wires": []
+  }
+]

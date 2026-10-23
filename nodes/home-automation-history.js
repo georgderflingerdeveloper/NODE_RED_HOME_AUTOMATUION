@@ -1,3 +1,5 @@
+const { monthRange, saveBill, readBill } = require("./monthly-bills.cjs");
+const { parseRange, calculateRange } = require("./energy-range.cjs");
 const { DatabaseSync } = require("node:sqlite");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -684,6 +686,35 @@ module.exports = function registerHistoryStore(RED) {
           send(msg);
           done();
           return;
+        }
+
+        if (msg.topic === "history/dashboard" && ['bill-load','bill-save'].includes(msg.payload?.action)) {
+          const request=msg.payload;
+          try {
+            const bill=request.action==='bill-save'?saveBill(database,request.bill):readBill(database,request.month);
+            const range=parseRange(monthRange(bill.month));
+            const from=new Date(range.from).toISOString(),to=new Date(range.to).toISOString();
+            const rows=database.prepare("SELECT * FROM hourly_snapshots WHERE interval_start < ? AND interval_end > ? ORDER BY interval_start").all(to,from);
+            const tariffs=database.prepare("SELECT * FROM tariff_slots WHERE valid_from < ? AND valid_until > ? ORDER BY valid_from").all(to,from);
+            let comparison;
+            try { comparison=calculateRange(rows,tariffs,range); } catch(error) { comparison={error:error.message}; }
+            msg.payload={requestId:request.requestId,bill,comparison};
+          } catch(error) { msg.payload={requestId:request.requestId,error:error.message}; }
+          msg.topic='history/bill/result';send(msg);done();return;
+        }
+
+        if (msg.topic === "history/dashboard" && msg.payload?.action === "range") {
+          const requestId = msg.payload.requestId;
+          try {
+            const range = parseRange(msg.payload);
+            if (range.to > Date.now()) throw new Error("Bitte einen abgeschlossenen Zeitraum wählen.");
+            const from = new Date(range.from).toISOString(), to = new Date(range.to).toISOString();
+            const rows = database.prepare("SELECT * FROM hourly_snapshots WHERE interval_start < ? AND interval_end > ? ORDER BY interval_start").all(to, from);
+            const tariffs = database.prepare("SELECT * FROM tariff_slots WHERE valid_from < ? AND valid_until > ? ORDER BY valid_from").all(to, from);
+            msg.payload = { ...calculateRange(rows, tariffs, range), requestId };
+          } catch (error) { msg.payload = { requestId, error: error.message }; }
+          msg.topic = "history/range/result";
+          send(msg); done(); return;
         }
 
         if (msg.topic === "history/dashboard") {

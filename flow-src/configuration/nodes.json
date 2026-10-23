@@ -2498,5 +2498,12 @@
     "disp": true,
     "width": "18",
     "collapse": false
+  },
+  {
+    "id": "ph_discovery_tab",
+    "type": "tab",
+    "label": "SYSTEM · Phidget Discovery",
+    "disabled": false,
+    "info": "Nur Inventarisierung über phidget22admin. Keine Kanalöffnung oder Ausgangsbefehle."
   }
 ]

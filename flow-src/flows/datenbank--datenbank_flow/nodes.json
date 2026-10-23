@@ -247,15 +247,31 @@
         "vt": "str"
       },
       {
+        "t": "eq",
+        "v": "history/range/result",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "history/bill/result",
+        "vt": "str"
+      },
+      {
         "t": "else"
       }
     ],
     "checkall": "true",
     "repair": false,
-    "outputs": 4,
+    "outputs": 6,
     "x": 950,
     "y": 240,
     "wires": [
+      [
+        "datenbank_dashboard_out"
+      ],
+      [
+        "datenbank_dashboard_out"
+      ],
       [
         "datenbank_dashboard_out"
       ],

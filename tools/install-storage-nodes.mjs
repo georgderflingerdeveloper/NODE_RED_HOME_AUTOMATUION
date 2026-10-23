@@ -7,6 +7,11 @@ const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const nodeRedUserDirectory = process.env.NODE_RED_USER_DIR || join(homedir(), ".node-red");
 const targetDirectory = join(nodeRedUserDirectory, "nodes");
 const files = [
+  "home-automation-phidget-discovery.js",
+  "home-automation-phidget-discovery.html",
+  "phidget-discovery-core.cjs",
+  "energy-range.cjs",
+  "monthly-bills.cjs",
   "home-automation-history.js",
   "home-automation-history.html",
   "home-automation-history.schema.sql",

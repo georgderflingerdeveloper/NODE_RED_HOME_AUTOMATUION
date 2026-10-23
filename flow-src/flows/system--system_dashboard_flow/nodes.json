@@ -239,7 +239,38 @@
     "x": 860,
     "y": 340,
     "wires": [
-      []
+      [
+        "ph_discovery_request_out"
+      ]
+    ]
+  },
+  {
+    "id": "ph_discovery_request_out",
+    "type": "link out",
+    "z": "system_dashboard_flow",
+    "name": "Dashboard → Phidget-Erkennung",
+    "mode": "link",
+    "links": [
+      "ph_discovery_request_in"
+    ],
+    "x": 1020,
+    "y": 700,
+    "wires": []
+  },
+  {
+    "id": "ph_discovery_result_in",
+    "type": "link in",
+    "z": "system_dashboard_flow",
+    "name": "Phidget-Inventar vom Erkennungsdienst",
+    "links": [
+      "ph_discovery_result_out"
+    ],
+    "x": 750,
+    "y": 700,
+    "wires": [
+      [
+        "phidget_dashboard_template"
+      ]
     ]
   }
 ]

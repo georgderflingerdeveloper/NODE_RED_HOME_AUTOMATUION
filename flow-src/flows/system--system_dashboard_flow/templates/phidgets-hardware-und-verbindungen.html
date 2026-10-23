@@ -1,132 +1,51 @@
 <style>
-.phg-card { width:100%; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; margin-top:6px; }
-.phg-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin:22px 0 10px; }
-.phg-header h3 { margin:0; color:#fff; font-size:18px; }
-.phg-subtitle { color:#a9c4c6; font-size:12px; margin-top:3px; }
-.phg-summary { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:10px; margin-bottom:12px; }
-.phg-kpi { padding:12px 14px; border-radius:12px; background:#1d3c41; }
-.phg-kpi-label { color:#b7ced0; font-size:10px; text-transform:uppercase; }
-.phg-kpi-value { margin-top:5px; color:#fff; font-size:21px; font-weight:700; }
-.phg-panel { border:1px solid #405b5f; border-radius:13px; background:#1d2d2f; overflow:hidden; }
-.phg-table-wrap { width:100%; overflow-x:auto; }
-.phg-table { width:100%; min-width:1000px; border-collapse:collapse; }
-.phg-table th { padding:10px 11px; background:#0b5960; color:#fff; text-align:left; font-size:11px; }
-.phg-table td { padding:10px 11px; border-top:1px solid #395357; font-size:12px; vertical-align:middle; }
-.phg-name { font-weight:700; color:#fff; }
-.phg-muted { color:#91afb2; font-size:10px; }
-.phg-id { font-family:monospace; color:#bfe8ea; }
-.phg-badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; background:#405055; }
-.phg-badge.online { background:#14613f; color:#b9ffdc; }
-.phg-badge.offline { background:#71342d; color:#ffd1c7; }
-.phg-badge.waiting { background:#66551c; color:#fff1ad; }
-.phg-value { font-family:monospace; font-weight:700; color:#ffe6a8; }
-.phg-empty { padding:22px; color:#9bb5b8; text-align:center; }
-@media(max-width:900px){.phg-summary{grid-template-columns:repeat(2,1fr);}}
+.ph-discovery{color:#edf7f7;font:14px/1.5 Arial,sans-serif;padding:12px}
+.ph-discovery button{background:#007d86;color:white;border:1px solid #65c5c8;border-radius:6px;padding:10px 16px;cursor:pointer}
+.ph-discovery table{width:100%;border-collapse:collapse}.ph-discovery th,.ph-discovery td{text-align:left;padding:9px;border-bottom:1px solid #456469;vertical-align:top}
+.ph-discovery .box{background:#203c40;border:1px solid #557b7f;border-radius:8px;padding:12px;margin:12px 0}
+.ph-discovery .dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:7px;background:#a4acaf}
+.ph-discovery .online{background:#87ec87}.ph-discovery .error,.ph-discovery .offline{background:#fa7777}.ph-discovery .warning,.ph-discovery .scanning{background:#f6d267}
+.ph-discovery .scroll{overflow-x:auto}.ph-discovery small{display:block;color:#bfdbdd}
 </style>
-
+<div class="ph-discovery">
+<h3>PHIDGETS · Server und Hardware</h3>
+<button ng-click="send({topic:'phidgets/scan'})" ng-disabled="ph.health.state==='scanning'">Jetzt scannen</button>
+<div class="box" role="status">
+<strong><span class="dot" ng-class="ph.health.state"></span>{{ph.health.label || 'Warte auf Erkennungsdienst …'}}</strong>
+<div>Scan-Werkzeug: {{ph.health.tool || 'ungeprüft'}}</div>
+<div>Lokales Serverprogramm: {{ph.health.serverPackage || 'ungeprüft'}} · Dienst: {{ph.health.localService || 'ungeprüft'}}</div>
+<small>Ein lokaler Network Server ist nur nötig, wenn dieser Rechner eigene Geräte bereitstellt.</small>
+<div>Letzter erfolgreicher Scan: {{ph.inventory.lastSuccess ? (ph.inventory.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</div>
+<div ng-if="ph.health.error">{{ph.health.error}}</div><div ng-if="ph.health.storageError">{{ph.health.storageError}}</div>
+<small>Servererkennung gilt für veröffentlichte, erreichbare Phidget-Server. Geräteerkennung bestätigt keine funktionierende Steuerung.</small>
+</div>
+<h4>Phidget-Server</h4>
+<div class="scroll"><table><thead><tr><th>Server</th><th>IP / Endpunkt</th><th>Status</th></tr></thead>
+<tbody><tr ng-repeat="s in ph.inventory.servers track by s.key"><td>{{s.name}}</td><td>{{s.ip}}<small>{{s.endpoint}}</small></td><td><span class="dot" ng-class="s.state"></span>{{label(s.state)}}</td></tr></tbody></table></div>
+<h4>Hardware · {{hubCount()}} VINT-Hubs</h4>
+<div ng-if="!ph.inventory.devices.length">Noch keine Hardwaredaten verfügbar. Scanstatus oben beachten.</div>
+<div class="box" ng-repeat="d in ph.inventory.devices track by d.key">
+<strong><span class="dot" ng-class="d.state"></span>{{d.name}} · {{label(d.state)}}</strong>
+<div>{{d.hub ? 'Hub-Seriennummer' : 'Seriennummer / Hub'}}: {{d.serial}}<span ng-if="d.port !== null"> · Port {{d.port}}</span> · Firmware {{d.firmware}}</div>
+<div>Erstmals erkannt: {{d.firstSeen | date:'dd.MM.yyyy HH:mm:ss'}}</div>
+<div>Server: {{d.servers.join(', ')}} · Zuletzt gesehen: {{d.lastSeen | date:'dd.MM.yyyy HH:mm:ss'}}</div>
+<details><summary>{{d.channels.length}} Kanäle · Details</summary>
+<div ng-repeat="c in d.channels track by $index">Kanal {{c.index}} · {{c.type}}</div>
+<div ng-if="d.capabilities.length"><strong>Mögliche Hub-Port-Betriebsarten (keine zusätzlichen Module)</strong>
+<div ng-repeat="c in d.capabilities track by $index">Port {{c.port}} · {{c.name}}</div></div>
+</details>
+</div>
+<details class="box"><summary>Vollständige Ausgabe des letzten erfolgreichen Scans</summary>
+<pre style="white-space:pre-wrap;overflow-wrap:anywhere">{{ph.inventory.rawScan.servers}}</pre>
+<pre style="white-space:pre-wrap;overflow-wrap:anywhere">{{ph.inventory.rawScan.devices}}</pre>
+</details>
+</div>
 <script>
 (function(scope){
-    var empty = {
-        summary:{hardware:null,hubs:null,online:null,offline:null,updatedAt:null},
-        phidgets:[]
-    };
-
-    scope.phg = angular.copy(empty);
-
-    scope.stateClass = function(state){
-        if(state === 'online') return 'online';
-        if(state === 'offline') return 'offline';
-        return 'waiting';
-    };
-
-    scope.stateLabel = function(state){
-        if(state === 'online') return 'verbunden';
-        if(state === 'offline') return 'getrennt';
-        return 'wartet';
-    };
-
-    scope.displayValue = function(device){
-        if(device.value === null || device.value === undefined) return '—';
-        if(device.value === true || device.value === 1) return '1 / EIN';
-        if(device.value === false || device.value === 0) return '0 / AUS';
-        return device.value;
-    };
-
-    scope.$watch('msg',function(msg){
-        if(!msg || !msg.payload) return;
-
-        scope.phg = {
-            summary: angular.extend({},empty.summary,msg.payload.summary || {}),
-            phidgets: Array.isArray(msg.payload.phidgets) ? msg.payload.phidgets : []
-        };
-    });
+ scope.ph={inventory:{servers:[],devices:[]},health:{}};
+ scope.label=function(s){return s==='online'?'erkannt':s==='offline'?'nicht mehr erkannt':'unbekannt / veraltet';};
+ scope.hubCount=function(){return scope.ph.inventory.devices.filter(function(d){return d.hub;}).length;};
+ scope.$watch('msg',function(msg){if(msg && msg.payload && msg.payload.discovery)scope.ph=msg.payload;});
+ scope.send({topic:'phidgets/get'});
 })(scope);
 </script>
-
-<div class="phg-card">
-    <div class="phg-header">
-        <div>
-            <h3>PHIDGETS · Hardware</h3>
-            <div class="phg-subtitle">VINT Hubs, angeschlossene Geräte, Kanäle, IDs und Verbindungszustände</div>
-        </div>
-        <div class="phg-subtitle">
-            Aktualisiert: {{phg.summary.updatedAt ? (phg.summary.updatedAt | date:'HH:mm:ss') : '—'}}
-        </div>
-    </div>
-
-    <div class="phg-summary">
-        <div class="phg-kpi">
-            <div class="phg-kpi-label">Hardware / Kanäle</div>
-            <div class="phg-kpi-value">{{phg.summary.hardware === null ? '—' : phg.summary.hardware}}</div>
-        </div>
-        <div class="phg-kpi">
-            <div class="phg-kpi-label">VINT Hubs</div>
-            <div class="phg-kpi-value">{{phg.summary.hubs === null ? '—' : phg.summary.hubs}}</div>
-        </div>
-        <div class="phg-kpi">
-            <div class="phg-kpi-label">Verbunden</div>
-            <div class="phg-kpi-value">{{phg.summary.online === null ? '—' : phg.summary.online}}</div>
-        </div>
-        <div class="phg-kpi">
-            <div class="phg-kpi-label">Getrennt</div>
-            <div class="phg-kpi-value">{{phg.summary.offline === null ? '—' : phg.summary.offline}}</div>
-        </div>
-    </div>
-
-    <div class="phg-panel phg-table-wrap" ng-if="phg.phidgets.length">
-        <table class="phg-table">
-            <thead>
-                <tr>
-                    <th>Phidget</th>
-                    <th>Klasse</th>
-                    <th>Device-ID</th>
-                    <th>Device Serial</th>
-                    <th>Hub Serial</th>
-                    <th>Hub Port</th>
-                    <th>Channel</th>
-                    <th>Wert</th>
-                    <th>Status</th>
-                    <th>Letzte Meldung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="device in phg.phidgets track by $index">
-                    <td class="phg-name">{{device.name}}</td>
-                    <td>{{device.deviceClass}}</td>
-                    <td class="phg-id">{{device.deviceID}}</td>
-                    <td class="phg-id">{{device.deviceSerialNumber}}</td>
-                    <td class="phg-id">{{device.hubSerialNumber}}</td>
-                    <td>{{device.hubPort}}</td>
-                    <td>{{device.channel}}</td>
-                    <td class="phg-value">{{displayValue(device)}}</td>
-                    <td><span class="phg-badge" ng-class="stateClass(device.state)">{{stateLabel(device.state)}}</span></td>
-                    <td>{{device.lastSeen ? (device.lastSeen | date:'HH:mm:ss') : '—'}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="phg-panel phg-empty" ng-if="!phg.phidgets.length">
-        Noch keine Phidget-Hardware erkannt.
-    </div>
-</div>

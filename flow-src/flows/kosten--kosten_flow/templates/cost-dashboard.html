@@ -118,8 +118,76 @@
     .cost-hours-inner { padding:10px; }
     .cost-hour-grid { grid-template-columns:1fr; }
   }
+/* Eingabegestaltung zentral hier ändern; native Kalender folgen dem Browser. */
+.cost-range-editor { font-size:14px; line-height:1.55; color:#edf8f8; }
+.cost-range-editor h3 { font-size:17px; background:transparent; margin:12px 0; }
+.cost-range-editor label { display:inline-flex; flex-direction:column; gap:5px; margin:6px 10px 10px 0; }
+.cost-range-editor input { box-sizing:border-box; min-height:44px; max-width:100%; padding:9px 12px; border:1px solid #8cabad; border-radius:6px; background:#fff; color:#152d30; font-size:16px; color-scheme:light; }
+.cost-range-editor button { min-height:42px; padding:9px 15px; margin:4px 8px 4px 0; border:1px solid #70c8cb; border-radius:6px; background:#006e76; color:white; font-size:14px; font-weight:600; cursor:pointer; }
+.cost-range-editor button:disabled { opacity:.55; cursor:wait; }
+.cost-range-editor input:focus,.cost-range-editor button:focus-visible { outline:3px solid #b6f29c; outline-offset:2px; }
+.range-fields,.range-presets { display:flex; flex-wrap:wrap; align-items:end; gap:8px; }
 </style>
 
+
+<div class="cost-info cost-range-editor" style="margin-top:12px">
+ <button ng-click="rangeOpen = !rangeOpen">Zeitraum auswerten</button>
+ <section ng-if="rangeOpen" role="region" aria-label="Zeitraumauswertung">
+  <h3>Zeitraumauswertung · Europe/Vienna</h3>
+  <div class="range-presets" aria-label="Zeitraumvorschläge">
+   <button ng-click="setRangePreset('today')">Heute bis jetzt</button>
+   <button ng-click="setRangePreset('yesterday')">Gestern</button>
+   <button ng-click="setRangePreset('month')">Dieser Monat bis jetzt</button>
+   <button ng-click="setRangePreset('lastMonth')">Letzter Monat</button>
+  </div>
+  <p>Wiener Ortszeit · Ende nicht eingeschlossen. Ein ganzer Tag endet um 00:00 Uhr am Folgetag.</p>
+  <div class="range-fields">
+   <label>Datum von <input type="date" ng-model="rangeForm.fromDate" placeholder="JJJJ-MM-TT" aria-label="Datum von"></label>
+   <label>Uhrzeit von <input type="time" step="60" ng-model="rangeForm.fromTime" placeholder="HH:MM" aria-label="Uhrzeit von"></label>
+   <label>Datum bis <input type="date" ng-model="rangeForm.toDate" placeholder="JJJJ-MM-TT" aria-label="Datum bis"></label>
+   <label>Uhrzeit bis <input type="time" step="60" ng-model="rangeForm.toTime" placeholder="HH:MM" aria-label="Uhrzeit bis"></label>
+   <button ng-click="showRange()" ng-disabled="rangePending">Zeige</button>
+  </div>
+  <p role="status">{{rangePending ? 'Wird berechnet …' : rangeError}}</p>
+  <div ng-if="rangeResult">
+   <p>{{rangeDate(rangeResult.from)}} – {{rangeDate(rangeResult.to)}} (Ende exklusiv)</p>
+   <div ng-repeat="item in rangeItems track by item.key">
+    <strong>{{item.label}}</strong>: {{rangeNumber(rangeResult.metrics[item.key].kwh,6)}} kWh ·
+    {{rangeNumber(rangeResult.metrics[item.key].costEur,6)}} € ·
+    {{rangeNumber(rangeResult.metrics[item.key].priceCtKwh,6)}} ct/kWh (verbrauchsgewichtet)
+    <br>Bepreiste Energie: {{rangeNumber(rangeResult.metrics[item.key].pricedKwh,6)}} kWh ·
+    Intervallabdeckung: {{rangeNumber(rangeResult.metrics[item.key].coveragePercent,2)}} % ·
+    mit Tarif: {{rangeNumber(rangeResult.metrics[item.key].pricedCoveragePercent,2)}} %
+   </div>
+   <p>{{rangeResult.basis}}</p>
+   <p ng-repeat="warning in rangeResult.warnings track by $index">{{warning}}</p>
+  </div>
+ </section>
+</div>
+
+<div class="cost-info cost-range-editor" style="margin-top:12px">
+ <h3>Eigene Monatsabrechnung · Netzbezug</h3>
+ <label>Monat <input type="month" ng-model="billMonth" aria-label="Abrechnungsmonat"></label><button ng-click="loadBill()">Laden / Neu</button>
+ <div ng-if="billDraft">
+  <strong>{{billDraft.month}}</strong>
+  <label>Abgerechnete kWh <input ng-model="billDraft.kwh" placeholder="123,456"></label>
+  <label>Rechnungsbetrag € <input ng-model="billDraft.totalEur" placeholder="45,67"></label>
+  <label>Reine Energiekosten € (optional) <input ng-model="billDraft.energyEur" placeholder="Ohne Netz/Steuern/Zuschläge"></label>
+  <label>Notiz <input ng-model="billDraft.note" maxlength="500"></label>
+  <button ng-click="saveBill()" ng-disabled="billPending">Abrechnung speichern</button>
+ </div>
+ <p role="status">{{billMessage}}</p>
+ <div ng-if="billSaved">
+  <p>Gespeichert: {{billSaved.month}} · {{billSaved.kwh}} kWh · {{billSaved.totalEur}} € Rechnungsbetrag</p>
+  <p ng-if="billComparison.metrics">Erfasster Netzbezug: {{rangeNumber(billComparison.metrics.grid.kwh,6)}} kWh ·
+   Berechnete Energiekosten: {{rangeNumber(billComparison.metrics.grid.costEur,6)}} € ·
+   Abdeckung: {{rangeNumber(billComparison.metrics.grid.coveragePercent,2)}} %</p>
+  <p>{{billDifference()}}</p>
+  <p ng-repeat="warning in billComparison.warnings track by $index">{{warning}}</p>
+  <p>{{billComparison.error}}</p>
+  <p>Rechnungsbetrag enthält möglicherweise Netzgebühren, Steuern und Zuschläge; kein direkter Vergleich mit dem Börsenpreis.</p>
+ </div>
+</div>
 <script>
 (function(scope) {
   scope.view = scope.view || { period: "month", tariff: null, history: null, forecast: null };
@@ -219,8 +287,71 @@
     return "von " + formatter.format(from) + " bis " + formatter.format(inclusiveTo);
   };
 
+  // Date-Modelle dienen nur der Kalenderbedienung. Übertragen wird Wiener Ortszeit,
+  // ohne UTC-Konvertierung; Sommerzeitprüfung bleibt im bestehenden Backend.
+  const padRange = value => String(value).padStart(2,'0');
+  function calendarText(value, kind) {
+    if (typeof value === 'string') return value;
+    if (!(value instanceof Date) || !Number.isFinite(value.getTime())) return '';
+    if (kind === 'time') return padRange(value.getHours())+':'+padRange(value.getMinutes());
+    const month=value.getFullYear()+'-'+padRange(value.getMonth()+1);
+    return kind === 'month' ? month : month+'-'+padRange(value.getDate());
+  }
+  function viennaClock() {
+    const parts=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Vienna',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+    const get=key=>Number(parts.find(p=>p.type===key).value);
+    return new Date(get('year'),get('month')-1,get('day'),get('hour'),get('minute'));
+  }
+  scope.setRangePreset=function(kind) {
+    const now=viennaClock(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    let from=new Date(today),to=new Date(now);
+    if(kind==='yesterday'){from.setDate(from.getDate()-1);to=new Date(today);}
+    else if(kind==='month'){from.setDate(1);}
+    else if(kind==='lastMonth'){to=new Date(now.getFullYear(),now.getMonth(),1);from=new Date(now.getFullYear(),now.getMonth()-1,1);}
+    scope.rangeForm={fromDate:from,fromTime:new Date(from),toDate:to,toTime:new Date(to)};
+    scope.rangeError='';
+  };
+  const initialMonth=viennaClock();
+  scope.billMonth=new Date(initialMonth.getFullYear(),initialMonth.getMonth()-1,1);
+  scope.billDraft=null;let billSequence=0;
+  scope.loadBill=function(){if(!calendarText(scope.billMonth,'month')){scope.billMessage='Bitte einen Monat auswählen.';return;}scope.billPending=true;scope.billMessage='Wird geladen …';scope.send({topic:'history/dashboard',payload:{action:'bill-load',month:calendarText(scope.billMonth,'month'),requestId:++billSequence}});};
+  scope.saveBill=function(){scope.billPending=true;scope.billMessage='Wird gespeichert …';scope.send({topic:'history/dashboard',payload:{action:'bill-save',bill:JSON.parse(JSON.stringify(scope.billDraft)),requestId:++billSequence}});};
+  scope.billDifference=function(){
+    const m=scope.billComparison && scope.billComparison.metrics && scope.billComparison.metrics.grid,b=scope.billSaved;
+    if(!m||!b||!b.revision)return '';
+    if(!m.complete)return 'Kein belastbarer Monatsvergleich: Daten oder Tarife fehlen.';
+    return 'Erfasst minus Abrechnung: '+scope.rangeNumber(m.kwh-Number(b.kwh),6)+' kWh'+(b.energyEur!==''?' · Energiekosten: '+scope.rangeNumber(m.costEur-Number(b.energyEur),6)+' €':'');
+  };
+  // Eigenständige Abfrage: Live-Updates ändern weder Eingaben noch Ergebnis.
+  scope.setRangePreset('yesterday');
+  scope.rangeItems = [{key:'grid',label:'Netzbezug / Energiekosten'},{key:'house',label:'Hausverbrauch / Tarifvergleichswert'}];
+  let rangeSequence = 0;
+  scope.rangeNumber = function(value, digits) { return typeof value==='number' && Number.isFinite(value) ? value.toLocaleString('de-AT',{minimumFractionDigits:digits,maximumFractionDigits:digits}) : '—'; };
+  scope.rangeDate = function(value) { return new Date(value).toLocaleString('de-AT',{timeZone:'Europe/Vienna'}); };
+  scope.showRange = function() {
+    const f=scope.rangeForm;
+    const from=calendarText(f.fromDate,'date')+'T'+calendarText(f.fromTime,'time');
+    const to=calendarText(f.toDate,'date')+'T'+calendarText(f.toTime,'time');
+    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(from)||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(to)||from>=to){
+      scope.rangeError='Bitte Datum und Uhrzeit vollständig wählen; Bis muss nach Von liegen.';return;
+    }
+    scope.rangeResult=null;scope.rangeError='';scope.rangePending=true;
+    scope.send({topic:'history/dashboard',payload:{action:'range',requestId:++rangeSequence,from:from,to:to}});
+  };
   scope.$watch("msg", function(msg) {
     if (!msg || !msg.payload) return;
+    if (msg.topic === 'history/bill/result') {
+      if(msg.payload.requestId!==billSequence)return;
+      scope.billPending=false;scope.billMessage=msg.payload.error||'Abrechnung geladen / gespeichert.';
+      if(!msg.payload.error){scope.billDraft=JSON.parse(JSON.stringify(msg.payload.bill));scope.billSaved=msg.payload.bill.revision?msg.payload.bill:null;scope.billComparison=msg.payload.comparison;}
+      scheduleCostLayoutRefresh();return;
+    }
+    if (msg.topic === 'history/range/result') {
+      if(msg.payload.requestId!==rangeSequence)return;
+      scope.rangePending=false;scope.rangeError=msg.payload.error||'';
+      scope.rangeResult=msg.payload.error?null:msg.payload;
+      scheduleCostLayoutRefresh();return;
+    }
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
       scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
       requestEnergyForecast();

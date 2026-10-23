@@ -1,0 +1,15 @@
+<script type="text/javascript">
+RED.nodes.registerType('home-automation-phidget-discovery',{
+ category:'network',color:'#91c9ca',defaults:{name:{value:''},interval:{value:60,required:true,validate:RED.validators.number()}},
+ inputs:1,outputs:1,icon:'bridge.svg',label:function(){return this.name||'Phidgets · Netz-Erkennung';}
+});
+</script>
+<script type="text/html" data-template-name="home-automation-phidget-discovery">
+<div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name"></div>
+<div class="form-row"><label for="node-input-interval">Intervall (s)</label><input id="node-input-interval" type="number" min="30"></div>
+</script>
+<script type="text/html" data-help-name="home-automation-phidget-discovery">
+<p>Liest phidget22admin -s und -R -d. Keine Kanalöffnung, kein Schalten. Mindestintervall 30 s.
+Benötigt phidget22admin und Netzwerk-Discovery im Node-RED-Dienstkontext.
+Inventar: userDir/phidget-inventory. phidgets/scan startet, phidgets/get liest den letzten Status.</p>
+</script>

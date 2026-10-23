@@ -133,3 +133,14 @@ CREATE TABLE IF NOT EXISTS daily_energy_reconciliation (
 );
 CREATE INDEX IF NOT EXISTS daily_energy_reconciliation_calculated_idx
   ON daily_energy_reconciliation(calculated_at);
+
+-- Manuelle Monatsabrechnung: separat von Messwerten, Geld als ganze Cent.
+CREATE TABLE IF NOT EXISTS user_monthly_bills (
+ month TEXT PRIMARY KEY,
+ kwh_milli INTEGER NOT NULL,
+ total_cents INTEGER NOT NULL,
+ energy_cents INTEGER,
+ note TEXT NOT NULL DEFAULT '',
+ revision INTEGER NOT NULL,
+ updated_at TEXT NOT NULL
+);

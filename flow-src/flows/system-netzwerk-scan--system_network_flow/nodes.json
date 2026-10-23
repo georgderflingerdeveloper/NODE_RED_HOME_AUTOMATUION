@@ -186,7 +186,8 @@
     "wires": [
       [
         "system_dashboard_data_out",
-        "system_scan_debug"
+        "system_scan_debug",
+        "ph_discovery_network_out"
       ]
     ]
   },
@@ -386,6 +387,19 @@
     ],
     "x": 850,
     "y": 480,
+    "wires": []
+  },
+  {
+    "id": "ph_discovery_network_out",
+    "type": "link out",
+    "z": "system_network_flow",
+    "name": "Netzscan → Phidget-Erkennung",
+    "mode": "link",
+    "links": [
+      "ph_discovery_request_in"
+    ],
+    "x": 1120,
+    "y": 600,
     "wires": []
   }
 ]
