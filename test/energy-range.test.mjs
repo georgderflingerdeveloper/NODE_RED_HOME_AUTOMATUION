@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const {parseRange,localInstant,calculateRange}=createRequire(import.meta.url)('../nodes/energy-range.cjs');
+const from=Date.parse('2026-10-01T00:00:00Z'),H=3600000;
+const row=(offset=0,kwh=2)=>({interval_start:new Date(from+offset*H).toISOString(),interval_end:new Date(from+(offset+1)*H).toISOString(),house_consumption_kwh:kwh*2,grid_import_kwh:kwh,energy_status:'online',sample_count:60});
+const tariff=(start,end,price)=>({valid_from:new Date(from+start*H).toISOString(),valid_until:new Date(from+end*H).toISOString(),price_ct_kwh:price});
+test('Verbrauchsgewichteter Preis statt arithmetischem Mittel; negative Tarife',()=>{const r=calculateRange([row(0,1),row(1,3)],[tariff(0,1,-10),tariff(1,2,30)],{from,to:from+2*H});assert.ok(Math.abs(r.metrics.grid.costEur-.8)<1e-12);assert.ok(Math.abs(r.metrics.grid.priceCtKwh-20)<1e-12);assert.equal(r.metrics.grid.kwh,4);});
+test('Teilstunden werden auf gewählten Bereich begrenzt und als Schätzung markiert',()=>{const r=calculateRange([row()],[tariff(0,1,20)],{from:from+H/4,to:from+H*3/4});assert.equal(r.metrics.grid.kwh,1);assert.equal(r.metrics.grid.costEur,.2);assert.equal(r.metrics.grid.estimated,true);});
+test('Tarifgrenze innerhalb Stunde und vor Bereich beginnender Tarif',()=>{const r=calculateRange([row()],[tariff(-1,.5,10),tariff(.5,2,30)],{from,to:from+H});assert.equal(r.metrics.grid.costEur,.4);assert.equal(r.metrics.grid.estimated,true);});
+test('Datenlücke und fehlende Tarife liefern Teilergebnis',()=>{const r=calculateRange([row()],[tariff(0,.5,20)],{from,to:from+2*H});assert.equal(r.metrics.grid.coveragePercent,50);assert.equal(r.metrics.grid.pricedCoveragePercent,25);assert.equal(r.metrics.grid.pricedKwh,1);assert.equal(r.metrics.grid.complete,false);});
+test('Keine Messwerte sind nicht Nullverbrauch, echte Null hat keinen Durchschnittspreis',()=>{assert.equal(calculateRange([],[],{from,to:from+H}).metrics.grid.kwh,null);const r=calculateRange([row(0,0)],[tariff(0,1,20)],{from,to:from+H});assert.equal(r.metrics.grid.kwh,0);assert.equal(r.metrics.grid.costEur,0);assert.equal(r.metrics.grid.priceCtKwh,null);});
+test('Offline und ungültige Werte bleiben Datenlücken',()=>{for(const invalid of [{...row(),energy_status:'offline'},{...row(),grid_import_kwh:null},{...row(),sample_count:1}])assert.equal(calculateRange([invalid],[],{from,to:from+H}).metrics.grid.kwh,null);});
+test('Überlappende Tarife werden nicht doppelt berechnet',()=>{const r=calculateRange([row()],[tariff(0,1,20),tariff(0,1,30)],{from,to:from+H});assert.equal(r.metrics.grid.costEur,null);assert.equal(r.metrics.grid.kwh,2);});
+test('Überlappende Energieintervalle werden abgewiesen',()=>assert.throws(()=>calculateRange([row(),row()],[],{from,to:from+H}),/Überlappende/));
+test('Ende exklusiv: Nachbarstunde wird nicht addiert',()=>assert.equal(calculateRange([row(),row(1)],[],{from,to:from+H}).metrics.grid.kwh,2));
+test('Wiener Zeitumstellung: 23 und 25 Stunden',()=>{for(const [day,next,hours] of [['2026-03-29','2026-03-30',23],['2026-10-25','2026-10-26',25]]){const r=parseRange({from:day+'T00:00',to:next+'T00:00'});assert.equal((r.to-r.from)/H,hours);}});
+test('Nicht vorhandene, doppelte und ungültige lokale Zeiten werden zurückgewiesen',()=>{for(const t of ['2026-03-29T02:30','2026-10-25T02:30','2026-02-30T12:00','2026-10-19T25:00'])assert.throws(()=>localInstant(t));assert.throws(()=>parseRange({from:'2026-10-19T12:00',to:'2026-10-19T11:00'}));});
