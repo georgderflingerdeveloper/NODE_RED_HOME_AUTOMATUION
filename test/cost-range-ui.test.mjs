@@ -19,3 +19,18 @@ test('Unvollständige und umgekehrte Eingaben senden keine Abfrage',()=>{
  scope.rangeForm={fromDate:'2026-10-20',fromTime:'00:00',toDate:'2026-10-19',toTime:'00:00'};
  scope.showRange();assert.equal(sent.length,n);
 });
+
+test('Preisfarben: Grenzwerte, negative Preise und unbekannte Werte',()=>{
+ const {scope}=ui();
+ for(const [value,expected] of [[-5,'cheap'],[0,'cheap'],[22,'cheap'],[22.001,'medium'],[25,'medium'],[25.001,'high'],[30,'high'],[30.001,'expensive'],[null,'unknown'],[undefined,'unknown'],[NaN,'unknown'],[Infinity,'unknown'],['20','unknown']]) {
+  assert.equal(scope.priceClass(value),'price-'+expected,String(value));
+ }
+});
+test('Kostensummen werden nach kWh gewichtet; unvollständige Daten bleiben neutral',()=>{
+ const {scope}=ui();
+ const row={recordedHourCount:2,offlineCount:0,houseConsumptionKWh:100,energyCostEur:20,gridImportKWh:2,gridImportCostEur:0.6};
+ assert.equal(scope.rowUnitPrice(row,false),20);
+ assert.equal(scope.rowUnitPrice(row,true),30);
+ assert.equal(scope.priceClass(scope.rowUnitPrice(row,false)),'price-cheap');
+ for(const change of [{offlineCount:1},{recordedHourCount:0},{houseConsumptionKWh:0},{energyCostEur:null}])assert.equal(scope.rowUnitPrice({...row,...change},false),null);
+});

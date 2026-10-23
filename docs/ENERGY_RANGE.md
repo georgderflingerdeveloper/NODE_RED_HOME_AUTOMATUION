@@ -14,3 +14,14 @@ Wartung: nodes/energy-range.cjs (Zeit/Berechnung), nodes/monthly-bills.cjs (Abre
 
 ## Kalenderbedienung 0.12.1
 Native Datum-, Zeit- und Monatsfelder mit großen kontrastreichen Eingaben. Vorgabe: gestern 00:00 bis heute 00:00 (Europe/Vienna), letzter Abrechnungsmonat. Schnellwahl setzt nur Eingaben; Zeige führt die Abfrage aus. Live-Updates erhalten Eingaben. Gestaltung: cost-range-editor im cost-dashboard.html; Vorgaben: setRangePreset. Kalenderdarstellung hängt vom Browser ab.
+
+## Preisfarben 0.13.2
+Stundentarife und Kosten in Tag-/Monat-/Jahrestabellen sind fett markiert.
+Grenzen: <=22 grün, <=25 gelb, <=30 orange, >30 rot (ct/kWh).
+Negative Preise zählen günstig. Nicht numerische/fehlende Werte bleiben neutral.
+Kostensummen werden anhand EUR*100/kWh bewertet, sofern Messdaten vorhanden und
+keine Offlineintervalle gemeldet sind. Bei null Verbrauch bleibt die Farbe neutral.
+Dies ist eine Preisbewertung, keine Aussage über vollständige Messabdeckung.
+Änderungsstellen im cost-dashboard.html: PRICE_BANDS (Grenzen), PREISFARBEN (CSS).
+Die Legende folgt den Grenzen automatisch. Aktuelle Stunde bleibt hellgrün;
+dunkle Preisfelder sichern den Kontrast. Keine neue Abfrage/Neuberechnung von Kosten.

@@ -127,6 +127,16 @@
 .cost-range-editor button:disabled { opacity:.55; cursor:wait; }
 .cost-range-editor input:focus,.cost-range-editor button:focus-visible { outline:3px solid #b6f29c; outline-offset:2px; }
 .range-fields,.range-presets { display:flex; flex-wrap:wrap; align-items:end; gap:8px; }
+
+/* PREISFARBEN: Farbwerte hier, Preisgrenzen bei PRICE_BANDS im Script ändern.
+   Dunkler Hintergrund erhält den Kontrast auch in der hellgrünen aktuellen Stunde. */
+.cost-price-tag {display:inline-block;background:#12282c;border-radius:4px;padding:1px 5px;font-weight:800!important;}
+.cost-price-tag.price-cheap {color:#a4f6a0!important;}
+.cost-price-tag.price-medium {color:#ffe27a!important;}
+.cost-price-tag.price-high {color:#ffb46b!important;}
+.cost-price-tag.price-expensive {color:#ff9292!important;}
+.cost-price-tag.price-unknown {color:#d1dadd!important;}
+.cost-price-legend {font-size:12px;line-height:1.8;margin:8px 0;}
 </style>
 
 
@@ -154,7 +164,7 @@
    <div ng-repeat="item in rangeItems track by item.key">
     <strong>{{item.label}}</strong>: {{rangeNumber(rangeResult.metrics[item.key].kwh,6)}} kWh ·
     {{rangeNumber(rangeResult.metrics[item.key].costEur,6)}} € ·
-    {{rangeNumber(rangeResult.metrics[item.key].priceCtKwh,6)}} ct/kWh (verbrauchsgewichtet)
+    <span class="cost-price-tag" ng-class="priceClass(rangeResult.metrics[item.key].priceCtKwh)">{{rangeNumber(rangeResult.metrics[item.key].priceCtKwh,6)}} ct/kWh</span> (verbrauchsgewichtet)
     <br>Bepreiste Energie: {{rangeNumber(rangeResult.metrics[item.key].pricedKwh,6)}} kWh ·
     Intervallabdeckung: {{rangeNumber(rangeResult.metrics[item.key].coveragePercent,2)}} % ·
     mit Tarif: {{rangeNumber(rangeResult.metrics[item.key].pricedCoveragePercent,2)}} %
@@ -190,6 +200,22 @@
 </div>
 <script>
 (function(scope) {
+
+  // PRICE_BANDS – zentrale Grenzen in ct/kWh, inklusive oberem Grenzwert.
+  const PRICE_BANDS = {cheapMax:22, mediumMax:25, highMax:30};
+  scope.priceBands=PRICE_BANDS;
+  scope.priceClass=function(value) {
+    if(typeof value!=='number'||!Number.isFinite(value))return 'price-unknown';
+    return value<=PRICE_BANDS.cheapMax?'price-cheap':value<=PRICE_BANDS.mediumMax?'price-medium':value<=PRICE_BANDS.highMax?'price-high':'price-expensive';
+  };
+  // Summen anhand des verbrauchsgewichteten Preises bewerten, niemals anhand der Eurohöhe.
+  scope.rowUnitPrice=function(row,grid) {
+    if(!row||!row.recordedHourCount||row.offlineCount>0)return null;
+    const energy=grid?row.gridImportKWh:row.houseConsumptionKWh;
+    const cost=grid?row.gridImportCostEur:row.energyCostEur;
+    return typeof energy==='number'&&energy>0&&typeof cost==='number'&&Number.isFinite(cost)?cost*100/energy:null;
+  };
+
   scope.view = scope.view || { period: "month", tariff: null, history: null, forecast: null };
   scope.expandedCostRows = scope.expandedCostRows || {};
   var layoutTimers = [];
@@ -543,6 +569,14 @@
     </div>
   </div>
 
+<div class="cost-price-legend">
+Preis je kWh:
+<span class="cost-price-tag price-cheap">≤ {{priceBands.cheapMax}} ct günstig</span>
+<span class="cost-price-tag price-medium">≤ {{priceBands.mediumMax}} ct mittel</span>
+<span class="cost-price-tag price-high">≤ {{priceBands.highMax}} ct teuer</span>
+<span class="cost-price-tag price-expensive">&gt; {{priceBands.highMax}} ct sehr teuer</span>
+<span class="cost-price-tag price-unknown">unbekannt / unvollständig</span>
+</div>
   <h3 class="cost-section-title">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>
   <div class="cost-table-wrap" ng-if="view.history.rows.length">
     <table class="cost-table">
@@ -555,8 +589,8 @@
           <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
           <td>{{row.gridImportKWh | number:3}} kWh</td>
           <td>{{row.pvEnergyKWh | number:3}} kWh</td>
-          <td><b>{{row.energyCostEur | currency:'€':3}}</b><br><span class="cost-muted">{{row.energyCostEur * 100 | number:2}} ct</span></td>
-          <td><b>{{row.gridImportCostEur | currency:'€':4}}</b><br><span class="cost-muted">{{row.gridImportCostEur * 100 | number:3}} ct</span></td>
+          <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur | currency:'€':3}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur * 100 | number:2}} ct</span></span></td>
+          <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,true))">{{row.gridImportCostEur | currency:'€':4}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,true))">{{row.gridImportCostEur * 100 | number:3}} ct</span></span></td>
           <td>
             {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}
             <br><span ng-class="{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}">
@@ -574,18 +608,18 @@
                 <span class="cost-current-label" ng-if="isCurrentCostHour(hour)">aktuelle Stunde</span>
                 <b>{{hour.time}} Uhr</b><br>
                 <span ng-if="hour.recorded">
-                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × {{hour.tariffCtPerKWh | number:3}} ct/kWh
+                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:3}} ct/kWh</span>
                   <div class="cost-hour-price">
-                    {{hour.energyCostEur | currency:'€':4}}
-                    <span class="cost-hour-cents">· {{hour.energyCostEur * 100 | number:2}} ct</span>
+                    <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.energyCostEur | currency:'€':4}}</span>
+                    <span class="cost-hour-cents">· <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.energyCostEur * 100 | number:2}} ct</span></span>
                   </div>
                   <span class="cost-muted">
                     Netz {{hour.gridImportKWh | number:3}} kWh ·
-                    {{hour.gridImportCostEur | currency:'€':4}} · {{hour.gridImportCostEur * 100 | number:3}} ct
+                    <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.gridImportCostEur | currency:'€':4}}</span> · <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.gridImportCostEur * 100 | number:3}} ct</span>
                   </span><br>
                 </span>
                 <span ng-if="!hour.recorded">
-                  Stundenpreis {{hour.tariffCtPerKWh | number:3}} ct/kWh<br>
+                  Stundenpreis <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:3}} ct/kWh</span><br>
                   <span class="cost-muted">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>
                 </span>
                 <span ng-if="hour.recorded">
