@@ -1,11 +1,11 @@
 {
   "name": "node-red-project",
   "description": "GEORGSHOME Home Automation",
-  "version": "0.13.2",
+  "version": "0.14.1",
   "private": true,
   "homeAutomation": {
     "branchPurposes": {
-      "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand f\u00fcr Solar, Wetter, Kosten, System\u00fcberwachung, Netzwerk-Teilnehmer und verschl\u00fcsselte Zugangsdaten.",
+      "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand für Solar, Wetter, Kosten, Systemüberwachung, Netzwerk-Teilnehmer und verschlüsselte Zugangsdaten.",
       "SOLAR_clean_start": "Stabiler Ausgangsstand der Solar- und Hausautomations-Flows."
     }
   },
@@ -57,7 +57,8 @@
       "home-automation-credential-vault": "nodes/home-automation-credential-vault.js",
       "home-automation-project-info": "nodes/home-automation-project-info.js",
       "home-automation-scheduler": "nodes/home-automation-scheduler.js",
-      "home-automation-phidget-discovery": "nodes/home-automation-phidget-discovery.js"
+      "home-automation-phidget-discovery": "nodes/home-automation-phidget-discovery.js",
+      "home-automation-phidget-io": "nodes/home-automation-phidget-io.js"
     },
     "settings": {
       "flowFile": "flows.json",

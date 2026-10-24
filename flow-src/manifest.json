@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "50acbf54e56c02211c844cb689f8070c60de7518685e859967bc50fca29f0110",
+  "flowSha256": "ebdbf758b11b087118e759edd73e31b15e8bebcb33fb7235ed7631c5009a25b2",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -625,7 +625,8 @@
     "ph_discovery_result_out",
     "ph_discovery_request_out",
     "ph_discovery_result_in",
-    "ph_discovery_network_out"
+    "ph_discovery_network_out",
+    "ph_io_node"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -1224,6 +1225,7 @@
     "ph_discovery_node": "flows/system-phidget-discovery--ph_discovery_tab/nodes.json",
     "ph_discovery_request_in": "flows/system-phidget-discovery--ph_discovery_tab/nodes.json",
     "ph_discovery_result_out": "flows/system-phidget-discovery--ph_discovery_tab/nodes.json",
+    "ph_io_node": "flows/system-phidget-discovery--ph_discovery_tab/nodes.json",
     "c5ac03d4.d71b": "flows/templates--d10e2758.4eed68/nodes.json",
     "78be8f10.9c6a": "flows/unit-tests--3a481bd8.00eb44/nodes.json",
     "2183351f.2e2b0a": "flows/unit-tests--3a481bd8.00eb44/nodes.json",
@@ -1506,7 +1508,7 @@
     "flows/sub-light-middle--53cbac0a.2b67f4/nodes.json": "4b9766f58bfd570f7096f7e313ba24487370b570f88b4f0dd42a8ebb4849c5b9",
     "flows/system--system_dashboard_flow/functions/phidget-daten-fur-dashboard.js": "d31410dee27e4c2596575665eb4143e6e3a767f406cdc21084e39608580bd9b8",
     "flows/system--system_dashboard_flow/nodes.json": "df8745f5e8c1aa49003ed7c65459821c3428241e8edcd491e5b3443ca4545db5",
-    "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": "7dae626362246d0c8b20ab21d04b3b52da72bed280537b5c2513d735bb38ea5f",
+    "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": "2d392ec8f96565b6e28e34715f4d3abde8f8aeb1d058f13fd7bc7df26185a33a",
     "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": "7ffe9e48b7e755f0dead6700c322ffe43eaab1ee9066fff3760f5a3374645502",
     "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": "94c0ea9a50121b0fd0de291a3cf51a46823964a00816b7ae781e0bed259ea59c",
     "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": "7307c29ef347b7a6ce54a7cbe3da25f549f42770a5b3b446c038a03a46fe0285",
@@ -1516,7 +1518,7 @@
     "flows/system-netzwerk-scan--system_network_flow/functions/online-liste-mit-hostnamen-bilden.js": "bc3932dea615d528814c9e0163bbdf9f62f1824ba03332fc42229e1b4700b1c3",
     "flows/system-netzwerk-scan--system_network_flow/functions/ping-ergebnis-sicher-auswerten.js": "94e91fed8a8a60fe57a0dece3e50062ac055f603e3164eac5494b67a3860817c",
     "flows/system-netzwerk-scan--system_network_flow/nodes.json": "28b7a93a55353c211be3a4f0459520806b3d395ab52927608a757dca08b3aab2",
-    "flows/system-phidget-discovery--ph_discovery_tab/nodes.json": "dbd0eaea8e207db187a728ca21e521f3bfde870b33789dc7f43d05f7eee8ee2b",
+    "flows/system-phidget-discovery--ph_discovery_tab/nodes.json": "726c334e34dac219b3cd613ed263ab478c9719bd5c31afc29496d354ffa1b347",
     "flows/templates--d10e2758.4eed68/nodes.json": "c33b6f252557b7bc949d5488b84f196ec2eb0c53088f68e8b88c9530951428c2",
     "flows/unit-tests--3a481bd8.00eb44/nodes.json": "26c3fe1742fccb8ae51635b777cfe47bab2e537adb09eabc7b28a2ade54d6d71",
     "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js": "9fbf0f524194d90c025a73cefb0cad7ffc43c7ea3360e66c69e0cf513a2e7d82",

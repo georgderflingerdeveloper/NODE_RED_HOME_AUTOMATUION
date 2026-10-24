@@ -6,6 +6,15 @@
 .ph-discovery .dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:7px;background:#a4acaf}
 .ph-discovery .online{background:#87ec87}.ph-discovery .error,.ph-discovery .offline{background:#fa7777}.ph-discovery .warning,.ph-discovery .scanning{background:#f6d267}
 .ph-discovery .scroll{overflow-x:auto}.ph-discovery small{display:block;color:#bfdbdd}
+.ph-discovery .io-true{color:#9df59d;font-weight:800}.ph-discovery .io-false{color:#d6dfe0;font-weight:800}.ph-discovery .io-stale{color:#ffd477}.ph-discovery .io-error{color:#ff9999}.ph-discovery input{color:#fff;background:#173337;padding:8px;border:1px solid #60888b}
+/* IO-LED: Farben und Größe hier zentral anpassen. Keine Blinkanimation. */
+.ph-discovery .io-led{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:middle;margin-right:8px;border:1px solid #b9cbcc;box-shadow:inset 0 2px 3px #ffffff66;background:#78868b;flex-shrink:0}
+.ph-discovery .io-led.led-on{background:#82ef7b;box-shadow:inset 0 2px 3px #ffffff99,0 0 8px #82ef7b88}
+.ph-discovery .io-led.led-off{background:#58656b}
+.ph-discovery .io-led.led-stale{background:#ffd166;box-shadow:0 0 6px #ffd16666}
+.ph-discovery .io-led.led-error{background:#ff7171;box-shadow:0 0 6px #ff717166}
+.ph-discovery .io-led-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0;font-size:12px}
+.ph-discovery .io-led-cell{white-space:nowrap;min-width:130px}
 </style>
 <div class="ph-discovery">
 <h3>PHIDGETS · Server und Hardware</h3>
@@ -22,6 +31,20 @@
 <h4>Phidget-Server</h4>
 <div class="scroll"><table><thead><tr><th>Server</th><th>IP / Endpunkt</th><th>Status</th></tr></thead>
 <tbody><tr ng-repeat="s in ph.inventory.servers track by s.key"><td>{{s.name}}</td><td>{{s.ip}}<small>{{s.endpoint}}</small></td><td><span class="dot" ng-class="s.state"></span>{{label(s.state)}}</td></tr></tbody></table></div>
+<h4>IO-Datenpunkte · nur lesen</h4>
+<div ng-if="io.error" class="io-error">{{io.error}}</div>
+<div ng-if="io.storageError" class="io-error">Speicherfehler: {{io.storageError}}</div>
+<div class="io-led-legend"><span><i class="io-led led-on" aria-hidden="true"></i>TRUE / Analogwert gültig</span><span><i class="io-led led-off" aria-hidden="true"></i>FALSE / unbekannt</span><span><i class="io-led led-stale" aria-hidden="true"></i>Veraltet</span><span><i class="io-led led-error" aria-hidden="true"></i>Fehler</span></div>
+<label>Filter: <input ng-model="ioFilter" placeholder="Server, Seriennummer, Kanaltyp …"></label>
+<small>FALSE ist ein gültiger Wert. — bedeutet unbekannt. PWM: State gemäß Phidget-API, Duty Cycle separat. Ausgangswerte sind Serverwerte, keine elektrische Rückmessung.</small>
+<div class="scroll"><table><thead><tr><th>Server / Gerät</th><th>Seriennummer</th><th>Port / Kanal</th><th>Typ</th><th>LED / Status</th><th>Wert</th><th>Qualität / zuletzt gelesen</th></tr></thead>
+<tbody><tr ng-repeat="r in io.rows | filter:ioFilter track by r.key">
+<td>{{r.actualServer || r.server}}<small>{{r.device}}</small></td><td>{{r.serial}}</td><td>{{r.port === null ? '—' : r.port}} / {{r.index}}</td><td>{{r.type}}</td>
+<td class="io-led-cell"><span class="io-led" ng-class="ioLed(r).css" role="img" aria-label="{{ioLed(r).label}}" title="{{ioLed(r).label}}"></span><strong>{{ioLed(r).label}}</strong></td>
+<td>{{r.value === undefined || r.value === null ? '—' : (r.value | number:3)}} {{r.unit}}<small ng-if="!ioFresh(r) && r.lastRead">Letzter bekannter Wert</small></td>
+<td ng-class="r.quality === 'error' ? 'io-error' : !ioFresh(r) ? 'io-stale' : ''">{{ioFresh(r) ? 'Verbunden · gelesen' : r.quality === 'unsupported' ? 'Nicht unterstützt' : r.quality === 'error' ? 'Fehler' : 'Unbekannt / veraltet'}}<small>{{r.lastRead ? (r.lastRead | date:'dd.MM.yyyy HH:mm:ss') : 'Noch nicht gelesen'}}</small><small>{{r.error}}</small></td>
+</tr></tbody></table></div>
+<div ng-if="!io.rows.length">Warte auf IO-Inventar / Lesedienst …</div>
 <h4>Hardware · {{hubCount()}} VINT-Hubs</h4>
 <div ng-if="!ph.inventory.devices.length">Noch keine Hardwaredaten verfügbar. Scanstatus oben beachten.</div>
 <div class="box" ng-repeat="d in ph.inventory.devices track by d.key">
@@ -42,10 +65,23 @@
 </div>
 <script>
 (function(scope){
+ scope.io={rows:[]};scope.ioNow=Date.now();
+ scope.ioFresh=function(r){return r.quality==='live' && scope.ioNow-r.lastRead<10000;};
+ // IO-LED: Statuszuordnung unabhängig vom gerundeten Anzeigewert.
+ scope.ioLed=function(r){
+  if(r.quality==='error')return {css:'led-error',label:'Fehler'};
+  if(r.quality==='unsupported')return {css:'led-off',label:'Kein IO-Adapter'};
+  if(!scope.ioFresh(r))return r.lastRead ? {css:'led-stale',label:'Veraltet'} : {css:'led-off',label:'Unbekannt'};
+  if(r.boolean===true)return {css:'led-on',label:'TRUE'};
+  if(r.boolean===false)return {css:'led-off',label:'FALSE'};
+  return {css:'led-on',label:'Wert gültig'};
+ };
+ const ioTimer=setInterval(function(){scope.$evalAsync(function(){scope.ioNow=Date.now();});},2000);
+ scope.$on('$destroy',function(){clearInterval(ioTimer);});
  scope.ph={inventory:{servers:[],devices:[]},health:{}};
  scope.label=function(s){return s==='online'?'erkannt':s==='offline'?'nicht mehr erkannt':'unbekannt / veraltet';};
  scope.hubCount=function(){return scope.ph.inventory.devices.filter(function(d){return d.hub;}).length;};
- scope.$watch('msg',function(msg){if(msg && msg.payload && msg.payload.discovery)scope.ph=msg.payload;});
+ scope.$watch('msg',function(msg){if(msg && msg.payload && msg.payload.discovery)scope.ph=msg.payload;if(msg && msg.payload && msg.payload.io){scope.io=msg.payload;scope.ioNow=Date.now();}});
  scope.send({topic:'phidgets/get'});
 })(scope);
 </script>

@@ -9,7 +9,8 @@
     "y": 160,
     "wires": [
       [
-        "ph_discovery_result_out"
+        "ph_discovery_result_out",
+        "ph_io_node"
       ]
     ]
   },
@@ -26,7 +27,8 @@
     "y": 160,
     "wires": [
       [
-        "ph_discovery_node"
+        "ph_discovery_node",
+        "ph_io_node"
       ]
     ]
   },
@@ -42,5 +44,19 @@
     "x": 720,
     "y": 160,
     "wires": []
+  },
+  {
+    "id": "ph_io_node",
+    "type": "home-automation-phidget-io",
+    "z": "ph_discovery_tab",
+    "name": "IO Werte · nur lesen",
+    "pollMs": 2000,
+    "x": 440,
+    "y": 260,
+    "wires": [
+      [
+        "ph_discovery_result_out"
+      ]
+    ]
   }
 ]

@@ -1,0 +1,5 @@
+<script type="text/javascript">
+RED.nodes.registerType('home-automation-phidget-io',{category:'function',color:'#86c5b7',defaults:{name:{value:'Phidget IO · nur lesen'},pollMs:{value:2000,validate:RED.validators.number()}},inputs:1,outputs:1,icon:'bridge.svg',label:function(){return this.name;}});
+</script>
+<script type="text/html" data-template-name="home-automation-phidget-io"><div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name"></div><div class="form-row"><label for="node-input-pollMs">Abfrage ms</label><input id="node-input-pollMs"></div></script>
+<script type="text/html" data-help-name="home-automation-phidget-io"><p>Liest erkannte IO über Network Server. Keine Ausgangsbefehle. Letzte Werte werden alle 30 Sekunden gespeichert; nach Neustart bis zum Lesen als veraltet markiert.</p></script>
