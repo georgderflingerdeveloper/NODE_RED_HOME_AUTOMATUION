@@ -1,0 +1,66 @@
+{
+  "flow-src/flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": {
+    "scripts": "a6b002f41d8a34e61d8befd90b2d5806232d75aadd057b92610baadfa7314792",
+    "markup": "3b4e164eb406a1a08a9cca2c8f4c70ff1fed69cee5feabcc322cca2c0efe61e1"
+  },
+  "flow-src/flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": {
+    "scripts": "00328d0e27d91804024687db07a35c79e0d642a6257816735b91a5d4b5173a8e",
+    "markup": "ca3728e70aca07649e8debef4bb24739516e2b487b5b378858798a90d55fac26"
+  },
+  "flow-src/flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": {
+    "scripts": "6ad076ce3b20282a6b6c1c618c0439f7bd2fedaca46d925a5efc207cc4e3f6c7",
+    "markup": "f94611a807f58d3c541ed35eb724d2d6e00a26670777a0417bbe88d548cb21a5"
+  },
+  "flow-src/flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": {
+    "scripts": "88576fdbb95fa0b58d5b7120ea3b1cf66f0c3b8a8941f5ffb3770e6b2800cb90",
+    "markup": "4bdb2525e6bbecbd153125f3f489f72a4201fdbe92588f3589de8727c1d22a38"
+  },
+  "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": {
+    "scripts": "9f6553239e05360d7a6b601f50cfac0af539e57fa8f85a35a96186ec04a4c93b",
+    "markup": "9f6553239e05360d7a6b601f50cfac0af539e57fa8f85a35a96186ec04a4c93b"
+  },
+  "flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "ecb8650cf2f33013fa75f9246bda6f6ed453b9fae095c165aa482c5c2c55787f"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solarleistung.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "43854905a65444a134f9f1b705f93c95fcbf4368465cdd932514a99fac1de236"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "0b48bc8ef8057163f5f78a59c3232c90b957cc99f360728610b3b1af71f7bf8c"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "1cba15b61038576f82fb648dca88cf916277825a49acd77732d0460723bd0d29"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "75f74e54352d111d945f60208ab3bab837c137f5fad796893ba9db00f597b635"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": {
+    "scripts": "3203fbf9823ffed77b0a7463a58d3b8fa82067372c2a4b16095f4ee26fc01f20",
+    "markup": "0510601cec5fda5b8f1e47cda6573a63c6f3911589623b9cce2650a61ed74f2c"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "00c583f796a75e72d3d52ef99ebefd69f443d15e167d01e5aeb028d4ed31f3db"
+  },
+  "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solaruberschuss.html": {
+    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "markup": "717be7bcc235470b983fd53e06d46e20ffb0a77bb91f6eb9bdbc76b5491541b9"
+  },
+  "flow-src/flows/kosten--kosten_flow/templates/cost-dashboard.html": {
+    "scripts": "b86a49abeceaaefc21de5559bd3f402c87bce629ddb9c8add7bfa2691ecc4457",
+    "markup": "09b850069ea8d4e2a3bb8a906b8beb199b8c90280a0e2f21eacbcda00eaa481d"
+  },
+  "flow-src/flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": {
+    "scripts": "142233f56090b691b9bf2cd4d4632de1e7248d4de499eee0e2a128e241ff4a58",
+    "markup": "f260a4c5dbd36d14d2b0a910bcfefa3e99dc7846a9efbcc18491e11d076eeac0"
+  },
+  "flow-src/flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": {
+    "scripts": "00f5570213f5c1092302cc8ce6ee2e1a48c822e58dc5d122f52f1a26772840ee",
+    "markup": "00f5570213f5c1092302cc8ce6ee2e1a48c822e58dc5d122f52f1a26772840ee"
+  }
+}

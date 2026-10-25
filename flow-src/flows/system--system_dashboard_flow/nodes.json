@@ -272,5 +272,49 @@
         "phidget_dashboard_template"
       ]
     ]
+  },
+  {
+    "id": "gh_theme_global",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "",
+    "name": "Design · global",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "global",
+    "x": 800,
+    "y": 850,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "gh_theme_picker",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "gh_theme_group",
+    "name": "Design · local",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/dashboard-theme-picker.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 800,
+    "y": 900,
+    "wires": [
+      []
+    ]
   }
 ]

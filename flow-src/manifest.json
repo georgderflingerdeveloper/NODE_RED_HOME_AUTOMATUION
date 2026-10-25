@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "ebdbf758b11b087118e759edd73e31b15e8bebcb33fb7235ed7631c5009a25b2",
+  "flowSha256": "d83615c005dab7f3304ede5fe83af8e286e677a0df7032257d8c882226fb3e36",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -626,7 +626,11 @@
     "ph_discovery_request_out",
     "ph_discovery_result_in",
     "ph_discovery_network_out",
-    "ph_io_node"
+    "ph_io_node",
+    "gh_theme_tab",
+    "gh_theme_group",
+    "gh_theme_global",
+    "gh_theme_picker"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -746,6 +750,8 @@
     "schedulers_ui_tab": "configuration/nodes.json",
     "schedulers_ui_group": "configuration/nodes.json",
     "ph_discovery_tab": "configuration/nodes.json",
+    "gh_theme_tab": "configuration/nodes.json",
+    "gh_theme_group": "configuration/nodes.json",
     "956c65fc.759a28": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "f4f718ca.73ad78": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "5e8c7091.07116": "flows/boiler--15e47868.0e5ea8/nodes.json",
@@ -1203,6 +1209,8 @@
     "phidget_dashboard_template": "flows/system--system_dashboard_flow/nodes.json",
     "ph_discovery_request_out": "flows/system--system_dashboard_flow/nodes.json",
     "ph_discovery_result_in": "flows/system--system_dashboard_flow/nodes.json",
+    "gh_theme_global": "flows/system--system_dashboard_flow/nodes.json",
+    "gh_theme_picker": "flows/system--system_dashboard_flow/nodes.json",
     "system_scan_schedule": "flows/system-netzwerk-scan--system_network_flow/nodes.json",
     "system_local_ip_exec": "flows/system-netzwerk-scan--system_network_flow/nodes.json",
     "system_scan_targets": "flows/system-netzwerk-scan--system_network_flow/nodes.json",
@@ -1342,7 +1350,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "f5f0400323384cfd3c8ae49ae9cf4d86efe7df7c62b8e050ab9e11f1ae79a2db",
+    "configuration/nodes.json": "a0db742050f1ee033eb8bc5d320f3530ca85f2cdd6c70d65e169a314d2d15fbf",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -1377,7 +1385,7 @@
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "3533971c7dfd0e01b8f0a042cfae91ad789ff3b383217c64dce65610ed8021d7",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "e500f17f36e212aac57d9c91276460203339ed1c45cda239fd64195311510a44",
     "flows/kosten--kosten_flow/nodes.json": "8d559cf78152ad28ed25a16b88d2fb923a013f7341dc202d98a339e76d1f780e",
-    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "6c3b5690657bbfd5c783bb176a162904c53a2cd995e2a65e515dea5e3c79a81b",
+    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "039cbfd187259f671a7999d769808c51e34355147851ef3f3480e0e7f23c4d54",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",
@@ -1386,7 +1394,7 @@
     "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-command.js": "5a8d2f8af401bd745d14398316787bb77effc4a47f33d7af48fa15a4e02ab47e",
     "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-status.js": "a2bbfdbedfb53c7de42b634317caec08d1c2804f247f58848751a69599f5249b",
     "flows/light-controller--light_controller_flow/nodes.json": "4533f549ed0e8b4a4ab8e72a39b62ae50ae828b8f151797064daaccd83876d2f",
-    "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": "aec0f3346158529548f4dcc668ede0440c820b5b43a2ec0ba503938b519ad853",
+    "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": "19e5705b0348dafd3af5b7245ef8978c951be547e438557c737ee593c570121b",
     "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left.js": "ea2970dc0b72fb1a23dc7de6ac4e514c234fb35357c66f63e700594b879cb5a3",
     "flows/light-door-entry-left--58c186d2.cc7718/nodes.json": "20de83c18832f21a31c0c37019b20034fed28194cbcb027a0ba158f6389cc388",
     "flows/light-gallery-down--1976d7f.0dd9028/functions/light-command-gallery-down.js": "ba8473de1243f513e91db46cbdaca85eeea00ca7eed0eb783feec7d7bae96763",
@@ -1461,7 +1469,7 @@
     "flows/scenarios--77dda60a.d7efe8/functions/make-dimm.js": "7c3a09f59f959190433f3541814115ff3621b0ca40862d0392f9e871a40daaf7",
     "flows/scenarios--77dda60a.d7efe8/nodes.json": "cca181e9c1013062ded56492464b95552e6bfb961979271704db6c0b1892ec91",
     "flows/schedulers--schedulers_flow/nodes.json": "71a5dd9dc3721a4a3e14c69463ac860f7a69b0f933f3ebc4048709bc4ae05cb7",
-    "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "6e4335ae47b91cc7d1cd381e668405e04f0c54e4907425cc7bf5fc94121d4a99",
+    "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "0776ff0fcffc43ff91a80311abf2605ddf2047ac2ef734956121a861f14fcbb1",
     "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung.js": "e0e40830c27ae870adf8bd8c2c2b724d9ef1e405660772515e853652b23fd521",
     "flows/se-grid-power--tab_read_feedin/functions/parse-solaredge-meter-energy-totals.js": "67cd7e0fce08aa4b84f10d61ff8457ca5edec53d604995417a72a7451fe1128f",
     "flows/se-grid-power--tab_read_feedin/functions/solaredge-meter-offline-sichere-nullwerte.js": "4389b20908d64a47af787541c3b2b0f38510d1cf773058b257cab7a6554ae762",
@@ -1475,7 +1483,7 @@
     "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload.js": "453327609babb6dafce54882848fde736893161bf84c81b50934fde94600074a",
     "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern.js": "03ac2c2f99c5a97ee351490bbf0308383a3a78568e24cb61167c6efde2df161c",
     "flows/solar-dashboard--b86cb602995b0261/nodes.json": "ebc16ccdfbfd60c719ccc263e98fad9c0958b430ac715eb992cb63bf371bcb72",
-    "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html": "d8ba2f2b8397c452e46fe47ddcd9b39cfaddbb9654ffe2bd6d3dce1909dbf2db",
+    "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html": "9573bfc5ad0fd2f362c0ab6a387ed3183639fa6f740bd41072f93c648a7bd5d6",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html": "1cba15b61038576f82fb648dca88cf916277825a49acd77732d0460723bd0d29",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": "00c583f796a75e72d3d52ef99ebefd69f443d15e167d01e5aeb028d4ed31f3db",
     "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": "69a76071dae8b4b4cccd3b053fd3f07e316986ad16ff66a9058cf13ecfdc9565",
@@ -1507,11 +1515,13 @@
     "flows/sub-light-anteroom-middle--658af8e2.d21c88/nodes.json": "f381fd85dfe2c9a0564730cbef5bee0231d642e4087cb8b5ef70dcebdbdeaab5",
     "flows/sub-light-middle--53cbac0a.2b67f4/nodes.json": "4b9766f58bfd570f7096f7e313ba24487370b570f88b4f0dd42a8ebb4849c5b9",
     "flows/system--system_dashboard_flow/functions/phidget-daten-fur-dashboard.js": "d31410dee27e4c2596575665eb4143e6e3a767f406cdc21084e39608580bd9b8",
-    "flows/system--system_dashboard_flow/nodes.json": "df8745f5e8c1aa49003ed7c65459821c3428241e8edcd491e5b3443ca4545db5",
-    "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": "2d392ec8f96565b6e28e34715f4d3abde8f8aeb1d058f13fd7bc7df26185a33a",
-    "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": "7ffe9e48b7e755f0dead6700c322ffe43eaab1ee9066fff3760f5a3374645502",
-    "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": "94c0ea9a50121b0fd0de291a3cf51a46823964a00816b7ae781e0bed259ea59c",
-    "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": "7307c29ef347b7a6ce54a7cbe3da25f549f42770a5b3b446c038a03a46fe0285",
+    "flows/system--system_dashboard_flow/nodes.json": "bdd4e83f2f9fbc3fafae5a724edd860268430ae7388ff525a061792ea3b40b68",
+    "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html": "dba80e64d81bf073082be4c0be899c460e8e015f2a40d1c78b92609a5fdfdae2",
+    "flows/system--system_dashboard_flow/templates/dashboard-theme-picker.html": "31a5290200536dcf745233cc009b8e99f7fe710ba0ab351d76d9045ddf7e5750",
+    "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": "7db76327e1880bb2b46ac75b5b1d5cc3dcbbf86d579110ff0a99f1ac7482c08d",
+    "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": "5258d51d6b39563e731aade9e1f133d2f63bfabb7eef58b442448499cece03f4",
+    "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": "718ccdd4ace7361d536977c54fc6291b841c22c87434d35e32094a1d6f0bd7b8",
+    "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": "3e6d51e2e06061f08d58cda0590c9c3e181f0be47d20a1ca6f8ca6aebb5b1c62",
     "flows/system-netzwerk-scan--system_network_flow/functions/hostname-sicher-ubernehmen.js": "958537e2bb109949696e6c31d0f7aa693908bf5b97b14760b4f7359d65e150b7",
     "flows/system-netzwerk-scan--system_network_flow/functions/livewerte-prufen-und-dashboard-aktualisieren.js": "4050addb9dea07be33d1d4d34c8daec5b9242ddeef4b8dd46dbd8c15a33c5bcc",
     "flows/system-netzwerk-scan--system_network_flow/functions/lokales-24-scan-netz-sicher-ableiten.js": "50b413640f3a99040a5be978b282b6fad3f8477566c4431a3aa7c6026745ac02",
@@ -1528,6 +1538,6 @@
     "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js": "40d6f42311f34803356593deb4795ecca26bde3146bdf4b152632c54b46309d1",
     "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren.js": "98bb02159f606f37629187b4ada352c19011e289664abee734e17e64b191978a",
     "flows/wetter--weather_flow/nodes.json": "71c52b11a6626ed1bc16c783c3bc13cb3ee452a1e51c6b412fad1898a5ba5c6d",
-    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "da563dfaaf27b592ffd0f4b267a3cf0acac44b50f73a6dfa0fc82a702e9af00e"
+    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "c19b19e3ee782b69f3b2e923b5de893dc149e7c1ba4c34bf5f058672f75366fc"
   }
 }

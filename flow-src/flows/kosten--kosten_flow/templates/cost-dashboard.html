@@ -3,58 +3,58 @@
   .cost-dashboard-grid { width:100% !important; min-height:calc(100vh - 118px) !important; min-height:calc(100dvh - 118px) !important; }
   .cost-dashboard-widget { width:100% !important; height:auto !important; min-height:calc(100vh - 145px) !important; min-height:calc(100dvh - 145px) !important; left:0 !important; }
   .cost-dashboard-template { height:auto !important; min-height:inherit !important; }
-  .cost-card { width:100%; min-height:calc(100vh - 165px); min-height:calc(100dvh - 165px); max-width:none; box-sizing:border-box; color:#eaf5f6; font-family:Roboto,Arial,sans-serif; }
+  .cost-card { width:100%; min-height:calc(100vh - 165px); min-height:calc(100dvh - 165px); max-width:none; box-sizing:border-box; color:var(--gh-text,#f1f1f1); font-family:Roboto,Arial,sans-serif; }
   .cost-toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
   .cost-toolbar h2 { margin:0; color:#fff; font-size:23px; }
-  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:#18292b; }
-  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:#a9c4c6; background:transparent; cursor:pointer; font-weight:700; }
-  .cost-periods button.active { color:#fff; background:#08747a; box-shadow:0 2px 7px rgba(0,0,0,.25); }
+  .cost-periods { display:flex; padding:4px; gap:4px; border-radius:11px; background:var(--gh-inset,#242424); }
+  .cost-periods button { border:0; border-radius:8px; padding:8px 15px; color:var(--gh-muted,#c6c6c6); background:transparent; cursor:pointer; font-weight:700; }
+  .cost-periods button.active { color:#fff; background:var(--gh-control,#444444); box-shadow:0 2px 7px rgba(0,0,0,.25); }
   .cost-head { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }
-  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,#0b5960,#08747a); box-shadow:0 5px 14px rgba(0,0,0,.22); }
-  .cost-kpi.secondary { background:linear-gradient(135deg,#253d40,#31565a); }
+  .cost-kpi { padding:15px; border-radius:14px; background:linear-gradient(135deg,var(--gh-card,#303030),var(--gh-control,#444444)); box-shadow:0 5px 14px rgba(0,0,0,.22); }
+  .cost-kpi.secondary { background:linear-gradient(135deg,var(--gh-card,#303030),var(--gh-control,#444444)); }
   .cost-kpi.cost-house-power { transition:background .45s ease,border-color .45s ease; border:1px solid transparent; }
   .cost-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.78; }
   .cost-kpi-value { margin-top:5px; font-size:25px; font-weight:700; white-space:nowrap; }
   .cost-kpi-note { margin-top:5px; min-height:15px; font-size:11px; opacity:.8; }
-  .cost-kpi-range { margin-top:7px; padding-top:6px; border-top:1px solid rgba(255,255,255,.22); color:#d6f5f7; font-size:11px; font-weight:700; }
-  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid #42676b; border-radius:12px; background:#24383a; color:#bad0d2; font-size:12px; }
+  .cost-kpi-range { margin-top:7px; padding-top:6px; border-top:1px solid rgba(255,255,255,.22); color:var(--gh-text,#f1f1f1); font-size:11px; font-weight:700; }
+  .cost-info { margin-bottom:14px; padding:13px 15px; border:1px solid var(--gh-border,#626262); border-radius:12px; background:var(--gh-card,#303030); color:var(--gh-muted,#c6c6c6); font-size:12px; }
   .cost-info b { color:#fff; }
-  .cost-forecast { margin-bottom:14px; padding:14px; border:1px solid #477579; border-radius:12px; background:#1b3234; }
+  .cost-forecast { margin-bottom:14px; padding:14px; border:1px solid var(--gh-border,#626262); border-radius:12px; background:var(--gh-card,#303030); }
   .cost-forecast-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
   .cost-forecast-title { color:#fff; font-size:16px; font-weight:700; }
   .cost-forecast-grid { display:grid; grid-template-columns:repeat(4,minmax(145px,1fr)); gap:9px; }
-  .cost-forecast-field { padding:10px; border-radius:9px; background:#233f42; }
-  .cost-forecast-field span { display:block; color:#a5c4c6; font-size:10px; text-transform:uppercase; }
+  .cost-forecast-field { padding:10px; border-radius:9px; background:var(--gh-card,#303030); }
+  .cost-forecast-field span { display:block; color:var(--gh-muted,#c6c6c6); font-size:10px; text-transform:uppercase; }
   .cost-forecast-field b { display:block; margin-top:5px; color:#fff; font-size:15px; }
   .cost-forecast-field b.true { color:#8df0ae; }
-  .cost-forecast-field b.false { color:#9bb5b8; }
+  .cost-forecast-field b.false { color:var(--gh-muted,#c6c6c6); }
   .cost-forecast-recommendation { margin-top:10px; padding:10px; border-left:4px solid #58c77d; color:#cfe8d7; background:#203c33; font-weight:700; }
   .cost-forecast-recommendation.expensive { border-left-color:#ff7a68; color:#ffd1c9; background:#412b29; }
   .cost-forecast-recommendation.unavailable { border-left-color:#e6bb5a; color:#f3ddb0; background:#3f3928; }
-  .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid #0f8e96; border-radius:12px; background:#183638; }
+  .cost-anchor { margin-bottom:14px; padding:14px; border:1px solid var(--gh-border,#626262); border-radius:12px; background:var(--gh-card,#303030); }
   .cost-anchor-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px; }
   .cost-anchor-title { color:#fff; font-weight:700; }
   .cost-anchor-grid { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:9px; }
-  .cost-anchor-value { padding:10px; border-radius:9px; background:#223f42; }
-  .cost-anchor-value span { display:block; color:#9fc3c6; font-size:10px; text-transform:uppercase; }
+  .cost-anchor-value { padding:10px; border-radius:9px; background:var(--gh-card,#303030); }
+  .cost-anchor-value span { display:block; color:var(--gh-muted,#c6c6c6); font-size:10px; text-transform:uppercase; }
   .cost-anchor-value b { display:block; margin-top:4px; color:#fff; font-size:17px; }
-  .cost-anchor-note { margin-top:10px; color:#a9c4c6; font-size:11px; line-height:1.45; }
+  .cost-anchor-note { margin-top:10px; color:var(--gh-muted,#c6c6c6); font-size:11px; line-height:1.45; }
   .cost-section-title { margin:18px 0 8px; color:#fff; font-size:16px; }
-  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid #456367; border-radius:12px; background:#1d2d2f; }
+  .cost-table-wrap { width:100%; max-width:100%; overflow-x:auto; box-sizing:border-box; border:1px solid var(--gh-border,#626262); border-radius:12px; background:var(--gh-card,#303030); }
   .cost-table { width:100%; min-width:760px; border-collapse:collapse; }
-  .cost-table th { padding:11px 12px; text-align:left; background:#0b5960; color:#fff; font-size:12px; }
-  .cost-table td { padding:10px 12px; border-top:1px solid #395357; font-size:12px; }
+  .cost-table th { padding:11px 12px; text-align:left; background:var(--gh-card,#303030); color:#fff; font-size:12px; }
+  .cost-table td { padding:10px 12px; border-top:1px solid var(--gh-control,#444444); font-size:12px; }
   .cost-row { cursor:pointer; transition:background .15s; }
-  .cost-row:hover td { background:#294347; }
-  .cost-expand { display:inline-block; width:20px; color:#61d6dd; font-weight:700; }
-  .cost-muted { color:#9bb5b8; }
+  .cost-row:hover td { background:var(--gh-control,#444444); }
+  .cost-expand { display:inline-block; width:20px; color:var(--gh-muted,#c6c6c6); font-weight:700; }
+  .cost-muted { color:var(--gh-muted,#c6c6c6); }
   .cost-offline { color:#ffad99; }
   /* SELBST ÄNDERN: Schriftfarbe für den Status „online“. */
   .cost-online { color:#8df0ae; font-weight:800; }
-  .cost-hours td { padding:0; background:#132426; }
+  .cost-hours td { padding:0; background:var(--gh-inset,#242424); }
   .cost-hours-inner { padding:12px 18px 14px 42px; }
   .cost-hour-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:7px; }
-  .cost-hour { padding:9px 10px; border-radius:8px; background:#223b3e; font-size:12px; line-height:1.55; }
+  .cost-hour { padding:9px 10px; border-radius:8px; background:var(--gh-card,#303030); font-size:12px; line-height:1.55; }
   /* SELBST ÄNDERN: Hintergrund und Rahmen der aktuell laufenden Stundenkarte. */
   .cost-hour.cost-hour-current { color:#15351f; background:#d7f5df; border:2px solid #79d99a; box-shadow:0 0 0 2px rgba(121,217,154,.18); }
   .cost-hour.cost-hour-current b,
@@ -65,16 +65,16 @@
   .cost-current-label { float:right; color:#176b37; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
   .cost-hour b { color:#fff; }
   .cost-hour-price { margin:5px 0; color:#fff; font-size:16px; font-weight:700; }
-  .cost-hour-cents { color:#61d6dd; font-size:12px; font-weight:700; }
-  .cost-empty { padding:22px; color:#9bb5b8; text-align:center; }
+  .cost-hour-cents { color:var(--gh-muted,#c6c6c6); font-size:12px; font-weight:700; }
+  .cost-empty { padding:22px; color:var(--gh-muted,#c6c6c6); text-align:center; }
   .cost-diagnostics { display:grid; grid-template-columns:repeat(3,minmax(180px,1fr)); gap:9px; }
-  .cost-source { padding:12px; border:1px solid #405b5f; border-radius:10px; background:#1d2d2f; }
+  .cost-source { padding:12px; border:1px solid var(--gh-border,#626262); border-radius:10px; background:var(--gh-card,#303030); }
   .cost-source-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
   .cost-source-name { color:#fff; font-weight:700; text-transform:capitalize; }
   .cost-badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; }
   .cost-badge.online { color:#b9ffdc; background:#14613f; }
   .cost-badge.offline { color:#ffd1c7; background:#71342d; }
-  .cost-source-detail { margin-top:7px; color:#9bb5b8; font-size:11px; line-height:1.45; }
+  .cost-source-detail { margin-top:7px; color:var(--gh-muted,#c6c6c6); font-size:11px; line-height:1.45; }
   @media(max-width:900px) {
     .cost-dashboard-group { width:calc(100vw - 20px) !important; margin-right:10px !important; margin-left:10px !important; }
     .cost-head { grid-template-columns:repeat(2,1fr); }
@@ -101,10 +101,10 @@
     .cost-table { display:block; min-width:0; }
     .cost-table thead { display:none; }
     .cost-table tbody { display:block; }
-    .cost-row { display:block; margin-bottom:10px; padding:7px 10px; border:1px solid #456367; border-radius:10px; background:#1d2d2f; }
-    .cost-row td { display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); gap:8px; padding:7px 2px; border-top:1px solid #395357; overflow-wrap:anywhere; }
+    .cost-row { display:block; margin-bottom:10px; padding:7px 10px; border:1px solid var(--gh-border,#626262); border-radius:10px; background:var(--gh-card,#303030); }
+    .cost-row td { display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); gap:8px; padding:7px 2px; border-top:1px solid var(--gh-control,#444444); overflow-wrap:anywhere; }
     .cost-row td:first-child { border-top:0; }
-    .cost-row td::before { color:#9bb5b8; font-size:11px; font-weight:700; }
+    .cost-row td::before { color:var(--gh-muted,#c6c6c6); font-size:11px; font-weight:700; }
     .cost-row td:nth-child(1)::before { content:"Zeitraum"; }
     .cost-row td:nth-child(2)::before { content:"Hausverbrauch"; }
     .cost-row td:nth-child(3)::before { content:"Netzbezug"; }
@@ -119,23 +119,23 @@
     .cost-hour-grid { grid-template-columns:1fr; }
   }
 /* Eingabegestaltung zentral hier ändern; native Kalender folgen dem Browser. */
-.cost-range-editor { font-size:14px; line-height:1.55; color:#edf8f8; }
+.cost-range-editor { font-size:14px; line-height:1.55; color:var(--gh-text,#f1f1f1); }
 .cost-range-editor h3 { font-size:17px; background:transparent; margin:12px 0; }
 .cost-range-editor label { display:inline-flex; flex-direction:column; gap:5px; margin:6px 10px 10px 0; }
-.cost-range-editor input { box-sizing:border-box; min-height:44px; max-width:100%; padding:9px 12px; border:1px solid #8cabad; border-radius:6px; background:#fff; color:#152d30; font-size:16px; color-scheme:light; }
-.cost-range-editor button { min-height:42px; padding:9px 15px; margin:4px 8px 4px 0; border:1px solid #70c8cb; border-radius:6px; background:#006e76; color:white; font-size:14px; font-weight:600; cursor:pointer; }
+.cost-range-editor input { box-sizing:border-box; min-height:44px; max-width:100%; padding:9px 12px; border:1px solid var(--gh-muted,#c6c6c6); border-radius:6px; background:#fff; color:var(--gh-inset,#242424); font-size:16px; color-scheme:light; }
+.cost-range-editor button { min-height:42px; padding:9px 15px; margin:4px 8px 4px 0; border:1px solid var(--gh-muted,#c6c6c6); border-radius:6px; background:var(--gh-control,#444444); color:white; font-size:14px; font-weight:600; cursor:pointer; }
 .cost-range-editor button:disabled { opacity:.55; cursor:wait; }
 .cost-range-editor input:focus,.cost-range-editor button:focus-visible { outline:3px solid #b6f29c; outline-offset:2px; }
 .range-fields,.range-presets { display:flex; flex-wrap:wrap; align-items:end; gap:8px; }
 
 /* PREISFARBEN: Farbwerte hier, Preisgrenzen bei PRICE_BANDS im Script ändern.
    Dunkler Hintergrund erhält den Kontrast auch in der hellgrünen aktuellen Stunde. */
-.cost-price-tag {display:inline-block;background:#12282c;border-radius:4px;padding:1px 5px;font-weight:800!important;}
+.cost-price-tag {display:inline-block;background:var(--gh-inset,#242424);border-radius:4px;padding:1px 5px;font-weight:800!important;}
 .cost-price-tag.price-cheap {color:#a4f6a0!important;}
 .cost-price-tag.price-medium {color:#ffe27a!important;}
 .cost-price-tag.price-high {color:#ffb46b!important;}
 .cost-price-tag.price-expensive {color:#ff9292!important;}
-.cost-price-tag.price-unknown {color:#d1dadd!important;}
+.cost-price-tag.price-unknown {color:var(--gh-muted,#c6c6c6)!important;}
 .cost-price-legend {font-size:12px;line-height:1.8;margin:8px 0;}
 </style>
 

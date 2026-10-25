@@ -1,7 +1,7 @@
 <style>
   .weather-card {
     font-family: Roboto, Arial, sans-serif;
-    color: #263238;
+    color: var(--gh-card,#303030);
     padding: 4px 2px 10px
   }
 
@@ -12,7 +12,7 @@
     margin-bottom: 14px;
     padding: 14px 16px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #f7fafc, #edf2f7)
+    background: linear-gradient(135deg, var(--gh-text,#f1f1f1), #edf2f7)
   }
 
   .weather-light {
@@ -43,7 +43,7 @@
 
   .weather-status {
     margin-top: 4px;
-    color: #546e7a
+    color: var(--gh-border,#626262)
   }
 
   .weather-kpis {
@@ -57,24 +57,24 @@
     padding: 10px;
     border-radius: 9px;
     background: #fff;
-    border: 1px solid #dfe7ec;
+    border: 1px solid var(--gh-text,#f1f1f1);
     text-align: center
   }
 
   .weather-kpi b {
     display: block;
     font-size: 19px;
-    color: #263238
+    color: var(--gh-card,#303030)
   }
 
   .weather-kpi span {
     font-size: 11px;
-    color: #607d8b
+    color: var(--gh-muted,#b8b8b8)
   }
 
   .weather-table-wrap {
     overflow-x: auto;
-    border: 1px solid #dfe7ec;
+    border: 1px solid var(--gh-text,#f1f1f1);
     border-radius: 9px
   }
 
@@ -88,19 +88,19 @@
   .weather-table th {
     padding: 9px 8px;
     text-align: left;
-    background: #455a64;
+    background: var(--gh-border,#626262);
     color: #fff;
     font-size: 12px
   }
 
   .weather-table td {
     padding: 9px 8px;
-    border-top: 1px solid #e8eef2;
+    border-top: 1px solid var(--gh-text,#f1f1f1);
     font-size: 13px
   }
 
   .weather-table tr:nth-child(even) td {
-    background: #f8fafb
+    background: var(--gh-text,#f1f1f1)
   }
 
   .sun-cell {
@@ -113,7 +113,7 @@
     gap: 16px;
     margin-top: 10px;
     font-size: 12px;
-    color: #607d8b
+    color: var(--gh-muted,#b8b8b8)
   }
 
   .legend-dot {
@@ -135,7 +135,7 @@
   .weather-suntimes {
     margin-top: 5px;
     font-size: 12px;
-    color: #607d8b
+    color: var(--gh-muted,#b8b8b8)
   }
 
   .weather-offline-note {
@@ -149,14 +149,14 @@
   }
 
   .weather-table tr.night-row td {
-    background: #eceff1;
-    color: #78909c
+    background: var(--gh-text,#f1f1f1);
+    color: var(--gh-muted,#b8b8b8)
   }
 
   .night-label {
     font-size: 10px;
     margin-left: 5px;
-    color: #78909c
+    color: var(--gh-muted,#b8b8b8)
   }
 
   @media(max-width:600px) {
@@ -217,7 +217,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:12px;color:#546e7a">Sonnendauer = Anteil der vollen Stunde (60 Minuten).
+  <p style="font-size:12px;color:#626262">Sonnendauer = Anteil der vollen Stunde (60 Minuten).
     Wolken = bedeckter Himmelsanteil am Stundenende. Beide Werte ergänzen sich nicht zu 100 %.
     Die erste Zeile zeigt das laufende Stundenintervall; alle Sonnenwerte sind Modellwerte, keine Messung der PV-Leistung.</p>
   <div class="weather-legend">

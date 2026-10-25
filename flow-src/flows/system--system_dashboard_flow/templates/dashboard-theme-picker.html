@@ -1,0 +1,18 @@
+<div class="gh-theme-picker">
+<h3>Darstellung</h3><p>Design auswählen – sofort sichtbar und auf diesem Browser gespeichert.</p>
+<div class="gh-theme-options" role="group" aria-label="Dashboard Design">
+<button class="gh-theme-option" ng-repeat="option in themes track by option.id" ng-click="chooseTheme(option.id)" aria-pressed="{{selectedTheme === option.id}}">
+<span class="gh-theme-swatch" aria-hidden="true"><span ng-repeat="color in option.colors track by $index" ng-style="{'background-color':color}"></span></span>
+<strong>{{option.name}}</strong><span ng-if="selectedTheme === option.id"> · Ausgewählt</span>
+</button></div><p role="status">{{themeWarning || 'Automatisch gespeichert. Status-, LED- und Preisfarben bleiben erhalten.'}}</p>
+<p>Die Auswahl gilt für diesen Browser und bleibt nach Neuladen und Node-RED-Neustart erhalten. Andere Geräte können ein eigenes Design verwenden. Beim Löschen der Browserdaten wird sie zurückgesetzt.</p>
+</div>
+<script>
+(function(scope){
+ scope.themes=[{"id": "grays", "name": "Grays", "colors": ["#1c1c1c", "#303030", "#242424", "#444444"]}, {"id": "dark", "name": "Dark Mode", "colors": ["#111316", "#202328", "#181b1f", "#353b43"]}, {"id": "blues", "name": "Blues", "colors": ["#17212c", "#253647", "#1d2c3b", "#3c536c"]}, {"id": "greens", "name": "Moderate Greens", "colors": ["#1b2420", "#2c3b33", "#223029", "#445b4c"]}];
+ function sync(){const service=window.GeorgDashboardTheme;scope.selectedTheme=service?service.current:'grays';scope.themeWarning=service?service.warning:'Design-Dienst wird geladen …';}
+ function changed(){scope.$evalAsync(sync);}
+ scope.chooseTheme=function(id){const service=window.GeorgDashboardTheme;if(service){service.apply(id,true);sync();}};
+ window.addEventListener('georg-theme-changed',changed);scope.$on('$destroy',function(){window.removeEventListener('georg-theme-changed',changed);});sync();
+})(scope);
+</script>

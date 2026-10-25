@@ -1,0 +1,48 @@
+<style>
+:root{--gh-page:#1c1c1c;--gh-card:#303030;--gh-inset:#242424;--gh-control:#444444;--gh-border:#626262;--gh-text:#f1f1f1;--gh-muted:#c6c6c6;}
+:root[data-gh-theme="grays"]{--gh-page:#1c1c1c;--gh-card:#303030;--gh-inset:#242424;--gh-control:#444444;--gh-border:#626262;--gh-text:#f1f1f1;--gh-muted:#c6c6c6;}
+:root[data-gh-theme="dark"]{--gh-page:#111316;--gh-card:#202328;--gh-inset:#181b1f;--gh-control:#353b43;--gh-border:#737d89;--gh-text:#f4f5f7;--gh-muted:#c4cbd3;}
+:root[data-gh-theme="blues"]{--gh-page:#17212c;--gh-card:#253647;--gh-inset:#1d2c3b;--gh-control:#3c536c;--gh-border:#8196ae;--gh-text:#f0f5fb;--gh-muted:#c4d3e3;}
+:root[data-gh-theme="greens"]{--gh-page:#1b2420;--gh-card:#2c3b33;--gh-inset:#223029;--gh-control:#445b4c;--gh-border:#8b9e8f;--gh-text:#f1f6f1;--gh-muted:#cad8cc;}
+
+/* Nur Dashboard-Flächen, keine Statuslampen oder Leistungsanzeigen überschreiben. */
+body.nr-dashboard-theme,body.nr-dashboard-theme md-content{background-color:var(--gh-page)!important;color:var(--gh-text)!important}
+body.nr-dashboard-theme md-toolbar,body.nr-dashboard-theme md-sidenav,body.nr-dashboard-theme md-sidenav md-content{background-color:var(--gh-inset)!important;color:var(--gh-text)!important}
+body.nr-dashboard-theme md-card,body.nr-dashboard-theme .nr-dashboard-cardpanel{background-color:var(--gh-card)!important;color:var(--gh-text)!important;border-color:var(--gh-border)!important}
+body.nr-dashboard-theme .nr-dashboard-cardtitle{color:var(--gh-text)!important}
+.gh-theme-picker{color:var(--gh-text);padding:12px}
+.gh-theme-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.gh-theme-option{background:var(--gh-card);color:var(--gh-text);border:1px solid rgba(180,190,200,.25);border-radius:10px;padding:14px;text-align:left;cursor:pointer;min-height:100px}
+.gh-theme-option[aria-pressed="true"]{border-color:var(--gh-text);box-shadow:inset 0 -2px 0 var(--gh-muted)}
+.gh-theme-option:focus-visible{outline:2px solid var(--gh-text);outline-offset:3px}
+.gh-theme-swatch{display:flex;height:22px;margin-bottom:10px;border-radius:5px;overflow:hidden}
+.gh-theme-swatch span{flex:1}
+.gh-theme-picker p{line-height:1.6}
+/* Text braucht keine eigenen Flächen. Konturen nur zur Gliederung der Karten.
+   Semantische Statuschips, LEDs und Preiskennzeichnungen behalten ihre Farben. */
+body.nr-dashboard-theme .nr-dashboard-template :is(h1,h2,h3,h4,h5,h6,p){background:transparent!important;box-shadow:none!important;border:0!important}
+body.nr-dashboard-theme :is(.ha-scheduler .sc-card,.lc-card,.ph-discovery .box){border-color:rgba(180,190,200,.16);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+body.nr-dashboard-theme .nr-dashboard-cardpanel{border-color:rgba(180,190,200,.14)!important}
+body.nr-dashboard-theme :is(.ha-scheduler,.ph-discovery) :is(td,th){border-bottom-color:rgba(180,190,200,.18)}
+</style>
+<script>
+(function(){
+ 'use strict';
+ // Globales Head-Template: kein Angular-scope. Vorhandene Instanz sauber ablösen.
+ if(window.GeorgDashboardTheme && window.GeorgDashboardTheme.dispose)window.GeorgDashboardTheme.dispose();
+ const KEY='georgshome.dashboard.theme.v1';
+ const allowed=['grays','dark','blues','greens'];
+ const normalize=value=>allowed.indexOf(value)>=0?value:'grays';
+ const service={current:'grays',warning:'',apply:function(value,persist){
+  this.current=normalize(value);this.warning='';
+  document.documentElement.setAttribute('data-gh-theme',this.current);
+  if(persist){try{window.localStorage.setItem(KEY,this.current);}catch(e){this.warning='Speichern im Browser nicht möglich. Auswahl gilt nur für diese Sitzung.';}}
+  window.dispatchEvent(new CustomEvent('georg-theme-changed'));
+ }};
+ let initial='grays';try{initial=window.localStorage.getItem(KEY);}catch(e){service.warning='Browserspeicher nicht verfügbar.';}
+ const initialWarning=service.warning;window.GeorgDashboardTheme=service;service.apply(initial,false);service.warning=initialWarning;
+ function storage(event){if(event.key===KEY||event.key===null)service.apply(event.newValue,false);}
+ window.addEventListener('storage',storage);
+ service.dispose=function(){window.removeEventListener('storage',storage);};
+})();
+</script>

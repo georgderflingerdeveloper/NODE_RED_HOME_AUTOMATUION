@@ -4,16 +4,16 @@
   #home-automation-project-status .ha-status-chip { color:#fff; font-size:12px; line-height:18px; white-space:nowrap; }
   #home-automation-project-status .ha-status-branch { max-width:280px; overflow:hidden; text-overflow:ellipsis; }
   #home-automation-project-info-button { min-width:30px; width:30px; height:30px; margin:0 4px 0 0; padding:0; border:1px solid rgba(255,255,255,.8); border-radius:50%; background:transparent; color:#fff; font-size:17px; font-weight:700; cursor:pointer; }
-  #home-automation-project-info-panel { position:fixed; z-index:10000; top:56px; right:12px; width:min(620px,calc(100vw - 24px)); max-height:calc(100vh - 72px); overflow:auto; box-sizing:border-box; padding:16px; border:1px solid #456367; border-radius:11px; background:#1d2d2f; color:#eaf5f6; box-shadow:0 10px 28px rgba(0,0,0,.45); font-family:Roboto,Arial,sans-serif; }
+  #home-automation-project-info-panel { position:fixed; z-index:10000; top:56px; right:12px; width:min(620px,calc(100vw - 24px)); max-height:calc(100vh - 72px); overflow:auto; box-sizing:border-box; padding:16px; border:1px solid var(--gh-border,#626262); border-radius:11px; background:var(--gh-card,#303030); color:var(--gh-text,#f1f1f1); box-shadow:0 10px 28px rgba(0,0,0,.45); font-family:Roboto,Arial,sans-serif; }
   #home-automation-project-info-panel[hidden] { display:none; }
   #home-automation-project-info-panel h3 { margin:0 0 5px; color:#fff; font-size:17px; }
-  #home-automation-project-info-panel .ha-branch-name { margin:0 0 9px; color:#73dfe5; font-family:monospace; overflow-wrap:anywhere; }
-  #home-automation-project-info-panel .ha-branch-purpose { margin:0 0 14px; padding:10px 12px; border-left:3px solid #61d6dd; background:#162729; line-height:1.45; }
+  #home-automation-project-info-panel .ha-branch-name { margin:0 0 9px; color:var(--gh-muted,#c6c6c6); font-family:monospace; overflow-wrap:anywhere; }
+  #home-automation-project-info-panel .ha-branch-purpose { margin:0 0 14px; padding:10px 12px; border-left:3px solid var(--gh-muted,#c6c6c6); background:var(--gh-inset,#242424); line-height:1.45; }
   #home-automation-project-info-panel .ha-info-grid { display:grid; grid-template-columns:repeat(2,minmax(200px,1fr)); gap:0 18px; }
-  #home-automation-project-info-panel .ha-info-row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid #395357; font-size:12px; }
-  #home-automation-project-info-panel .ha-info-label { color:#9bb5b8; }
+  #home-automation-project-info-panel .ha-info-row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--gh-control,#444444); font-size:12px; }
+  #home-automation-project-info-panel .ha-info-label { color:var(--gh-muted,#c6c6c6); }
   #home-automation-project-info-panel .ha-info-value { color:#fff; text-align:right; font-family:monospace; overflow-wrap:anywhere; }
-  #home-automation-project-info-panel .ha-overview { margin:12px 0 0; padding-left:20px; color:#c9dfe1; font-size:12px; line-height:1.6; }
+  #home-automation-project-info-panel .ha-overview { margin:12px 0 0; padding-left:20px; color:var(--gh-muted,#c6c6c6); font-size:12px; line-height:1.6; }
   @media (max-width:900px) { #home-automation-project-status .ha-status-name, #home-automation-project-status .ha-status-project { display:none; } #home-automation-project-status .ha-status-branch { max-width:190px; } }
   @media (max-width:520px) { #home-automation-project-status .ha-status-branch { max-width:125px; } #home-automation-project-info-panel .ha-info-grid { grid-template-columns:1fr; } }
 </style>
@@ -131,3 +131,18 @@
   setTimeout(loadProjectInfo, 250);
 })();
 </script>
+
+<style>
+/* GEORGSHOME GRAUSTUFEN v0.14.2: Fokus und Bedienzustände zentral anpassen.
+   Keine Größen-/Layoutänderungen; Statusfarben bleiben in den Fachtemplates. */
+body.nr-dashboard-theme :is(button,input,select,textarea,a,summary):focus-visible {
+ outline:2px solid #f0f0f0 !important;outline-offset:3px;
+}
+body.nr-dashboard-theme :is(button,input,select,textarea):disabled {
+ cursor:not-allowed;opacity:.55;
+}
+body.nr-dashboard-theme :is(input,select,textarea) {color-scheme:dark;}
+body.nr-dashboard-theme button:not(:disabled):hover {filter:brightness(1.13);}
+body.nr-dashboard-theme button:not(:disabled):active {filter:brightness(.90);}
+body.nr-dashboard-theme table {font-variant-numeric:tabular-nums;}
+</style>
