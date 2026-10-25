@@ -89,3 +89,19 @@ get einen Snapshot an. Späterer Schreibadapter muss separat freigegeben werden.
 SDK-Vertrag anhand des Quellcodes von 2.19.1 geprüft; Tests verwenden simulierte Antworten.
 Dein echter Gerätebestand und deine Cloud-Zugangsdaten sind hier nicht verfügbar.
 Die erste Live-Abnahme erfolgt nach deiner lokalen Autorisierung.
+
+## Erweiterte Geräteübersicht · v0.17.0
+
+Die Übersicht zeigt pro Gerät die gemeldeten Ist- und Solltemperaturen,
+Luftfeuchte, Ventilöffnung, Fenster-/Türzustände, Schaltzustände und weitere
+unterstützte Messwerte (z. B. Leistung, Energie, Helligkeit und Bewegung).
+Mehrere gleichartige Messwerte bleiben mit Kanalbezeichnung getrennt sichtbar.
+Nicht gemeldete Werte werden nicht als Null interpretiert. Die vollständigen
+Rohdatenpunkte bleiben pro Gerät aufklappbar.
+
+Zähler fassen Gerätebestand, aktuell erreichbare Geräte, Offline-/fehlende
+Geräte, schwache Batterien und veraltete Zustände zusammen. Suche, Raumfilter
+und „Nur Warnungen“ lassen sich kombinieren. Die Raumwahl verwendet die vom
+Cloud-Adapter gemeldete Raumzuordnung (gegebenenfalls mehrere Räume zusammen).
+Veraltete und fehlende Geräte behalten ihre letzten bekannten Werte mit
+sichtbarem Hinweis; Aktualisieren bleibt an das Abfrageintervall gebunden.

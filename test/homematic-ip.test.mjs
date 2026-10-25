@@ -52,3 +52,26 @@ test('HAP dashboard: Update bewahrt Suchtext und offene Details; Link-Schnittste
  const nodes=JSON.parse(fs.readFileSync('flows.json'));assert.equal(nodes.find(n=>n.id==='hmip_ui').fwdInMessages,false);assert.deepEqual(nodes.find(n=>n.id==='hmip_link_out').links,[]);
 });
 test('Python bridge: Sanitizing, atomic private credentials and mocked SDK contract',()=>{execFileSync('python3',['-m','unittest','discover','-s','test/homematic','-p','test_*.py'],{stdio:'pipe'});});
+test('HAP dashboard: Messwerte, Mehrkanäle, Nullwerte, Warnungen und Filter',()=>{
+ const html=fs.readFileSync('flow-src/flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html','utf8');
+ const watches={};const scope={$watch:(key,fn)=>watches[key]=fn,send:()=>{}};
+ vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],{scope});
+ const raw=sample();Object.assign(raw.devices.dev1.functionalChannels[1],{setPointTemperature:22,humidity:0,valvePosition:0.35,windowState:'CLOSED'});
+ raw.devices.dev1.functionalChannels[2]={actualTemperature:0,on:true};
+ const rows=normalize(raw).rows;
+ watches.msg({topic:'homematic-ip/state',payload:{rows:[...rows,{...rows[0],id:'warn',rooms:'Bad',lowBattery:true,quality:'stale'}]}});
+ const metrics=scope.state.rows[0].metrics;
+ assert.equal(metrics.find(m=>m.name==='1.setPointTemperature').text,'22');
+ assert.equal(metrics.find(m=>m.name==='1.valvePosition').text,'35');
+ assert.equal(metrics.find(m=>m.name==='1.humidity').text,'0');
+ assert.equal(metrics.find(m=>m.name==='2.actualTemperature').text,'0');
+ assert.equal(metrics.find(m=>m.name==='1.actualTemperature').channel,'1');
+ assert.equal(metrics.find(m=>m.name==='2.actualTemperature').channel,'2');
+ assert.equal(metrics.find(m=>m.name==='1.on').text,'Aus');
+ assert.equal(metrics.find(m=>m.name==='1.windowState').text,'Geschlossen');
+ assert.equal(scope.summary.battery,1);assert.equal(scope.summary.stale,1);assert.equal(scope.summary.current,1);
+ scope.warningsOnly=true;watches.warningsOnly();assert.equal(scope.visibleRows.length,1);assert.equal(scope.visibleRows[0].id,'warn');
+ scope.room='Küche';watches.room();assert.equal(scope.visibleRows.length,0);
+ scope.warningsOnly=false;scope.query='test-serial';watches.query();assert.equal(scope.visibleRows.length,1);
+ watches.msg({topic:'homematic-ip/state'});assert.equal(scope.state.rows.length,2);
+});
