@@ -83,7 +83,7 @@ tariff.dashboard = {
 
 flow.set("aWATTarCurrentTariff", tariff);
 global.set("aWATTarCurrentTariff", tariff);
-node.status({ fill: "green", shape: "dot", text: priceCtPerKWh.toFixed(3) + " ct/kWh" });
+node.status({ fill: "green", shape: "dot", text: priceCtPerKWh.toFixed(2) + " ct/kWh" });
 
 msg.topic = "aWATTar/tariff/current";
 msg.payload = tariff;

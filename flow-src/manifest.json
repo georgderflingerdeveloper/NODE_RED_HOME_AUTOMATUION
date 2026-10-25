@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "a1ca4b9b1cc076bac838afbbbca8636ab2aea80c45ac9b61440c6d2649d4f4ff",
+  "flowSha256": "0f9467d61879c7e4114a335aa7553c30fcfff04a68f50fa8b798ea2bc744b0d6",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1278,7 +1278,7 @@
   "functionLibraryFiles": {
     "anteroom-gallery-up/light-command-anteroom-gallery-up.js": "b84884c5dc26cc8e1bb2fd6fa748317731722d249da9e7101d903bf7da9cc6a6",
     "boiler/boiler-command.js": "636f52fe7ba8c35058a7387896bc90a2e100cba606dd4773ce3f11651c504a00",
-    "energy-forecast/build-provider-neutral-energy-forecast.js": "46e36bd013575bd21b4503944c77eb8f69044e1790db90c069a2ba301847070a",
+    "energy-forecast/build-provider-neutral-energy-forecast.js": "4df535c29b5c8e13162b4402dd133c753762e7de964a6312fe0fafb5efb2368f",
     "energy-forecast/read-energy-forecast-data.js": "82ffc3995ebd5f2789319f4cdb63cc54dff5540a9eab1c11d649d2c1d2013463",
     "flow-plug-ir/plug-ir.js": "20dfb7241056c3d4036a05ed278d17ab6fe580dd2d14ed3447303fbbc1cf3135",
     "flow-westside/light-command-all-lights-west.js": "2881a9560f63cf19aba1ea3171c1e320d283d29ad970f6086697db8de20f4af7",
@@ -1286,7 +1286,7 @@
     "global/function.js": "d026bba53afcdec70a5b8ff3c7fa908747b2a26096a82c78d87227b562d2ae74",
     "heater-kid-room/heater-kid.js": "76288c5bdfa2fc79cef2709f49365bd056d5fd078c9895cf2cc8155c13e01b15",
     "home/command-all.js": "ca9a3fc0569c7ee069f9aa664c41f1209a3c4809352a751f7a4723e3023e8e45",
-    "kosten/aktuellen-awattar-tarif-aufbereiten.js": "8c0949490f0e5780976c6828295b1ef3cba5ec2b3171a19a1a46c5f1156b8eba",
+    "kosten/aktuellen-awattar-tarif-aufbereiten.js": "07d5e27b8277d4380c14191483d17787f471915b7ab3187220909ddf6c4247cf",
     "kosten/route-cost-dashboard-request.js": "73e4f0bc1d15a45e077447e3819e0bc7fb7bd49cfd220c948b7b3245bf7e3d7e",
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
     "light-bath-all/light-command-bathroom-all.js": "9e29a2a2c99c414cbe6f7e65ecbd8af29381e849a14b5e5b67960fc35c7a26a5",
@@ -1372,7 +1372,7 @@
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
     "flows/boiler--15e47868.0e5ea8/nodes.json": "34e896821cb3cd9b788fcea4ccc5ac8759b7fbda89dcab639018848368661c03",
     "flows/datenbank--datenbank_flow/nodes.json": "5fb5f39ae67cda24d17aa48c2570a735ba285cc417d368c2e8185f43417c417e",
-    "flows/energy-forecast--energy_forecast_flow/functions/build-provider-neutral-energy-forecast.js": "d5f137dd5592173b313df77605d955736833f3737ee1c68f0cb19c7316a0aabe",
+    "flows/energy-forecast--energy_forecast_flow/functions/build-provider-neutral-energy-forecast.js": "5959520b0cfe377ad57633f5b65133782254f3765dc5f8b9a5466764d4daede6",
     "flows/energy-forecast--energy_forecast_flow/functions/read-energy-forecast-data.js": "0ed1c38c40f06c311aa4afb57ae402d11c4a76eb77558824a883d7382884e887",
     "flows/energy-forecast--energy_forecast_flow/nodes.json": "d97ad31a6cb26a2398c12df1bca8720a66240cb48dd1318c01c0be048d95b598",
     "flows/flow-anteroom--1f4c4ae3.09c2f5/nodes.json": "dc8335c281afbb1ff10d26f19d0f877f2db35d99d0efc250c6e6cd8f4219323b",
@@ -1400,10 +1400,10 @@
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
     "flows/homematic-ip--hmip_flow/nodes.json": "0b1254ee9b4ec1f982d2dcf6570013134fe7341c24c0a733b83896c7c4e579fb",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "08f22b77894aff1b6be9a4d350aa61fb4998e2e610d7d041932dd512a1a051fe",
-    "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "3533971c7dfd0e01b8f0a042cfae91ad789ff3b383217c64dce65610ed8021d7",
+    "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "8cbd096590566a6fb1a33b40614b16c03d101ce9f9dddf817f0a930679946aaf",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "e500f17f36e212aac57d9c91276460203339ed1c45cda239fd64195311510a44",
     "flows/kosten--kosten_flow/nodes.json": "8d559cf78152ad28ed25a16b88d2fb923a013f7341dc202d98a339e76d1f780e",
-    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "039cbfd187259f671a7999d769808c51e34355147851ef3f3480e0e7f23c4d54",
+    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "faa06c37601efeb3df6bd05942cbec752cff33c2103e3724c69fdbb7d7699f59",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",

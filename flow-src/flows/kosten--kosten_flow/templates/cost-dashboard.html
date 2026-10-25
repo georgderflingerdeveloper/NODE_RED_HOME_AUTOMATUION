@@ -136,6 +136,11 @@
 .cost-price-tag.price-high {color:#ffb46b!important;}
 .cost-price-tag.price-expensive {color:#ff9292!important;}
 .cost-price-tag.price-unknown {color:var(--gh-muted,#c6c6c6)!important;}
+.cost-range-price {border:2px solid currentColor;border-radius:6px;padding:4px 9px;margin:4px 2px;font-size:16px;line-height:1.4;white-space:nowrap;}
+.cost-range-result {margin:12px 0;padding:14px;border:1px solid var(--gh-border,#626262);border-radius:10px;}
+.cost-range-current {margin:8px 0;}
+.cost-range-current .cost-range-price {font-size:26px;border-width:3px;padding:8px 12px;max-width:100%;box-sizing:border-box;}
+.cost-range-price-label {display:block;font-weight:700;}
 .cost-price-legend {font-size:12px;line-height:1.8;margin:8px 0;}
 </style>
 
@@ -161,10 +166,15 @@
   <p role="status">{{rangePending ? 'Wird berechnet …' : rangeError}}</p>
   <div ng-if="rangeResult">
    <p>{{rangeDate(rangeResult.from)}} – {{rangeDate(rangeResult.to)}} (Ende exklusiv)</p>
-   <div ng-repeat="item in rangeItems track by item.key">
-    <strong>{{item.label}}</strong>: {{rangeNumber(rangeResult.metrics[item.key].kwh,6)}} kWh ·
-    {{rangeNumber(rangeResult.metrics[item.key].costEur,6)}} € ·
-    <span class="cost-price-tag" ng-class="priceClass(rangeResult.metrics[item.key].priceCtKwh)">{{rangeNumber(rangeResult.metrics[item.key].priceCtKwh,6)}} ct/kWh</span> (verbrauchsgewichtet)
+   <div class="cost-range-result" ng-repeat="item in rangeItems track by item.key">
+    <strong>{{item.label}}</strong>
+    <div class="cost-range-current">
+     <span class="cost-range-price-label">Akkumulierter Preis im gewählten Zeitraum</span>
+     <strong class="cost-price-tag cost-range-price" ng-class="priceClass(rangeResult.metrics[item.key].priceCtKwh)">{{rangeNumber(rangeResult.metrics[item.key].priceCtKwh,2)}} ct/kWh</strong>
+     <span>verbrauchsgewichtet</span>
+    </div>
+    {{rangeNumber(rangeResult.metrics[item.key].kwh,6)}} kWh ·
+    <strong class="cost-price-tag cost-range-price" ng-class="priceClass(rangeResult.metrics[item.key].priceCtKwh)">{{rangeNumber(rangeResult.metrics[item.key].costEur,2)}} €</strong> gesamt
     <br>Bepreiste Energie: {{rangeNumber(rangeResult.metrics[item.key].pricedKwh,6)}} kWh ·
     Intervallabdeckung: {{rangeNumber(rangeResult.metrics[item.key].coveragePercent,2)}} % ·
     mit Tarif: {{rangeNumber(rangeResult.metrics[item.key].pricedCoveragePercent,2)}} %
@@ -188,9 +198,9 @@
  </div>
  <p role="status">{{billMessage}}</p>
  <div ng-if="billSaved">
-  <p>Gespeichert: {{billSaved.month}} · {{billSaved.kwh}} kWh · {{billSaved.totalEur}} € Rechnungsbetrag</p>
+  <p>Gespeichert: {{billSaved.month}} · {{billSaved.kwh}} kWh · {{billSaved.totalEur | number:2}} € Rechnungsbetrag</p>
   <p ng-if="billComparison.metrics">Erfasster Netzbezug: {{rangeNumber(billComparison.metrics.grid.kwh,6)}} kWh ·
-   Berechnete Energiekosten: {{rangeNumber(billComparison.metrics.grid.costEur,6)}} € ·
+   Berechnete Energiekosten: {{rangeNumber(billComparison.metrics.grid.costEur,2)}} € ·
    Abdeckung: {{rangeNumber(billComparison.metrics.grid.coveragePercent,2)}} %</p>
   <p>{{billDifference()}}</p>
   <p ng-repeat="warning in billComparison.warnings track by $index">{{warning}}</p>
@@ -346,7 +356,7 @@
     const m=scope.billComparison && scope.billComparison.metrics && scope.billComparison.metrics.grid,b=scope.billSaved;
     if(!m||!b||!b.revision)return '';
     if(!m.complete)return 'Kein belastbarer Monatsvergleich: Daten oder Tarife fehlen.';
-    return 'Erfasst minus Abrechnung: '+scope.rangeNumber(m.kwh-Number(b.kwh),6)+' kWh'+(b.energyEur!==''?' · Energiekosten: '+scope.rangeNumber(m.costEur-Number(b.energyEur),6)+' €':'');
+    return 'Erfasst minus Abrechnung: '+scope.rangeNumber(m.kwh-Number(b.kwh),6)+' kWh'+(b.energyEur!==''?' · Energiekosten: '+scope.rangeNumber(m.costEur-Number(b.energyEur),2)+' €':'');
   };
   // Eigenständige Abfrage: Live-Updates ändern weder Eingaben noch Ergebnis.
   scope.setRangePreset('yesterday');
@@ -429,7 +439,7 @@
   <div class="cost-head">
     <div class="cost-kpi">
       <div class="cost-kpi-label">Aktueller aWATTar-Preis</div>
-      <div class="cost-kpi-value">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:3}} ct/kWh</div>
+      <div class="cost-kpi-value">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:2}} ct/kWh</div>
       <div class="cost-kpi-note">reiner Börsenpreis, ohne Gebühren</div>
     </div>
     <div class="cost-kpi cost-house-power" ng-style="housePowerStyle(view.history.live.houseConsumptionWatt)">
@@ -439,8 +449,8 @@
     </div>
     <div class="cost-kpi secondary">
       <div class="cost-kpi-label">Verbrauchswert bei aktueller Hausleistung</div>
-      <div class="cost-kpi-value">{{view.history.live.energyValuePerHourEur | currency:'€':4}} / h</div>
-      <div class="cost-kpi-note">Netzkosten aktuell {{view.history.live.gridImportCostPerHourEur | currency:'€':4}} / h</div>
+      <div class="cost-kpi-value">{{view.history.live.energyValuePerHourEur | currency:'€':2}} / h</div>
+      <div class="cost-kpi-note">Netzkosten aktuell {{view.history.live.gridImportCostPerHourEur | currency:'€':2}} / h</div>
     </div>
     <div class="cost-kpi">
       <div class="cost-kpi-label">Verbrauchswert im Zeitraum</div>
@@ -486,15 +496,15 @@
       </div>
       <div class="cost-forecast-field">
         <span>Aktueller Prognosepreis</span>
-        <b>{{view.forecast.Current ? (view.forecast.Current.PriceCtPerKWh | number:3) + ' ct/kWh' : '—'}}</b>
+        <b>{{view.forecast.Current ? (view.forecast.Current.PriceCtPerKWh | number:2) + ' ct/kWh' : '—'}}</b>
       </div>
       <div class="cost-forecast-field">
         <span>Günstig bis</span>
-        <b>{{view.forecast.Thresholds.CheapCtPerKWh === null ? '—' : (view.forecast.Thresholds.CheapCtPerKWh | number:3) + ' ct/kWh'}}</b>
+        <b>{{view.forecast.Thresholds.CheapCtPerKWh === null ? '—' : (view.forecast.Thresholds.CheapCtPerKWh | number:2) + ' ct/kWh'}}</b>
       </div>
       <div class="cost-forecast-field">
         <span>Teuer ab</span>
-        <b>{{view.forecast.Thresholds.ExpensiveCtPerKWh === null ? '—' : (view.forecast.Thresholds.ExpensiveCtPerKWh | number:3) + ' ct/kWh'}}</b>
+        <b>{{view.forecast.Thresholds.ExpensiveCtPerKWh === null ? '—' : (view.forecast.Thresholds.ExpensiveCtPerKWh | number:2) + ' ct/kWh'}}</b>
       </div>
       <div class="cost-forecast-field">
         <span>KI-Erweiterung</span>
@@ -533,11 +543,11 @@
       </div>
       <div class="cost-anchor-value">
         <span>Vergleichskosten vom Netz</span>
-        <b>{{view.history.latestReconciliation.importComparisonCostEur | currency:'€':4}}</b>
+        <b>{{view.history.latestReconciliation.importComparisonCostEur | currency:'€':2}}</b>
       </div>
       <div class="cost-anchor-value">
         <span>Vergleichswert ins Netz</span>
-        <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':4}}</b>
+        <b>{{view.history.latestReconciliation.exportComparisonValueEur | currency:'€':2}}</b>
       </div>
     </div>
     <div class="cost-anchor-note" ng-if="view.history.latestReconciliation.quality !== 'partial-day'">
@@ -545,7 +555,7 @@
       Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh ·
       PV {{view.history.latestReconciliation.fallbackPvProductionKWh | number:3}} kWh ·
       Hausverbrauch {{view.history.latestReconciliation.fallbackHouseConsumptionKWh | number:3}} kWh.
-      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:3}} ct/kWh Börsenpreis;
+      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:2}} ct/kWh Börsenpreis;
       keine Netzentgelte und keine vertragliche Einspeisevergütung.
     </div>
     <div class="cost-anchor-grid" ng-if="view.history.latestReconciliation.quality === 'partial-day'">
@@ -589,8 +599,8 @@ Preis je kWh:
           <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
           <td>{{row.gridImportKWh | number:3}} kWh</td>
           <td>{{row.pvEnergyKWh | number:3}} kWh</td>
-          <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur | currency:'€':3}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur * 100 | number:2}} ct</span></span></td>
-          <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,true))">{{row.gridImportCostEur | currency:'€':4}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,true))">{{row.gridImportCostEur * 100 | number:3}} ct</span></span></td>
+          <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur | currency:'€':2}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur * 100 | number:2}} ct</span></span></td>
+          <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,true))">{{row.gridImportCostEur | currency:'€':2}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,true))">{{row.gridImportCostEur * 100 | number:2}} ct</span></span></td>
           <td>
             {{row.averageTemperatureC === null ? '—' : (row.averageTemperatureC | number:1) + ' °C'}}
             <br><span ng-class="{'cost-offline':row.recordedHourCount && row.weatherOfflineCount>0}">
@@ -608,18 +618,18 @@ Preis je kWh:
                 <span class="cost-current-label" ng-if="isCurrentCostHour(hour)">aktuelle Stunde</span>
                 <b>{{hour.time}} Uhr</b><br>
                 <span ng-if="hour.recorded">
-                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:3}} ct/kWh</span>
+                  Haus {{hour.houseConsumptionKWh | number:3}} kWh × <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:2}} ct/kWh</span>
                   <div class="cost-hour-price">
-                    <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.energyCostEur | currency:'€':4}}</span>
+                    <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.energyCostEur | currency:'€':2}}</span>
                     <span class="cost-hour-cents">· <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.energyCostEur * 100 | number:2}} ct</span></span>
                   </div>
                   <span class="cost-muted">
                     Netz {{hour.gridImportKWh | number:3}} kWh ·
-                    <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.gridImportCostEur | currency:'€':4}}</span> · <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.gridImportCostEur * 100 | number:3}} ct</span>
+                    <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.gridImportCostEur | currency:'€':2}}</span> · <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.gridImportCostEur * 100 | number:2}} ct</span>
                   </span><br>
                 </span>
                 <span ng-if="!hour.recorded">
-                  Stundenpreis <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:3}} ct/kWh</span><br>
+                  Stundenpreis <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:2}} ct/kWh</span><br>
                   <span class="cost-muted">Noch keine Verbrauchsdaten · Kosten folgen nach der Messung.</span><br>
                 </span>
                 <span ng-if="hour.recorded">
