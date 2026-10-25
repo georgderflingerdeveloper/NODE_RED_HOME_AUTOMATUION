@@ -52,8 +52,8 @@
     "markup": "717be7bcc235470b983fd53e06d46e20ffb0a77bb91f6eb9bdbc76b5491541b9"
   },
   "flow-src/flows/kosten--kosten_flow/templates/cost-dashboard.html": {
-    "scripts": "39144fe5ef3b5f149b35b129e85186edfa0d3ae5528a2f83b71a62e37f786608",
-    "markup": "ff8a8a0b83575fb7660461650f0fcaea06e5eaa17c9bae4a9eb21dfbd36c66f5"
+    "scripts": "fbb408a180ee40e200a8b641fdca2bc4ca402b3e704ad3e15024dc22e597e092",
+    "markup": "95cba958d691c4d7a8dbdae4989f61cd17bcf3b220ac926b50621587534073b7"
   },
   "flow-src/flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": {
     "scripts": "142233f56090b691b9bf2cd4d4632de1e7248d4de499eee0e2a128e241ff4a58",

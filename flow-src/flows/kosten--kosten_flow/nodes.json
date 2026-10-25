@@ -157,7 +157,8 @@
     "y": 300,
     "wires": [
       [
-        "kosten_dashboard_template"
+        "kosten_dashboard_template",
+        "solaredge_compare_ui"
       ]
     ]
   },
@@ -323,6 +324,31 @@
     "wires": [
       [
         "kosten_forecast_provider_out"
+      ]
+    ]
+  },
+  {
+    "id": "solaredge_compare_ui",
+    "type": "ui_template",
+    "z": "kosten_flow",
+    "group": "solaredge_compare_group",
+    "name": "SolarEdge Cloud vs lokal",
+    "order": 1,
+    "width": 24,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/kosten--kosten_flow/templates/solaredge-comparison.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 985,
+    "y": 540,
+    "wires": [
+      [
+        "kosten_dashboard_request_router"
       ]
     ]
   }

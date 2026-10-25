@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "0f9467d61879c7e4114a335aa7553c30fcfff04a68f50fa8b798ea2bc744b0d6",
+  "flowSha256": "48f1ca1b10f478ed4a617e0aafaffc1d2a75f32dbd28f130ee1d994030516eaa",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -638,7 +638,10 @@
     "hmip_reader",
     "hmip_link_out",
     "hmip_ui",
-    "hmip_comment"
+    "hmip_comment",
+    "solaredge_compare_tab",
+    "solaredge_compare_group",
+    "solaredge_compare_ui"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -762,6 +765,8 @@
     "gh_theme_group": "configuration/nodes.json",
     "hmip_ui_tab": "configuration/nodes.json",
     "hmip_ui_group": "configuration/nodes.json",
+    "solaredge_compare_tab": "configuration/nodes.json",
+    "solaredge_compare_group": "configuration/nodes.json",
     "956c65fc.759a28": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "f4f718ca.73ad78": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "5e8c7091.07116": "flows/boiler--15e47868.0e5ea8/nodes.json",
@@ -961,6 +966,7 @@
     "kosten_forecast_result_in": "flows/kosten--kosten_flow/nodes.json",
     "kosten_forecast_provider_catch": "flows/kosten--kosten_flow/nodes.json",
     "kosten_forecast_provider_offline": "flows/kosten--kosten_flow/nodes.json",
+    "solaredge_compare_ui": "flows/kosten--kosten_flow/nodes.json",
     "ed728d49.43d96": "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json",
     "4bc9db11.460844": "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json",
     "5138ce61.f5ce7": "flows/light-bath-all--3486c1a7.a51b3e/nodes.json",
@@ -1366,12 +1372,12 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "89096a9229abb1f7d4467639bedfd2e220e8c70b9d4851d0372ac8db78f8e451",
+    "configuration/nodes.json": "a08ef4b54218755413a1cf1db0a107c17dc5c496965137046d90d1b02c27a657",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
     "flows/boiler--15e47868.0e5ea8/nodes.json": "34e896821cb3cd9b788fcea4ccc5ac8759b7fbda89dcab639018848368661c03",
-    "flows/datenbank--datenbank_flow/nodes.json": "5fb5f39ae67cda24d17aa48c2570a735ba285cc417d368c2e8185f43417c417e",
+    "flows/datenbank--datenbank_flow/nodes.json": "18c5f28f544697f12ef10736bd8e1f0321c56a7063f6b3d4f18fe6f26b66d2ad",
     "flows/energy-forecast--energy_forecast_flow/functions/build-provider-neutral-energy-forecast.js": "5959520b0cfe377ad57633f5b65133782254f3765dc5f8b9a5466764d4daede6",
     "flows/energy-forecast--energy_forecast_flow/functions/read-energy-forecast-data.js": "0ed1c38c40f06c311aa4afb57ae402d11c4a76eb77558824a883d7382884e887",
     "flows/energy-forecast--energy_forecast_flow/nodes.json": "d97ad31a6cb26a2398c12df1bca8720a66240cb48dd1318c01c0be048d95b598",
@@ -1402,8 +1408,9 @@
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "08f22b77894aff1b6be9a4d350aa61fb4998e2e610d7d041932dd512a1a051fe",
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "8cbd096590566a6fb1a33b40614b16c03d101ce9f9dddf817f0a930679946aaf",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "e500f17f36e212aac57d9c91276460203339ed1c45cda239fd64195311510a44",
-    "flows/kosten--kosten_flow/nodes.json": "8d559cf78152ad28ed25a16b88d2fb923a013f7341dc202d98a339e76d1f780e",
-    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "faa06c37601efeb3df6bd05942cbec752cff33c2103e3724c69fdbb7d7699f59",
+    "flows/kosten--kosten_flow/nodes.json": "e5ece433d499fa777115ec5a79b46e37ac3b96d3be0caa60c00392575558506e",
+    "flows/kosten--kosten_flow/templates/cost-dashboard.html": "a9aea954c698ce86894fee56e42b6b03c24abcaf6c7eab96c796c27dc7fb03e5",
+    "flows/kosten--kosten_flow/templates/solaredge-comparison.html": "85c2050c4d008c460dd3f917d808712c8f8d521d5e993df6667e8e2c6d2e2ebf",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",

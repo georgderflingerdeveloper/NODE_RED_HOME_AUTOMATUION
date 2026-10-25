@@ -58,7 +58,10 @@
       [
         "datenbank_result_router"
       ]
-    ]
+    ],
+    "cloudSiteId": "",
+    "cloudAuto": true,
+    "cloudLookbackDays": 7
   },
   {
     "id": "datenbank_history_debug",
@@ -257,15 +260,23 @@
         "vt": "str"
       },
       {
+        "t": "eq",
+        "v": "history/solar/result",
+        "vt": "str"
+      },
+      {
         "t": "else"
       }
     ],
     "checkall": "true",
     "repair": false,
-    "outputs": 6,
+    "outputs": 7,
     "x": 950,
     "y": 240,
     "wires": [
+      [
+        "datenbank_dashboard_out"
+      ],
       [
         "datenbank_dashboard_out"
       ],

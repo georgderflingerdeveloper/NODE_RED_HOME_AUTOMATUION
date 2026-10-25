@@ -1,0 +1,82 @@
+<style>
+.se-compare{padding:16px;color:var(--gh-text,#f1f1f1);font-size:14px}.se-compare h3{margin:8px 0 14px}.se-compare .se-local{color:#78c8ff!important}.se-compare .se-cloud{color:#d6a4ff!important}.se-compare .se-warning{color:#ffd166}.se-compare .se-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:12px 0}.se-compare label{display:flex;flex-direction:column;gap:6px}.se-compare button,.se-compare select,.se-compare input{padding:9px;border:1px solid var(--gh-border,#626262);border-radius:6px;background:var(--gh-control,#444);color:inherit;min-height:42px}.se-compare input[type=date]{background:#fff;color:#222;color-scheme:light}.se-compare button:disabled{opacity:.45}.se-compare .se-info,.se-compare .se-summary{padding:14px;border:1px solid var(--gh-border,#626262);border-radius:9px;background:var(--gh-card,#303030);margin:12px 0}.se-compare .se-scroll{overflow:auto;max-height:620px}.se-compare table{width:100%;border-collapse:collapse;font-size:13px}.se-compare th,.se-compare td{padding:9px;border-bottom:1px solid var(--gh-border,#626262);text-align:left;white-space:nowrap}.se-compare th{position:sticky;top:0;background:var(--gh-card,#303030)}.se-compare .se-graph-scroll{overflow-x:auto}.se-compare svg{width:100%;min-width:640px;height:320px;display:block;cursor:crosshair;touch-action:pan-y}.se-compare .se-slider{display:block;width:100%;padding:0;accent-color:#d6a4ff}.se-compare button:focus-visible,.se-compare input:focus-visible{outline:2px solid #b6f29c}.se-compare .se-readout{min-height:44px;line-height:1.6}.se-compare small{color:var(--gh-muted,#c6c6c6)}
+</style>
+<div class="se-compare">
+ <h3>SolarEdge · App vs lokale Aufzeichnung</h3>
+ <div class="se-info">
+  <strong>Cloud-Anbindung: {{cloud.configured ? 'Eingerichtet' : 'Noch nicht eingerichtet'}}</strong>
+  <p ng-if="!cloud.configured">Im Node-RED-Flow DATENBANK den Knoten „Home Automation Historie“ öffnen und SolarEdge-Anlagen-ID sowie API-Schlüssel hinterlegen. Der Schlüssel wird ausschließlich auf dem Server gespeichert.</p>
+  <p>Automatisches Nachladen: {{cloud.auto ? 'Aktiv (alle 6 Stunden)' : 'Inaktiv'}} · Letzter Erfolg: {{cloud.lastSuccess ? date(cloud.lastSuccess) : '—'}}</p>
+  <p class="se-warning" ng-if="cloud.error">{{cloud.error}}</p>
+  <p class="se-warning" ng-if="cloud.skipped">{{cloud.skipped}} nicht eindeutig zuordenbare oder doppelte Cloud-Werte ausgelassen (z. B. Zeitumstellung).</p>
+  <small>Quelle Cloud: <a href="https://www.solaredge.com" target="_blank" rel="noopener">SolarEdge Monitoring</a> · Datenquelle der mySolarEdge-App. Lokale Originalwerte bleiben erhalten. Die letzten zwei Stunden werden wegen Cloud-Verzögerung nicht nachgeladen.</small>
+ </div>
+ <div class="se-controls">
+  <label>Von (Wien, 00:00)<input type="date" ng-model="form.from" aria-label="Vergleich Datum von"></label>
+  <label>Bis exklusiv (Wien, 00:00)<input type="date" ng-model="form.to" aria-label="Vergleich Datum bis"></label>
+  <button ng-click="preset('yesterday')">Gestern</button><button ng-click="preset('week')">Letzte 7 Tage</button>
+  <button ng-click="compare()" ng-disabled="pending">{{pending ? 'Wird geladen …' : 'Daten laden und vergleichen'}}</button>
+ </div>
+ <p role="status">{{message}}</p>
+ <div ng-if="result">
+  <p>{{date(result.from)}} – {{date(result.to)}} · Europe/Vienna</p>
+  <p><strong class="se-local">■ Lokal / Modbus</strong> · <strong class="se-cloud">■ SolarEdge-Cloud</strong> · Differenzen beziehen sich auf dieselben gültigen Stunden.</p>
+  <div class="se-summary se-scroll"><table>
+   <thead><tr><th>Messgröße</th><th class="se-local">Lokal (alle gültigen)</th><th class="se-cloud">Cloud (alle verfügbaren)</th><th>Gemeinsame Stunden</th><th class="se-local">Lokal (gemeinsam)</th><th class="se-cloud">Cloud (gemeinsam)</th><th>Δ lokal − Cloud</th><th>Ergänzte Stunden</th></tr></thead>
+   <tbody><tr ng-repeat="m in metrics track by m.key"><td>{{m.label}}</td><td class="se-local">{{number(result.summary[m.key].localKwh,3)}} kWh<br>{{result.summary[m.key].localHours}} h</td><td class="se-cloud">{{number(result.summary[m.key].cloudKwh,3)}} kWh<br>{{result.summary[m.key].cloudHours}} h</td><td>{{result.summary[m.key].pairedHours}}</td><td class="se-local">{{number(result.summary[m.key].pairedLocalKwh,3)}} kWh</td><td class="se-cloud">{{number(result.summary[m.key].pairedCloudKwh,3)}} kWh</td><td ng-class="{'se-warning':result.summary[m.key].withinTolerance===false}">{{number(result.summary[m.key].differenceKwh,3)}} kWh · {{number(result.summary[m.key].differencePercent,2)}} %<br>{{result.summary[m.key].withinTolerance===null ? 'Keine Vergleichsbasis' : result.summary[m.key].withinTolerance ? 'Innerhalb der Toleranz' : 'Abweichung prüfen'}}</td><td class="se-cloud">{{result.summary[m.key].filledHours}}</td></tr></tbody>
+  </table></div>
+  <p><small>{{result.note}}</small></p>
+  <div class="se-info" ng-if="result.costComparison">
+   <strong>Kostenvergleich auf gemeinsam erfassten Stunden und denselben gespeicherten Tarifen</strong>
+   <div ng-repeat="m in metrics | limitTo:2 track by m.key">
+    <p>{{m.label}} · <span class="se-local">Lokal {{number(result.costComparison[m.key].local.costEur,2)}} € · {{number(result.costComparison[m.key].local.priceCtKwh,2)}} ct/kWh</span> · <span class="se-cloud">Cloud {{number(result.costComparison[m.key].cloud.costEur,2)}} € · {{number(result.costComparison[m.key].cloud.priceCtKwh,2)}} ct/kWh</span><br><small>Mit Tarif abgedeckt: {{number(result.costComparison[m.key].local.pricedCoveragePercent,2)}} % des gewählten Zeitraums.</small></p>
+   </div><small>Reine Energiepreise. Bei Tarifwechsel innerhalb einer Stunde werden Kosten zeitanteilig geschätzt; fehlende Tarife bleiben unbepreist.</small>
+  </div>
+  <div class="se-controls">
+   <label>Diagramm / Tabelle<select ng-model="metric" ng-change="draw()" aria-label="Verglichene Messgröße"><option ng-repeat="m in metrics track by m.key" value="{{m.key}}">{{m.label}}</option></select></label>
+   <button ng-click="zoom(2)" ng-disabled="graph.zoom>=128">Zoom +</button><button ng-click="zoom(0.5)" ng-disabled="graph.zoom<=1">Zoom −</button>
+   <button ng-click="pan(-1)" ng-disabled="graph.position<=0">← Früher</button><button ng-click="pan(1)" ng-disabled="graph.position>=1000 || graph.zoom<=1">Später →</button><button ng-click="reset()">Gesamter Zeitraum</button>
+  </div>
+  <p>{{date(graph.start)}} – {{date(graph.end)}} · {{graph.zoom}}× · kWh je Stunde</p>
+  <div class="se-readout">{{cursor.label || 'Cursor: Maus bewegen oder Diagramm antippen'}}<span ng-if="cursor"><br><strong class="se-local">Lokal {{number(cursor.local,3)}} kWh {{cursor.partial ? '(unvollständig)' : ''}}</strong> · <strong class="se-cloud">Cloud {{number(cursor.cloud,3)}} kWh</strong></span></div>
+  <div class="se-graph-scroll"><svg viewBox="0 0 1000 320" preserveAspectRatio="none" role="img" aria-label="Vergleichsdiagramm lokal blau und Cloud violett" ng-mousemove="hover($event)" ng-click="hover($event)">
+   <g ng-repeat="tick in graph.yTicks track by $index"><line x1="65" x2="980" ng-attr-y1="{{tick.y}}" ng-attr-y2="{{tick.y}}" stroke="currentColor" opacity=".15"/><text x="58" ng-attr-y="{{tick.y+4}}" text-anchor="end" fill="currentColor" font-size="13">{{number(tick.value,2)}}</text></g>
+   <g ng-repeat="tick in graph.xTicks track by $index"><text ng-attr-x="{{tick.x}}" y="287" text-anchor="middle" fill="currentColor" font-size="12">{{tick.day}}</text><text ng-attr-x="{{tick.x}}" y="307" text-anchor="middle" fill="currentColor" font-size="12">{{tick.time}}</text></g>
+   <path ng-attr-d="{{graph.localPath}}" stroke="#78c8ff" stroke-width="3" fill="none"/><path ng-attr-d="{{graph.partialPath}}" stroke="#78c8ff" stroke-width="2" stroke-dasharray="3 4" fill="none"/><path ng-attr-d="{{graph.cloudPath}}" stroke="#d6a4ff" stroke-width="3" stroke-dasharray="9 3" fill="none"/>
+   <line ng-if="cursor" ng-attr-x1="{{cursor.x}}" ng-attr-x2="{{cursor.x}}" y1="20" y2="260" stroke="currentColor" stroke-dasharray="4 4"/>
+  </svg></div>
+  <label>Zeitraum verschieben (aktiviert bei 1× automatisch 2×)<input class="se-slider" type="range" min="0" max="1000" step="1" ng-model="graph.position" ng-change="slide()" aria-label="Vergleichszeitraum verschieben"></label>
+  <p><small>Blaue Punkte/Striche: unvollständige lokale Stunde, im Summenvergleich ausgelassen. Violett gestrichelt: Cloud. Lücken bleiben sichtbar.</small></p>
+  <div class="se-controls"><button ng-click="page=page-1" ng-disabled="page<=0">Vorherige Stunden</button><span>Seite {{page+1}} / {{pages()}}</span><button ng-click="page=page+1" ng-disabled="page+1>=pages()">Nächste Stunden</button></div>
+  <div class="se-scroll"><table><thead><tr><th>Stunde (Wien)</th><th class="se-local">Lokal kWh</th><th class="se-cloud">Cloud kWh</th><th>Δ kWh</th><th>Verwendete Quelle</th></tr></thead><tbody><tr ng-repeat="h in result.intervals | limitTo:100:page*100 track by h.from"><td>{{date(h.from)}}</td><td class="se-local">{{number(h.metrics[metric].localKwh,3)}} <small ng-if="!h.metrics[metric].localValid">unvollständig / fehlt</small><small ng-if="h.metrics[metric].localValid && !h.metrics[metric].coverageKnown">Abdeckung unbekannt</small></td><td class="se-cloud">{{number(h.metrics[metric].cloudKwh,3)}}</td><td>{{number(h.metrics[metric].differenceKwh,3)}}</td><td ng-class="{'se-local':h.metrics[metric].source==='local','se-cloud':h.metrics[metric].source==='cloud'}">{{sourceName(h.metrics[metric].source)}}</td></tr></tbody></table></div>
+  <div class="se-info" ng-if="result.effective"><strong>Berechnung mit ergänzten Lücken</strong><p ng-repeat="m in metrics | limitTo:2 track by m.key">{{m.label}}: {{number(result.effective.metrics[m.key].kwh,3)}} kWh · {{number(result.effective.metrics[m.key].costEur,2)}} € · {{number(result.effective.metrics[m.key].priceCtKwh,2)}} ct/kWh<br><span class="se-local">Lokal {{number(result.effective.metrics[m.key].sources.localKwh,3)}} kWh</span> · <span class="se-cloud">Cloud ergänzt {{number(result.effective.metrics[m.key].sources.cloudKwh,3)}} kWh</span></p><p ng-repeat="warning in result.effective.warnings track by $index"><small>{{warning}}</small></p></div>
+ </div>
+</div>
+<script>
+(function(scope){
+ const H=3600000;let sequence=0;
+ scope.cloud={};scope.pending=false;scope.result=null;scope.page=0;scope.metric='grid';scope.graph={zoom:1,position:0};
+ scope.metrics=[{key:'grid',label:'Netzbezug'},{key:'house',label:'Hausverbrauch'},{key:'pv',label:'PV-Erzeugung'},{key:'export',label:'Einspeisung'}];
+ scope.number=(v,n)=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('de-AT',{minimumFractionDigits:n,maximumFractionDigits:n}):'—';
+ scope.date=v=>new Date(v).toLocaleString('de-AT',{timeZone:'Europe/Vienna',timeZoneName:'shortOffset'});
+ const dateText=d=>typeof d==='string'?d:d instanceof Date?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'';
+ scope.preset=function(kind){const parts=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Vienna',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-').map(Number);const to=new Date(parts[0],parts[1]-1,parts[2]),from=new Date(to);from.setDate(from.getDate()-(kind==='week'?7:1));scope.form={from,to};};
+ scope.preset('yesterday');
+ scope.compare=function(){const from=dateText(scope.form.from),to=dateText(scope.form.to);if(!from||!to||from>=to){scope.message='Bitte gültigen Zeitraum wählen (Bis nach Von).';return;}scope.pending=true;scope.message='Cloud wird abgefragt und mit lokalen Werten verglichen …';scope.send({topic:'history/dashboard',payload:{action:'solar-compare',from:from+'T00:00',to:to+'T00:00',requestId:++sequence}});};
+ scope.sourceName=v=>({local:'Lokal',cloud:'Cloud · nachgeladen',missing:'Lücke'}[v]||'Unbekannt');
+ scope.pages=()=>Math.max(1,Math.ceil((scope.result&&scope.result.intervals||[]).length/100));
+ scope.draw=function(){const r=scope.result,c=scope.graph;if(!r)return;const from=Date.parse(r.from),to=Date.parse(r.to),span=(to-from)/c.zoom;c.position=Math.round(Math.max(0,Math.min(1000,Number(c.position)||0)));c.start=from+(to-from-span)*c.position/1000;c.end=c.start+span;scope.cursor=null;
+  let max=.1;r.intervals.forEach(h=>{const m=h.metrics[scope.metric];if(m.localKwh!==null)max=Math.max(max,m.localKwh);if(m.cloudKwh!==null)max=Math.max(max,m.cloudKwh);});c.max=max*1.1;const x=t=>65+(t-c.start)/span*915,y=v=>260-v/c.max*240;const paths={local:[],cloud:[],partial:[]},previous={};
+  r.intervals.filter(h=>Date.parse(h.from)<c.end&&Date.parse(h.to)>c.start).forEach(h=>{const a=Math.max(c.start,Date.parse(h.from)),b=Math.min(c.end,Date.parse(h.to)),m=h.metrics[scope.metric];for(const source of ['local','cloud']){const value=source==='local'?m.localKwh:m.cloudKwh;if(value===null){previous[source]=null;continue;}const kind=source==='local'&&!m.localValid?'partial':source,prev=previous[source];const prefix=prev&&prev.to===a&&prev.kind===kind?'M '+x(a)+' '+y(prev.value)+' L '+x(a)+' '+y(value)+' ':'M '+x(a)+' '+y(value)+' ';paths[kind].push(prefix+'L '+x(b)+' '+y(value));previous[source]={to:b,value,kind};}});
+  c.localPath=paths.local.join(' ');c.cloudPath=paths.cloud.join(' ');c.partialPath=paths.partial.join(' ');
+  c.yTicks=Array.from({length:5},(_,i)=>({y:260-60*i,value:c.max*i/4}));c.xTicks=Array.from({length:5},(_,i)=>{const t=c.start+span*i/4;return {x:65+915*i/4,day:new Date(t).toLocaleDateString('de-AT',{timeZone:'Europe/Vienna',day:'2-digit',month:'2-digit'}),time:new Date(t).toLocaleTimeString('de-AT',{timeZone:'Europe/Vienna',hour:'2-digit',minute:'2-digit',timeZoneName:'shortOffset'})};});
+ };
+ scope.reset=function(){scope.graph.zoom=1;scope.graph.position=0;scope.draw();};
+ scope.zoom=function(f){scope.graph.zoom=Math.max(1,Math.min(128,scope.graph.zoom*f));scope.draw();};
+ scope.pan=function(direction){const c=scope.graph;c.position=Number(c.position)+direction*500/Math.max(1,c.zoom-1);scope.draw();};
+ scope.slide=function(){if(scope.graph.zoom<=1)scope.graph.zoom=2;scope.draw();};
+ scope.hover=function(e){const c=scope.graph,rect=e.currentTarget.getBoundingClientRect(),x=Math.max(65,Math.min(980,(e.clientX-rect.left)/rect.width*1000)),t=Math.min(c.end-1,c.start+(x-65)/915*(c.end-c.start)),h=scope.result.intervals.find(h=>Date.parse(h.from)<=t&&Date.parse(h.to)>t),m=h&&h.metrics[scope.metric];scope.cursor={x,label:scope.date(t),local:m?m.localKwh:null,cloud:m?m.cloudKwh:null,partial:m?!m.localValid:false};};
+ scope.$watch('msg',function(msg){if(!msg||msg.topic!=='history/solar/result'||!msg.payload||msg.payload.requestId!==sequence)return;const p=msg.payload;scope.pending=false;scope.message=p.error||'';if(p.cloud)scope.cloud=p.cloud;if(p.intervals){scope.result=p;scope.page=0;scope.reset();scope.message=p.cloud&&p.cloud.error?p.cloud.error:p.cloud&&!p.cloud.configured?'Cloud-Zugang fehlt; nur lokale und bereits gespeicherte Werte verfügbar.':'Vergleich geladen.';}});
+ scope.send({topic:'history/dashboard',payload:{action:'solar-status',requestId:sequence}});
+})(scope);
+</script>

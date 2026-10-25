@@ -1,3 +1,4 @@
+const { createCloudStore, effectiveRows, compareSources, METRICS } = require("./solaredge-cloud.cjs");
 const { monthRange, saveBill, readBill } = require("./monthly-bills.cjs");
 const { parseRange, calculateRange } = require("./energy-range.cjs");
 const { DatabaseSync } = require("node:sqlite");
@@ -62,6 +63,43 @@ module.exports = function registerHistoryStore(RED) {
     fs.mkdirSync(backupDirectory, { recursive: true });
     const database = new DatabaseSync(databasePath);
     database.exec(fs.readFileSync(path.join(__dirname, "home-automation-history.schema.sql"), "utf8"));
+
+    const cloud = createCloudStore(database, {
+      siteId: config.cloudSiteId || process.env.SOLAREDGE_SITE_ID || '',
+      apiKey: node.credentials?.cloudApiKey || process.env.SOLAREDGE_API_KEY || '',
+      auto: config.cloudAuto !== false,
+    });
+    let cloudClosed = false;
+    const coverageRead=database.prepare('SELECT * FROM local_energy_coverage WHERE interval_start>=? AND interval_start<?');
+    const coverageWrite=database.prepare('INSERT OR REPLACE INTO local_energy_coverage(interval_start,covered_ms) VALUES (?,?)');
+    const localRowsFor=(from,to)=>database.prepare('SELECT * FROM hourly_snapshots WHERE interval_start<? AND interval_end>? ORDER BY interval_start').all(to,from);
+    function coverageFor(from,to){return new Map(coverageRead.all(from,to).map(r=>[r.interval_start,r.covered_ms]));}
+    function mergedRows(from,to,local=localRowsFor(from,to)){
+      return effectiveRows(local,cloud.rows(Date.parse(from),Date.parse(to)),coverageFor(from,to));
+    }
+    function rangeResult(range){
+      const from=new Date(range.from).toISOString(),to=new Date(range.to).toISOString();
+      const tariffs=database.prepare('SELECT * FROM tariff_slots WHERE valid_from<? AND valid_until>? ORDER BY valid_from').all(to,from);
+      return {...calculateRange(mergedRows(from,to),tariffs,range),cloud:cloud.status()};
+    }
+    function compareCosts(comparison,range){
+      const from=new Date(range.from).toISOString(),to=new Date(range.to).toISOString();
+      const tariffs=database.prepare('SELECT * FROM tariff_slots WHERE valid_from<? AND valid_until>? ORDER BY valid_from').all(to,from);
+      const result={};
+      for(const metric of ['grid','house']){
+        const key=METRICS[metric],pairs=comparison.intervals.filter(i=>i.metrics[metric].localValid&&i.metrics[metric].cloudKwh!==null);
+        const calculate=source=>calculateRange(pairs.map(i=>({interval_start:i.from,interval_end:i.to,[key]:i.metrics[metric][source+'Kwh'],source_by_metric:{[metric]:source==='local'?'local':'cloud'}})),tariffs,range).metrics[metric];
+        result[metric]={local:calculate('local'),cloud:calculate('cloud')};
+      }
+      return result;
+    }
+    async function refreshCloud(){
+      const end=Date.now(),days=Math.max(1,Math.min(366,Number(config.cloudLookbackDays)||7));
+      await cloud.sync(end-days*DAY_MS,end);
+    }
+    // No network activity until credentials exist. One serialized, cached sync every six hours.
+    let cloudTimer=null,cloudStart=null;
+    if(cloud.status().auto){cloudStart=setTimeout(()=>{if(!cloudClosed)refreshCloud().catch(()=>{});},15000);cloudStart.unref?.();cloudTimer=setInterval(()=>{if(!cloudClosed)refreshCloud().catch(()=>{});},6*HOUR_MS);cloudTimer.unref?.();}
 
     const insertEvent = database.prepare(`
       INSERT INTO telemetry_events (observed_at, received_at, source, topic, event_type, payload_json)
@@ -282,6 +320,8 @@ module.exports = function registerHistoryStore(RED) {
         costEur: finite(existing?.energy_cost_eur),
         sampleCount: finite(existing?.sample_count),
         last: null,
+        coveredMs: database.prepare('SELECT covered_ms FROM local_energy_coverage WHERE interval_start=?').get(intervalStart)?.covered_ms || 0,
+        coverageKnown: !existing || !!database.prepare('SELECT covered_ms FROM local_energy_coverage WHERE interval_start=?').get(intervalStart),
       };
       return energyAccumulator;
     }
@@ -303,6 +343,7 @@ module.exports = function registerHistoryStore(RED) {
       if (previous && previous.online && sample.online) {
         const elapsedHours = (sample.timestampMs - previous.timestampMs) / HOUR_MS;
         if (elapsedHours > 0 && elapsedHours <= 5 / 60) {
+          accumulator.coveredMs += elapsedHours * HOUR_MS;
           const trapezoidWh = (left, right) => ((left + right) / 2) * elapsedHours;
           accumulator.pvWh += trapezoidWh(previous.pvW, sample.pvW);
           accumulator.houseWh += trapezoidWh(previous.houseW, sample.houseW);
@@ -350,6 +391,7 @@ module.exports = function registerHistoryStore(RED) {
         energyAccumulator.sampleCount,
         quality
       );
+      if(energyAccumulator.coverageKnown)coverageWrite.run(energyAccumulator.intervalStart,energyAccumulator.coveredMs);
       return selectSnapshot.get(energyAccumulator.intervalStart);
     }
 
@@ -491,7 +533,8 @@ module.exports = function registerHistoryStore(RED) {
       persistEnergyAccumulator();
       const period = ["day", "month", "year"].includes(request.period) ? request.period : "month";
       const range = periodRange(period, request.anchor);
-      const snapshots = querySnapshots.all(range.from, range.to);
+      const snapshots = mergedRows(range.from, range.to, querySnapshots.all(range.from, range.to));
+      const cloudState=cloud.status();
       const tariffRows = queryTariffs.all(range.from, range.to);
       const keyFormatter = period === "day"
         ? new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", hour: "2-digit", minute: "2-digit" })
@@ -522,25 +565,39 @@ module.exports = function registerHistoryStore(RED) {
           energyOfflineCount: 0,
           tariffOfflineCount: 0,
           recordedHourCount: 0,
+          cloudHourCount: 0,
           hours: [],
         };
         groups.set(key, group);
         return group;
       };
       for (const row of snapshots) {
+        const sourceValues=Object.values(row.source_by_metric||{}),cloudUsed=sourceValues.includes('cloud');
+        let cloudMetrics=null;
+        if(cloudUsed){
+          const tariffs=database.prepare('SELECT * FROM tariff_slots WHERE valid_from<? AND valid_until>? ORDER BY valid_from').all(row.interval_end,row.interval_start);
+          const m=calculateRange([row],tariffs,{from:Date.parse(row.interval_start),to:Date.parse(row.interval_end)}).metrics;
+          cloudMetrics=m;row.energy_cost_eur=m.grid.costEur;row.market_price_ct_kwh=m.house.priceCtKwh??m.grid.priceCtKwh??(tariffs.length===1?tariffs[0].price_ct_kwh:null);
+          row.energy_status=sourceValues.includes('missing')?'partial':'online';
+          row.tariff_status=m.grid.pricedCoveragePercent===100?'online':'offline';
+          row.data_quality='cloud_supplemented';
+        }
         const group = getGroup(row.interval_start);
-        const tariffCtPerKWh = Number(row.market_price_ct_kwh);
-        const houseConsumptionKWh = finite(row.house_consumption_kwh);
-        const consumptionCostEur = Number.isFinite(tariffCtPerKWh)
+        const tariffCtPerKWh = row.market_price_ct_kwh===null||row.market_price_ct_kwh===undefined?null:Number(row.market_price_ct_kwh);
+        const effectiveValue=(metric,key)=>row.source_by_metric?.[metric]==='missing'?null:(typeof row[key]==='number'?row[key]:null);
+        const houseConsumptionKWh=effectiveValue('house','house_consumption_kwh');
+        const gridImportKWh=effectiveValue('grid','grid_import_kwh');
+        const consumptionCostEur = cloudMetrics?cloudMetrics.house.costEur:houseConsumptionKWh!==null&&Number.isFinite(tariffCtPerKWh)
           ? houseConsumptionKWh * (tariffCtPerKWh / 100)
           : null;
-        group.pvEnergyKWh += finite(row.pv_energy_kwh);
-        group.houseConsumptionKWh += houseConsumptionKWh;
-        group.gridImportKWh += finite(row.grid_import_kwh);
-        group.gridExportKWh += finite(row.grid_export_kwh);
+        group.pvEnergyKWh += finite(effectiveValue('pv','pv_energy_kwh'));
+        group.houseConsumptionKWh += finite(houseConsumptionKWh);
+        group.gridImportKWh += finite(gridImportKWh);
+        group.gridExportKWh += finite(effectiveValue('export','grid_export_kwh'));
         group.energyCostEur += finite(consumptionCostEur);
-        group.gridImportCostEur += finite(row.energy_cost_eur);
+        group.gridImportCostEur += gridImportKWh===null?0:finite(row.energy_cost_eur);
         group.recordedHourCount += 1;
+        if(cloudUsed)group.cloudHourCount += 1;
         if (Number.isFinite(Number(row.temperature_c))) group.temperatures.push(Number(row.temperature_c));
         if (Number.isFinite(Number(row.sunshine_percent))) group.sunshine.push(Number(row.sunshine_percent));
         if (row.data_quality !== "complete") group.offlineCount += 1;
@@ -549,11 +606,13 @@ module.exports = function registerHistoryStore(RED) {
         if (row.tariff_status !== "online") group.tariffOfflineCount += 1;
         group.hours.push({
           intervalStart: row.interval_start,
+          sourceByMetric: row.source_by_metric,
+          cloudSupplemented: cloudUsed,
           time: new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", hour: "2-digit", minute: "2-digit" }).format(new Date(row.interval_start)),
-          gridImportKWh: finite(row.grid_import_kwh),
+          gridImportKWh,
           houseConsumptionKWh,
           energyCostEur: consumptionCostEur,
-          gridImportCostEur: finite(row.energy_cost_eur),
+          gridImportCostEur: gridImportKWh===null?null:row.energy_cost_eur,
           tariffCtPerKWh,
           temperatureC: row.temperature_c,
           status: row.data_quality,
@@ -617,6 +676,7 @@ module.exports = function registerHistoryStore(RED) {
       const priceEurPerKWh = priceCtPerKWh === null ? null : priceCtPerKWh / 100;
       return {
         schemaVersion: 1,
+        cloud: cloudState,
         generatedAt: new Date().toISOString(),
         period,
         range,
@@ -689,41 +749,59 @@ module.exports = function registerHistoryStore(RED) {
         }
 
         if (msg.topic === "history/dashboard" && ['bill-load','bill-save'].includes(msg.payload?.action)) {
-          const request=msg.payload;
-          try {
-            const bill=request.action==='bill-save'?saveBill(database,request.bill):readBill(database,request.month);
-            const range=parseRange(monthRange(bill.month));
-            const from=new Date(range.from).toISOString(),to=new Date(range.to).toISOString();
-            const rows=database.prepare("SELECT * FROM hourly_snapshots WHERE interval_start < ? AND interval_end > ? ORDER BY interval_start").all(to,from);
-            const tariffs=database.prepare("SELECT * FROM tariff_slots WHERE valid_from < ? AND valid_until > ? ORDER BY valid_from").all(to,from);
-            let comparison;
-            try { comparison=calculateRange(rows,tariffs,range); } catch(error) { comparison={error:error.message}; }
-            msg.payload={requestId:request.requestId,bill,comparison};
-          } catch(error) { msg.payload={requestId:request.requestId,error:error.message}; }
-          msg.topic='history/bill/result';send(msg);done();return;
+          const request={...msg.payload};let bill,range;
+          try{bill=request.action==='bill-save'?saveBill(database,request.bill):readBill(database,request.month);range=parseRange(monthRange(bill.month));}
+          catch(error){msg.payload={requestId:request.requestId,error:error.message};msg.topic='history/bill/result';send(msg);done();return;}
+          const answer=()=>{
+            if(cloudClosed){done();return;}
+            let comparison;try{comparison=rangeResult(range);}catch(error){comparison={error:error.message};}
+            msg.payload={requestId:request.requestId,bill,comparison};msg.topic='history/bill/result';send(msg);done();
+          };
+          const to=Math.min(range.to,Date.now());
+          if(cloud.status().configured&&to>range.from)cloud.sync(range.from,to).then(answer,()=>answer());else answer();
+          return;
         }
 
-        if (msg.topic === "history/dashboard" && msg.payload?.action === "range") {
-          const requestId = msg.payload.requestId;
-          try {
-            const range = parseRange(msg.payload);
-            if (range.to > Date.now()) throw new Error("Bitte einen abgeschlossenen Zeitraum wählen.");
-            const from = new Date(range.from).toISOString(), to = new Date(range.to).toISOString();
-            const rows = database.prepare("SELECT * FROM hourly_snapshots WHERE interval_start < ? AND interval_end > ? ORDER BY interval_start").all(to, from);
-            const tariffs = database.prepare("SELECT * FROM tariff_slots WHERE valid_from < ? AND valid_until > ? ORDER BY valid_from").all(to, from);
-            msg.payload = { ...calculateRange(rows, tariffs, range), requestId };
-          } catch (error) { msg.payload = { requestId, error: error.message }; }
-          msg.topic = "history/range/result";
-          send(msg); done(); return;
+        if (msg.topic === 'history/dashboard' && msg.payload?.action === 'solar-status') {
+          msg.topic='history/solar/result';msg.payload={requestId:msg.payload.requestId,cloud:cloud.status()};send(msg);done();return;
+        }
+        if (msg.topic === 'history/dashboard' && ['range','solar-compare','solar-sync'].includes(msg.payload?.action)) {
+          const request={...msg.payload},isRange=request.action==='range';
+          msg.topic=isRange?'history/range/result':'history/solar/result';
+          let range;
+          try{range=parseRange(request);if(range.to>Date.now())throw Error('Bitte einen abgeschlossenen Zeitraum wählen.');}
+          catch(error){msg.payload={requestId:request.requestId,error:error.message};send(msg);done();return;}
+          const answer=()=>{
+            if(cloudClosed){done();return;}
+            try{
+              if(isRange)msg.payload={...rangeResult(range),requestId:request.requestId};
+              else{
+                const from=new Date(range.from).toISOString(),to=new Date(range.to).toISOString();
+                const comparison=compareSources(localRowsFor(from,to),cloud.rows(range.from,range.to),range,coverageFor(from,to));
+                msg.payload={...comparison,costComparison:compareCosts(comparison,range),effective:rangeResult(range),cloud:cloud.status(),requestId:request.requestId};
+              }
+            }catch(error){msg.payload={requestId:request.requestId,error:error.message};}
+            send(msg);done();
+          };
+          if(cloud.status().configured)cloud.sync(range.from,range.to).then(answer,()=>answer());else answer();
+          return;
         }
 
         if (msg.topic === "history/dashboard") {
-          msg.payload = buildDashboard(msg.payload || {});
-          msg.topic = "history/dashboard/result";
-          msg.history = { action: "dashboard", rowCount: msg.payload.rows.length, databasePath };
-          node.status({ fill: "green", shape: "dot", text: "Dashboard aktualisiert" });
-          send(msg);
-          done();
+          const request={...(msg.payload||{})};
+          const answer=()=>{
+            if(cloudClosed){done();return;}
+            try{
+              msg.payload=buildDashboard(request);msg.topic='history/dashboard/result';
+              msg.history={action:'dashboard',rowCount:msg.payload.rows.length,databasePath};
+              node.status({fill:'green',shape:'dot',text:'Dashboard aktualisiert'});send(msg);done();
+            }catch(error){done(error);}
+          };
+          if(cloud.status().auto){
+            const period=['day','month','year'].includes(request.period)?request.period:'month',range=periodRange(period,request.anchor);
+            const from=Date.parse(range.from),to=Math.min(Date.parse(range.to),Date.now());
+            if(to>from)cloud.sync(from,to).then(answer,()=>answer());else answer();
+          }else answer();
           return;
         }
 
@@ -848,12 +926,13 @@ module.exports = function registerHistoryStore(RED) {
       }
     });
     node.on("close", () => {
+      cloudClosed=true;clearTimeout(cloudStart);clearInterval(cloudTimer);cloud.close();
       persistEnergyAccumulator();
       database.close();
     });
   }
 
-  RED.nodes.registerType("home-automation-history", HistoryStoreNode);
+  RED.nodes.registerType("home-automation-history", HistoryStoreNode, {credentials:{cloudApiKey:{type:'password'}}});
 };
 
 module.exports.sortDashboardRows = sortDashboardRows;

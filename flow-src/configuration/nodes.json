@@ -2544,5 +2544,25 @@
     "width": "24",
     "collapse": false,
     "className": ""
+  },
+  {
+    "id": "solaredge_compare_tab",
+    "type": "ui_tab",
+    "name": "SolarEdge Vergleich",
+    "icon": "compare_arrows",
+    "order": 23,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "solaredge_compare_group",
+    "type": "ui_group",
+    "name": "Cloud und lokale Aufzeichnung",
+    "tab": "solaredge_compare_tab",
+    "order": 1,
+    "disp": true,
+    "width": "24",
+    "collapse": false,
+    "className": ""
   }
 ]

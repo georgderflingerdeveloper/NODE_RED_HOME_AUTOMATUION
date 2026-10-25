@@ -144,3 +144,25 @@ CREATE TABLE IF NOT EXISTS user_monthly_bills (
  revision INTEGER NOT NULL,
  updated_at TEXT NOT NULL
 );
+
+-- Cloud-Messwerte separat halten: lokale Rohdaten werden niemals überschrieben.
+CREATE TABLE IF NOT EXISTS solaredge_cloud_energy (
+ site_id TEXT NOT NULL,
+ interval_start TEXT NOT NULL,
+ interval_end TEXT NOT NULL,
+ metric TEXT NOT NULL CHECK(metric IN ('house','grid','pv','export')),
+ kwh REAL NOT NULL CHECK(kwh>=0),
+ fetched_at TEXT NOT NULL,
+ PRIMARY KEY(site_id,interval_start,metric)
+);
+CREATE INDEX IF NOT EXISTS solaredge_cloud_energy_end_idx ON solaredge_cloud_energy(site_id,interval_end);
+CREATE TABLE IF NOT EXISTS solaredge_cloud_state (
+ site_id TEXT NOT NULL,
+ name TEXT NOT NULL,
+ value_json TEXT NOT NULL,
+ PRIMARY KEY(site_id,name)
+);
+CREATE TABLE IF NOT EXISTS local_energy_coverage (
+ interval_start TEXT PRIMARY KEY,
+ covered_ms REAL NOT NULL DEFAULT 0
+);

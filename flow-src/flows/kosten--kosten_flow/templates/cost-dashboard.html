@@ -142,6 +142,18 @@
 .cost-range-current .cost-range-price {font-size:26px;border-width:3px;padding:8px 12px;max-width:100%;box-sizing:border-box;}
 .cost-range-price-label {display:block;font-weight:700;}
 .cost-price-legend {font-size:12px;line-height:1.8;margin:8px 0;}
+.cost-source-local {color:#78c8ff!important;}
+.cost-source-cloud {color:#d6a4ff!important;}
+.cost-chart-panel {margin:14px 0;padding:14px;border:1px solid var(--gh-border,#626262);border-radius:10px;background:var(--gh-inset,#242424);}
+.cost-chart-toolbar {display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.cost-chart-toolbar label {flex-direction:row;align-items:center;}
+.cost-chart-scroll {overflow-x:auto;overscroll-behavior-x:contain;}
+.cost-chart-svg {display:block;width:100%;min-width:620px;height:340px;touch-action:pan-y;color:var(--gh-muted,#c6c6c6);cursor:crosshair;}
+.cost-chart-scroll:focus-visible {outline:2px solid #b6f29c;}
+.cost-range-editor label.cost-chart-slider-label {display:flex;width:100%;margin:10px 0;box-sizing:border-box;}
+.cost-range-editor input.cost-chart-slider {display:block;width:100%;height:44px;margin:8px 0;padding:0;border:0;background:transparent;accent-color:#a4f6a0;cursor:ew-resize;}
+.cost-chart-readout {min-height:32px;margin:10px 0;font-size:16px;}
+.cost-chart-note {font-size:12px;}
 </style>
 
 
@@ -175,10 +187,43 @@
     </div>
     {{rangeNumber(rangeResult.metrics[item.key].kwh,6)}} kWh ·
     <strong class="cost-price-tag cost-range-price" ng-class="priceClass(rangeResult.metrics[item.key].priceCtKwh)">{{rangeNumber(rangeResult.metrics[item.key].costEur,2)}} €</strong> gesamt
+    <p ng-if="rangeResult.metrics[item.key].sources"><span class="cost-source-local">Lokal: {{rangeNumber(rangeResult.metrics[item.key].sources.localKwh,3)}} kWh</span> · <span class="cost-source-cloud">Cloud ergänzt: {{rangeNumber(rangeResult.metrics[item.key].sources.cloudKwh,3)}} kWh</span></p>
     <br>Bepreiste Energie: {{rangeNumber(rangeResult.metrics[item.key].pricedKwh,6)}} kWh ·
     Intervallabdeckung: {{rangeNumber(rangeResult.metrics[item.key].coveragePercent,2)}} % ·
     mit Tarif: {{rangeNumber(rangeResult.metrics[item.key].pricedCoveragePercent,2)}} %
    </div>
+   <button ng-click="togglePriceChart()" aria-expanded="{{!!priceChartOpen}}">Graphische Anzeige für den Zeitraum {{priceChartOpen ? '▴' : '▾'}}</button>
+   <section class="cost-chart-panel" ng-if="priceChartOpen" aria-label="Preisverlauf im ausgewerteten Zeitraum">
+    <h3>Preisverlauf · ct/kWh</h3>
+    <div class="cost-chart-toolbar">
+     <button ng-click="zoomPriceChart(2)" ng-disabled="chart.zoom >= 128" aria-label="Diagramm vergrößern">Zoom +</button>
+     <button ng-click="zoomPriceChart(0.5)" ng-disabled="chart.zoom <= 1" aria-label="Diagramm verkleinern">Zoom −</button>
+     <button ng-click="panPriceChart(-0.5)" ng-disabled="chart.start <= chart.from" aria-label="Früheren Zeitraum anzeigen">← Früher</button>
+     <button ng-click="panPriceChart(0.5)" ng-disabled="chart.end >= chart.to" aria-label="Späteren Zeitraum anzeigen">Später →</button>
+     <button ng-click="resetPriceChart()">Gesamter Zeitraum</button>
+     <span>{{chart.zoom}}×</span>
+    </div>
+    <p class="cost-chart-note">{{rangeDate(chart.start)}} – {{rangeDate(chart.end)}} · Europe/Vienna</p>
+    <div class="cost-chart-readout" aria-live="polite">
+     {{chart.cursor.label || 'Cursor: Maus bewegen oder Diagramm antippen'}}
+     <strong ng-if="chart.cursor" class="cost-price-tag cost-range-price" ng-class="priceClass(chart.cursor.price)">{{rangeNumber(chart.cursor.price,2)}} ct/kWh</strong>
+    </div>
+    <div class="cost-chart-scroll" tabindex="0" aria-label="Preisdiagramm; Pfeiltasten verschieben, Plus und Minus zoomen" ng-keydown="priceChartKey($event)">
+     <svg class="cost-chart-svg" viewBox="0 0 1000 340" preserveAspectRatio="none" role="img" aria-label="Tarifverlauf mit Zeit- und Preisachse" ng-mousemove="priceChartCursor($event)" ng-click="priceChartCursor($event)">
+      <g ng-repeat="tick in chart.yTicks track by $index"><line x1="70" x2="980" ng-attr-y1="{{tick.y}}" ng-attr-y2="{{tick.y}}" stroke="currentColor" opacity="0.2"/><text x="60" ng-attr-y="{{tick.y+4}}" text-anchor="end" fill="currentColor" font-size="13">{{rangeNumber(tick.value,2)}}</text></g>
+      <g ng-repeat="tick in chart.xTicks track by $index"><line ng-attr-x1="{{tick.x}}" ng-attr-x2="{{tick.x}}" y1="24" y2="282" stroke="currentColor" opacity="0.12"/><text ng-attr-x="{{tick.x}}" y="305" text-anchor="middle" fill="currentColor" font-size="12">{{tick.day}}</text><text ng-attr-x="{{tick.x}}" y="323" text-anchor="middle" fill="currentColor" font-size="12">{{tick.time}}</text></g>
+      <path ng-repeat="line in chart.lines track by $index" ng-attr-d="{{line.path}}" ng-attr-stroke="{{line.color}}" fill="none" stroke-width="3"/>
+      <line ng-if="chart.average !== null" x1="70" x2="980" ng-attr-y1="{{chart.averageY}}" ng-attr-y2="{{chart.averageY}}" stroke="#b9c8ff" stroke-dasharray="6 5"/>
+      <line ng-if="chart.cursor" ng-attr-x1="{{chart.cursor.x}}" ng-attr-x2="{{chart.cursor.x}}" y1="24" y2="282" stroke="currentColor" stroke-dasharray="4 4"/>
+      <circle ng-if="chart.cursor && chart.cursor.price !== null" ng-attr-cx="{{chart.cursor.x}}" ng-attr-cy="{{chart.cursor.y}}" r="5" fill="currentColor"/>
+     </svg>
+    </div>
+    <label class="cost-chart-note cost-chart-slider-label">Zeitraum verschieben <input class="cost-chart-slider" type="range" min="0" max="1000" step="1" ng-model="chart.position" ng-change="slidePriceChart(chart.position)" aria-label="Sichtbaren Zeitraum verschieben"></label>
+    <p class="cost-chart-note"><span class="cost-price-tag price-cheap">≤ {{priceBands.cheapMax}} grün</span> <span class="cost-price-tag price-medium">≤ {{priceBands.mediumMax}} gelb</span> <span class="cost-price-tag price-high">≤ {{priceBands.highMax}} orange</span> <span class="cost-price-tag price-expensive">&gt; {{priceBands.highMax}} rot</span> ct/kWh</p>
+    <p class="cost-chart-note" ng-if="chart.average !== null">Gestrichelt: akkumulierter Netzbezugspreis {{rangeNumber(chart.average,2)}} ct/kWh (verbrauchsgewichtet).</p>
+    <p class="cost-chart-note">{{chart.lines.length ? 'Linie: gespeicherter Energiepreis je Tarifintervall. Lücken bedeuten fehlende oder widersprüchliche Tarife.' : 'Keine eindeutigen Tarifdaten für diesen Ausschnitt vorhanden.'}} Reine Energiepreise ohne Netzgebühren, Steuern und Zuschläge. Zoom über +/−; Verschieben über Schieberegler, Pfeile oder Tastatur. Bei 1× aktiviert der Schieberegler automatisch 2× Zoom. Auf schmalen Displays horizontal scrollbar.</p>
+   </section>
+   <p ng-if="rangeResult.cloud.error">{{rangeResult.cloud.error}} · Vorhandene Daten werden weiterhin ausgewertet.</p>
    <p>{{rangeResult.basis}}</p>
    <p ng-repeat="warning in rangeResult.warnings track by $index">{{warning}}</p>
   </div>
@@ -364,6 +409,50 @@
   let rangeSequence = 0;
   scope.rangeNumber = function(value, digits) { return typeof value==='number' && Number.isFinite(value) ? value.toLocaleString('de-AT',{minimumFractionDigits:digits,maximumFractionDigits:digits}) : '—'; };
   scope.rangeDate = function(value) { return new Date(value).toLocaleString('de-AT',{timeZone:'Europe/Vienna'}); };
+  scope.sourceName=v=>({local:'Lokal',cloud:'Cloud',missing:'Lücke'}[v]||'Unbekannt');
+  scope.priceChartOpen=false;
+  scope.chart={zoom:1,position:0,lines:[],xTicks:[],yTicks:[],average:null};
+  const chartColors={'price-cheap':'#a4f6a0','price-medium':'#ffe27a','price-high':'#ffb46b','price-expensive':'#ff9292'};
+  function chartTime(value,options){return new Date(value).toLocaleString('de-AT',Object.assign({timeZone:'Europe/Vienna'},options));}
+  function drawPriceChart(){
+    const c=scope.chart,r=scope.rangeResult;if(!r)return;
+    c.from=Date.parse(r.from);c.to=Date.parse(r.to);if(!(c.to>c.from))return;
+    c.position=Math.round(Math.max(0,Math.min(1000,Number(c.position)||0)));
+    const span=(c.to-c.from)/c.zoom;
+    c.start=c.from+(c.to-c.from-span)*Number(c.position)/1000;c.end=c.start+span;c.cursor=null;
+    const all=(r.priceSeries||[]).filter(p=>Number.isFinite(p.priceCtKwh)&&p.to>p.from);
+    c.average=r.metrics&&r.metrics.grid&&typeof r.metrics.grid.priceCtKwh==='number'?r.metrics.grid.priceCtKwh:null;
+    let low=Infinity,high=-Infinity;all.forEach(p=>{low=Math.min(low,p.priceCtKwh);high=Math.max(high,p.priceCtKwh);});
+    if(c.average!==null){low=Math.min(low,c.average);high=Math.max(high,c.average);}
+    if(!Number.isFinite(low)){low=0;high=30;}
+    const pad=Math.max(1,(high-low)*0.1);c.low=low-pad;c.high=high+pad;
+    const x=t=>70+(t-c.start)/span*910,y=p=>282-(p-c.low)/(c.high-c.low)*258;
+    c.averageY=y(c.average);c.lines=[];let previous=null;const paths={};
+    all.filter(p=>p.from<c.end&&p.to>c.start).forEach(p=>{
+      const a=Math.max(c.start,p.from),b=Math.min(c.end,p.to);
+      const connector=previous&&previous.to===p.from?'M '+x(a)+' '+y(previous.priceCtKwh)+' L '+x(a)+' '+y(p.priceCtKwh)+' ':'M '+x(a)+' '+y(p.priceCtKwh)+' ';
+      const color=chartColors[scope.priceClass(p.priceCtKwh)];(paths[color]||(paths[color]=[])).push(connector+'L '+x(b)+' '+y(p.priceCtKwh));previous=p;
+    });
+    c.lines=Object.keys(paths).map(color=>({color:color,path:paths[color].join(' ')}));
+    c.xTicks=Array.from({length:5},(_,i)=>{const t=c.start+span*i/4;return {x:70+910*i/4,day:chartTime(t,{day:'2-digit',month:'2-digit'}),time:chartTime(t,{hour:'2-digit',minute:'2-digit',timeZoneName:'shortOffset'})};});
+    c.yTicks=Array.from({length:5},(_,i)=>({y:282-258*i/4,value:c.low+(c.high-c.low)*i/4}));
+  }
+  scope.togglePriceChart=function(){scope.priceChartOpen=!scope.priceChartOpen;if(scope.priceChartOpen)drawPriceChart();scheduleCostLayoutRefresh();};
+  scope.resetPriceChart=function(){scope.chart.zoom=1;scope.chart.position=0;drawPriceChart();};
+  scope.zoomPriceChart=function(factor){const c=scope.chart,center=(c.start+c.end)/2;c.zoom=Math.max(1,Math.min(128,c.zoom*factor));const span=(c.to-c.from)/c.zoom,travel=c.to-c.from-span;c.position=travel?Math.max(0,Math.min(1000,(center-span/2-c.from)/travel*1000)):0;drawPriceChart();};
+  scope.panPriceChart=function(direction){const c=scope.chart,travel=c.to-c.from-(c.end-c.start);if(travel>0)c.position=Math.max(0,Math.min(1000,Number(c.position)+direction*(c.end-c.start)/travel*1000));drawPriceChart();};
+  scope.slidePriceChart=function(position){
+    const c=scope.chart;c.position=position===undefined?c.position:position;
+    if(c.zoom<=1)c.zoom=2;
+    drawPriceChart();
+  };
+  scope.priceChartKey=function(event){const k=event.key;if(k==='+'||k==='=')scope.zoomPriceChart(2);else if(k==='-')scope.zoomPriceChart(0.5);else if(k==='ArrowLeft')scope.panPriceChart(-0.5);else if(k==='ArrowRight')scope.panPriceChart(0.5);else if(k==='Home')scope.resetPriceChart();else return;event.preventDefault();};
+  scope.priceChartCursor=function(event){
+    const c=scope.chart,rect=event.currentTarget.getBoundingClientRect(),x=Math.max(70,Math.min(980,(event.clientX-rect.left)/rect.width*1000));
+    const time=Math.min(c.end-1,c.start+(x-70)/910*(c.end-c.start));
+    const p=(scope.rangeResult.priceSeries||[]).find(p=>p.from<=time&&p.to>time);
+    c.cursor={x:x,price:p?p.priceCtKwh:null,y:p?282-(p.priceCtKwh-c.low)/(c.high-c.low)*258:null,label:chartTime(time,{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'shortOffset'})+(p?'':' · Tariflücke')};
+  };
   scope.showRange = function() {
     const f=scope.rangeForm;
     const from=calendarText(f.fromDate,'date')+'T'+calendarText(f.fromTime,'time');
@@ -371,7 +460,7 @@
     if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(from)||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(to)||from>=to){
       scope.rangeError='Bitte Datum und Uhrzeit vollständig wählen; Bis muss nach Von liegen.';return;
     }
-    scope.rangeResult=null;scope.rangeError='';scope.rangePending=true;
+    scope.rangeResult=null;scope.priceChartOpen=false;scope.rangeError='';scope.rangePending=true;
     scope.send({topic:'history/dashboard',payload:{action:'range',requestId:++rangeSequence,from:from,to:to}});
   };
   scope.$watch("msg", function(msg) {
@@ -386,6 +475,7 @@
       if(msg.payload.requestId!==rangeSequence)return;
       scope.rangePending=false;scope.rangeError=msg.payload.error||'';
       scope.rangeResult=msg.payload.error?null:msg.payload;
+      scope.resetPriceChart();
       scheduleCostLayoutRefresh();return;
     }
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
@@ -587,6 +677,7 @@ Preis je kWh:
 <span class="cost-price-tag price-expensive">&gt; {{priceBands.highMax}} ct sehr teuer</span>
 <span class="cost-price-tag price-unknown">unbekannt / unvollständig</span>
 </div>
+  <p ng-if="view.history.cloud"><span class="cost-source-local">■ Lokale Aufzeichnung</span> · <span class="cost-source-cloud">■ SolarEdge-Cloud / nachgeladen</span><br><small>{{view.history.cloud.configured ? 'Cloud-Lückenfüllung eingerichtet. Vergleich im Menü SolarEdge Vergleich.' : 'Cloud-Lückenfüllung noch nicht eingerichtet. Zugang im History-Knoten hinterlegen.'}}</small></p>
   <h3 class="cost-section-title">Energie, Kosten und Wetter · {{view.period === 'day' ? 'Tag' : (view.period === 'year' ? 'Jahr' : 'Monat')}}</h3>
   <div class="cost-table-wrap" ng-if="view.history.rows.length">
     <table class="cost-table">
@@ -596,7 +687,7 @@ Preis je kWh:
       <tbody>
         <tr class="cost-row" ng-repeat-start="row in view.history.rows" ng-click="toggleCostRow(row)">
           <td><span class="cost-expand">{{row.expanded ? '⌄' : '›'}}</span><b>{{row.label}}</b></td>
-          <td>{{row.houseConsumptionKWh | number:3}} kWh</td>
+          <td>{{row.houseConsumptionKWh | number:3}} kWh<br><small class="cost-source-cloud" ng-if="row.cloudHourCount">{{row.cloudHourCount}} Stunden mit Cloud-Ergänzung</small></td>
           <td>{{row.gridImportKWh | number:3}} kWh</td>
           <td>{{row.pvEnergyKWh | number:3}} kWh</td>
           <td><b><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur | currency:'€':2}}</span></b><br><span class="cost-muted"><span class="cost-price-tag" ng-class="priceClass(rowUnitPrice(row,false))">{{row.energyCostEur * 100 | number:2}} ct</span></span></td>
@@ -617,6 +708,9 @@ Preis je kWh:
               <div class="cost-hour" ng-class="{'cost-hour-current':isCurrentCostHour(hour)}" ng-repeat="hour in row.hours">
                 <span class="cost-current-label" ng-if="isCurrentCostHour(hour)">aktuelle Stunde</span>
                 <b>{{hour.time}} Uhr</b><br>
+                <span ng-if="hour.cloudSupplemented" class="cost-source-cloud">SolarEdge-Cloud ergänzt</span>
+                <span ng-if="hour.recorded && !hour.cloudSupplemented" class="cost-source-local">Lokale Aufzeichnung</span><br>
+                <small ng-if="hour.sourceByMetric">Haus: {{sourceName(hour.sourceByMetric.house)}} · Netz: {{sourceName(hour.sourceByMetric.grid)}}</small><br>
                 <span ng-if="hour.recorded">
                   Haus {{hour.houseConsumptionKWh | number:3}} kWh × <span class="cost-price-tag" ng-class="priceClass(hour.tariffCtPerKWh)">{{hour.tariffCtPerKWh | number:2}} ct/kWh</span>
                   <div class="cost-hour-price">

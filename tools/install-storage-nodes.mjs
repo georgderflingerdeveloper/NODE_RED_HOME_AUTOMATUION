@@ -15,6 +15,7 @@ const files = [
   "home-automation-phidget-discovery.html",
   "phidget-discovery-core.cjs",
   "energy-range.cjs",
+  "solaredge-cloud.cjs",
   "monthly-bills.cjs",
   "home-automation-history.js",
   "home-automation-history.html",

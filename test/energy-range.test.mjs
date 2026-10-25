@@ -16,3 +16,13 @@ test('Überlappende Energieintervalle werden abgewiesen',()=>assert.throws(()=>c
 test('Ende exklusiv: Nachbarstunde wird nicht addiert',()=>assert.equal(calculateRange([row(),row(1)],[],{from,to:from+H}).metrics.grid.kwh,2));
 test('Wiener Zeitumstellung: 23 und 25 Stunden',()=>{for(const [day,next,hours] of [['2026-03-29','2026-03-30',23],['2026-10-25','2026-10-26',25]]){const r=parseRange({from:day+'T00:00',to:next+'T00:00'});assert.equal((r.to-r.from)/H,hours);}});
 test('Nicht vorhandene, doppelte und ungültige lokale Zeiten werden zurückgewiesen',()=>{for(const t of ['2026-03-29T02:30','2026-10-25T02:30','2026-02-30T12:00','2026-10-19T25:00'])assert.throws(()=>localInstant(t));assert.throws(()=>parseRange({from:'2026-10-19T12:00',to:'2026-10-19T11:00'}));});
+
+test('Diagrammtarife: auf Zeitraum begrenzt, negative/Nullpreise erhalten, Konflikte als Lücken',()=>{
+ const r=calculateRange([],[tariff(-1,1,-5),tariff(1,2,0),tariff(2,4,30),tariff(2.5,3,40),tariff(4,5,null)],{from:from+H/2,to:from+5*H});
+ assert.deepEqual(r.priceSeries,[{from:from+H/2,to:from+H,priceCtKwh:-5},{from:from+H,to:from+2*H,priceCtKwh:0},{from:from+2*H,to:from+2.5*H,priceCtKwh:30},{from:from+3*H,to:from+4*H,priceCtKwh:30}]);
+ assert.equal(r.metrics.grid.kwh,null);
+});
+test('Diagrammtarife: fehlende Intervalle werden nicht überbrückt; Ende exklusiv',()=>{
+ const r=calculateRange([],[tariff(0,1,20),tariff(2,3,25),tariff(3,4,30)],{from,to:from+3*H});
+ assert.equal(r.priceSeries.length,2);assert.equal(r.priceSeries[0].to,from+H);assert.equal(r.priceSeries[1].from,from+2*H);assert.equal(r.priceSeries[1].to,from+3*H);
+});

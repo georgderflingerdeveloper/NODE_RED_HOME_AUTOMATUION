@@ -4,8 +4,12 @@ RED.nodes.registerType('home-automation-history', {
   defaults: {
     name: { value: '' },
     databasePath: { value: 'projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite', required: true },
-    backupRetention: { value: 31, validate: RED.validators.number() }
+    backupRetention: { value: 31, validate: RED.validators.number() },
+    cloudSiteId: {value:''},
+    cloudAuto: {value:true},
+    cloudLookbackDays: {value:7,validate:RED.validators.number()}
   },
+  credentials: {cloudApiKey:{type:'password'}},
   inputs: 1, outputs: 1, icon: 'db.svg', label: function() { return this.name || 'Home Automation Historie'; }
 });
 </script>
@@ -13,8 +17,14 @@ RED.nodes.registerType('home-automation-history', {
   <div class="form-row"><label for="node-input-name"><i class="fa fa-tag"></i> Name</label><input type="text" id="node-input-name"></div>
   <div class="form-row"><label for="node-input-databasePath"><i class="fa fa-database"></i> Datenbank</label><input type="text" id="node-input-databasePath"></div>
   <div class="form-row"><label for="node-input-backupRetention"><i class="fa fa-history"></i> Backup-Tage</label><input type="number" id="node-input-backupRetention"></div>
+  <hr><h4>SolarEdge Monitoring · Lückenfüllung</h4>
+  <div class="form-row"><label for="node-input-cloudSiteId">Anlagen-ID</label><input type="text" id="node-input-cloudSiteId" placeholder="SolarEdge Site ID"></div>
+  <div class="form-row"><label for="node-input-cloudApiKey">API-Schlüssel</label><input type="password" id="node-input-cloudApiKey" autocomplete="new-password"></div>
+  <div class="form-row"><label for="node-input-cloudAuto">Automatisch</label><input type="checkbox" id="node-input-cloudAuto" style="width:auto"></div>
+  <div class="form-row"><label for="node-input-cloudLookbackDays">Rückblick Tage</label><input type="number" id="node-input-cloudLookbackDays" min="1" max="366"></div>
 </script>
 <script type="text/x-red" data-help-name="home-automation-history">
+  <p>SolarEdge: Site-ID und Site-API-Schlüssel hier hinterlegen. Der Schlüssel bleibt im Node-RED-Credential-Speicher. Alternativ SOLAREDGE_SITE_ID/SOLAREDGE_API_KEY als Server-Umgebungsvariablen. Anlagen-Zeitzone: Europe/Vienna. Automatischer Abgleich alle sechs Stunden, standardmäßig sieben Tage rückwirkend. Ältere Zeiträume im Menü SolarEdge Vergleich auswählen. Die letzten zwei Stunden werden wegen Cloud-Verzögerung nicht importiert. Lokale Rohdaten bleiben erhalten.</p>
   <p>Speichert fachliche Telemetrie sicher in einer projektlokalen SQLite-Datenbank.</p>
   <p><code>history/source/energy</code>, <code>history/source/weather</code> und
     <code>aWATTar/tariff/current</code> aktualisieren die Datenquellen.</p>
