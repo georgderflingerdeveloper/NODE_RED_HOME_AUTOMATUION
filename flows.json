@@ -12659,5 +12659,105 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "hmip_ui_tab",
+        "type": "ui_tab",
+        "name": "Homematic IP",
+        "icon": "devices",
+        "order": 22,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "hmip_ui_group",
+        "type": "ui_group",
+        "name": "Geräteübersicht",
+        "tab": "hmip_ui_tab",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "hmip_flow",
+        "type": "tab",
+        "label": "HOMEMATIC IP",
+        "disabled": false,
+        "info": "Lesende Cloud-Anbindung. Anleitung: docs/HOMEMATIC_IP.md. Schaltbefehle werden nicht verarbeitet."
+    },
+    {
+        "id": "hmip_link_in",
+        "type": "link in",
+        "z": "hmip_flow",
+        "name": "Homematic IP · get / refresh",
+        "links": [],
+        "x": 135,
+        "y": 100,
+        "wires": [
+            [
+                "hmip_reader"
+            ]
+        ]
+    },
+    {
+        "id": "hmip_reader",
+        "type": "home-automation-homematic-ip",
+        "z": "hmip_flow",
+        "name": "HAP · Cloud lesen",
+        "intervalMs": 60000,
+        "x": 350,
+        "y": 100,
+        "wires": [
+            [
+                "hmip_link_out",
+                "hmip_ui"
+            ]
+        ]
+    },
+    {
+        "id": "hmip_link_out",
+        "type": "link out",
+        "z": "hmip_flow",
+        "name": "Homematic IP · Gerätezustände",
+        "mode": "link",
+        "links": [],
+        "x": 590,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "hmip_ui",
+        "type": "ui_template",
+        "z": "hmip_flow",
+        "group": "hmip_ui_group",
+        "name": "Homematic IP · Übersicht",
+        "order": 1,
+        "width": 24,
+        "height": 0,
+        "format": "<style>\n.hmip-panel{color:var(--gh-text,#f1f1f1);padding:12px}\n.hmip-panel .hmip-status{display:flex;gap:10px;align-items:center;min-height:40px}\n.hmip-panel .hmip-led{display:inline-block;width:12px;height:12px;border-radius:50%;background:#929292;flex-shrink:0}\n.hmip-panel .running{background:#82ef7b}.hmip-panel .warning{background:#ffd166}.hmip-panel .error{background:#ff7171}\n.hmip-panel input,.hmip-panel button{background:var(--gh-control,#444);color:inherit;padding:8px;border:1px solid var(--gh-border,#626262);border-radius:6px}\n.hmip-panel .hmip-scroll{overflow:auto;max-height:620px;margin-top:12px}\n.hmip-panel table{width:100%;border-collapse:collapse;font-size:13px}\n.hmip-panel td,.hmip-panel th{text-align:left;padding:9px;border-bottom:1px solid rgba(180,190,200,.18);vertical-align:top}\n.hmip-panel th{position:sticky;top:0;background:var(--gh-card,#303030)}\n.hmip-panel .hmip-points{max-height:260px;overflow:auto}.hmip-panel small{color:var(--gh-muted,#c6c6c6)}\n.hmip-panel .hmip-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}\n</style>\n<div class=\"hmip-panel\">\n <h3>Homematic IP · Geräte und Datenpunkte</h3>\n <div class=\"hmip-status\"><span class=\"hmip-led\" ng-class=\"state.status\" aria-hidden=\"true\"></span><strong>{{state.message || 'Status wird geladen …'}}</strong></div>\n <p ng-if=\"state.storageError\">{{state.storageError}}</p>\n <small>Nur lesend · Cloud-Abfrage alle {{(state.intervalMs || 60000)/1000}} s · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>\n <div class=\"hmip-toolbar\"><input ng-model=\"query\" aria-label=\"Geräte durchsuchen\" placeholder=\"Name, Raum, Seriennummer …\"><button ng-click=\"refresh()\">Aktualisieren</button></div>\n <p ng-if=\"!state.rows.length\">Noch keine Geräte. Bei Ersteinrichtung bitte die lokale Autorisierung ausführen.</p>\n <div class=\"hmip-scroll\"><table ng-if=\"state.rows.length\"><thead><tr><th>Gerät / Raum</th><th>Modell / Seriennummer (SGTIN)</th><th>Status</th><th>Datenpunkte</th></tr></thead>\n <tbody><tr ng-repeat=\"d in state.rows | filter:query track by d.id\">\n  <td><strong>{{d.name}}</strong><br>{{d.rooms || 'Raum nicht gemeldet'}}</td>\n  <td>{{d.model}}<br><small>{{d.serial || 'Nicht gemeldet'}}</small></td>\n  <td><span class=\"hmip-led\" ng-class=\"qualityClass(d)\" aria-hidden=\"true\"></span> {{qualityText(d)}}<br>\n   <small>Erreichbar: {{tri(d.reachable)}}<br>Batterie schwach: {{tri(d.lowBattery)}}<br>{{d.lastSeen | date:'dd.MM. HH:mm:ss'}}</small></td>\n  <td><button ng-click=\"expanded[d.id]=!expanded[d.id]\" aria-expanded=\"{{!!expanded[d.id]}}\">{{d.points.length}} Werte {{expanded[d.id] ? '▴' : '▾'}}</button>\n   <div class=\"hmip-points\" ng-show=\"expanded[d.id]\"><table><tbody><tr ng-repeat=\"p in d.points track by p.name\"><td>{{p.name}}</td><td><strong>{{display(p.value)}}</strong> {{p.unit}}</td></tr></tbody></table></div></td>\n </tr></tbody></table></div>\n <small>Grün: abgefragt · Gelb: Warnung / veraltet · Rot: Abfragefehler / Gerät offline · Grau: noch kein Status. Werte sind Cloud-Zustände, keine garantierte Echtzeitmessung.</small>\n</div>\n<script>\n(function(scope){\n scope.state={rows:[]};scope.expanded={};scope.query='';\n scope.tri=function(v){return v===true?'TRUE':v===false?'FALSE':'Unbekannt';};\n scope.display=function(v){return v===true?'TRUE':v===false?'FALSE':v===null?'—':v;};\n scope.qualityText=function(d){return {current:'Abgefragt',stale:'Veraltet',offline:'Offline',missing:'Nicht mehr gemeldet'}[d.quality]||'Unbekannt';};\n scope.qualityClass=function(d){return d.quality==='offline'?'error':d.quality==='current'?(d.lowBattery?'warning':'running'):'warning';};\n scope.refresh=function(){scope.send({topic:'homematic-ip/refresh'});};\n scope.$watch('msg',function(msg){if(msg&&msg.topic==='homematic-ip/state'&&Array.isArray(msg.payload.rows))scope.state=msg.payload;});\n scope.send({topic:'homematic-ip/get'});\n})(scope);\n</script>\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 180,
+        "wires": [
+            [
+                "hmip_reader"
+            ]
+        ]
+    },
+    {
+        "id": "hmip_comment",
+        "type": "comment",
+        "z": "hmip_flow",
+        "name": "Nur lesend · kein automatisches Schalten · Link-Schnittstellen für spätere Erweiterungen",
+        "info": "Zugangsdaten ausschließlich im Node-RED userDir/homematic-ip. Siehe docs/HOMEMATIC_IP.md.",
+        "x": 430,
+        "y": 40,
+        "wires": []
     }
 ]

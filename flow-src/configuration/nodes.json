@@ -2524,5 +2524,25 @@
     "disp": true,
     "width": "12",
     "collapse": false
+  },
+  {
+    "id": "hmip_ui_tab",
+    "type": "ui_tab",
+    "name": "Homematic IP",
+    "icon": "devices",
+    "order": 22,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "hmip_ui_group",
+    "type": "ui_group",
+    "name": "Geräteübersicht",
+    "tab": "hmip_ui_tab",
+    "order": 1,
+    "disp": true,
+    "width": "24",
+    "collapse": false,
+    "className": ""
   }
 ]

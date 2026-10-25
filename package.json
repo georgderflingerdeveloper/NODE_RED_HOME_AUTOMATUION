@@ -1,7 +1,7 @@
 {
   "name": "node-red-project",
   "description": "GEORGSHOME Home Automation",
-  "version": "0.15.1",
+  "version": "0.16.0",
   "private": true,
   "homeAutomation": {
     "branchPurposes": {
@@ -58,7 +58,8 @@
       "home-automation-project-info": "nodes/home-automation-project-info.js",
       "home-automation-scheduler": "nodes/home-automation-scheduler.js",
       "home-automation-phidget-discovery": "nodes/home-automation-phidget-discovery.js",
-      "home-automation-phidget-io": "nodes/home-automation-phidget-io.js"
+      "home-automation-phidget-io": "nodes/home-automation-phidget-io.js",
+      "home-automation-homematic-ip": "nodes/home-automation-homematic-ip.js"
     },
     "settings": {
       "flowFile": "flows.json",

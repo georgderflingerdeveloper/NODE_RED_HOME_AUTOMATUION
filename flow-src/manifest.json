@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "d83615c005dab7f3304ede5fe83af8e286e677a0df7032257d8c882226fb3e36",
+  "flowSha256": "da5e3760fa69573394c7d0d923d7365f558dd0becc098605cbbfdcf51c201f89",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -630,7 +630,15 @@
     "gh_theme_tab",
     "gh_theme_group",
     "gh_theme_global",
-    "gh_theme_picker"
+    "gh_theme_picker",
+    "hmip_ui_tab",
+    "hmip_ui_group",
+    "hmip_flow",
+    "hmip_link_in",
+    "hmip_reader",
+    "hmip_link_out",
+    "hmip_ui",
+    "hmip_comment"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -752,6 +760,8 @@
     "ph_discovery_tab": "configuration/nodes.json",
     "gh_theme_tab": "configuration/nodes.json",
     "gh_theme_group": "configuration/nodes.json",
+    "hmip_ui_tab": "configuration/nodes.json",
+    "hmip_ui_group": "configuration/nodes.json",
     "956c65fc.759a28": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "f4f718ca.73ad78": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "5e8c7091.07116": "flows/boiler--15e47868.0e5ea8/nodes.json",
@@ -929,6 +939,12 @@
     "67458fb3.fd5b5": "flows/home--7fa0f8f.5a71708/nodes.json",
     "9dd3e2de.6f4df": "flows/home--7fa0f8f.5a71708/nodes.json",
     "b5fdcfb9.05a01": "flows/home--7fa0f8f.5a71708/nodes.json",
+    "hmip_flow": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_link_in": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_reader": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_link_out": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_ui": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_comment": "flows/homematic-ip--hmip_flow/nodes.json",
     "kosten_tarif_zeitplan": "flows/kosten--kosten_flow/nodes.json",
     "kosten_awattar_api": "flows/kosten--kosten_flow/nodes.json",
     "kosten_aktuellen_tarif_aufbereiten": "flows/kosten--kosten_flow/nodes.json",
@@ -1350,7 +1366,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "a0db742050f1ee033eb8bc5d320f3530ca85f2cdd6c70d65e169a314d2d15fbf",
+    "configuration/nodes.json": "89096a9229abb1f7d4467639bedfd2e220e8c70b9d4851d0372ac8db78f8e451",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -1382,6 +1398,8 @@
     "flows/home--7fa0f8f.5a71708/functions/command-all.js": "663d6e9773279c8ac283507d8805d7a3c4eeb917c578e7d1a00f2e8b1c28b768",
     "flows/home--7fa0f8f.5a71708/nodes.json": "19cf90e3db3bc6a08b70dd8a446bf4e7fb5fc62740913a75dca9cc7d1c8ea5eb",
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
+    "flows/homematic-ip--hmip_flow/nodes.json": "0b1254ee9b4ec1f982d2dcf6570013134fe7341c24c0a733b83896c7c4e579fb",
+    "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "9b43013fc098dee53299691ee3d221845b8708cdda275b603b5989759063ffb6",
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "3533971c7dfd0e01b8f0a042cfae91ad789ff3b383217c64dce65610ed8021d7",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "e500f17f36e212aac57d9c91276460203339ed1c45cda239fd64195311510a44",
     "flows/kosten--kosten_flow/nodes.json": "8d559cf78152ad28ed25a16b88d2fb923a013f7341dc202d98a339e76d1f780e",

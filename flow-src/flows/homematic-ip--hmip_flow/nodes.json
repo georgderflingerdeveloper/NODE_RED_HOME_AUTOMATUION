@@ -1,0 +1,84 @@
+[
+  {
+    "id": "hmip_flow",
+    "type": "tab",
+    "label": "HOMEMATIC IP",
+    "disabled": false,
+    "info": "Lesende Cloud-Anbindung. Anleitung: docs/HOMEMATIC_IP.md. Schaltbefehle werden nicht verarbeitet."
+  },
+  {
+    "id": "hmip_link_in",
+    "type": "link in",
+    "z": "hmip_flow",
+    "name": "Homematic IP · get / refresh",
+    "links": [],
+    "x": 135,
+    "y": 100,
+    "wires": [
+      [
+        "hmip_reader"
+      ]
+    ]
+  },
+  {
+    "id": "hmip_reader",
+    "type": "home-automation-homematic-ip",
+    "z": "hmip_flow",
+    "name": "HAP · Cloud lesen",
+    "intervalMs": 60000,
+    "x": 350,
+    "y": 100,
+    "wires": [
+      [
+        "hmip_link_out",
+        "hmip_ui"
+      ]
+    ]
+  },
+  {
+    "id": "hmip_link_out",
+    "type": "link out",
+    "z": "hmip_flow",
+    "name": "Homematic IP · Gerätezustände",
+    "mode": "link",
+    "links": [],
+    "x": 590,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "hmip_ui",
+    "type": "ui_template",
+    "z": "hmip_flow",
+    "group": "hmip_ui_group",
+    "name": "Homematic IP · Übersicht",
+    "order": 1,
+    "width": 24,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 600,
+    "y": 180,
+    "wires": [
+      [
+        "hmip_reader"
+      ]
+    ]
+  },
+  {
+    "id": "hmip_comment",
+    "type": "comment",
+    "z": "hmip_flow",
+    "name": "Nur lesend · kein automatisches Schalten · Link-Schnittstellen für spätere Erweiterungen",
+    "info": "Zugangsdaten ausschließlich im Node-RED userDir/homematic-ip. Siehe docs/HOMEMATIC_IP.md.",
+    "x": 430,
+    "y": 40,
+    "wires": []
+  }
+]

@@ -1,0 +1,43 @@
+<style>
+.hmip-panel{color:var(--gh-text,#f1f1f1);padding:12px}
+.hmip-panel .hmip-status{display:flex;gap:10px;align-items:center;min-height:40px}
+.hmip-panel .hmip-led{display:inline-block;width:12px;height:12px;border-radius:50%;background:#929292;flex-shrink:0}
+.hmip-panel .running{background:#82ef7b}.hmip-panel .warning{background:#ffd166}.hmip-panel .error{background:#ff7171}
+.hmip-panel input,.hmip-panel button{background:var(--gh-control,#444);color:inherit;padding:8px;border:1px solid var(--gh-border,#626262);border-radius:6px}
+.hmip-panel .hmip-scroll{overflow:auto;max-height:620px;margin-top:12px}
+.hmip-panel table{width:100%;border-collapse:collapse;font-size:13px}
+.hmip-panel td,.hmip-panel th{text-align:left;padding:9px;border-bottom:1px solid rgba(180,190,200,.18);vertical-align:top}
+.hmip-panel th{position:sticky;top:0;background:var(--gh-card,#303030)}
+.hmip-panel .hmip-points{max-height:260px;overflow:auto}.hmip-panel small{color:var(--gh-muted,#c6c6c6)}
+.hmip-panel .hmip-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+</style>
+<div class="hmip-panel">
+ <h3>Homematic IP · Geräte und Datenpunkte</h3>
+ <div class="hmip-status"><span class="hmip-led" ng-class="state.status" aria-hidden="true"></span><strong>{{state.message || 'Status wird geladen …'}}</strong></div>
+ <p ng-if="state.storageError">{{state.storageError}}</p>
+ <small>Nur lesend · Cloud-Abfrage alle {{(state.intervalMs || 60000)/1000}} s · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
+ <div class="hmip-toolbar"><input ng-model="query" aria-label="Geräte durchsuchen" placeholder="Name, Raum, Seriennummer …"><button ng-click="refresh()">Aktualisieren</button></div>
+ <p ng-if="!state.rows.length">Noch keine Geräte. Bei Ersteinrichtung bitte die lokale Autorisierung ausführen.</p>
+ <div class="hmip-scroll"><table ng-if="state.rows.length"><thead><tr><th>Gerät / Raum</th><th>Modell / Seriennummer (SGTIN)</th><th>Status</th><th>Datenpunkte</th></tr></thead>
+ <tbody><tr ng-repeat="d in state.rows | filter:query track by d.id">
+  <td><strong>{{d.name}}</strong><br>{{d.rooms || 'Raum nicht gemeldet'}}</td>
+  <td>{{d.model}}<br><small>{{d.serial || 'Nicht gemeldet'}}</small></td>
+  <td><span class="hmip-led" ng-class="qualityClass(d)" aria-hidden="true"></span> {{qualityText(d)}}<br>
+   <small>Erreichbar: {{tri(d.reachable)}}<br>Batterie schwach: {{tri(d.lowBattery)}}<br>{{d.lastSeen | date:'dd.MM. HH:mm:ss'}}</small></td>
+  <td><button ng-click="expanded[d.id]=!expanded[d.id]" aria-expanded="{{!!expanded[d.id]}}">{{d.points.length}} Werte {{expanded[d.id] ? '▴' : '▾'}}</button>
+   <div class="hmip-points" ng-show="expanded[d.id]"><table><tbody><tr ng-repeat="p in d.points track by p.name"><td>{{p.name}}</td><td><strong>{{display(p.value)}}</strong> {{p.unit}}</td></tr></tbody></table></div></td>
+ </tr></tbody></table></div>
+ <small>Grün: abgefragt · Gelb: Warnung / veraltet · Rot: Abfragefehler / Gerät offline · Grau: noch kein Status. Werte sind Cloud-Zustände, keine garantierte Echtzeitmessung.</small>
+</div>
+<script>
+(function(scope){
+ scope.state={rows:[]};scope.expanded={};scope.query='';
+ scope.tri=function(v){return v===true?'TRUE':v===false?'FALSE':'Unbekannt';};
+ scope.display=function(v){return v===true?'TRUE':v===false?'FALSE':v===null?'—':v;};
+ scope.qualityText=function(d){return {current:'Abgefragt',stale:'Veraltet',offline:'Offline',missing:'Nicht mehr gemeldet'}[d.quality]||'Unbekannt';};
+ scope.qualityClass=function(d){return d.quality==='offline'?'error':d.quality==='current'?(d.lowBattery?'warning':'running'):'warning';};
+ scope.refresh=function(){scope.send({topic:'homematic-ip/refresh'});};
+ scope.$watch('msg',function(msg){if(msg&&msg.topic==='homematic-ip/state'&&Array.isArray(msg.payload.rows))scope.state=msg.payload;});
+ scope.send({topic:'homematic-ip/get'});
+})(scope);
+</script>
