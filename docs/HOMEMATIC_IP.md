@@ -55,7 +55,7 @@ stale = alter Bestand nach Fehler/Neustart/HAP offline, missing = nicht mehr in 
 Unbekannte Erreichbarkeit wird ausdrücklich als unbekannt angezeigt.
 
 Persistenz: ~/.node-red/homematic-ip/<node-id>-snapshot.json. Letzter erfolgreicher
-Bestand, atomar geschrieben; kein historisches Messarchiv. Verschwundene Geräte bleiben
+Bestand, atomar geschrieben. Das getrennte historische Messarchiv ist seit 0.20.0 verfügbar (siehe unten). Verschwundene Geräte bleiben
 als missing erhalten. Nach Neustart niemals sofort als aktuell markieren.
 UI-Suchtext/offene Zeilen bleiben bei Datenupdates erhalten (nicht browserübergreifend).
 Anzeigezeit im Browser in dessen lokaler Zeitzone; Zeitstempel als Unix-Millisekunden.
@@ -64,7 +64,7 @@ Anzeigezeit im Browser in dessen lokaler Zeitzone; Zeitstempel als Unix-Millisek
 Eingang `Homematic IP · get / refresh`:
 - msg.topic = homematic-ip/get: letzten Bestand sofort ausgeben, ohne Cloudzugriff.
 - msg.topic = homematic-ip/refresh: Abfrage, sofern Mindestintervall abgelaufen.
-Andere Topics werden ignoriert und als Warnung protokolliert. Keine Befehlsweiterleitung.
+Zusätzlich stehen seit 0.20.0 die unten beschriebenen lesenden Historienabfragen zur Verfügung. Andere Topics werden ignoriert und als Warnung protokolliert. Keine Befehlsweiterleitung.
 Ausgang `Homematic IP · Gerätezustände` bleibt für deine Verdrahtung unverbunden.
 
 Ausgabe: topic homematic-ip/state; payload:
@@ -105,3 +105,97 @@ und „Nur Warnungen“ lassen sich kombinieren. Die Raumwahl verwendet die vom
 Cloud-Adapter gemeldete Raumzuordnung (gegebenenfalls mehrere Räume zusammen).
 Veraltete und fehlende Geräte behalten ihre letzten bekannten Werte mit
 sichtbarem Hinweis; Aktualisieren bleibt an das Abfrageintervall gebunden.
+
+
+## Dynamische Trends und Messarchiv · v0.20.0
+
+Unter der Geräteübersicht erscheint „Trends und Historie“ mit einem dynamischen
+Trendmenü. Gerät/Raum und Suche filtern den Katalog tatsächlich aufgezeichneter
+Datenpunkte. Anfangs werden Ist- und, falls verfügbar, Solltemperatur desselben
+Geräts gewählt. Bis zu sechs numerische Trends gleicher Einheit lassen sich
+vergleichen. Boolesche Zustände werden gemeinsam als 0/1, Textzustände einzeln
+mit ihren Zustandsnamen dargestellt. Unbekannte numerische Datenpunkte bleiben
+auswählbar; Identifikatoren, Metadaten und Geheimnisfelder sind ausgeschlossen.
+Prozentwerte von Ventilposition, Dimmer und Rollladen werden für die Darstellung
+von 0–1 auf 0–100 skaliert. Rohdaten in den Gerätedetails bleiben erhalten.
+
+„Aktueller Verlauf · Live“ bietet 1, 6, 24 Stunden oder 7 Tage und aktualisiert
+sich nach Geräteabfragen, ohne zusätzliche Cloud-Abfragen auszulösen.
+„Historischer Verlauf“ verwendet Von-/Bis-Datum und Uhrzeit in Europe/Vienna,
+maximal 366 Tage, Ende exklusiv; Vorschläge gestern und letzte 7 Tage.
+Mehrdeutige/nicht existente lokale Zeiten bei Zeitumstellung werden abgewiesen.
+Historische Ergebnisse, Gerätewahl, Trendwahl und Suchfilter werden durch
+Live-Nachrichten nicht ersetzt. Eine bewusst geleerte Auswahl bleibt leer.
+
+Temperaturen haben einen festen wertabhängigen Farbverlauf: 0 °C und darunter
+blau, um 20 °C grün, über Gelb/Orange bis zu Rot ab 35 °C. Diese Farben sind eine
+visuelle Temperatureinordnung, keine gerätespezifischen Alarmgrenzen. Sollwerte
+sind als Stufenlinie gestrichelt. Weitere Linien unterscheiden sich durch
+Strichmuster; andere Messgrößen erhalten unterscheidbare Serienfarben.
+
+Mausbewegung oder Antippen setzt den Cursor. Pro Trend zeigt er eine tatsächlich
+aufgezeichnete Messung samt eigenem Messzeitpunkt oder „—“ bei einer Lücke.
+Die Cursorzeit und die Messzeit werden getrennt ausgewiesen; bei verdichteten
+Daten wird kein interpolierter Wert als Messung ausgegeben. Zeitangaben nennen
+Wiener Zeit und UTC-Offset, auch an Tagen mit Sommer-/Winterzeitwechsel.
+
+Zoom +/− bis 128×, Früher/Später und der volle Zeitraum-Schieberegler navigieren
+im abgefragten Bereich. Der Slider funktioniert sofort und schaltet bei 1×
+automatisch auf 2×. Zoom und Verschieben laden den Ausschnitt nach kurzer
+Entprellung (200 ms) detailliert aus dem lokalen Archiv nach. Bei fokussiertem
+Diagramm: +/−, Pfeiltasten und Home; auf kleinen Displays horizontal scrollbar.
+Veraltete Antworten werden anhand von requestId ignoriert.
+
+### Speicherung und Datenqualität
+
+`~/.node-red/homematic-ip/<node-id>-history.sqlite` speichert die Zeitreihen
+separat vom letzten JSON-Snapshot. WAL-Modus, transaktionale Poll-Batches und
+ein eindeutiger Schlüssel aus Datenpunkt/Zeitpunkt verhindern halbe oder doppelte
+Schreibvorgänge. Datei 0600, eigenes Verzeichnis 0700. Die Historie übersteht
+Node-RED- und Browser-Neustarts. Im Knoten ist die Aufbewahrung konfigurierbar:
+standardmäßig 365 Tage, 1–3650 Tage. Abgelaufene Messwerte werden spätestens bei
+der nächsten täglichen Bereinigung entfernt; der Trendkatalog bleibt bestehen.
+
+Aufzeichnung beginnt nach Installation mit den künftigen Geräteabfragen.
+Vorherige Messverläufe können aus einem einzelnen Snapshot nicht rückwirkend
+hergestellt werden. Zeitstempel sind Abfragezeitpunkte der Cloud, keine
+zugesicherten physischen Messzeitpunkte im Gerät. Gleichbleibende Werte können
+dem unveränderten Cloudbestand entsprechen. Die Historie behauptet deshalb
+keine höhere Echtzeitauflösung als das bestehende Abfrageintervall.
+
+Nur aktuelle Gerätewerte werden als Messungen gespeichert. Offline-/veraltete,
+verschwundene oder nicht mehr gemeldete Datenpunkte sowie fehlgeschlagene Polls
+erzeugen Lücken statt Wiederholungen alter Werte. Auch zeitliche Lücken zwischen
+Abfragen über 2,5 Intervallen werden beim Zeichnen nicht überbrückt. Bei langen
+Zeiträumen liefert jede Serie höchstens ungefähr 1600 Originalpunkte: erster,
+minimaler, maximaler und letzter Wert sowie Lückenmarker je Zeitbucket. Buckets
+mit internen Lücken werden bewusst ohne verbindende Linie dargestellt.
+Min/Max/Mittelwert/Anzahl beziehen sich auf alle gültigen Archivwerte im geladenen
+Ausschnitt. Sie sind bei unregelmäßigen Abfragen nicht zeitgewichtet.
+
+### Lesende Schnittstellen und Installation
+
+- `homematic-ip/history/catalog` → gleiches Topic mit `/result`:
+  `{requestId, series, retentionDays, intervalMs}`.
+- `homematic-ip/history/query` → gleiches Topic mit `/result`:
+  `seriesIds` (max. 6), entweder `mode: live` mit `hours: 1|6|24|168` oder
+  Wiener Von-/Bis-Text `YYYY-MM-DDTHH:mm`; für Zoom numerische Unix-Millisekunden.
+  Antwort `{requestId, from, to, series, bucketMs, intervalMs, retentionDays}`.
+  Jede Serie enthält Metadaten, Originalpunkte `{at,value,text,quality,breakBefore}`
+  und unverdichtete Statistik. Fehler werden als `{requestId,error}` ausgegeben.
+
+Antworten erhalten socketid und requestId; sie gehen nur an den anfragenden
+Dashboard-Client. Keine Steuerbefehle, keine zusätzliche Cloud-Anmeldung.
+`homematic-ip/state` enthält zusätzlich `historyError`, falls das Messarchiv
+nicht geöffnet/beschrieben werden kann. Die aktuelle Geräteanzeige bleibt dabei
+verfügbar.
+
+`npm run nodes:install` installiert auch `homematic-ip-history.cjs`; danach die
+synchronisierten Flows laden / Node-RED neu starten. Das aktualisierte
+`package.json` gehört zur Installation. Für Sicherungen des neuen Archivs einen
+SQLite-konsistenten Backup-Weg verwenden; die bisherige History-Datenbank und
+Homematic-Archivdatei sind getrennte Datenbanken.
+
+Tests: `test/homematic-ip-history.test.mjs`, `test/homematic-ip-trends-ui.test.mjs`
+und bestehende `test/homematic-ip.test.mjs`. Sie verwenden temporäre Datenbanken
+und simulierte Geräteabfragen, keine Hardware- oder Cloud-Zugriffe.

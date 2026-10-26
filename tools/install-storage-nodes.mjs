@@ -10,6 +10,7 @@ const files = [
   "home-automation-homematic-ip.js",
   "home-automation-homematic-ip.html",
   "homematic-ip-core.cjs",
+  "homematic-ip-history.cjs",
   "homematic-ip-bridge.py",
   "home-automation-phidget-discovery.js",
   "home-automation-phidget-discovery.html",

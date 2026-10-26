@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "48f1ca1b10f478ed4a617e0aafaffc1d2a75f32dbd28f130ee1d994030516eaa",
+  "flowSha256": "048989e8258b84378bebdfc9a5ad178a42743821672c4454557957a1b37d4f2f",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -641,7 +641,8 @@
     "hmip_comment",
     "solaredge_compare_tab",
     "solaredge_compare_group",
-    "solaredge_compare_ui"
+    "solaredge_compare_ui",
+    "hmip_trends_ui"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -950,6 +951,7 @@
     "hmip_link_out": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_ui": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_comment": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_trends_ui": "flows/homematic-ip--hmip_flow/nodes.json",
     "kosten_tarif_zeitplan": "flows/kosten--kosten_flow/nodes.json",
     "kosten_awattar_api": "flows/kosten--kosten_flow/nodes.json",
     "kosten_aktuellen_tarif_aufbereiten": "flows/kosten--kosten_flow/nodes.json",
@@ -1404,8 +1406,9 @@
     "flows/home--7fa0f8f.5a71708/functions/command-all.js": "663d6e9773279c8ac283507d8805d7a3c4eeb917c578e7d1a00f2e8b1c28b768",
     "flows/home--7fa0f8f.5a71708/nodes.json": "19cf90e3db3bc6a08b70dd8a446bf4e7fb5fc62740913a75dca9cc7d1c8ea5eb",
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
-    "flows/homematic-ip--hmip_flow/nodes.json": "0b1254ee9b4ec1f982d2dcf6570013134fe7341c24c0a733b83896c7c4e579fb",
-    "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "08f22b77894aff1b6be9a4d350aa61fb4998e2e610d7d041932dd512a1a051fe",
+    "flows/homematic-ip--hmip_flow/nodes.json": "85730b5a7f2bd5734f1d7e8bfc56583975eb4e0c943ce86ba6666ebc0849696c",
+    "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "f5c82972d93a8f5fea539a1cc012fb0ee72094c5f2316909cc7d57902c4755ec",
+    "flows/homematic-ip--hmip_flow/templates/homematic-ip-trends.html": "2fbd8e700640aca1bc1dd7aed4b4e132926b57c0c04637636c67d367eeda922a",
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "8cbd096590566a6fb1a33b40614b16c03d101ce9f9dddf817f0a930679946aaf",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "e500f17f36e212aac57d9c91276460203339ed1c45cda239fd64195311510a44",
     "flows/kosten--kosten_flow/nodes.json": "e5ece433d499fa777115ec5a79b46e37ac3b96d3be0caa60c00392575558506e",

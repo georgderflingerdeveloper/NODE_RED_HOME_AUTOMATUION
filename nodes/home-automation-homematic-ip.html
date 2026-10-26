@@ -1,12 +1,13 @@
 <script type="text/javascript">
 RED.nodes.registerType('home-automation-homematic-ip',{
- category:'network',color:'#a8b8ac',defaults:{name:{value:'Homematic IP · Lesen'},intervalMs:{value:60000,validate:RED.validators.number()}},
+ category:'network',color:'#a8b8ac',defaults:{name:{value:'Homematic IP · Lesen'},intervalMs:{value:60000,validate:RED.validators.number()},historyDays:{value:365,validate:RED.validators.number()}},
  inputs:1,outputs:1,icon:'bridge.svg',label:function(){return this.name||'Homematic IP';}
 });
 </script>
 <script type="text/html" data-template-name="home-automation-homematic-ip">
 <div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name"></div>
 <div class="form-row"><label for="node-input-intervalMs">Intervall ms</label><input id="node-input-intervalMs" type="number" min="60000"></div>
+<div class="form-row"><label for="node-input-historyDays">Historie Tage</label><input id="node-input-historyDays" type="number" min="1" max="3650"></div>
 <p>Nur lesend. Zugangsdaten liegen außerhalb des Projekts im Node-RED-userDir. Einrichtung siehe docs/HOMEMATIC_IP.md.</p>
 </script>
-<script type="text/html" data-help-name="home-automation-homematic-ip"><p>Abfrage mindestens alle 60 Sekunden. Link-Eingang: homematic-ip/get oder homematic-ip/refresh. Ausgabe: homematic-ip/state. Keine Schaltbefehle.</p></script>
+<script type="text/html" data-help-name="home-automation-homematic-ip"><p>Abfrage mindestens alle 60 Sekunden. Link-Eingang: homematic-ip/get oder homematic-ip/refresh. Ausgabe: homematic-ip/state. Historie: homematic-ip/history/catalog und homematic-ip/history/query. Lokal gespeicherte zukünftige Abfragen, standardmäßig 365 Tage. Keine Schaltbefehle.</p></script>

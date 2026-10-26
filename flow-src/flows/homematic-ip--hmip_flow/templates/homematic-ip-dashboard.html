@@ -24,6 +24,7 @@
  <h3>Homematic IP · Geräte und Datenpunkte</h3>
  <div class="hmip-status"><span class="hmip-led" ng-class="state.status" aria-hidden="true"></span><strong>{{state.message || 'Status wird geladen …'}}</strong></div>
  <p ng-if="state.storageError">{{state.storageError}}</p>
+ <p ng-if="state.historyError">{{state.historyError}}</p>
  <small>Nur lesend · Cloud-Abfrage alle {{(state.intervalMs || 60000)/1000}} s · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
  <div class="hmip-summary" aria-label="Geräteübersicht">
   <div><small>Geräte gesamt</small><strong>{{state.rows.length}}</strong></div>

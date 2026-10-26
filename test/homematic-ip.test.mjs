@@ -25,7 +25,7 @@ test('HAP: Offline, HAP offline, verschwundene Geräte und Wiederkehr',()=>{
 function harness(dir){
  const events={},sent=[],timers=[],calls=[];let Type;
  const RED={settings:{userDir:dir},nodes:{createNode(node){node.id='test';node.on=(k,f)=>events[k]=f;node.send=m=>sent.push(structuredClone(m));node.status=()=>{};node.warn=()=>{};},registerType(_name,ctor){Type=ctor;}}};
- const customRequire=id=>id==='node:child_process'?{execFile:(exe,args,options,callback)=>{calls.push({exe,args,options,callback,killed:false});return {kill(){calls.at(-1).killed=true;}};}}:id==='./homematic-ip-core.cjs'?{normalize,mergeRows}:require(id);
+ const customRequire=id=>id==='node:child_process'?{execFile:(exe,args,options,callback)=>{calls.push({exe,args,options,callback,killed:false});return {kill(){calls.at(-1).killed=true;}};}}:id==='./homematic-ip-core.cjs'?{normalize,mergeRows}:id==='./homematic-ip-history.cjs'?require('../nodes/homematic-ip-history.cjs'):require(id);
  const box={module:{exports:{}},require:customRequire,__dirname:'/runtime/nodes',process:{env:{}},setTimeout:(fn)=>{timers.push(fn);return timers.length;},clearTimeout:()=>{},Date};
  vm.runInNewContext(fs.readFileSync('nodes/home-automation-homematic-ip.js','utf8'),box);box.module.exports(RED);new Type({intervalMs:1});return {events,sent,timers,calls};
 }
@@ -74,4 +74,16 @@ test('HAP dashboard: Messwerte, Mehrkanäle, Nullwerte, Warnungen und Filter',()
  scope.room='Küche';watches.room();assert.equal(scope.visibleRows.length,0);
  scope.warningsOnly=false;scope.query='test-serial';watches.query();assert.equal(scope.visibleRows.length,1);
  watches.msg({topic:'homematic-ip/state'});assert.equal(scope.state.rows.length,2);
+});
+test('HAP Historie: Gerätedaten werden archiviert; Trendabfragen bleiben lokal und socketgebunden',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hmip-trend-runtime-'));try{
+  fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
+  const h=harness(dir);h.timers[0]();h.calls[0].callback(null,JSON.stringify(sample()));
+  let catalog;h.events.input({topic:'homematic-ip/history/catalog',socketid:'client-a',payload:{requestId:5}},m=>catalog=m,()=>{});
+  assert.equal(catalog.socketid,'client-a');assert.equal(catalog.payload.requestId,5);assert.equal(catalog.topic,'homematic-ip/history/catalog/result');
+  const s=catalog.payload.series.find(s=>s.kind==='temperature');assert.ok(s);let result;
+  h.events.input({topic:'homematic-ip/history/query',socketid:'client-a',payload:{requestId:6,seriesIds:[s.id],from:s.lastAt-1000,to:s.lastAt+1000}},m=>result=m,()=>{});
+  assert.equal(result.socketid,'client-a');assert.equal(result.payload.series[0].points[0].value,20.5);assert.equal(h.calls.length,1);assert.ok(!JSON.stringify(result).includes('secret'));
+  h.events.close(false,()=>{});
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });

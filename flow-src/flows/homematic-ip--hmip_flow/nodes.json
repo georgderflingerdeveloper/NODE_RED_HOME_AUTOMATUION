@@ -31,9 +31,11 @@
     "wires": [
       [
         "hmip_link_out",
-        "hmip_ui"
+        "hmip_ui",
+        "hmip_trends_ui"
       ]
-    ]
+    ],
+    "historyDays": 365
   },
   {
     "id": "hmip_link_out",
@@ -80,5 +82,30 @@
     "x": 430,
     "y": 40,
     "wires": []
+  },
+  {
+    "id": "hmip_trends_ui",
+    "type": "ui_template",
+    "z": "hmip_flow",
+    "group": "hmip_ui_group",
+    "name": "Homematic IP · Live und historische Trends",
+    "order": 2,
+    "width": 24,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/homematic-ip--hmip_flow/templates/homematic-ip-trends.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 620,
+    "y": 260,
+    "wires": [
+      [
+        "hmip_reader"
+      ]
+    ]
   }
 ]
