@@ -547,6 +547,11 @@ module.exports = function registerHistoryStore(RED) {
         : period === "year"
           ? new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna", year: "numeric", month: "2-digit" }).format(new Date(intervalStart))
           : new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(intervalStart));
+      const observedIntervalGroupKey = (intervalStart) => period === "day" ? localDay(intervalStart) : groupKey(intervalStart);
+      const recordedGroupKeys = new Set([
+        ...snapshots.map((row) => observedIntervalGroupKey(row.interval_start)),
+        ...tariffRows.map((row) => observedIntervalGroupKey(row.valid_from)),
+      ]);
       const getGroup = (intervalStart) => {
         const key = groupKey(intervalStart);
         const group = groups.get(key) || {
@@ -646,6 +651,36 @@ module.exports = function registerHistoryStore(RED) {
           tariffStatus: "online",
           recorded: false,
         });
+      }
+      const expectedUntil = Math.min(Date.parse(range.to), Date.now());
+      for (let start = Date.parse(range.from); start + HOUR_MS <= expectedUntil; start += HOUR_MS) {
+        const intervalStart = new Date(start).toISOString();
+        if (!recordedGroupKeys.has(observedIntervalGroupKey(intervalStart))) continue;
+        const group = getGroup(intervalStart);
+        const hour = group.hours.find((item) => item.intervalStart === intervalStart);
+        if (hour?.recorded) continue;
+        if (hour) {
+          hour.incomplete = true;
+          hour.status = "keine Messdaten";
+        } else {
+          group.hours.push({
+            intervalStart,
+            time: new Intl.DateTimeFormat("de-AT", { timeZone: "Europe/Vienna", hour: "2-digit", minute: "2-digit" }).format(new Date(intervalStart)),
+            gridImportKWh: null,
+            houseConsumptionKWh: null,
+            energyCostEur: null,
+            gridImportCostEur: null,
+            tariffCtPerKWh: null,
+            temperatureC: null,
+            status: "keine Messdaten",
+            weatherStatus: "ausstehend",
+            energyStatus: "ausstehend",
+            tariffStatus: "ausstehend",
+            recorded: false,
+            incomplete: true,
+          });
+        }
+        group.offlineCount += 1;
       }
       const reconciliations = selectDailyReconciliations.all()
         .filter((row) => {

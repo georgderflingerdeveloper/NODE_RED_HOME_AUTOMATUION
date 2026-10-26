@@ -98,8 +98,7 @@ function normalizeRecord(record, previous = null) {
   if (!user || user.length > 64) throw new Error("SSH-Benutzer fehlt oder ist zu lang");
   const password = typeof record?.password === "string" && record.password.length
     ? record.password
-    : previous?.password;
-  if (!password) throw new Error("SSH-Passwort fehlt");
+    : previous?.password || null;
   return {
     id: ip,
     name: String(record?.name || previous?.name || ip).trim().slice(0, 80),
@@ -334,7 +333,7 @@ class CredentialVault {
     } catch {
       if (key) key.fill(0);
       this.authFailed();
-      throw new Error("Master-Passwort ist falsch");
+      throw new Error("Master-Passwort ist falsch. Das Raspberry-Pi- oder Standardpasswort entsperrt den Tresor nicht.");
     }
   }
 
@@ -367,10 +366,10 @@ class CredentialVault {
   }
 
   // Vor jeder Operation wird geprüft, ob der Tresor noch aktiv ist.
-  requireUnlocked() {
+  requireUnlocked(touch = true) {
     this.autoLock();
     if (!this.dataKey || !this.records) throw new Error("Tresor ist gesperrt");
-    this.touch();
+    if (touch) this.touch();
   }
 
   // Speichern der aktiven Datensätze im verschlüsselten Format. Dabei wird nur
@@ -384,8 +383,8 @@ class CredentialVault {
   }
 
   // Lesen aller Einträge ohne Passwörter im Klartext.
-  list() {
-    this.requireUnlocked();
+  list({ touch = true } = {}) {
+    this.requireUnlocked(touch);
     return this.records.map(({ password, ...record }) => ({ ...record, hasPassword: Boolean(password) }));
   }
 
@@ -468,7 +467,9 @@ class CredentialVault {
       records = this.decryptRecords(envelope, temporaryKey).map((record) => ({ ...record }));
     }
     try {
-      const devices = await Promise.all(records.map((record) => probe(record, this.spawn)));
+      const devices = await Promise.all(records.map((record) => record.password
+        ? probe(record, this.spawn)
+        : Promise.resolve({ ip: record.ip, online: false, hostname: record.name, error: "SSH-Zugangsdaten fehlen" })));
       return { source: "encrypted-vault", observedAt: new Date().toISOString(), devices };
     } finally {
       if (temporaryKey) temporaryKey.fill(0);

@@ -25,7 +25,8 @@
  <div class="hmip-status"><span class="hmip-led" ng-class="state.status" aria-hidden="true"></span><strong>{{state.message || 'Status wird geladen …'}}</strong></div>
  <p ng-if="state.storageError">{{state.storageError}}</p>
  <p ng-if="state.historyError">{{state.historyError}}</p>
- <small>Nur lesend · Cloud-Abfrage alle {{(state.intervalMs || 60000)/1000}} s · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
+ <small ng-if="state.nextAttemptAt">Nächste Cloud-Abfrage frühestens: {{state.nextAttemptAt | date:'dd.MM.yyyy HH:mm:ss'}}</small>
+ <small>Nur lesend · Cloud-Abfrage alle {{(state.intervalMs || 120000)/1000}} s · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
  <div class="hmip-summary" aria-label="Geräteübersicht">
   <div><small>Geräte gesamt</small><strong>{{state.rows.length}}</strong></div>
   <div><small>Aktuell erreichbar</small><strong>{{summary.current}}</strong></div>

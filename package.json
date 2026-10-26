@@ -1,69 +1,69 @@
 {
-  "name": "node-red-project",
-  "description": "GEORGSHOME Home Automation",
-  "version": "0.20.0",
-  "private": true,
-  "homeAutomation": {
-    "branchPurposes": {
-      "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand für Solar, Wetter, Kosten, Systemüberwachung, Netzwerk-Teilnehmer und verschlüsselte Zugangsdaten.",
-      "SOLAR_clean_start": "Stabiler Ausgangsstand der Solar- und Hausautomations-Flows."
-    }
-  },
-  "scripts": {
-    "flow:export": "node tools/flow-source/export.mjs",
-    "flow:import": "node tools/flow-source/import.mjs --write",
-    "flow:import:check": "node tools/flow-source/import.mjs",
-    "flow:check": "node tools/flow-source/validate.mjs",
-    "flow:roundtrip": "node tools/flow-source/roundtrip.mjs",
-    "library:install": "node tools/flow-source/install-library.mjs",
-    "desktop:install": "node tools/install-desktop-dashboard.mjs",
-    "database:check": "node tools/database-check.mjs",
-    "nodes:install": "node tools/install-storage-nodes.mjs",
-    "history:install": "npm run nodes:install",
-    "history:restore": "node tools/restore-history-db.mjs",
-    "flow:deploy": "npm run nodes:install && npm run library:install && node tools/flow-source/deploy.mjs",
-    "version:patch": "node tools/bump-version.mjs patch",
-    "version:minor": "node tools/bump-version.mjs minor",
-    "version:major": "node tools/bump-version.mjs major",
-    "test": "node --test test/*.test.mjs"
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "dependencies": {
-    "@redplc/node-red-redplc": "^2.0.1",
-    "node-red-contrib-actionflows": "~2.0.3",
-    "node-red-contrib-assert": "~1.3.2",
-    "node-red-contrib-bigtimer": "~2.6.3",
-    "node-red-contrib-blockly": "~1.1.0",
-    "node-red-contrib-boolean-logic-ultimate": "~1.0.23",
-    "node-red-contrib-calc": "~1.0.5",
-    "node-red-contrib-chatbot": "~0.18.3",
-    "node-red-contrib-config": "~1.2.1",
-    "node-red-contrib-curve": "~1.0.1",
-    "node-red-contrib-finite-statemachine": "~1.0.4",
-    "node-red-contrib-flow-asserter": "~0.4.0",
-    "node-red-contrib-music": "~1.3.5",
-    "node-red-contrib-persist": "~1.0.4",
-    "node-red-contrib-publishflows": "0.0.2",
-    "node-red-contrib-simple-gate": "~0.3.1",
-    "node-red-contrib-simpletime": "~2.8.1",
-    "node-red-contrib-telegrambot": "~7.1.1",
-    "node-red-contrib-cron-plus": "3.2.0"
-  },
-  "node-red": {
-    "nodes": {
-      "home-automation-history": "nodes/home-automation-history.js",
-      "home-automation-credential-vault": "nodes/home-automation-credential-vault.js",
-      "home-automation-project-info": "nodes/home-automation-project-info.js",
-      "home-automation-scheduler": "nodes/home-automation-scheduler.js",
-      "home-automation-phidget-discovery": "nodes/home-automation-phidget-discovery.js",
-      "home-automation-phidget-io": "nodes/home-automation-phidget-io.js",
-      "home-automation-homematic-ip": "nodes/home-automation-homematic-ip.js"
+    "name": "node-red-project",
+    "description": "GEORGSHOME Home Automation",
+    "version": "0.20.9",
+    "private": true,
+    "homeAutomation": {
+        "branchPurposes": {
+            "home-automation-solar-workspace": "Wartbarer gemeinsamer Arbeitsstand für Solar, Wetter, Kosten, Systemüberwachung, Netzwerk-Teilnehmer und verschlüsselte Zugangsdaten.",
+            "SOLAR_clean_start": "Stabiler Ausgangsstand der Solar- und Hausautomations-Flows."
+        }
     },
-    "settings": {
-      "flowFile": "flows.json",
-      "credentialsFile": "flows_cred.json"
+    "scripts": {
+        "flow:export": "node tools/flow-source/export.mjs",
+        "flow:import": "node tools/flow-source/import.mjs --write",
+        "flow:import:check": "node tools/flow-source/import.mjs",
+        "flow:check": "node tools/flow-source/validate.mjs",
+        "flow:roundtrip": "node tools/flow-source/roundtrip.mjs",
+        "library:install": "node tools/flow-source/install-library.mjs",
+        "desktop:install": "node tools/install-desktop-dashboard.mjs",
+        "database:check": "node tools/database-check.mjs",
+        "nodes:install": "node tools/install-storage-nodes.mjs",
+        "history:install": "npm run nodes:install",
+        "history:restore": "node tools/restore-history-db.mjs",
+        "flow:deploy": "npm run nodes:install && npm run library:install && node tools/flow-source/deploy.mjs",
+        "version:patch": "node tools/bump-version.mjs patch",
+        "version:minor": "node tools/bump-version.mjs minor",
+        "version:major": "node tools/bump-version.mjs major",
+        "test": "node --test test/*.test.mjs"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "dependencies": {
+        "@redplc/node-red-redplc": "^2.0.1",
+        "node-red-contrib-actionflows": "~2.0.3",
+        "node-red-contrib-assert": "~1.3.2",
+        "node-red-contrib-bigtimer": "~2.6.3",
+        "node-red-contrib-blockly": "~1.1.0",
+        "node-red-contrib-boolean-logic-ultimate": "~1.0.23",
+        "node-red-contrib-calc": "~1.0.5",
+        "node-red-contrib-chatbot": "~0.18.3",
+        "node-red-contrib-config": "~1.2.1",
+        "node-red-contrib-curve": "~1.0.1",
+        "node-red-contrib-finite-statemachine": "~1.0.4",
+        "node-red-contrib-flow-asserter": "~0.4.0",
+        "node-red-contrib-music": "~1.3.5",
+        "node-red-contrib-persist": "~1.0.4",
+        "node-red-contrib-publishflows": "0.0.2",
+        "node-red-contrib-simple-gate": "~0.3.1",
+        "node-red-contrib-simpletime": "~2.8.1",
+        "node-red-contrib-telegrambot": "~7.1.1",
+        "node-red-contrib-cron-plus": "3.2.0"
+    },
+    "node-red": {
+        "nodes": {
+            "home-automation-history": "nodes/home-automation-history.js",
+            "home-automation-credential-vault": "nodes/home-automation-credential-vault.js",
+            "home-automation-project-info": "nodes/home-automation-project-info.js",
+            "home-automation-scheduler": "nodes/home-automation-scheduler.js",
+            "home-automation-phidget-discovery": "nodes/home-automation-phidget-discovery.js",
+            "home-automation-phidget-io": "nodes/home-automation-phidget-io.js",
+            "home-automation-homematic-ip": "nodes/home-automation-homematic-ip.js"
+        },
+        "settings": {
+            "flowFile": "flows.json",
+            "credentialsFile": "flows_cred.json"
+        }
     }
-  }
 }

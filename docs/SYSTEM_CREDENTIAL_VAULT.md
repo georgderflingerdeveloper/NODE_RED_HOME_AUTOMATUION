@@ -31,7 +31,7 @@ Sie darf gesichert, aber nicht manuell bearbeitet werden.
 | Entsperrt | Bedien-Schlüssel liegt zeitlich begrenzt im RAM | Anzeigen, Anlegen, Bearbeiten, Löschen, SSH-Livewerte |
 | Wartezeit | Fünf falsche Versuche | Nach 30 Sekunden erneut versuchen |
 
-Nach zehn Minuten ohne Tresorzugriff oder beim Stoppen des Node-RED-Knotens wird
+Nach spätestens fünf Minuten ohne Tresorzugriff oder beim Stoppen des Node-RED-Knotens wird
 der Schlüssel aus dem Arbeitsspeicher gelöscht.
 
 Die automatische SSH-Abfrage bleibt auch im gesperrten Zustand möglich. Sie
@@ -53,6 +53,7 @@ einem Debug-Knoten protokolliert werden.
 | `system/vault/lock` | keine | gesperrter Zustand |
 | `system/vault/recover` | `recoveryAnswer`, `newMasterPassword` | neues Master-Passwort |
 | `system/vault/save` | `record: {id?, name, ip, user, password?}` | aktualisierte Liste |
+| `system/vault/reveal-list` | `masterPassword`, Dashboard-Client | maskierte Zugangsliste |
 | `system/vault/reveal` | `id` | genau ein Zugang, 15 Sekunden im Dashboard sichtbar |
 | `system/vault/delete` | `id` | aktualisierte Liste |
 | `system/vault/change-master` | `newMasterPassword` | neu verschlüsselter Schlüsselumschlag |
@@ -118,3 +119,53 @@ Dashboard sollten nur im vertrauenswürdigen Heimnetz erreichbar und zusätzlich
 mit Node-RED-Anmeldung beziehungsweise HTTPS geschützt sein. Die offizielle
 Node-RED-Sicherheitskonfiguration ist unter
 <https://nodered.org/docs/user-guide/runtime/securing-node-red> beschrieben.
+
+
+## Zugangsliste und Sitzungsregeln · v0.20.3
+
+„Zugangsliste anzeigen“ fragt das bestehende Master-Passwort erneut ab und zeigt
+Name, IP und SSH-Benutzer der gespeicherten Systeme. Passwörter bleiben maskiert
+und werden nur einzeln auf ausdrücklichen Klick für 15 Sekunden angezeigt.
+Es gibt kein fest eingebautes Standardpasswort. Ein leerer Tresor wird als leer
+angezeigt; frühere Chat-Inhalte werden nicht rekonstruiert.
+
+Jeder Dashboard-Client hat einen getrennten Tresorschlüssel im Arbeitsspeicher.
+Entsperren gilt ausschließlich für diesen Client. Änderungen sperren andere
+Sitzungen, um veraltete Schreibstände zu verhindern. Antworten sind an socketid
+gebunden. Bedienbefehle ohne Client-ID werden abgewiesen. Die automatische
+SSH-Messung verwendet weiterhin ihren separaten Betriebsschlüssel.
+
+Nach spätestens fünf Minuten Inaktivität beziehungsweise zehn Minuten absoluter
+Sitzungsdauer wird serverseitig gesperrt. Statusabfragen verlängern die Frist
+nicht. Fehlversuche werden auch über wechselnde Browser-Sitzungen gezählt:
+fünf falsche Anmeldungen führen zu 30 Sekunden Wartezeit. Sicherheitsereignisse
+werden ohne Passwörter oder Sitzungskennungen protokolliert.
+
+Anfragen mit Geheimnissen sind nur über direktes TLS oder vom lokalen Rechner
+über Loopback zulässig. Die Transportprüfung verwendet tatsächliche
+Socket-Adressen, keine vom Client gesetzten Forwarded-Header. Remote-Aufrufe
+über unverschlüsseltes HTTP werden serverseitig und im Dashboard abgewiesen.
+Für Fernzugriff muss Node-RED mit HTTPS konfiguriert werden; TLS-Terminierung
+an einem vorgeschalteten Proxy ist hier nicht automatisch freigegeben.
+Die Rechte des Betriebsschlüssels und die Verschlüsselung ersetzen diesen
+Transportschutz nicht.
+
+Der Dashboard-Bereich reserviert zwölf Rasterzeilen und hat einen eigenen
+Scrollbereich für längere Formulare. Die Darstellung auf kleinen Displays
+bleibt einspaltig; Eingaben und Schaltflächen werden nicht abgeschnitten.
+
+Die Umsetzung orientiert sich an den OWASP-Empfehlungen für Sitzungsverwaltung
+und Geheimnisverwaltung. Dies ist keine Zertifizierung oder vollständige
+ASVS-Konformitätsprüfung des gesamten Node-RED-Systems.
+
+- https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+- https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+
+## Bekannte Systeme übernehmen
+
+Nach dem Entsperren übernimmt „Bekannte Systeme übernehmen“ die aktuellen
+Hausgeräte `pieast`, `piwest`, `PIANTE_`, `PICENTER2` und `pientry` mit ihren
+festen Hausnetzadressen. Das Passwort wird ausschließlich im dafür vorgesehenen
+Passwortfeld eingegeben und verschlüsselt gespeichert; es ist weder fest im
+Flow hinterlegt noch Teil der Geräte- oder Projektdaten. Vorhandene Einträge
+werden dabei auf das bewusst eingegebene Standardpasswort aktualisiert.

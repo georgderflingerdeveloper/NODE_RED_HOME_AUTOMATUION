@@ -23,6 +23,22 @@ class Tests(unittest.TestCase):
             self.assertEqual(file.stat().st_mode & 0o777,0o600)
             self.assertEqual(bridge.ROOT.stat().st_mode & 0o777,0o700)
             self.assertFalse((bridge.ROOT/'credentials.tmp').exists())
+    def test_cloud_error_redaction_and_retry_after(self):
+        error = RuntimeError('secret remote response')
+        error.response = types.SimpleNamespace(status_code=429, headers={'Retry-After': '1800'})
+        self.assertEqual(bridge.cloud_error(error), {'error': {'code': 'rate_limited', 'retryAfterMs': 1800000}})
+        error.response.headers['Retry-After'] = 'invalid secret'
+        self.assertEqual(bridge.cloud_error(error)['error']['retryAfterMs'], 0)
+        error.response.headers['Retry-After'] = 'Thu, 01 Jan 1970 00:30:00 GMT'
+        with patch.object(bridge.time, 'time', return_value=0):
+            self.assertEqual(bridge.cloud_error(error)['error']['retryAfterMs'], 1800000)
+        throttled = type('HmipThrottlingError', (Exception,), {})('secret')
+        wrapped = RuntimeError('secret')
+        wrapped.__cause__ = throttled
+        self.assertEqual(bridge.cloud_error(wrapped)['error']['code'], 'rate_limited')
+        self.assertEqual(bridge.cloud_error(RuntimeError('secret')), {'error': {'code': 'cloud_error'}})
+    def test_bridge_copies_match(self):
+        self.assertEqual(pathlib.Path('tools/homematic/bridge.py').read_bytes(), pathlib.Path('nodes/homematic-ip-bridge.py').read_bytes())
     def test_sdk_snapshot(self):
         class FakeHome:
             async def init_async(self, access, token):

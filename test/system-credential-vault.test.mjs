@@ -114,3 +114,23 @@ test("Automatische SSH-Messung funktioniert gesperrt, ohne Passwort auszugeben",
   assert.equal(JSON.stringify(result).includes("nur-intern"), false);
   assert.equal(statSync(`${item.file}.key`).mode & 0o777, 0o600);
 });
+
+
+test("Statuslisten verlängern die automatische Sperrzeit nicht", (t) => {
+  let now = 1000;
+  const item = fixture({ now: () => now, autoLockMs: 60000 }); t.after(item.dispose);
+  item.vault.initialize("Mein Master 2026!", "Private Frage?", "Meine sehr lange geheime Antwort");
+  now += 30000;
+  item.vault.list({ touch: false });
+  now += 30001;
+  assert.equal(item.vault.status().locked, true);
+});
+
+test("Systeme dürfen ohne Passwort vorgemerkt und später ergänzt werden", (t) => {
+  const item = fixture(); t.after(item.dispose);
+  item.vault.initialize("Mein Master 2026!", "Private Frage?", "Meine sehr lange geheime Antwort");
+  item.vault.upsert({ name: "piwest", ip: "192.168.0.105", user: "pi" });
+  assert.equal(item.vault.list()[0].hasPassword, false);
+  item.vault.upsert({ name: "piwest", ip: "192.168.0.105", user: "pi", password: "später hinterlegt" });
+  assert.equal(item.vault.list()[0].hasPassword, true);
+});

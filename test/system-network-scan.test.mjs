@@ -91,3 +91,20 @@ test("Fehler der SSH-Teilnehmerabfrage werden sichtbar statt verschluckt", async
   assert.equal(statuses.at(-1).fill, "red");
   assert.match(warnings.at(-1), /Zugangsdaten nicht gefunden/);
 });
+
+
+test("System-Scan folgt der Hausnetzroute trotz angeschlossener eQ3-LAN-Freigabe", async () => {
+  const { result } = await runFunctionNode("system_scan_targets", {
+    msg: { payload: "192.0.2.1 via 192.168.0.1 dev wlo1 src 192.168.0.131 uid 1000\n    cache\n" },
+  });
+  assert.equal(result.scanSubnet, "192.168.0");
+  assert.equal(result.payload.includes("192.168.0.105"), true);
+  assert.equal(result.payload.includes("10.42.0.47"), false);
+});
+
+test("System-Scan rät bei mehreren Adressen oder fehlender Route kein Netz", async () => {
+  for (const payload of ["10.42.0.1 192.168.0.131", "RTNETLINK answers: Network is unreachable", "192.0.2.1 via 192.168.0.1 dev wlo1"]) {
+    const { result } = await runFunctionNode("system_scan_targets", { msg: { payload } });
+    assert.equal(result, null);
+  }
+});

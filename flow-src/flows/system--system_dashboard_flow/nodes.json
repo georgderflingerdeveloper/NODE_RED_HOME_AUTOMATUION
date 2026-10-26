@@ -75,7 +75,7 @@
     "name": "Verschlüsselte System-Zugangsdaten",
     "order": 2,
     "width": 0,
-    "height": 0,
+    "height": 12,
     "format": {
       "$flowSource": "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html"
     },
@@ -83,7 +83,7 @@
     "fwdInMessages": false,
     "resendOnRefresh": false,
     "templateScope": "local",
-    "className": "",
+    "className": "vault-dashboard-widget",
     "x": 535,
     "y": 240,
     "wires": [

@@ -38,7 +38,16 @@ Ohne Python-SDK oder Zugang bleibt der Flow grau / Einrichtung ausstehend.
 setup.sh benötigt Internet; installieren.sh und --pruefen führen keine Cloudzugriffe aus.
 
 ## Daten und Status
-Mindestens 60 Sekunden zwischen Abfragen, auch nach Fehlern/manuellem Refresh.
+Mindestens 120 Sekunden zwischen regulären Abfragen, auch bei manuellem Refresh.
+Bei HTTP 429 / SDK-Drosselung mindestens 15 Minuten Pause; wiederholte Fehler
+verdoppeln die Pause bis auf zwei Stunden. Ein verfügbares längeres Retry-After
+wird berücksichtigt (maximal knapp 25 Tage). Sonstige Fehler starten bei zwei
+Minuten mit derselben Verdopplung. Erfolg setzt die Fehlerpause zurück.
+Der nächste erlaubte Versuch und der Fehlerzähler liegen gemeinsam für alle
+Homematic-Nodes im userDir unter homematic-ip/cloud-poll-state.json. Neustarts
+und Aktualisieren umgehen die Pause nicht. Bei fehlerhaftem Sperrspeicher
+bleiben Cloud-Abfragen aus; das Dashboard zeigt den Speicherfehler.
+Im Dashboard werden Drosselung und frühester nächster Versuch angezeigt.
 Eine Abfrage maximal 45 Sekunden, nie überlappend. Kein WebSocket-Livestream.
 „Abgefragt“ bezeichnet den Cloudbestand, nicht eine garantierte physische Live-Messung.
 Seriennummer zeigt die vom SDK gelieferte SGTIN; unbekannte Felder bleiben unbekannt.

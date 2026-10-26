@@ -1,15 +1,17 @@
 <style>
-  .vault { width: 100%; box-sizing: border-box; color: var(--gh-text,#f1f1f1); font-family: Roboto, Arial, sans-serif; border: 1px solid var(--gh-border,#626262); border-radius: 13px; background: var(--gh-card,#303030); overflow: hidden; }
+  .vault { display: flex; flex-direction: column; height: 100%; min-height: 0; width: 100%; box-sizing: border-box; color: var(--gh-text,#f1f1f1); font-family: Roboto, Arial, sans-serif; border: 1px solid var(--gh-border,#626262); border-radius: 13px; background: var(--gh-card,#303030); overflow: hidden; }
   .vault-head, .vault-actions { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-  .vault-head { padding: 13px 15px; border-bottom: 1px solid var(--gh-control,#444444); background: var(--gh-card,#303030); color: #fff; font-weight: 700; font-size: 14px; }
-  .vault-body { padding: 13px 15px; }
+  .vault-head { flex: 0 0 auto; padding: 13px 15px; border-bottom: 1px solid var(--gh-control,#444444); background: var(--gh-card,#303030); color: #fff; font-weight: 700; font-size: 14px; }
+  .vault-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 13px 15px; }
+  .vault-dashboard-widget { overflow: hidden !important; }
+  .vault-dashboard-widget > div { height: 100%; min-height: 0; }
   .vault-status, .vault-muted { color: var(--gh-muted,#c6c6c6); font-size: 12px; }
   .vault-error { margin: 12px 0; padding: 10px 12px; border-radius: 8px; background: #5a2525; color: #ffd4cf; }
-  .vault-form { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 12px; }
-  .vault-field { display: flex; flex-direction: column; gap: 5px; }
+  .vault-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .vault-field { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
   .vault-field.wide { grid-column: 1 / -1; }
   .vault-field label { font-size: 11px; color: var(--gh-muted,#c6c6c6); }
-  .vault-field input { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid var(--gh-border,#626262); border-radius: 7px; background: var(--gh-inset,#242424); color: #fff; }
+  .vault-field input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 9px 10px; border: 1px solid var(--gh-border,#626262); border-radius: 7px; background: var(--gh-inset,#242424); color: #fff; }
   .vault-actions { justify-content: flex-start; margin-top: 12px; }
   .vault-btn { border: 1px solid var(--gh-border,#626262); border-radius: 7px; padding: 8px 11px; background: var(--gh-card,#303030); color: #fff; cursor: pointer; }
   .vault-btn.secondary { background: var(--gh-card,#303030); }
@@ -24,7 +26,15 @@
   .vault-table td { padding: 11px 12px; border-top: 1px solid var(--gh-control,#444444); font-size: 12px; vertical-align: top; }
   .vault-secret { font-family: monospace; color: #ffe6a8; word-break: break-all; }
   .vault-empty { padding: 20px; color: var(--gh-muted,#c6c6c6); text-align: center; }
-  @media (max-width: 600px) { .vault-form { grid-template-columns: 1fr; } .vault-field.wide { grid-column: auto; } }
+  @media (max-width: 600px) {
+    md-card.vault-dashboard-widget,
+    md-card.vault-dashboard-widget .nr-dashboard-cardcontainer,
+    md-card.vault-dashboard-widget .nr-dashboard-cardpanel,
+    md-card.vault-dashboard-widget .vault { width: calc(100vw - 120px) !important; min-width: 0 !important; max-width: calc(100vw - 120px) !important; }
+    .vault-form { grid-template-columns: 1fr; }
+    .vault-field.wide { grid-column: auto; }
+    .vault-table { min-width: 620px; }
+  }
 </style>
 
 <script>
@@ -36,6 +46,10 @@
 
   function send(topic, payload) {
     scope.vault.error = null;
+    if (topic !== "system/vault/status" && topic !== "system/vault/lock" && window.isSecureContext === false) {
+      scope.vault.error = "Zugangsdaten nur über HTTPS oder direkt auf diesem Laptop über localhost öffnen.";
+      return;
+    }
     scope.send({ topic: topic, payload: payload || {} });
   }
   function passwordsMatch(left, right, label) {
@@ -50,6 +64,22 @@
     if (revealTimer) clearTimeout(revealTimer);
     scope.$applyAsync();
   }
+
+  scope.showAccessList = function () {
+    hideRevealedPassword();
+    scope.vaultInput.listMaster = "";
+    scope.showListPassword = true;
+  };
+  scope.loadAccessList = function () {
+    hideRevealedPassword();
+    send("system/vault/reveal-list", { masterPassword: scope.vaultInput.listMaster });
+    scope.vaultInput.listMaster = "";
+  };
+  scope.cancelAccessList = function () {
+    scope.showListPassword = false;
+    scope.vaultInput.listMaster = "";
+    hideRevealedPassword();
+  };
 
   scope.setup = function () {
     if (!passwordsMatch(scope.vaultInput.master, scope.vaultInput.master2, "Master-Passwörter")) return;
@@ -76,6 +106,15 @@
   scope.add = function () {
     scope.deviceForm = {};
     scope.showDeviceForm = true;
+  };
+  scope.importKnown = function () {
+    if (!scope.vaultInput.knownPassword) {
+      scope.vault.error = "Das Standardpasswort fehlt.";
+      return;
+    }
+    send("system/vault/import-known", { password: scope.vaultInput.knownPassword });
+    scope.vaultInput.knownPassword = "";
+    scope.showKnownPassword = false;
   };
   scope.edit = function (entry) {
     scope.deviceForm = { id: entry.id, name: entry.name, ip: entry.ip, user: entry.user, password: "" };
@@ -104,12 +143,21 @@
   };
   scope.$watch("msg", function (msg) {
     if (!msg || msg.topic !== "system/vault/state" || !msg.payload) return;
-    scope.vault = angular.extend({}, scope.vault, msg.payload);
+    // Klartext wird nur in den kurzlebigen Anzeigefeldern gehalten.
+    var state = angular.extend({}, msg.payload);
+    delete state.revealed;
+    delete state.revealedEntries;
+    scope.vault = angular.extend({}, scope.vault, state);
+    if (msg.payload.locked || msg.payload.error) hideRevealedPassword();
     if (msg.payload.revealed) {
+      hideRevealedPassword();
       scope.revealed = msg.payload.revealed;
       revealTimer = setTimeout(hideRevealedPassword, 15000);
     }
+    delete msg.payload.revealed;
+    delete msg.payload.revealedEntries;
     if (!msg.payload.error) {
+      scope.showListPassword = false;
       scope.vaultInput.master = "";
       scope.vaultInput.master2 = "";
       scope.vaultInput.answer = "";
@@ -119,14 +167,25 @@
       scope.deviceForm = {};
     }
   });
-  setTimeout(function () { send("system/vault/status"); }, 250);
+  var statusTimer = setTimeout(function () { send("system/vault/status"); }, 250);
+  var statusPoll = setInterval(function () {
+    if (!scope.vault.locked && !scope.showListPassword && !scope.showDeviceForm && !scope.showMaster && !scope.showQuestion) send("system/vault/status");
+  }, 15000);
+  scope.$on("$destroy", function () {
+    clearTimeout(statusTimer);
+    clearTimeout(revealTimer);
+    clearInterval(statusPoll);
+    scope.send({ topic: "system/vault/lock", payload: {} });
+    scope.revealed = null;
+    scope.vaultInput.listMaster = "";
+  });
 })(scope);
 </script>
 
 <div class="vault">
   <div class="vault-head">
     <span>Verschlüsselte System-Zugangsdaten</span>
-    <span class="vault-status" ng-if="vault.initialized">{{vault.locked ? 'GESPERRT' : 'ENTSPERRT · automatische Sperre nach 10 Minuten'}}</span>
+    <span class="vault-status" ng-if="vault.initialized">{{vault.locked ? 'GESPERRT' : 'ENTSPERRT · automatische Sperre nach spätestens 5 Minuten'}}</span>
   </div>
   <div class="vault-body">
     <div class="vault-error" ng-if="vault.error">{{vault.error}}</div>
@@ -143,8 +202,16 @@
       <div class="vault-actions"><button class="vault-btn" ng-click="setup()">Tresor einrichten</button></div>
     </div>
 
+    <div ng-if="vault.initialized">
+      <div class="vault-actions"><button class="vault-btn" ng-click="showAccessList()">Zugangsliste anzeigen</button></div>
+      <div class="vault-subpanel" ng-if="showListPassword">
+        <div class="vault-field"><label>Master-Passwort für die Zugangsliste</label><input type="password" autocomplete="current-password" ng-model="vaultInput.listMaster" ng-keypress="$event.which === 13 && loadAccessList()"></div>
+        <div class="vault-actions"><button class="vault-btn" ng-click="loadAccessList()" ng-disabled="!vaultInput.listMaster || vault.retryAfterSeconds > 0">Zugangsliste entsperren</button><button class="vault-btn secondary" ng-click="cancelAccessList()">Abbrechen</button></div>
+      </div>
+    </div>
+
     <div ng-if="vault.initialized && vault.locked">
-      <div class="vault-field"><label>Master-Passwort</label><input type="password" autocomplete="current-password" ng-model="vaultInput.master" ng-keypress="$event.which === 13 && unlock()"></div>
+      <div class="vault-field"><label>Tresor-Master-Passwort (nicht das Raspberry-Pi-Passwort)</label><input type="password" autocomplete="current-password" ng-model="vaultInput.master" ng-keypress="$event.which === 13 && unlock()"></div>
       <div class="vault-actions"><button class="vault-btn" ng-click="unlock()" ng-disabled="vault.retryAfterSeconds > 0">Entsperren</button><button class="vault-link" ng-click="showRecovery = !showRecovery">Master-Passwort vergessen?</button></div>
       <div class="vault-subpanel" ng-if="showRecovery">
         <strong>{{vault.recoveryQuestion || 'Keine Sicherheitsfrage eingerichtet'}}</strong>
@@ -158,10 +225,11 @@
     </div>
 
     <div ng-if="vault.initialized && !vault.locked">
-      <div class="vault-actions"><button class="vault-btn" ng-click="add()">System hinzufügen</button><button class="vault-btn secondary" ng-click="showMaster = !showMaster">Master-Passwort ändern</button><button class="vault-btn secondary" ng-click="showQuestion = !showQuestion">Sicherheitsfrage ändern</button><button class="vault-btn danger" ng-click="lock()">Jetzt sperren</button></div>
+      <div class="vault-actions"><button class="vault-btn" ng-click="showKnownPassword = !showKnownPassword">Bekannte Systeme übernehmen</button><button class="vault-btn" ng-click="add()">System hinzufügen</button><button class="vault-btn secondary" ng-click="showMaster = !showMaster">Master-Passwort ändern</button><button class="vault-btn secondary" ng-click="showQuestion = !showQuestion">Sicherheitsfrage ändern</button><button class="vault-btn danger" ng-click="lock()">Jetzt sperren</button></div>
+      <div class="vault-subpanel" ng-if="showKnownPassword"><strong>Bekannte Raspberry Pis übernehmen</strong><div class="vault-field"><label>Aktuelles Standardpasswort für alle fünf bekannten Geräte</label><input type="password" autocomplete="new-password" ng-model="vaultInput.knownPassword" ng-keypress="$event.which === 13 && importKnown()"></div><div class="vault-actions"><button class="vault-btn" ng-click="importKnown()">Verschlüsselt übernehmen</button><button class="vault-btn secondary" ng-click="showKnownPassword = false; vaultInput.knownPassword = ''">Abbrechen</button></div></div>
       <div class="vault-table-wrap" ng-if="vault.entries.length">
         <table class="vault-table"><thead><tr><th>System</th><th>IP</th><th>Benutzer</th><th>Passwort</th><th>Aktionen</th></tr></thead><tbody>
-          <tr ng-repeat="entry in vault.entries"><td><strong>{{entry.name}}</strong></td><td>{{entry.ip}}</td><td>{{entry.user}}</td><td><span ng-if="!revealed || revealed.id !== entry.id">••••••••</span><span class="vault-secret" ng-if="revealed && revealed.id === entry.id">{{revealed.password}}</span></td><td><button class="vault-btn secondary" ng-click="reveal(entry)">15 s anzeigen</button> <button class="vault-btn secondary" ng-click="edit(entry)">Bearbeiten</button> <button class="vault-btn danger" ng-click="remove(entry)">Löschen</button></td></tr>
+          <tr ng-repeat="entry in vault.entries"><td><strong>{{entry.name}}</strong></td><td>{{entry.ip}}</td><td>{{entry.user}}</td><td><span ng-if="!entry.hasPassword">nicht hinterlegt</span><span ng-if="entry.hasPassword && (!revealed || revealed.id !== entry.id)">••••••••</span><span class="vault-secret" ng-if="entry.hasPassword && revealed && revealed.id === entry.id">{{revealed.password}}</span></td><td><button class="vault-btn secondary" ng-click="reveal(entry)" ng-disabled="!entry.hasPassword">15 s anzeigen</button> <button class="vault-btn secondary" ng-click="edit(entry)">Bearbeiten</button> <button class="vault-btn danger" ng-click="remove(entry)">Löschen</button></td></tr>
         </tbody></table>
       </div>
       <div class="vault-empty" ng-if="!vault.entries.length">Noch keine Zugangsdaten gespeichert.</div>

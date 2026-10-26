@@ -8,8 +8,8 @@
     "markup": "ca3728e70aca07649e8debef4bb24739516e2b487b5b378858798a90d55fac26"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": {
-    "scripts": "6ad076ce3b20282a6b6c1c618c0439f7bd2fedaca46d925a5efc207cc4e3f6c7",
-    "markup": "f94611a807f58d3c541ed35eb724d2d6e00a26670777a0417bbe88d548cb21a5"
+    "scripts": "e679d24bdd1c20996212884a030a6929c49639bf3502750b29cb457606f3c662",
+    "markup": "bd9bc49d81b8a55420e57d45eed37b971b77dd4597792c94931e1e02fd2db01a"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": {
     "scripts": "88576fdbb95fa0b58d5b7120ea3b1cf66f0c3b8a8941f5ffb3770e6b2800cb90",
@@ -53,7 +53,7 @@
   },
   "flow-src/flows/kosten--kosten_flow/templates/cost-dashboard.html": {
     "scripts": "fbb408a180ee40e200a8b641fdca2bc4ca402b3e704ad3e15024dc22e597e092",
-    "markup": "95cba958d691c4d7a8dbdae4989f61cd17bcf3b220ac926b50621587534073b7"
+    "markup": "85d3f094f2f5feebde72de4857088707e8ef75e12c6bc100a4dd4d6de6d3571c"
   },
   "flow-src/flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": {
     "scripts": "142233f56090b691b9bf2cd4d4632de1e7248d4de499eee0e2a128e241ff4a58",

@@ -698,8 +698,8 @@ Preis je kWh:
               {{!row.recordedHourCount ? 'Wetter ausstehend' : (row.weatherOfflineCount ? row.weatherOfflineCount + ' Wetterintervall offline' : 'Wetter online')}}
             </span>
           </td>
-          <td ng-class="{'cost-offline':row.recordedHourCount && row.offlineCount>0}">
-            {{!row.recordedHourCount ? 'noch keine Messdaten' : (row.offlineCount ? row.offlineCount + ' unvollständig' : 'vollständig')}}
+          <td ng-class="{'cost-offline':row.offlineCount>0}">
+            {{row.offlineCount ? row.offlineCount + ' unvollständig' : (!row.recordedHourCount ? 'noch keine Messdaten' : 'vollständig')}}
           </td>
         </tr>
         <tr class="cost-hours" ng-repeat-end ng-if="row.expanded">

@@ -8,6 +8,9 @@ import os
 from pathlib import Path
 import re
 import sys
+import math
+import time
+from email.utils import parsedate_to_datetime
 
 logging.disable(logging.CRITICAL)
 ROOT = Path(os.environ.get('NODE_RED_USER_DIR', str(Path.home() / '.node-red'))) / 'homematic-ip'
@@ -71,6 +74,29 @@ async def snapshot():
               'connected': raw.get('home', {}).get('connected')}
     print(json.dumps(sanitize(result), allow_nan=False))
 
+def cloud_error(error):
+    """Only export a fixed error code and Retry-After, never exception text."""
+    current, seen = error, set()
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        response = getattr(current, 'response', None)
+        if type(current).__name__ == 'HmipThrottlingError' or getattr(response, 'status_code', None) == 429:
+            retry_ms = 0
+            header = getattr(response, 'headers', {}).get('Retry-After')
+            if header:
+                try:
+                    seconds = float(header)
+                except (ValueError, TypeError):
+                    try:
+                        seconds = parsedate_to_datetime(header).timestamp() - time.time()
+                    except (ValueError, TypeError, OverflowError):
+                        seconds = 0
+                if math.isfinite(seconds) and seconds > 0:
+                    retry_ms = min(2147480000, math.ceil(seconds * 1000))
+            return {'error': {'code': 'rate_limited', 'retryAfterMs': retry_ms}}
+        current = current.__cause__ or current.__context__
+    return {'error': {'code': 'cloud_error'}}
+
 if __name__ == '__main__':
     try:
         if sys.argv[1:] == ['authorize']:
@@ -79,7 +105,9 @@ if __name__ == '__main__':
             asyncio.run(asyncio.wait_for(snapshot(), timeout=40))
         else:
             raise ValueError('COMMAND')
-    except (Exception, KeyboardInterrupt):
+    except (Exception, KeyboardInterrupt) as error:
+        if sys.argv[1:] == ['snapshot']:
+            print(json.dumps(cloud_error(error)))
         # SDK exception messages may include remote response bodies. Never forward them.
         print('Homematic IP: Vorgang fehlgeschlagen. Zugang, PIN, Internet und Cloud prüfen. Vorhandene Zugangsdaten werden nicht überschrieben.', file=sys.stderr)
         sys.exit(1)

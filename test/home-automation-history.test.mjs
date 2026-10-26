@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createRequire } from "node:module";
+import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 
 const require = createRequire(import.meta.url);
@@ -132,6 +133,75 @@ test("Datenbank-Service integriert Netzbezug und liefert Dashboard-Diagnose", ()
   assert.equal(dashboard.payload.latestReconciliation.meterHouseConsumptionKWh, null);
   assert.equal(dashboard.payload.diagnostics.find((item) => item.source === "solaredgeMeter").status, "online");
   assert.equal(dashboard.payload.diagnostics.find((item) => item.source === "solaredgeInverterEnergy").status, "online");
+
+  node.emit("close");
+  rmSync(userDir, { recursive: true, force: true });
+});
+
+test("Kosten-Dashboard markiert jede fehlende oder offline Stunde des Tages als unvollständig", () => {
+  const userDir = mkdtempSync(join(tmpdir(), "home-automation-history-gaps-"));
+  let HistoryStore;
+  const RED = {
+    settings: { userDir },
+    nodes: {
+      createNode(node) {
+        const emitter = new EventEmitter();
+        node.on = emitter.on.bind(emitter);
+        node.emit = emitter.emit.bind(emitter);
+        node.status = () => {};
+      },
+      registerType(name, constructor) {
+        assert.equal(name, "home-automation-history");
+        HistoryStore = constructor;
+      },
+    },
+  };
+  registerHistoryStore(RED);
+  const node = new HistoryStore({ databasePath: "data/test.sqlite", backupRetention: 2, cloudAuto: false });
+  const database = new DatabaseSync(join(userDir, "data", "test.sqlite"));
+  const insert = database.prepare(`
+    INSERT INTO hourly_snapshots (
+      interval_start, interval_end, captured_at, energy_status, weather_status, tariff_status,
+      pv_energy_kwh, house_consumption_kwh, grid_import_kwh, grid_export_kwh,
+      energy_cost_eur, market_price_ct_kwh, temperature_c, cloud_cover_percent,
+      sunshine_percent, precipitation_probability_percent, sample_count, data_quality
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  const dayStart = Date.parse("2026-10-19T22:00:00.000Z");
+  const hourMs = 60 * 60 * 1000;
+  for (let hour = 0; hour < 24; hour += 1) {
+    if (hour === 7) continue;
+    const start = new Date(dayStart + hour * hourMs).toISOString();
+    const end = new Date(dayStart + (hour + 1) * hourMs).toISOString();
+    const offline = hour === 13;
+    insert.run(
+      start, end, end, offline ? "offline" : "online", "online", "online",
+      0, 1, 0.5, 0, 0.1, 10, 20, 50, 0, 0, 60, offline ? "offline" : "complete",
+    );
+  }
+  database.close();
+
+  const sent = [];
+  const deliver = (period) => {
+    node.emit("input", {
+      topic: "history/dashboard",
+      payload: { period, anchor: "2026-10-20T12:00:00+02:00" },
+    }, (output) => sent.push(output), (error) => { if (error) throw error; });
+    return sent.at(-1).payload;
+  };
+
+  const month = deliver("month");
+  const day = month.rows.find((row) => row.key === "2026-10-20");
+  assert.equal(day.recordedHourCount, 23);
+  assert.equal(day.offlineCount, 2);
+  assert.equal(day.hours.length, 24);
+  assert.equal(day.hours.find((hour) => hour.time === "07:00").incomplete, true);
+
+  const hours = deliver("day");
+  assert.equal(hours.rows.length, 24);
+  const missingHour = hours.rows.find((row) => row.label === "07:00");
+  assert.equal(missingHour.recordedHourCount, 0);
+  assert.equal(missingHour.offlineCount, 1);
 
   node.emit("close");
   rmSync(userDir, { recursive: true, force: true });

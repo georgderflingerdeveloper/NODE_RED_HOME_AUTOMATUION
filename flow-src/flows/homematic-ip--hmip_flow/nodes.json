@@ -25,7 +25,7 @@
     "type": "home-automation-homematic-ip",
     "z": "hmip_flow",
     "name": "HAP · Cloud lesen",
-    "intervalMs": 60000,
+    "intervalMs": 120000,
     "x": 350,
     "y": 100,
     "wires": [

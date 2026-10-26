@@ -23,11 +23,11 @@ test('HAP: Offline, HAP offline, verschwundene Geräte und Wiederkehr',()=>{
  assert.throws(()=>normalize({}));assert.throws(()=>normalize({devices:[]}));
 });
 function harness(dir){
- const events={},sent=[],timers=[],calls=[];let Type;
+ const events={},sent=[],timers=[],calls=[],delays=[];let Type,clock=Date.now();
  const RED={settings:{userDir:dir},nodes:{createNode(node){node.id='test';node.on=(k,f)=>events[k]=f;node.send=m=>sent.push(structuredClone(m));node.status=()=>{};node.warn=()=>{};},registerType(_name,ctor){Type=ctor;}}};
  const customRequire=id=>id==='node:child_process'?{execFile:(exe,args,options,callback)=>{calls.push({exe,args,options,callback,killed:false});return {kill(){calls.at(-1).killed=true;}};}}:id==='./homematic-ip-core.cjs'?{normalize,mergeRows}:id==='./homematic-ip-history.cjs'?require('../nodes/homematic-ip-history.cjs'):require(id);
- const box={module:{exports:{}},require:customRequire,__dirname:'/runtime/nodes',process:{env:{}},setTimeout:(fn)=>{timers.push(fn);return timers.length;},clearTimeout:()=>{},Date};
- vm.runInNewContext(fs.readFileSync('nodes/home-automation-homematic-ip.js','utf8'),box);box.module.exports(RED);new Type({intervalMs:1});return {events,sent,timers,calls};
+ const box={module:{exports:{}},require:customRequire,__dirname:'/runtime/nodes',process:{env:{}},setTimeout:(fn,delay)=>{const due=clock+delay;delays.push(delay);timers.push(()=>{clock=Math.max(clock,due);fn();});return timers.length;},clearTimeout:()=>{},Date:class extends Date{static now(){return clock;}}};
+ vm.runInNewContext(fs.readFileSync('nodes/home-automation-homematic-ip.js','utf8'),box);box.module.exports(RED);new Type({intervalMs:1});return {events,sent,timers,calls,delays};
 }
 test('HAP runtime: unkonfiguriert keine Cloud-Anfrage; fremde Befehle werden ignoriert',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hmip-test-'));try{const h=harness(dir);h.timers[0]();assert.equal(h.calls.length,0);assert.equal(h.sent.at(-1).payload.status,'idle');h.events.input({topic:'AllLightsOn'},null,()=>{});assert.equal(h.calls.length,0);h.events.close(false,()=>{});}finally{fs.rmSync(dir,{recursive:true,force:true});}
@@ -37,7 +37,7 @@ test('HAP runtime: Snapshot, Neustart veraltet, Rate-Limit auch nach Fehlern, ke
   fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
   const h=harness(dir);h.timers[0]();assert.equal(h.calls.length,1);assert.equal(h.calls[0].options.timeout,45000);assert.deepEqual(Array.from(h.calls[0].args),['/runtime/nodes/homematic-ip-bridge.py','snapshot']);
   h.events.input({topic:'homematic-ip/refresh'});assert.equal(h.calls.length,1);
-  h.calls[0].callback(null,JSON.stringify(sample()));assert.equal(h.sent.at(-1).payload.status,'running');assert.equal(h.sent.at(-1).payload.intervalMs,60000);
+  h.calls[0].callback(null,JSON.stringify(sample()));assert.equal(h.sent.at(-1).payload.status,'running');assert.equal(h.sent.at(-1).payload.intervalMs,120000);
   const saved=JSON.parse(fs.readFileSync(path.join(dir,'homematic-ip/test-snapshot.json')));assert.equal(saved.rows.length,1);
   h.events.input({topic:'homematic-ip/refresh'});assert.equal(h.calls.length,1);
   h.timers.at(-1)();h.calls[1].callback(Error('secret token'),'', 'secret token');assert.equal(h.sent.at(-1).payload.status,'error');assert.equal(h.sent.at(-1).payload.rows[0].quality,'stale');assert.ok(!JSON.stringify(h.sent).includes('secret token'));
@@ -85,5 +85,34 @@ test('HAP Historie: Gerätedaten werden archiviert; Trendabfragen bleiben lokal 
   h.events.input({topic:'homematic-ip/history/query',socketid:'client-a',payload:{requestId:6,seriesIds:[s.id],from:s.lastAt-1000,to:s.lastAt+1000}},m=>result=m,()=>{});
   assert.equal(result.socketid,'client-a');assert.equal(result.payload.series[0].points[0].value,20.5);assert.equal(h.calls.length,1);assert.ok(!JSON.stringify(result).includes('secret'));
   h.events.close(false,()=>{});
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('HAP: Drosselung pausiert Klicks, weitere Nodes und Neustarts; Retry-After gilt, Erfolg setzt Pause zurück',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hmip-throttle-'));
+ try{
+  fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
+  const h=harness(dir);h.timers[0]();
+  h.calls[0].callback(Error('secret'),JSON.stringify({error:{code:'rate_limited',retryAfterMs:1800000}}));
+  assert.equal(h.sent.at(-1).payload.errorCode,'rate_limited');assert.equal(h.sent.at(-1).payload.status,'warning');assert.equal(h.delays.at(-1),1800000);
+  for(let i=0;i<20;i++)h.events.input({topic:'homematic-ip/refresh'});
+  assert.equal(h.calls.length,1);
+  const next=harness(dir);next.timers[0]();assert.equal(next.calls.length,0);assert.equal(next.sent.at(-1).payload.errorCode,'rate_limited');next.events.close(false,()=>{});
+  h.timers.at(-1)();assert.equal(h.calls.length,2);
+  h.calls[1].callback(Error('secret'),JSON.stringify({error:{code:'rate_limited'}}));assert.equal(h.delays.at(-1),1800000);
+  h.timers.at(-1)();h.calls[2].callback(null,JSON.stringify(sample()));assert.equal(h.delays.at(-1),120000);assert.equal(h.sent.at(-1).payload.errorCode,'');
+  h.events.input({topic:'homematic-ip/refresh'});assert.equal(h.calls.length,3);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'homematic-ip/cloud-poll-state.json'))).failures,0);
+  assert.ok(!JSON.stringify(h.sent).includes('secret'));h.events.close(false,()=>{});
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+test('HAP: wiederholte Cloudfehler verlängern Pause; beschädigte Sperrdatei verhindert Anfragen',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hmip-backoff-'));
+ try{
+  fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
+  const h=harness(dir);h.timers[0]();h.calls[0].callback(Error('timeout'),'');assert.equal(h.delays.at(-1),120000);
+  h.timers.at(-1)();h.calls[1].callback(Error('timeout'),'');assert.equal(h.delays.at(-1),240000);
+  fs.writeFileSync(path.join(dir,'homematic-ip/cloud-poll-state.json'),'broken');
+  h.timers.at(-1)();assert.equal(h.calls.length,2);assert.match(h.sent.at(-1).payload.message,/Speicherfehler/);h.events.close(false,()=>{});
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
