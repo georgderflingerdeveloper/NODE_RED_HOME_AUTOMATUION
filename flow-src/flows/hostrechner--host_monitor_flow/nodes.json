@@ -106,7 +106,7 @@
     "type": "comment",
     "z": "host_monitor_flow",
     "name": "Nur lokale Lesedaten · 5 s · Details: docs/HOST_MONITOR.md",
-    "info": "Keine Steuerbefehle. RAM-Belegung = Gesamt minus MemAvailable. CPU: Messintervall 0,4 s. SSD: statvfs, verfügbar ohne reservierten Platz. Dashboard meldet nach 20 s veraltete Werte.",
+    "info": "Keine Steuerbefehle. RAM-Belegung = Gesamt minus MemAvailable. CPU: Messintervall ca. 0,8 s; Prozesslast aus /proc ohne Kommandozeilen. SSD: statvfs, verfügbar ohne reservierten Platz. Dashboard meldet nach 20 s veraltete Werte.",
     "x": 380,
     "y": 40,
     "wires": []

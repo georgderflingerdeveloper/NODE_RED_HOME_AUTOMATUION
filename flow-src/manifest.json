@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "8833391a204aff455fe3a16c1a3cedd563c6c3562566ec256ef1a6bc0cea9514",
+  "flowSha256": "efdc9917ab36d51ff52fe367eaa9880295edf38edf0e3016be73a8e03f25921d",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1427,8 +1427,8 @@
     "flows/homematic-ip--hmip_flow/nodes.json": "040094047a33d8191f551d8d9df46d444cafdf39712c04478af0924024c4f0db",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "34f0d6488fdd87e878a79974d6f8d99cade7c2b1eb62a3a4f2874bba0282b755",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-trends.html": "2fbd8e700640aca1bc1dd7aed4b4e132926b57c0c04637636c67d367eeda922a",
-    "flows/hostrechner--host_monitor_flow/nodes.json": "3088c90871625faca5b83db761896801654dc520f5f0d6df904eca17e1b2c686",
-    "flows/hostrechner--host_monitor_flow/templates/hostrechner-live-ubersicht.html": "dc31322a9de9f0ce7dba8ada52be09b86f748e57769a22dcdc37cbb38a059a3d",
+    "flows/hostrechner--host_monitor_flow/nodes.json": "aa471261aa9f830b4049ae8f474462777ce3c5aeb04168278cd0187e10424563",
+    "flows/hostrechner--host_monitor_flow/templates/hostrechner-live-ubersicht.html": "7b11cf4f45079f72ac58482994e95ea46fd4b857585da2c2b9193b7c82227790",
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "8cbd096590566a6fb1a33b40614b16c03d101ce9f9dddf817f0a930679946aaf",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "e500f17f36e212aac57d9c91276460203339ed1c45cda239fd64195311510a44",
     "flows/kosten--kosten_flow/nodes.json": "e5ece433d499fa777115ec5a79b46e37ac3b96d3be0caa60c00392575558506e",
