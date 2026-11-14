@@ -160,9 +160,15 @@ expect {
 // Temperatur und Speicherauslastung umgewandelt werden. Bei Fehlern wird der
 // Eintrag trotzdem als offline markiert, damit das System sauber fortgesetzt
 // werden kann.
+function resolveExpectPath(exists = fs.existsSync, userHome = os.homedir()) {
+  const systemPath = "/usr/bin/expect";
+  const userPath = path.join(userHome, ".local", "bin", "expect");
+  return exists(systemPath) ? systemPath : (exists(userPath) ? userPath : systemPath);
+}
+
 function probe(record, spawnImpl = spawn) {
   return new Promise((resolve) => {
-    const child = spawnImpl("/usr/bin/expect", ["-c", expectScript], {
+    const child = spawnImpl(resolveExpectPath(), ["-c", expectScript], {
       env: { ...process.env, SSH_USER: record.user, SSH_IP: record.ip, SSH_PASSWORD: record.password },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -485,4 +491,4 @@ function defaultVaultPath(userDir = path.join(os.homedir(), ".node-red")) {
   return path.join(userDir, "system-credentials.vault.json");
 }
 
-module.exports = { CredentialVault, defaultVaultPath, privateIpv4 };
+module.exports = { CredentialVault, defaultVaultPath, privateIpv4, resolveExpectPath };

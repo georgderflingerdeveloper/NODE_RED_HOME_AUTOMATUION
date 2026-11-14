@@ -44,6 +44,7 @@ const onlineDevices = entries
             memoryUsedPercent: live?.memoryUsedPercent ?? null,
             diskUsedPercent: live?.diskUsedPercent ?? null,
             uptimeSeconds: live?.uptimeSeconds ?? null,
+            metricsObservedAt: live?.observedAt ?? null,
             loadAverage: live?.loadAverage ?? null,
             inventoryObservedAt: inventory ? "2026-07-26" : null,
             ip: entry.ip,
@@ -52,6 +53,7 @@ const onlineDevices = entries
         };
     });
 const finished = scan.completed >= scan.expected;
+const liveMetricsError = flow.get("systemLiveMetricsError") || null;
 
 if (!liveMetricsUpdate && !finished && scan.completed % 5 !== 0) return null;
 
@@ -59,8 +61,12 @@ msg.topic = "system/network/overview";
 msg.payload = {
     system: {
         network: {
+            subnet: scan.subnet,
+            liveMetricsError,
             state: finished ? "online" : "scanning",
-            label: liveMetricsUpdate
+            label: liveMetricsUpdate && liveMetricsError
+                ? `SSH-Livewerte fehlen · ${onlineDevices.length} Geräte per Netzscan erreichbar`
+                : liveMetricsUpdate
                 ? `Live-Systemwerte aktualisiert · ${Object.keys(liveMetrics).length} Raspberry Pis erreichbar`
                 : (finished
                 ? `Netzscan abgeschlossen · ${onlineDevices.length} Geräte erreichbar`

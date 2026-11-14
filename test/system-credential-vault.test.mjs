@@ -134,3 +134,10 @@ test("Systeme dürfen ohne Passwort vorgemerkt und später ergänzt werden", (t)
   item.vault.upsert({ name: "piwest", ip: "192.168.0.105", user: "pi", password: "später hinterlegt" });
   assert.equal(item.vault.list()[0].hasPassword, true);
 });
+
+test('SSH-Messung unterstützt systemweites und ohne Administratorrechte installiertes expect', () => {
+  const {resolveExpectPath}=require('../nodes/home-automation-credential-vault-core.cjs');
+  assert.equal(resolveExpectPath(p=>p==='/usr/bin/expect','/test-user'),'/usr/bin/expect');
+  assert.equal(resolveExpectPath(p=>p==='/test-user/.local/bin/expect','/test-user'),'/test-user/.local/bin/expect');
+  assert.equal(resolveExpectPath(()=>false,'/test-user'),'/usr/bin/expect');
+});

@@ -169,3 +169,12 @@ festen Hausnetzadressen. Das Passwort wird ausschließlich im dafür vorgesehene
 Passwortfeld eingegeben und verschlüsselt gespeichert; es ist weder fest im
 Flow hinterlegt noch Teil der Geräte- oder Projektdaten. Vorhandene Einträge
 werden dabei auf das bewusst eingegebene Standardpasswort aktualisiert.
+
+## Benutzerlokales expect · 0.21.2
+
+Die SSH-Probe verwendet vorrangig `/usr/bin/expect`. Fehlt die Systeminstallation,
+wird `~/.local/bin/expect` verwendet, wenn vorhanden. Auf dem Home-PC liegt dort
+ein Wrapper für die unveränderten Ubuntu-Pakete `expect` und `tcl-expect` unter
+`~/.local/opt/expect/`. Er setzt ausschließlich für diesen Prozess den Bibliothekspfad.
+Damit benötigt der Messbetrieb keine Administratorrechte. Der Wrapper und die
+Paketdateien enthalten keine Zugangsdaten.

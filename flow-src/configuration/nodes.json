@@ -2148,7 +2148,7 @@
       }
     },
     "site": {
-      "name": "Node-RED Dashboard",
+      "name": "Homeautomation · 1880",
       "hideToolbar": "false",
       "allowSwipe": "false",
       "allowTempTheme": "true",
@@ -2564,5 +2564,31 @@
     "width": "24",
     "collapse": false,
     "className": ""
+  },
+  {
+    "id": "host_monitor_flow",
+    "type": "tab",
+    "label": "HOSTRECHNER",
+    "disabled": false,
+    "info": "Lokale, nur lesende Linux-Systemüberwachung. Aktualisierung alle 5 Sekunden. Dokumentation: docs/HOST_MONITOR.md."
+  },
+  {
+    "id": "host_monitor_tab",
+    "type": "ui_tab",
+    "name": "HOSTRECHNER",
+    "icon": "computer",
+    "order": 24,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "host_monitor_group",
+    "type": "ui_group",
+    "name": "Systemleistung & Speicher",
+    "tab": "host_monitor_tab",
+    "order": 1,
+    "disp": true,
+    "width": "24",
+    "collapse": false
   }
 ]

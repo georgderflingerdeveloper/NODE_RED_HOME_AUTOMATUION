@@ -41,6 +41,22 @@
   scope.stateLabel = function (state) {
     return state === "online" ? "online" : (state === "offline" ? "offline" : (state === "scanning" ? "Scan läuft" : "ausstehend"));
   };
+  scope.uptimeLabel = function (seconds) {
+    if (seconds === null || seconds === undefined || !Number.isFinite(Number(seconds))) return "—";
+    var s = Math.max(0, Math.floor(Number(seconds)));
+    return Math.floor(s / 86400) + " Tage " + Math.floor(s % 86400 / 3600) + " Std " + Math.floor(s % 3600 / 60) + " Min";
+  };
+  scope.bootAt = function (device) {
+    if (device.uptimeSeconds === null || device.uptimeSeconds === undefined) return null;
+    var observed = Date.parse(device.metricsObservedAt || device.lastSeen);
+    return Number.isFinite(observed) ? observed - device.uptimeSeconds * 1000 : null;
+  };
+  scope.metricsError = function () {
+    var error = scope.systemView.network.liveMetricsError || "";
+    if (/ENOENT.*system-credentials\.vault\.json/.test(error)) return "Auf dieser Node-RED-Instanz fehlt der SSH-Zugangstresor. Temperatur und Laufzeit können erst nach Übernahme der gespeicherten Zugänge live erfasst werden.";
+    if (/expect.*ENOENT/.test(error)) return "Das für SSH-Abfragen benötigte Programm expect fehlt auf diesem Rechner.";
+    return error;
+  };
   scope.$watch("msg", function (msg) {
     if (!msg || !msg.payload || typeof msg.payload !== "object") return;
     var incoming = msg.payload.system || msg.payload;
@@ -64,6 +80,8 @@
     </div>
   </div>
 
+  <div class="sys-overview" role="alert" ng-if="systemView.network.liveMetricsError" style="border-color:#ffd166;margin-bottom:16px">SSH-Livewerte fehlen: {{metricsError()}}</div>
+  <div class="sys-subtitle" ng-if="systemView.network.subnet">Hausnetz: {{systemView.network.subnet}}.0/24 · Scan alle 5 Minuten · SSH-Livewerte jede Minute</div>
   <div class="sys-summary">
     <div class="sys-kpi"><div class="sys-kpi-label">Erfasste Geräte</div><div class="sys-kpi-value">{{systemView.summary.devices === null ? '—' : systemView.summary.devices}}</div><div class="sys-kpi-note">Raspberry Pi und Netzwerktechnik</div></div>
     <div class="sys-kpi"><div class="sys-kpi-label">Online</div><div class="sys-kpi-value">{{systemView.summary.online === null ? '—' : systemView.summary.online}}</div><div class="sys-kpi-note">aktuell erreichbar</div></div>
@@ -74,12 +92,13 @@
   <h3 class="sys-title">Angeschlossene Systeme</h3>
   <div class="sys-panel sys-table-wrap" ng-if="systemView.devices.length">
     <table class="sys-table">
-      <thead><tr><th>Hostname</th><th>IP</th><th>System</th><th>Temperatur</th><th>Letzte Antwort</th><th>Status</th></tr></thead>
+      <thead><tr><th>Hostname</th><th>IP</th><th>System</th><th>Temperatur</th><th>Systemstart / Laufzeit</th><th>Letzte Antwort</th><th>Status</th></tr></thead>
       <tbody><tr ng-repeat="device in systemView.devices">
         <td class="sys-device-name">{{device.name}}<br><span class="sys-muted">{{device.hostname || 'kein Hostname'}}</span></td>
         <td>{{device.ip}}</td>
         <td>{{device.model || '—'}}<br><span class="sys-muted">{{device.operatingSystem}}</span></td>
-        <td>{{device.temperatureC === null || device.temperatureC === undefined ? '—' : (device.temperatureC | number:1) + ' °C'}}</td>
+        <td>{{device.temperatureC === null || device.temperatureC === undefined ? '—' : (device.temperatureC | number:1) + ' °C'}}<br><span class="sys-muted" ng-if="device.temperatureSource === 'inventory'">Inventarwert vom {{device.inventoryObservedAt}} · keine Live-Messung</span></td>
+        <td>{{bootAt(device) !== null ? (bootAt(device) | date:'dd.MM.yyyy HH:mm') : '—'}}<br><span class="sys-muted">{{uptimeLabel(device.uptimeSeconds)}}{{device.uptimeSeconds === null || device.uptimeSeconds === undefined ? ' · SSH-Livewert fehlt' : ''}}</span></td>
         <td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td>
         <td><span class="sys-badge" ng-class="stateClass(device.state)">{{stateLabel(device.state)}}</span></td>
       </tr></tbody>

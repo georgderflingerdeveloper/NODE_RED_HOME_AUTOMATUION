@@ -108,3 +108,28 @@ test("System-Scan rät bei mehreren Adressen oder fehlender Route kein Netz", as
     assert.equal(result, null);
   }
 });
+
+test('Starlink-Standardroute wird bei fehlender Hausnetz-LAN-Route nicht gescannt', async () => {
+  const {result,warnings}=await runFunctionNode('system_scan_targets',{msg:{payload:'192.168.0.1 via 192.168.1.1 dev wlp2s0 src 192.168.1.236 uid 1000'}});
+  assert.equal(result,null);
+  assert.match(warnings[0],/statt 192\.168\.0/);
+});
+
+test('LAN-Scan prüft bekannte Pis zuerst und bewahrt Geräte bis zu deren neuer Prüfung', async () => {
+  const previous={subnet:'192.168.0',results:{'192.168.0.150':{ip:'192.168.0.150',state:'online'}}};
+  const {result,flow}=await runFunctionNode('system_scan_targets',{msg:{payload:'192.168.0.1 dev enp1s0 src 192.168.0.149 uid 1000'},flowValues:{systemNetworkScan:previous}});
+  assert.equal(result.scanSubnet,'192.168.0');
+  assert.deepEqual(result.payload.slice(0,5),['192.168.0.104','192.168.0.105','192.168.0.125','192.168.0.150','192.168.0.190']);
+  assert.equal(new Set(result.payload).size,253);
+  assert.equal(flow.get('systemNetworkScan').results['192.168.0.150'].state,'online');
+});
+
+test('Dashboard-Payload enthält SSH-Fehler, Hausnetz und gemessene Laufzeit', async () => {
+ const scan={scanId:'test',subnet:'192.168.0',expected:1,completed:1,results:{'192.168.0.150':{ip:'192.168.0.150',state:'online',observedAt:'2026-11-14T10:00:00Z'}}};
+ const {result}=await runFunctionNode('system_scan_result',{msg:{liveMetricsUpdate:true},flowValues:{systemNetworkScan:scan,systemLiveMetricsError:'Tresor fehlt',systemLiveMetrics:{'192.168.0.150':{hostname:'PICENTER2',uptimeSeconds:3600,temperatureC:44,observedAt:'2026-11-14T10:00:00Z'}}}});
+ assert.equal(result.payload.system.network.liveMetricsError,'Tresor fehlt');
+ assert.equal(result.payload.system.network.subnet,'192.168.0');
+ assert.equal(result.payload.system.devices[0].uptimeSeconds,3600);
+ assert.equal(result.payload.system.devices[0].temperatureSource,'live');
+ assert.equal(result.payload.system.devices[0].metricsObservedAt,'2026-11-14T10:00:00Z');
+});

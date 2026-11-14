@@ -1,7 +1,7 @@
 // nodeId: system_scan_targets
 const value = String(msg.payload || "").trim();
-// Die Quelladresse der Standardroute bestimmt das Hausnetz.
-// Zusätzliche LAN-Freigaben dürfen die Netzauswahl nicht verändern.
+// Der Exec-Knoten fragt ausdrücklich die Route ins Raspberry-Hausnetz ab.
+// Internet (Starlink) und Hausnetz dürfen unterschiedliche Schnittstellen nutzen.
 const match = value.match(/\bsrc\s+(\d{1,3}(?:\.\d{1,3}){3})\b/)
     || value.match(/^(\d{1,3}(?:\.\d{1,3}){3})$/);
 
@@ -28,6 +28,14 @@ if (!privateNetwork) {
 }
 
 const subnet = parts.slice(0, 3).join(".");
+// Bei unterbrochenem LAN darf die Internetroute keinen Scan im Starlink-Netz auslösen.
+const expectedSubnet = String(env.get("SYSTEM_SCAN_SUBNET") || "192.168.0");
+if (subnet !== expectedSubnet) {
+    node.status({ fill: "red", shape: "ring", text: "Hausnetz-LAN nicht erreichbar" });
+    node.warn(`Systemnetz-Scan übersprungen: Route führt nach ${subnet}.0/24 statt ${expectedSubnet}.0/24.`);
+    return null;
+}
+const previousScan = flow.get("systemNetworkScan");
 const scanId = `${subnet}-${Date.now()}`;
 const targets = [];
 for (let host = 1; host <= 254; host += 1) {
@@ -35,6 +43,9 @@ for (let host = 1; host <= 254; host += 1) {
     if (target !== ip) targets.push(target);
 }
 
+// Bekannte Pis zuerst prüfen; das vollständige /24 bleibt erhalten.
+const knownHosts = [104, 105, 125, 150, 190].map((host) => `${subnet}.${host}`);
+targets.sort((a, b) => (knownHosts.includes(a) ? 0 : 1) - (knownHosts.includes(b) ? 0 : 1));
 flow.set("systemNetworkScan", {
     scanId,
     subnet,
@@ -42,7 +53,7 @@ flow.set("systemNetworkScan", {
     startedAt: new Date().toISOString(),
     expected: targets.length,
     completed: 0,
-    results: {}
+    results: previousScan?.subnet === subnet ? { ...previousScan.results } : {}
 });
 
 msg.topic = "system/network/scan/target";

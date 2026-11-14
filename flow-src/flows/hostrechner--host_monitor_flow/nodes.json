@@ -1,0 +1,114 @@
+[
+  {
+    "id": "host_monitor_tick",
+    "type": "inject",
+    "z": "host_monitor_flow",
+    "name": "Alle 5 Sekunden",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "5",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 1,
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 100,
+    "wires": [
+      [
+        "host_monitor_collect"
+      ]
+    ]
+  },
+  {
+    "id": "host_monitor_collect",
+    "type": "exec",
+    "z": "host_monitor_flow",
+    "name": "Linux-Systemdaten lesen",
+    "command": "python3 /home/georgshomepc/Projekte/NODE_RED_HOME_AUTOMATUION/tools/host-monitor/collect.py",
+    "addpay": false,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "4",
+    "winHide": true,
+    "oldrc": false,
+    "x": 420,
+    "y": 100,
+    "wires": [
+      [
+        "host_monitor_json"
+      ],
+      [
+        "host_monitor_error"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "host_monitor_json",
+    "type": "json",
+    "z": "host_monitor_flow",
+    "name": "Messdaten → Objekt",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 660,
+    "y": 100,
+    "wires": [
+      [
+        "host_monitor_ui"
+      ]
+    ]
+  },
+  {
+    "id": "host_monitor_ui",
+    "type": "ui_template",
+    "z": "host_monitor_flow",
+    "group": "host_monitor_group",
+    "name": "Hostrechner · Live-Übersicht",
+    "order": 1,
+    "width": 24,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/hostrechner--host_monitor_flow/templates/hostrechner-live-ubersicht.html"
+    },
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 920,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "host_monitor_error",
+    "type": "debug",
+    "z": "host_monitor_flow",
+    "name": "Hostmonitor · Erfassungsfehler",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 680,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "host_monitor_note",
+    "type": "comment",
+    "z": "host_monitor_flow",
+    "name": "Nur lokale Lesedaten · 5 s · Details: docs/HOST_MONITOR.md",
+    "info": "Keine Steuerbefehle. RAM-Belegung = Gesamt minus MemAvailable. CPU: Messintervall 0,4 s. SSD: statvfs, verfügbar ohne reservierten Platz. Dashboard meldet nach 20 s veraltete Werte.",
+    "x": 380,
+    "y": 40,
+    "wires": []
+  }
+]

@@ -12,8 +12,8 @@
     "markup": "bd9bc49d81b8a55420e57d45eed37b971b77dd4597792c94931e1e02fd2db01a"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": {
-    "scripts": "88576fdbb95fa0b58d5b7120ea3b1cf66f0c3b8a8941f5ffb3770e6b2800cb90",
-    "markup": "4bdb2525e6bbecbd153125f3f489f72a4201fdbe92588f3589de8727c1d22a38"
+    "scripts": "b7f3b565beeabd9157dab43d0c07dc98e01d3a05f0940659dd724396d84b7660",
+    "markup": "b5731d87968ac984dd23ad8a8a83bd29455586b6ea5410f2ae94fe10940edd0f"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": {
     "scripts": "9f6553239e05360d7a6b601f50cfac0af539e57fa8f85a35a96186ec04a4c93b",
