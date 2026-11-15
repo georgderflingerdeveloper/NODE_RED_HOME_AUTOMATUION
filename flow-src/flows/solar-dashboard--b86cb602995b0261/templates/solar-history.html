@@ -1,31 +1,124 @@
 <style>
-.gh-solar-history{padding:14px;color:var(--gh-text);font-size:14px;line-height:1.6}
-.gh-solar-history p{margin:0 0 12px}.gh-solar-history form{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
-.gh-solar-history label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--gh-muted)}
-.gh-solar-history input,.gh-solar-history select,.gh-solar-history button{box-sizing:border-box;min-height:38px;max-width:100%;border:1px solid var(--gh-border);border-radius:7px;background:var(--gh-inset);color:var(--gh-text);padding:7px 10px}
-.gh-solar-history button{cursor:pointer;font-weight:700}.gh-solar-history .gh-history-status{margin-top:16px;padding-top:12px;border-top:1px solid var(--gh-border)}
-.gh-solar-history .gh-history-warning{font-weight:700;color:#ffd166}
+.gh-solar-history{padding:18px;color:var(--gh-text,#eee);font-size:13px;line-height:1.5;box-sizing:border-box}
+.gh-solar-history *{box-sizing:border-box}.gh-solar-history h3{font-size:20px;letter-spacing:-.4px;margin:0 0 3px}.gh-solar-history p{margin:5px 0 12px}.gh-solar-history .sh-muted{color:var(--gh-muted,#aaa)}
+.gh-solar-history .sh-heading,.gh-solar-history .sh-toolbar,.gh-solar-history .sh-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.gh-solar-history .sh-heading{justify-content:space-between;margin-bottom:16px}
+.gh-solar-history button,.gh-solar-history input,.gh-solar-history select,.gh-solar-history .sh-download{min-height:36px;border:1px solid var(--gh-border,#555);border-radius:7px;background:var(--gh-inset,#262626);color:var(--gh-text,#eee);padding:7px 10px;font:inherit;max-width:100%}
+.gh-solar-history button,.gh-solar-history .sh-download{cursor:pointer;text-decoration:none;font-weight:600}.gh-solar-history button:disabled{opacity:.4;cursor:default}.gh-solar-history button:focus-visible,.gh-solar-history a:focus-visible{outline:2px solid #72b9ff;outline-offset:3px}
+.gh-solar-history .sh-primary{background:#dce8f4;color:#162331;border-color:#dce8f4}.gh-solar-history label{font-size:12px;color:var(--gh-muted,#aaa)}.gh-solar-history .sh-field{display:flex;flex-direction:column;gap:4px}
+.gh-solar-history .sh-toolbar{margin:12px 0}.gh-solar-history input[type=checkbox]{min-height:0;accent-color:#a7c9ed}.gh-solar-history .sh-range{align-items:end;padding:12px;border:1px solid var(--gh-border,#555);border-radius:9px}
+.gh-solar-history .sh-legend button{font-size:12px;display:flex;align-items:center;gap:7px}.gh-solar-history .sh-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}.gh-solar-history .sh-off{opacity:.45}
+.gh-solar-history .sh-chart{position:relative;margin:14px 0 6px;border:1px solid var(--gh-border,#555);border-radius:10px;background:var(--gh-inset,#202020);overflow:hidden}
+.gh-solar-history canvas{display:block;width:100%;height:310px;touch-action:pan-y}.gh-solar-history .sh-empty{position:absolute;inset:65px 50px 65px 60px;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:none;color:var(--gh-muted,#aaa);background:var(--gh-inset,#202020)}
+.gh-solar-history .sh-inspector{min-height:56px;padding:9px 12px;background:var(--gh-inset,#242424);border-radius:7px;font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;gap:5px 18px}.gh-solar-history .sh-inspector strong{width:100%}
+.gh-solar-history .sh-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.gh-solar-history .sh-card{padding:12px;background:var(--gh-inset,#262626);border:1px solid var(--gh-border,#555);border-radius:9px}.gh-solar-history .sh-card h4{margin:0 0 10px;font-size:13px}.gh-solar-history .sh-numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.gh-solar-history .sh-numbers b{display:block;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}.gh-solar-history .sh-numbers small{font-size:10px;color:var(--gh-muted,#aaa);display:block}.gh-solar-history .sh-numbers span{font-size:11px;color:var(--gh-muted,#aaa)}
+.gh-solar-history .sh-error{color:#ffa6a0;padding:10px;border:1px solid #b56964;border-radius:7px}.gh-solar-history details{border-top:1px solid var(--gh-border,#555);padding-top:12px;margin-top:14px}.gh-solar-history summary{cursor:pointer;font-weight:600}.gh-solar-history .gh-history-warning{color:#ffd166}
+.gh-solar-history .sh-mobile-menu{display:none}
+@media(max-width:700px){
+ body:has(#Tab_SOLAR:not(.ng-hide) .gh-solar-history) md-sidenav{position:absolute!important;z-index:75!important;transform:translateX(-100%)!important;height:calc(100% - 88px)!important;top:88px!important}
+ body.gh-solar-menu-open:has(#Tab_SOLAR:not(.ng-hide) .gh-solar-history) md-sidenav{transform:translateX(0)!important}
+ #Tab_SOLAR{display:flex!important;flex-direction:column;width:100%!important;height:auto!important;padding:8px;gap:12px;box-sizing:border-box}
+ #Tab_SOLAR>ui-card-panel{position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:100%!important;max-width:100%!important}
+ #Tab_SOLAR .nr-dashboard-cardpanel,#Tab_SOLAR .nr-dashboard-cardcontainer,#Tab_SOLAR md-card{width:100%!important;max-width:100%!important;box-sizing:border-box}
+ .gh-solar-history .sh-mobile-menu{display:block;margin-bottom:12px}
+ body.gh-solar-menu-open .gh-solar-history .sh-mobile-menu{position:fixed;right:12px;top:100px;z-index:80}
+}
+@media(max-width:550px){.gh-solar-history{padding:10px}.gh-solar-history .sh-cards{grid-template-columns:1fr}.gh-solar-history canvas{height:260px}.gh-solar-history .sh-field{flex:1 1 150px}.gh-solar-history .sh-range input{width:100%}.gh-solar-history .sh-numbers b{font-size:17px}}
 </style>
-<section class="gh-solar-history">
- <p><strong>Solar-Historie</strong> · SQLite mit Leistungswerten, Zählerständen und Stundenenergie.</p>
- <form action="/home-automation/solar/export.csv" method="get">
-  <label>Datensatz<select name="dataset"><option value="power">Leistung · Minutenwerte (W)</option><option value="hourly">Stundenenergie (kWh)</option><option value="meter">Netz-Zählerstände (kWh)</option><option value="inverter">PV-Zählerstände (kWh)</option><option value="daily">Tagesbilanz (kWh)</option><option value="grid">Netz-Tagesvergleich</option><option value="cloud">SolarEdge Cloud (kWh)</option></select></label>
-  <label>Von · UTC<input type="date" name="from" ng-model="historyFrom"></label>
-  <label>Bis einschließlich · UTC<input type="date" name="to" ng-model="historyTo"></label>
-  <button type="submit">CSV herunterladen</button>
+<section class="gh-solar-history" id="solar-trend-{{$id}}">
+ <button type="button" class="sh-mobile-menu" ng-click="trendMenu()" aria-expanded="{{solarMenuOpen || false}}">{{solarMenuOpen ? "✕ Menü schließen" : "☰ Menü"}}</button>
+ <div class="sh-heading"><div><h3>Solar · Historischer Verlauf</h3><span class="sh-muted">Erzeugung, Verbrauch und Netzflüsse im Zeitvergleich</span></div><label><input type="checkbox" ng-model="trend.live" ng-change="trendLive()"> Live fortschreiben</label></div>
+ <div class="sh-toolbar" aria-label="Messgröße"><label class="sh-field">Messgröße<select ng-model="trend.mode" ng-change="trendLoad()"><option value="power">Leistungen · W</option><option value="energy">Stundenenergie · kWh</option></select></label><label class="sh-field">Datenstatus<select ng-model="trend.status" ng-change="trendLoad()"><option value="all">Alle · Lücken sichtbar</option><option value="online">Nur online</option><option value="offline">Nur offline / unvollständig</option></select></label></div>
+ <div class="sh-toolbar" aria-label="Zeitraum wählen"><button type="button" ng-repeat="preset in trendPresets" ng-click="trendPreset(preset.hours)">{{preset.label}}</button><button type="button" ng-click="trendToday()">Heute</button></div>
+ <form class="sh-toolbar sh-range" ng-submit="trendApply()">
+  <label class="sh-field">Von · {{trendZone}}<input type="datetime-local" ng-model="trend.from" required step="60"></label>
+  <label class="sh-field">Bis · exklusiv<input type="datetime-local" ng-model="trend.to" required step="60"></label>
+  <button class="sh-primary" type="submit">Anwenden</button>
  </form>
- <p>Ohne Datum wird die gesamte Historie exportiert. CSV mit Semikolon und UTF-8; Leistungswerte etwa jede Minute und bei Statuswechsel. Offline-Zeiten bleiben als solche erkennbar.</p>
- <div class="gh-history-status" aria-live="polite">
-  <p>{{solarHistory.samples.count || 0}} Leistungswerte · {{solarHistory.hourly.count || 0}} Stundenwerte<br>Stundenhistorie ab {{solarHistory.hourly.first || 'noch keine Daten'}}</p>
-  <p ng-class="{'gh-history-warning':solarHistory.backup.state !== 'ok'}"><strong>Sicherung:</strong> {{solarHistory.backup.message || historyError || 'Status wird geladen …'}}</p>
-  <p ng-if="solarHistory.backup.lastLocalSuccessAt">Lokal: {{solarHistory.backup.lastLocalSuccessAt}}</p>
-  <p ng-if="solarHistory.backup.lastCloudSuccessAt">Google Drive zuletzt erfolgreich: {{solarHistory.backup.lastCloudSuccessAt}}</p>
- </div>
+ <div class="sh-toolbar" aria-label="Zeitnavigation"><button type="button" ng-click="trendShift(-1)" aria-label="Vorheriger Zeitraum">← Zurück</button><button type="button" ng-click="trendZoom(.5)" aria-label="Zeitraum halbieren">＋ Zoom</button><button type="button" ng-click="trendZoom(2)" aria-label="Zeitraum verdoppeln">− Zoom</button><button type="button" ng-click="trendShift(1)" aria-label="Nächster Zeitraum">Weiter →</button><button type="button" ng-click="trendLoad()" ng-disabled="trend.loading">Aktualisieren</button><button type="button" class="sh-primary" ng-click="trendExport()" ng-disabled="!trendData || trend.loading || trend.error || trendDirty()">↓ Gefilterte CSV</button></div>
+ <div class="sh-legend" aria-label="Kurven ein- oder ausblenden"><button type="button" ng-repeat="metric in trendMetrics" ng-click="trendToggle(metric)" ng-class="{'sh-off':!metric.enabled}" aria-pressed="{{metric.enabled}}"><i class="sh-dot" ng-style="{'background-color':metric.color}"></i>{{metric.label}}</button></div>
+ <p class="sh-error" role="alert" ng-if="trend.error">{{trend.error}}</p>
+ <p class="sh-muted" aria-live="polite">{{trend.loading ? 'Messwerte werden geladen …' : trendCaption}}<span ng-if="trendDirty()"> · Geänderte Filter bitte anwenden.</span></p>
+ <div class="sh-chart"><canvas aria-label="Historischer Solarverlauf. Minima und Maxima stehen zusätzlich in den Kennzahlen unter dem Diagramm." role="img"></canvas><div class="sh-empty" ng-if="!trend.loading && trendData && !trendHasValues">{{trendData.counts.total ? 'In diesem Zeitraum sind nur Offline-Meldungen oder fehlende Messwerte gespeichert.' : 'Keine Messwerte im gewählten Zeitraum. Wähle einen anderen Zeitraum oder Stundenenergie für ältere Daten.'}}</div></div>
+ <p class="sh-muted">Ziehen im Diagramm vergrößert den Zeitbereich · Antippen zeigt Messwerte · Linien: Mittelwerte je Zeitfenster · Band: Min–Max</p>
+ <div class="sh-inspector" aria-live="polite"><strong>{{trendHover.title || 'Messpunkt mit Maus oder Finger auswählen'}}</strong><span ng-repeat="item in trendHover.items"><i class="sh-dot" ng-style="{'background-color':item.color}"></i> {{item.label}}: {{item.value}}</span></div>
+ <div class="sh-cards"><article class="sh-card" ng-repeat="series in trendData.series"><h4><i class="sh-dot" ng-style="{'background-color':series.color}"></i> {{series.label}} <span class="sh-muted">· {{series.stats.count}} Werte</span></h4><div class="sh-numbers"><div><span>Minimum</span><b>{{trendNumber(series.stats.min)}} <small>{{trendData.unit}}</small></b><small>{{trendTime(series.stats.minAt)}}</small></div><div><span>Maximum / Spitze</span><b>{{trendNumber(series.stats.max)}} <small>{{trendData.unit}}</small></b><small>{{trendTime(series.stats.maxAt)}}</small></div><div><span>Mittelwert</span><b>{{trendNumber(series.stats.average)}} <small>{{trendData.unit}}</small></b><small ng-if="trendData.mode==='energy'">Summe {{trendNumber(series.stats.total)}} kWh</small></div></div></article></div>
+ <p class="sh-muted">{{trendData.note}} Offline-Werte zählen nicht als Nullleistung. Längere Erfassungslücken werden nicht verbunden. CSV exportiert die ausgewählten Kurven, den angewendeten Zeitraum und Statusfilter als unveränderte Einzelwerte.</p>
+ <details><summary>Weitere Datensätze exportieren</summary><form class="sh-toolbar" action="/home-automation/solar/export.csv" method="get"><label class="sh-field">Datensatz<select name="dataset"><option value="power">Leistung · Minutenwerte (W)</option><option value="hourly">Stundenenergie (kWh)</option><option value="meter">Netz-Zählerstände (kWh)</option><option value="inverter">PV-Zählerstände (kWh)</option><option value="daily">Tagesbilanz (kWh)</option><option value="grid">Netz-Tagesvergleich</option><option value="cloud">SolarEdge Cloud (kWh)</option></select></label><label class="sh-field">Von · UTC<input type="date" name="from"></label><label class="sh-field">Bis einschließlich · UTC<input type="date" name="to"></label><button type="submit">CSV herunterladen</button></form><p class="sh-muted">Ohne Datum: vollständiger Datensatz. Semikolon, UTF-8.</p></details>
+ <details><summary>Historienbestand & Sicherung</summary><p>{{solarHistory.samples.count || 0}} Leistungswerte · {{solarHistory.hourly.count || 0}} Stundenwerte</p><p class="sh-muted">Leistung ab {{trendTime(solarHistory.samples.first)}} · Stundenenergie ab {{trendTime(solarHistory.hourly.first)}}</p><p ng-class="{'gh-history-warning':solarHistory.backup.state !== 'ok'}"><strong>Sicherung:</strong> {{solarHistory.backup.message || historyError || 'Status wird geladen …'}}</p><p ng-if="solarHistory.backup.lastLocalSuccessAt">Lokal: {{trendTime(solarHistory.backup.lastLocalSuccessAt)}}</p><p ng-if="solarHistory.backup.lastCloudSuccessAt">Google Drive: {{trendTime(solarHistory.backup.lastCloudSuccessAt)}}</p></details>
 </section>
 <script>
 (function(scope){
- let disposed=false;
- function refresh(){fetch('/home-automation/solar/history-status',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(!disposed)scope.$evalAsync(()=>{scope.solarHistory=data;scope.historyError='';});}).catch(()=>{if(!disposed)scope.$evalAsync(()=>{scope.historyError='Historienstatus nicht erreichbar.';});});}
- refresh();const timer=setInterval(refresh,60000);scope.$on('$destroy',()=>{disposed=true;clearInterval(timer);});
+ 'use strict';
+ let disposed=false,controller,requestId=0,canvas,resizeObserver,hoverX=null,drag=null,applied=null;
+ const MINUTE=60000,DAY=86400000;
+ scope.trendMenu=()=>{scope.solarMenuOpen=!scope.solarMenuOpen;document.body.classList.toggle("gh-solar-menu-open",scope.solarMenuOpen);};
+ scope.trendZone=Intl.DateTimeFormat().resolvedOptions().timeZone;
+ scope.trend={mode:'power',status:'all',live:true,loading:false,error:''};
+ scope.trendMetrics=[{key:'pv',label:'PV-Erzeugung',color:'#f4c75e',enabled:true},{key:'house',label:'Hausverbrauch',color:'#72b9ff',enabled:true},{key:'import',label:'Netzbezug',color:'#f48e87',enabled:true},{key:'export',label:'Einspeisung',color:'#69d5b0',enabled:true}];
+ scope.trendPresets=[{label:'1 Stunde',hours:1},{label:'6 Stunden',hours:6},{label:'24 Stunden',hours:24},{label:'7 Tage',hours:168},{label:'30 Tage',hours:720}];
+ scope.trendNumber=value=>value===null || value===undefined?'—':Number(value).toLocaleString('de-AT',{maximumFractionDigits:scope.trendData?.unit==='W'?0:3});
+ scope.trendTime=value=>value?new Date(value).toLocaleString('de-AT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+ const minute=value=>new Date(Math.floor(value/MINUTE)*MINUTE);
+ function setRange(from,to){scope.trend.from=minute(from);scope.trend.to=minute(to);}
+ function parameters(){
+  const from=scope.trend.from,to=scope.trend.to;
+  if(!(from instanceof Date) || !(to instanceof Date) || !Number.isFinite(+from) || !Number.isFinite(+to) || +to<=+from || +to-+from>366*DAY)throw Error('Bitte einen gültigen Zeitraum bis 366 Tage wählen.');
+  return {start:from.toISOString(),end:to.toISOString(),mode:scope.trend.mode,status:scope.trend.status,metrics:scope.trendMetrics.filter(m=>m.enabled).map(m=>m.key).join(',')};
+ }
+ scope.trendDirty=()=>{try{return !!applied && JSON.stringify(parameters())!==JSON.stringify(applied);}catch{return true;}};
+ function loadStatus(){fetch('/home-automation/solar/history-status',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(!disposed)scope.$evalAsync(()=>{scope.solarHistory=data;scope.historyError='';});}).catch(()=>{if(!disposed)scope.$evalAsync(()=>scope.historyError='Historienstatus nicht erreichbar.');});}
+ scope.trendLoad=function(){
+  let query;try{query=parameters();}catch(error){scope.trend.error=error.message;return;}
+  controller?.abort();controller=new AbortController();const id=++requestId;
+  scope.trend.loading=true;scope.trend.error='';hoverX=null;scope.trendHover=null;
+  fetch('/home-automation/solar/trend?'+new URLSearchParams(query),{cache:'no-store',signal:controller.signal}).then(async r=>{const data=await r.json();if(!r.ok)throw Error(data.error || 'Trenddaten nicht erreichbar.');return data;}).then(data=>{
+   if(disposed || id!==requestId)return;
+   scope.$evalAsync(()=>{applied=query;scope.trendData=data;scope.trend.loading=false;scope.trendHasValues=data.series.some(s=>s.stats.count>0);scope.trendCaption=scope.trendTime(data.start)+' – '+scope.trendTime(data.end)+' · '+data.counts.total+' Datensätze · '+(data.counts.offline||0)+' offline / unvollständig · Zeitfenster '+Math.round(data.bucketSeconds/60)+' min';setTimeout(draw,0);});
+  }).catch(error=>{if(!disposed && id===requestId && error.name!=='AbortError')scope.$evalAsync(()=>{scope.trend.loading=false;scope.trend.error=error.message || 'Trenddaten nicht erreichbar.';});});
+ };
+ scope.trendApply=()=>{scope.trend.live=false;scope.trendLoad();};
+ scope.trendPreset=hours=>{const end=+minute(Date.now())+MINUTE;setRange(end-hours*3600000,end);scope.trend.live=true;scope.trendLoad();};
+ scope.trendToday=()=>{const start=new Date();start.setHours(0,0,0,0);setRange(+start,+minute(Date.now())+MINUTE);scope.trend.live=true;scope.trendLoad();};
+ scope.trendLive=()=>{if(scope.trend.live){const duration=+scope.trend.to-+scope.trend.from,end=+minute(Date.now())+MINUTE;setRange(end-duration,end);scope.trendLoad();}};
+ scope.trendShift=direction=>{if(!scope.trend.from || !scope.trend.to)return;const duration=+scope.trend.to-+scope.trend.from;setRange(+scope.trend.from+direction*duration,+scope.trend.to+direction*duration);scope.trend.live=false;scope.trendLoad();};
+ scope.trendZoom=factor=>{if(!scope.trend.from || !scope.trend.to)return;const center=(+scope.trend.from+ +scope.trend.to)/2,duration=Math.max(MINUTE,Math.min(366*DAY,(+scope.trend.to-+scope.trend.from)*factor));setRange(center-duration/2,center+duration/2);scope.trend.live=false;scope.trendLoad();};
+ scope.trendToggle=metric=>{if(metric.enabled && scope.trendMetrics.filter(m=>m.enabled).length===1)return;metric.enabled=!metric.enabled;scope.trendLoad();};
+ scope.trendExport=()=>{if(!applied || scope.trendDirty())return;const link=document.createElement('a');link.href='/home-automation/solar/export.csv?'+new URLSearchParams({dataset:'trend',...applied});link.download='solar-'+applied.mode+'.csv';document.body.appendChild(link);link.click();link.remove();};
+ function geometry(){const w=canvas.clientWidth,h=canvas.clientHeight;return {w,h,left:60,right:w-18,top:26,bottom:h-42};}
+ function draw(){
+  if(disposed || !canvas || !canvas.clientWidth)return;
+  const g=geometry(),ratio=window.devicePixelRatio || 1;canvas.width=g.w*ratio;canvas.height=g.h*ratio;const ctx=canvas.getContext('2d');ctx.scale(ratio,ratio);
+  const data=scope.trendData,style=getComputedStyle(canvas.closest('.gh-solar-history')),muted=style.getPropertyValue('--gh-muted').trim() || '#aaa',border=style.getPropertyValue('--gh-border').trim() || '#444';
+  const start=Date.parse(data?.start || scope.trend.from),end=Date.parse(data?.end || scope.trend.to),max=Math.max(1,...(data?.series || []).map(s=>s.stats.max || 0))*1.12;
+  const x=t=>g.left+(Date.parse(t)-start)/(end-start)*(g.right-g.left),y=v=>g.bottom-v/max*(g.bottom-g.top);
+  ctx.font='11px sans-serif';ctx.fillStyle=muted;ctx.fillText(data?.unit || 'W',9,16);
+  for(let i=0;i<=4;i++){const yy=g.bottom-i/4*(g.bottom-g.top);ctx.strokeStyle=border;ctx.globalAlpha=.5;ctx.beginPath();ctx.moveTo(g.left,yy);ctx.lineTo(g.right,yy);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle=muted;ctx.textAlign='right';ctx.fillText((max*i/4).toLocaleString('de-AT',{maximumFractionDigits:max<10?2:0}),g.left-8,yy+4);}
+  for(let i=0;i<=4;i++){const t=start+(end-start)*i/4,xx=g.left+i/4*(g.right-g.left);ctx.textAlign=i===0?'left':i===4?'right':'center';ctx.fillStyle=muted;ctx.fillText(new Date(t).toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'}),xx,g.bottom+19);if(end-start>DAY*.9)ctx.fillText(new Date(t).toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit'}),xx,g.bottom+33);}
+  for(const series of data?.series || []){
+   let previous=null;ctx.strokeStyle=series.color;ctx.fillStyle=series.color;ctx.lineWidth=1.7;
+   for(const point of series.points){
+    if(point.valid===0){previous=null;continue;}
+    const xx=x(new Date((Date.parse(point.first)+Date.parse(point.last))/2).toISOString()),yy=y(point.value);
+    const contiguous=previous && previous.valid===previous.samples && point.valid===point.samples && previous.complete===previous.samples && point.complete===point.samples && !point.gap && Date.parse(point.first)-Date.parse(previous.last)<=Math.max(data.bucketSeconds*1000+90000,data.mode==='energy'?5400000:90000);
+    if(contiguous){const px=x(new Date((Date.parse(previous.first)+Date.parse(previous.last))/2).toISOString());ctx.globalAlpha=.13;ctx.beginPath();ctx.moveTo(px,y(previous.low));ctx.lineTo(xx,y(point.low));ctx.lineTo(xx,y(point.high));ctx.lineTo(px,y(previous.high));ctx.closePath();ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.moveTo(px,y(previous.value));ctx.lineTo(xx,yy);ctx.stroke();}
+    ctx.globalAlpha=.6;ctx.beginPath();ctx.moveTo(xx,y(point.low));ctx.lineTo(xx,y(point.high));ctx.stroke();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(xx,yy,series.points.length>200?1:2,0,Math.PI*2);ctx.fill();previous=point;
+   }
+  }
+  if(hoverX!==null){ctx.strokeStyle=muted;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(hoverX,g.top);ctx.lineTo(hoverX,g.bottom);ctx.stroke();ctx.setLineDash([]);}
+  if(drag && drag.end!==null){ctx.fillStyle='#72b9ff';ctx.globalAlpha=.18;ctx.fillRect(Math.min(drag.start,drag.end),g.top,Math.abs(drag.end-drag.start),g.bottom-g.top);ctx.globalAlpha=1;}
+ }
+ function position(event){const g=geometry();return Math.max(g.left,Math.min(g.right,event.clientX-canvas.getBoundingClientRect().left));}
+ function inspect(event){
+  const data=scope.trendData;if(!data)return;hoverX=position(event);const g=geometry(),t=Date.parse(data.start)+(hoverX-g.left)/(g.right-g.left)*(Date.parse(data.end)-Date.parse(data.start));
+  const items=data.series.map(series=>{let nearest=null;for(const p of series.points){const distance=Math.abs((Date.parse(p.first)+Date.parse(p.last))/2-t);if(!nearest || distance<nearest.distance)nearest={point:p,distance};}const p=nearest?.point,near=p && nearest.distance<=Math.max(data.bucketSeconds*1000, data.mode==='energy'?3600000:90000);return {label:series.label,color:series.color,value:near && p.valid?scope.trendNumber(p.value)+' '+data.unit+' · '+scope.trendNumber(p.low)+'–'+scope.trendNumber(p.high)+' · '+scope.trendTime(p.first)+(p.valid<p.samples?' · teilweise offline':''):near?'offline':'keine Messung'};});
+  scope.$evalAsync(()=>scope.trendHover={title:scope.trendTime(new Date(t).toISOString()),items});draw();
+ }
+ function pointerDown(event){if(event.button!==0)return;drag={start:position(event),end:null};canvas.setPointerCapture(event.pointerId);inspect(event);}
+ function pointerMove(event){if(drag)drag.end=position(event);inspect(event);}
+ function pointerUp(event){if(!drag)return;const selected=drag;drag=null;if(selected.end!==null && Math.abs(selected.end-selected.start)>14 && scope.trendData){const g=geometry(),start=Date.parse(scope.trendData.start),duration=Date.parse(scope.trendData.end)-start;scope.$evalAsync(()=>{const from=start+(Math.min(selected.start,selected.end)-g.left)/(g.right-g.left)*duration,to=start+(Math.max(selected.start,selected.end)-g.left)/(g.right-g.left)*duration;setRange(from,Math.max(from+MINUTE,to));scope.trend.live=false;scope.trendLoad();});}draw();}
+ function pointerCancel(){drag=null;hoverX=null;draw();}
+ const init=setTimeout(()=>{if(disposed)return;canvas=document.querySelector('#solar-trend-'+scope.$id+' canvas');if(!canvas)return;canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerCancel);resizeObserver=new ResizeObserver(draw);resizeObserver.observe(canvas);draw();},0);
+ scope.trendToday();loadStatus();const timer=setInterval(()=>{loadStatus();if(scope.trend.live && !scope.trend.loading && !scope.trendDirty())scope.$evalAsync(()=>scope.trendLive());},60000);
+ scope.$on('$destroy',()=>{document.body.classList.remove('gh-solar-menu-open');disposed=true;clearInterval(timer);clearTimeout(init);controller?.abort();resizeObserver?.disconnect();if(canvas){canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerCancel);}});
 })(scope);
 </script>

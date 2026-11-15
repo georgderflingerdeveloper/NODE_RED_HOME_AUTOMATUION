@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "725b10b156c3999c0ec06fd0b4ef3ec5916446c6fd44cde65d03f97e6583fd5e",
+  "flowSha256": "1630bcbbdbdc88b32eae43baf6471fe856bdab7991db0240a54d62242bc7f8cc",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1534,11 +1534,11 @@
     "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower.js": "e0d9799a847de68702b4d44da9d284df81bf875a8eb83ad2432be74660680c63",
     "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload.js": "453327609babb6dafce54882848fde736893161bf84c81b50934fde94600074a",
     "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern.js": "03ac2c2f99c5a97ee351490bbf0308383a3a78568e24cb61167c6efde2df161c",
-    "flows/solar-dashboard--b86cb602995b0261/nodes.json": "6df877d8fe5b5ebe1f753a6b425c6bb32f3406cf8b5884755871926c3a1ccfbd",
+    "flows/solar-dashboard--b86cb602995b0261/nodes.json": "770013ec3932b8c41296b54cc320514bfe94472e2ff18592c88a6df480648c0e",
     "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html": "9573bfc5ad0fd2f362c0ab6a387ed3183639fa6f740bd41072f93c648a7bd5d6",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html": "1cba15b61038576f82fb648dca88cf916277825a49acd77732d0460723bd0d29",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": "00c583f796a75e72d3d52ef99ebefd69f443d15e167d01e5aeb028d4ed31f3db",
-    "flows/solar-dashboard--b86cb602995b0261/templates/solar-history.html": "8f18268abf42f94b8d3042dd6ad69296305c1b397549f7bde0ab578a44e674d7",
+    "flows/solar-dashboard--b86cb602995b0261/templates/solar-history.html": "cae7f4495773e960bbf103764d04b02c659b7eaa59a23028f44e8b7445d15b66",
     "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": "69a76071dae8b4b4cccd3b053fd3f07e316986ad16ff66a9058cf13ecfdc9565",
     "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus.html": "cb16ca72fbf48bbcc7e2b9ed4b0ad1eeb6c79b4b328c21f9571fe95745bd4afd",
     "flows/solar-dashboard--b86cb602995b0261/templates/solarleistung.html": "43854905a65444a134f9f1b705f93c95fcbf4368465cdd932514a99fac1de236",

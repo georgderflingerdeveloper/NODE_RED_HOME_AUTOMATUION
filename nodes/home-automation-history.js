@@ -1,3 +1,4 @@
+const { readTrend, trendRequest } = require("./solar-trend.cjs");
 const { streamExport, historyStatus } = require("./solar-history-export.cjs");
 const { createCloudStore, effectiveRows, compareSources, METRICS } = require("./solaredge-cloud.cjs");
 const { monthRange, saveBill, readBill } = require("./monthly-bills.cjs");
@@ -57,6 +58,13 @@ module.exports = function registerHistoryStore(RED) {
     RED.httpNode.get('/home-automation/solar/export.csv', (request,response) => {
       if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
       return streamExport(activeDatabasePath,request,response);
+    });
+    RED.httpNode.get('/home-automation/solar/trend', (request,response) => {
+      if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
+      try { trendRequest(request.query); }
+      catch(error) { return response.status(400).json({error:error.message}); }
+      try { response.set('Cache-Control','no-store'); response.json(readTrend(activeDatabasePath,request.query)); }
+      catch { response.status(500).json({error:'Trenddaten konnten nicht gelesen werden.'}); }
     });
     RED.httpNode.get('/home-automation/solar/history-status', (_request,response) => {
       if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});

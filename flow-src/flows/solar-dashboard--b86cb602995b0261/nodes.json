@@ -490,10 +490,10 @@
     "type": "ui_template",
     "z": "b86cb602995b0261",
     "group": "solar_history_group",
-    "name": "Solar-Historie und Export",
+    "name": "Solar-Trend, Historie und gefilterter Export",
     "order": 1,
     "width": 12,
-    "height": 8,
+    "height": 0,
     "format": {
       "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solar-history.html"
     },

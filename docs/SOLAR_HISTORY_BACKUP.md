@@ -70,3 +70,36 @@ separat sichern. Dann die geprüfte Snapshot-Datei einsetzen und neu starten.
 diese Instanz ohne Anpassung NICHT zu verwenden.
 
 Tests: `test/solar-history-export.test.mjs`, `test/solar-backup.test.mjs`.
+
+## Historischer Trend · 0.24.0
+
+SOLAR → HISTORIE & SICHERUNG zeigt vier einzeln wählbare Kurven: PV-Erzeugung,
+Hausverbrauch, Netzbezug und Einspeisung. Umschaltbar zwischen gespeicherter
+Minutenleistung in W und Stundenenergie in kWh. Amperewerte werden nicht erfasst
+und nicht aus Leistungen geschätzt. Bei Stundenenergie sind Maxima Stundenmengen,
+keine momentanen Leistungsspitzen.
+
+Schnellwahl 1 h / 6 h / 24 h / 7 Tage / 30 Tage / Heute, freie Von-bis-Zeit,
+Vor-/Zurücknavigation, Zoomtasten und Ziehen im Diagramm. Eingaben und Achsen
+verwenden die Browser-Ortszeit (angezeigte Zeitzone); Server und Export UTC.
+Das Bis-Datum der Trendansicht ist exklusiv. Live verschiebt den Zeitbereich
+minütlich; manuelles Navigieren schaltet Live ab. Messpunkte sind per Maus oder
+Antippen ablesbar. Kennzahlen zeigen Minimum, Maximum mit Zeitpunkt und Mittelwert
+aller gültigen gespeicherten Werte, bei Energie zusätzlich die Summe.
+
+`GET /home-automation/solar/trend?start=2026-11-15T00:00:00.000Z&end=2026-11-16T00:00:00.000Z&mode=power&metrics=pv,house,import,export&status=all`
+
+`mode=power|energy`, `status=all|online|offline`, maximal 366 Tage.
+SQL verdichtet den Graphen auf ungefähr 600 Zeitfenster je Kurve; jedes enthält
+Mittelwert, Minimum, Maximum, Gültigkeitszähler und Lückenmarkierung. Die Kennzahlen
+werden vor Verdichtung über sämtliche ausgewählten Messwerte berechnet. Offline-
+Leistungen bleiben NULL, echte Nullmessungen gültig. Linien verbinden keine
+Offline-Zeitfenster oder längere Erfassungslücken. Vergangene Stromstärken und
+Sekundenspitzen zwischen Minutenmessungen lassen sich daraus nicht rekonstruieren.
+
+„Gefilterte CSV“ verwendet den angewendeten Zeitraum, Status und die aktiven
+Kurven: `GET /home-automation/solar/export.csv?dataset=trend&start=...&end=...&mode=power&metrics=pv,house&status=online`.
+Der Export enthält unveränderte Einzelwerte, Zeit und Status, keine Verdichtung
+und keine Roh-JSON-Spalte. Solange Änderungen nicht angewendet sind, bleibt dieser
+Button gesperrt. Der bisherige vollständige Export mit UTC-Datumsfilter bleibt
+unter „Weitere Datensätze exportieren“ erhalten. Tests: `test/solar-trend.test.mjs`.
