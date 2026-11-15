@@ -24,6 +24,23 @@ body.nr-dashboard-theme .nr-dashboard-template :is(h1,h2,h3,h4,h5,h6,p){backgrou
 body.nr-dashboard-theme :is(.ha-scheduler .sc-card,.lc-card,.ph-discovery .box){border-color:rgba(180,190,200,.16);box-shadow:0 2px 8px rgba(0,0,0,.08)}
 body.nr-dashboard-theme .nr-dashboard-cardpanel{border-color:rgba(180,190,200,.14)!important}
 body.nr-dashboard-theme :is(.ha-scheduler,.ph-discovery) :is(td,th){border-bottom-color:rgba(180,190,200,.18)}
+
+/* Navigation: Räume zuerst, technische Seiten darunter. Selektoren verwenden
+   stabile Icons statt Seitennummern; versteckte Tabs verschieben keine Gruppen. */
+body.nr-dashboard-theme md-sidenav md-list{padding:12px 10px 20px}
+body.nr-dashboard-theme md-sidenav md-list-item{position:relative;margin:3px 0;border-radius:10px;min-height:46px;overflow:visible}
+body.nr-dashboard-theme md-sidenav md-list-item .md-button{border-radius:10px}
+body.nr-dashboard-theme md-sidenav md-list-item p{font-size:13px;font-weight:500;letter-spacing:.035em}
+body.nr-dashboard-theme md-sidenav md-list-item ui-icon{display:flex;align-items:center;justify-content:center;width:34px;min-width:34px;height:34px;border-radius:9px;background:var(--gh-card);color:var(--gh-muted)}
+body.nr-dashboard-theme md-sidenav .nr-menu-item-active{background:var(--gh-control);box-shadow:inset 3px 0 0 var(--gh-text)}
+body.nr-dashboard-theme md-sidenav .nr-menu-item-active ui-icon{color:var(--gh-text);background:var(--gh-inset)}
+body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="home"]),
+body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="wb_cloudy"]){margin-top:36px}
+body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="home"])::after,
+body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="wb_cloudy"])::after{position:absolute;left:12px;top:-27px;z-index:1;opacity:1;color:var(--gh-muted);font-size:10px;font-weight:700;letter-spacing:.14em;pointer-events:none;white-space:nowrap}
+body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="home"])::after{content:"RÄUME"}
+body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="wb_cloudy"])::after{content:"SYSTEM & DIENSTE"}
+body.nr-dashboard-theme md-sidenav md-list-item .md-button:focus-visible{outline:2px solid var(--gh-text);outline-offset:-3px}
 </style>
 <script>
 (function(){

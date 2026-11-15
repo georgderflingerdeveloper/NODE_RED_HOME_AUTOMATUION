@@ -2581,27 +2581,28 @@
         "id": "1ec83753.5b31a9",
         "type": "ui_tab",
         "name": "HAUS",
-        "icon": "dashboard"
+        "icon": "home",
+        "order": 1
     },
     {
         "id": "35aaad8a.ed3c12",
         "type": "ui_tab",
         "name": "KÜCHE",
-        "icon": "dashboard",
+        "icon": "kitchen",
         "order": 3
     },
     {
         "id": "52acc5d.8b5ba3c",
         "type": "ui_tab",
         "name": "WOHNZIMMER",
-        "icon": "dashboard",
+        "icon": "weekend",
         "order": 2
     },
     {
         "id": "ea22f5b5.5af548",
         "type": "ui_tab",
         "name": "VORHAUS",
-        "icon": "dashboard",
+        "icon": "fa-sign-in",
         "order": 4
     },
     {
@@ -2618,7 +2619,7 @@
         "id": "56be4a6.19911b4",
         "type": "ui_tab",
         "name": "OBEN",
-        "icon": "dashboard",
+        "icon": "fa-level-up",
         "order": 5
     },
     {
@@ -2635,7 +2636,7 @@
         "id": "c1a8c6ed.e57098",
         "type": "ui_tab",
         "name": "BAD",
-        "icon": "dashboard",
+        "icon": "fa-tint",
         "order": 6
     },
     {
@@ -2652,7 +2653,7 @@
         "id": "60261446.7371fc",
         "type": "ui_tab",
         "name": "WC",
-        "icon": "dashboard",
+        "icon": "wc",
         "order": 7
     },
     {
@@ -2679,8 +2680,8 @@
         "id": "17e38b6a.856c95",
         "type": "ui_tab",
         "name": "KINDERZIMMER",
-        "icon": "dashboard",
-        "order": 10,
+        "icon": "child_care",
+        "order": 8,
         "disabled": false,
         "hidden": false
     },
@@ -2816,8 +2817,8 @@
         "id": "1132541c42ce2a8d",
         "type": "ui_tab",
         "name": "SOLAR",
-        "icon": "wi-wu-sunny",
-        "order": 13,
+        "icon": "wb_sunny",
+        "order": 10,
         "disabled": false,
         "hidden": false
     },
@@ -2836,8 +2837,8 @@
         "id": "weather_dashboard_tab",
         "type": "ui_tab",
         "name": "WETTER",
-        "icon": "dashboard",
-        "order": 11,
+        "icon": "wb_cloudy",
+        "order": 9,
         "disabled": false,
         "hidden": false
     },
@@ -2857,7 +2858,7 @@
         "type": "ui_tab",
         "name": "KOSTEN",
         "icon": "euro_symbol",
-        "order": 14,
+        "order": 11,
         "disabled": false,
         "hidden": false
     },
@@ -2877,7 +2878,7 @@
         "type": "ui_tab",
         "name": "SYSTEM",
         "icon": "dns",
-        "order": 15,
+        "order": 12,
         "disabled": false,
         "hidden": false
     },
@@ -2897,7 +2898,7 @@
         "type": "ui_tab",
         "name": "Schedulers",
         "icon": "schedule",
-        "order": 20,
+        "order": 13,
         "disabled": false,
         "hidden": false
     },
@@ -12618,7 +12619,7 @@
         "type": "ui_tab",
         "name": "Darstellung",
         "icon": "palette",
-        "order": 21,
+        "order": 17,
         "disabled": false,
         "hidden": false
     },
@@ -12641,7 +12642,7 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "format": "<style>\n:root{--gh-page:#1c1c1c;--gh-card:#303030;--gh-inset:#242424;--gh-control:#444444;--gh-border:#626262;--gh-text:#f1f1f1;--gh-muted:#c6c6c6;}\n:root[data-gh-theme=\"grays\"]{--gh-page:#1c1c1c;--gh-card:#303030;--gh-inset:#242424;--gh-control:#444444;--gh-border:#626262;--gh-text:#f1f1f1;--gh-muted:#c6c6c6;}\n:root[data-gh-theme=\"dark\"]{--gh-page:#111316;--gh-card:#202328;--gh-inset:#181b1f;--gh-control:#353b43;--gh-border:#737d89;--gh-text:#f4f5f7;--gh-muted:#c4cbd3;}\n:root[data-gh-theme=\"blues\"]{--gh-page:#17212c;--gh-card:#253647;--gh-inset:#1d2c3b;--gh-control:#3c536c;--gh-border:#8196ae;--gh-text:#f0f5fb;--gh-muted:#c4d3e3;}\n:root[data-gh-theme=\"greens\"]{--gh-page:#1b2420;--gh-card:#2c3b33;--gh-inset:#223029;--gh-control:#445b4c;--gh-border:#8b9e8f;--gh-text:#f1f6f1;--gh-muted:#cad8cc;}\n\n/* Nur Dashboard-Flächen, keine Statuslampen oder Leistungsanzeigen überschreiben. */\nbody.nr-dashboard-theme,body.nr-dashboard-theme md-content{background-color:var(--gh-page)!important;color:var(--gh-text)!important}\nbody.nr-dashboard-theme md-toolbar,body.nr-dashboard-theme md-sidenav,body.nr-dashboard-theme md-sidenav md-content{background-color:var(--gh-inset)!important;color:var(--gh-text)!important}\nbody.nr-dashboard-theme md-card,body.nr-dashboard-theme .nr-dashboard-cardpanel{background-color:var(--gh-card)!important;color:var(--gh-text)!important;border-color:var(--gh-border)!important}\nbody.nr-dashboard-theme .nr-dashboard-cardtitle{color:var(--gh-text)!important}\n.gh-theme-picker{color:var(--gh-text);padding:12px}\n.gh-theme-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}\n.gh-theme-option{background:var(--gh-card);color:var(--gh-text);border:1px solid rgba(180,190,200,.25);border-radius:10px;padding:14px;text-align:left;cursor:pointer;min-height:100px}\n.gh-theme-option[aria-pressed=\"true\"]{border-color:var(--gh-text);box-shadow:inset 0 -2px 0 var(--gh-muted)}\n.gh-theme-option:focus-visible{outline:2px solid var(--gh-text);outline-offset:3px}\n.gh-theme-swatch{display:flex;height:22px;margin-bottom:10px;border-radius:5px;overflow:hidden}\n.gh-theme-swatch span{flex:1}\n.gh-theme-picker p{line-height:1.6}\n/* Text braucht keine eigenen Flächen. Konturen nur zur Gliederung der Karten.\n   Semantische Statuschips, LEDs und Preiskennzeichnungen behalten ihre Farben. */\nbody.nr-dashboard-theme .nr-dashboard-template :is(h1,h2,h3,h4,h5,h6,p){background:transparent!important;box-shadow:none!important;border:0!important}\nbody.nr-dashboard-theme :is(.ha-scheduler .sc-card,.lc-card,.ph-discovery .box){border-color:rgba(180,190,200,.16);box-shadow:0 2px 8px rgba(0,0,0,.08)}\nbody.nr-dashboard-theme .nr-dashboard-cardpanel{border-color:rgba(180,190,200,.14)!important}\nbody.nr-dashboard-theme :is(.ha-scheduler,.ph-discovery) :is(td,th){border-bottom-color:rgba(180,190,200,.18)}\n</style>\n<script>\n(function(){\n 'use strict';\n // Globales Head-Template: kein Angular-scope. Vorhandene Instanz sauber ablösen.\n if(window.GeorgDashboardTheme && window.GeorgDashboardTheme.dispose)window.GeorgDashboardTheme.dispose();\n const KEY='georgshome.dashboard.theme.v1';\n const allowed=['grays','dark','blues','greens'];\n const normalize=value=>allowed.indexOf(value)>=0?value:'grays';\n const service={current:'grays',warning:'',apply:function(value,persist){\n  this.current=normalize(value);this.warning='';\n  document.documentElement.setAttribute('data-gh-theme',this.current);\n  if(persist){try{window.localStorage.setItem(KEY,this.current);}catch(e){this.warning='Speichern im Browser nicht möglich. Auswahl gilt nur für diese Sitzung.';}}\n  window.dispatchEvent(new CustomEvent('georg-theme-changed'));\n }};\n let initial='grays';try{initial=window.localStorage.getItem(KEY);}catch(e){service.warning='Browserspeicher nicht verfügbar.';}\n const initialWarning=service.warning;window.GeorgDashboardTheme=service;service.apply(initial,false);service.warning=initialWarning;\n function storage(event){if(event.key===KEY||event.key===null)service.apply(event.newValue,false);}\n window.addEventListener('storage',storage);\n service.dispose=function(){window.removeEventListener('storage',storage);};\n})();\n</script>\n",
+        "format": "<style>\n:root{--gh-page:#1c1c1c;--gh-card:#303030;--gh-inset:#242424;--gh-control:#444444;--gh-border:#626262;--gh-text:#f1f1f1;--gh-muted:#c6c6c6;}\n:root[data-gh-theme=\"grays\"]{--gh-page:#1c1c1c;--gh-card:#303030;--gh-inset:#242424;--gh-control:#444444;--gh-border:#626262;--gh-text:#f1f1f1;--gh-muted:#c6c6c6;}\n:root[data-gh-theme=\"dark\"]{--gh-page:#111316;--gh-card:#202328;--gh-inset:#181b1f;--gh-control:#353b43;--gh-border:#737d89;--gh-text:#f4f5f7;--gh-muted:#c4cbd3;}\n:root[data-gh-theme=\"blues\"]{--gh-page:#17212c;--gh-card:#253647;--gh-inset:#1d2c3b;--gh-control:#3c536c;--gh-border:#8196ae;--gh-text:#f0f5fb;--gh-muted:#c4d3e3;}\n:root[data-gh-theme=\"greens\"]{--gh-page:#1b2420;--gh-card:#2c3b33;--gh-inset:#223029;--gh-control:#445b4c;--gh-border:#8b9e8f;--gh-text:#f1f6f1;--gh-muted:#cad8cc;}\n\n/* Nur Dashboard-Flächen, keine Statuslampen oder Leistungsanzeigen überschreiben. */\nbody.nr-dashboard-theme,body.nr-dashboard-theme md-content{background-color:var(--gh-page)!important;color:var(--gh-text)!important}\nbody.nr-dashboard-theme md-toolbar,body.nr-dashboard-theme md-sidenav,body.nr-dashboard-theme md-sidenav md-content{background-color:var(--gh-inset)!important;color:var(--gh-text)!important}\nbody.nr-dashboard-theme md-card,body.nr-dashboard-theme .nr-dashboard-cardpanel{background-color:var(--gh-card)!important;color:var(--gh-text)!important;border-color:var(--gh-border)!important}\nbody.nr-dashboard-theme .nr-dashboard-cardtitle{color:var(--gh-text)!important}\n.gh-theme-picker{color:var(--gh-text);padding:12px}\n.gh-theme-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}\n.gh-theme-option{background:var(--gh-card);color:var(--gh-text);border:1px solid rgba(180,190,200,.25);border-radius:10px;padding:14px;text-align:left;cursor:pointer;min-height:100px}\n.gh-theme-option[aria-pressed=\"true\"]{border-color:var(--gh-text);box-shadow:inset 0 -2px 0 var(--gh-muted)}\n.gh-theme-option:focus-visible{outline:2px solid var(--gh-text);outline-offset:3px}\n.gh-theme-swatch{display:flex;height:22px;margin-bottom:10px;border-radius:5px;overflow:hidden}\n.gh-theme-swatch span{flex:1}\n.gh-theme-picker p{line-height:1.6}\n/* Text braucht keine eigenen Flächen. Konturen nur zur Gliederung der Karten.\n   Semantische Statuschips, LEDs und Preiskennzeichnungen behalten ihre Farben. */\nbody.nr-dashboard-theme .nr-dashboard-template :is(h1,h2,h3,h4,h5,h6,p){background:transparent!important;box-shadow:none!important;border:0!important}\nbody.nr-dashboard-theme :is(.ha-scheduler .sc-card,.lc-card,.ph-discovery .box){border-color:rgba(180,190,200,.16);box-shadow:0 2px 8px rgba(0,0,0,.08)}\nbody.nr-dashboard-theme .nr-dashboard-cardpanel{border-color:rgba(180,190,200,.14)!important}\nbody.nr-dashboard-theme :is(.ha-scheduler,.ph-discovery) :is(td,th){border-bottom-color:rgba(180,190,200,.18)}\n\n/* Navigation: Räume zuerst, technische Seiten darunter. Selektoren verwenden\n   stabile Icons statt Seitennummern; versteckte Tabs verschieben keine Gruppen. */\nbody.nr-dashboard-theme md-sidenav md-list{padding:12px 10px 20px}\nbody.nr-dashboard-theme md-sidenav md-list-item{position:relative;margin:3px 0;border-radius:10px;min-height:46px;overflow:visible}\nbody.nr-dashboard-theme md-sidenav md-list-item .md-button{border-radius:10px}\nbody.nr-dashboard-theme md-sidenav md-list-item p{font-size:13px;font-weight:500;letter-spacing:.035em}\nbody.nr-dashboard-theme md-sidenav md-list-item ui-icon{display:flex;align-items:center;justify-content:center;width:34px;min-width:34px;height:34px;border-radius:9px;background:var(--gh-card);color:var(--gh-muted)}\nbody.nr-dashboard-theme md-sidenav .nr-menu-item-active{background:var(--gh-control);box-shadow:inset 3px 0 0 var(--gh-text)}\nbody.nr-dashboard-theme md-sidenav .nr-menu-item-active ui-icon{color:var(--gh-text);background:var(--gh-inset)}\nbody.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon=\"home\"]),\nbody.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon=\"wb_cloudy\"]){margin-top:36px}\nbody.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon=\"home\"])::after,\nbody.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon=\"wb_cloudy\"])::after{position:absolute;left:12px;top:-27px;z-index:1;opacity:1;color:var(--gh-muted);font-size:10px;font-weight:700;letter-spacing:.14em;pointer-events:none;white-space:nowrap}\nbody.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon=\"home\"])::after{content:\"RÄUME\"}\nbody.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon=\"wb_cloudy\"])::after{content:\"SYSTEM & DIENSTE\"}\nbody.nr-dashboard-theme md-sidenav md-list-item .md-button:focus-visible{outline:2px solid var(--gh-text);outline-offset:-3px}\n</style>\n<script>\n(function(){\n 'use strict';\n // Globales Head-Template: kein Angular-scope. Vorhandene Instanz sauber ablösen.\n if(window.GeorgDashboardTheme && window.GeorgDashboardTheme.dispose)window.GeorgDashboardTheme.dispose();\n const KEY='georgshome.dashboard.theme.v1';\n const allowed=['grays','dark','blues','greens'];\n const normalize=value=>allowed.indexOf(value)>=0?value:'grays';\n const service={current:'grays',warning:'',apply:function(value,persist){\n  this.current=normalize(value);this.warning='';\n  document.documentElement.setAttribute('data-gh-theme',this.current);\n  if(persist){try{window.localStorage.setItem(KEY,this.current);}catch(e){this.warning='Speichern im Browser nicht möglich. Auswahl gilt nur für diese Sitzung.';}}\n  window.dispatchEvent(new CustomEvent('georg-theme-changed'));\n }};\n let initial='grays';try{initial=window.localStorage.getItem(KEY);}catch(e){service.warning='Browserspeicher nicht verfügbar.';}\n const initialWarning=service.warning;window.GeorgDashboardTheme=service;service.apply(initial,false);service.warning=initialWarning;\n function storage(event){if(event.key===KEY||event.key===null)service.apply(event.newValue,false);}\n window.addEventListener('storage',storage);\n service.dispose=function(){window.removeEventListener('storage',storage);};\n})();\n</script>\n",
         "storeOutMessages": false,
         "fwdInMessages": false,
         "resendOnRefresh": false,
@@ -12677,7 +12678,7 @@
         "type": "ui_tab",
         "name": "Homematic IP",
         "icon": "devices",
-        "order": 22,
+        "order": 14,
         "disabled": false,
         "hidden": false
     },
@@ -12779,7 +12780,7 @@
         "type": "ui_tab",
         "name": "SolarEdge Vergleich",
         "icon": "compare_arrows",
-        "order": 23,
+        "order": 15,
         "disabled": false,
         "hidden": false
     },
@@ -12852,7 +12853,7 @@
         "type": "ui_tab",
         "name": "HOSTRECHNER",
         "icon": "computer",
-        "order": 24,
+        "order": 16,
         "disabled": false,
         "hidden": false
     },

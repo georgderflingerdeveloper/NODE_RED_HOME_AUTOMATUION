@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "efdc9917ab36d51ff52fe367eaa9880295edf38edf0e3016be73a8e03f25921d",
+  "flowSha256": "858a41219b74c1c3d1604fd190aa76bd7bf54b9b3817c338a70c3082132cd657",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1392,7 +1392,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "b1e490fc45ff0085c559c9546f7e0d7809dd3a66db0347c14cfa984793d87f5a",
+    "configuration/nodes.json": "759ea63ccbb450b87b3c46c1f2f6cbdd0b2967996b2fbb8eef1735da8f53d387",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -1564,7 +1564,7 @@
     "flows/sub-light-middle--53cbac0a.2b67f4/nodes.json": "4b9766f58bfd570f7096f7e313ba24487370b570f88b4f0dd42a8ebb4849c5b9",
     "flows/system--system_dashboard_flow/functions/phidget-daten-fur-dashboard.js": "d31410dee27e4c2596575665eb4143e6e3a767f406cdc21084e39608580bd9b8",
     "flows/system--system_dashboard_flow/nodes.json": "79b5887df04c71349c18316518c62feb7939db05fd983dfece702d997af9ea63",
-    "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html": "dba80e64d81bf073082be4c0be899c460e8e015f2a40d1c78b92609a5fdfdae2",
+    "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html": "5987b308905425817382fb86da1c47480709b2e8c2a63d25a19ea7beb13dec61",
     "flows/system--system_dashboard_flow/templates/dashboard-theme-picker.html": "31a5290200536dcf745233cc009b8e99f7fe710ba0ab351d76d9045ddf7e5750",
     "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": "7db76327e1880bb2b46ac75b5b1d5cc3dcbbf86d579110ff0a99f1ac7482c08d",
     "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": "5258d51d6b39563e731aade9e1f133d2f63bfabb7eef58b442448499cece03f4",
