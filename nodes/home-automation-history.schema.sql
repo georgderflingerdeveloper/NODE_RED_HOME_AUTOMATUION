@@ -166,3 +166,16 @@ CREATE TABLE IF NOT EXISTS local_energy_coverage (
  interval_start TEXT PRIMARY KEY,
  covered_ms REAL NOT NULL DEFAULT 0
 );
+
+-- Leistungsstichprobe mindestens alle 60 Sekunden sowie bei Online/Offline-Wechsel.
+-- Rohdaten bleiben getrennt von integrierten Energie- und Zählerwerten erhalten.
+CREATE TABLE IF NOT EXISTS solar_power_samples (
+ observed_at TEXT PRIMARY KEY,
+ received_at TEXT NOT NULL,
+ online INTEGER NOT NULL CHECK(online IN (0,1)),
+ pv_power_w REAL,
+ house_consumption_w REAL,
+ grid_import_w REAL,
+ grid_export_w REAL,
+ raw_json TEXT NOT NULL
+);

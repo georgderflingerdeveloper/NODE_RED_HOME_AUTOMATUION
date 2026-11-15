@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "858a41219b74c1c3d1604fd190aa76bd7bf54b9b3817c338a70c3082132cd657",
+  "flowSha256": "725b10b156c3999c0ec06fd0b4ef3ec5916446c6fd44cde65d03f97e6583fd5e",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -651,7 +651,9 @@
     "host_monitor_json",
     "host_monitor_ui",
     "host_monitor_error",
-    "host_monitor_note"
+    "host_monitor_note",
+    "solar_history_group",
+    "solar_history_dashboard"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -780,6 +782,7 @@
     "host_monitor_flow": "configuration/nodes.json",
     "host_monitor_tab": "configuration/nodes.json",
     "host_monitor_group": "configuration/nodes.json",
+    "solar_history_group": "configuration/nodes.json",
     "956c65fc.759a28": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "f4f718ca.73ad78": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "5e8c7091.07116": "flows/boiler--15e47868.0e5ea8/nodes.json",
@@ -1195,6 +1198,7 @@
     "se_node_red_restart_exec": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "datenbank_energy_out": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "ui_house_total_power": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
+    "solar_history_dashboard": "flows/solar-dashboard--b86cb602995b0261/nodes.json",
     "8908334401038236": "flows/solar-power--79160448dc533f1d/nodes.json",
     "7db9c065c104320e": "flows/solar-power--79160448dc533f1d/nodes.json",
     "5a499b5d44485fa5": "flows/solar-power--79160448dc533f1d/nodes.json",
@@ -1392,7 +1396,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "759ea63ccbb450b87b3c46c1f2f6cbdd0b2967996b2fbb8eef1735da8f53d387",
+    "configuration/nodes.json": "f0c12396bd26f17d63f7ecac68638bf8d3ccfa2fdafd938209d0ae5bdccbed46",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -1530,10 +1534,11 @@
     "flows/solar-dashboard--b86cb602995b0261/functions/getexcesspower.js": "e0d9799a847de68702b4d44da9d284df81bf875a8eb83ad2432be74660680c63",
     "flows/solar-dashboard--b86cb602995b0261/functions/make-excesspower-to-payload.js": "453327609babb6dafce54882848fde736893161bf84c81b50934fde94600074a",
     "flows/solar-dashboard--b86cb602995b0261/functions/reconnect-serverneustart-absichern.js": "03ac2c2f99c5a97ee351490bbf0308383a3a78568e24cb61167c6efde2df161c",
-    "flows/solar-dashboard--b86cb602995b0261/nodes.json": "ebc16ccdfbfd60c719ccc263e98fad9c0958b430ac715eb992cb63bf371bcb72",
+    "flows/solar-dashboard--b86cb602995b0261/nodes.json": "6df877d8fe5b5ebe1f753a6b425c6bb32f3406cf8b5884755871926c3a1ccfbd",
     "flows/solar-dashboard--b86cb602995b0261/templates/gesamtleistungsaufnahme-haus.html": "9573bfc5ad0fd2f362c0ab6a387ed3183639fa6f740bd41072f93c648a7bd5d6",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html": "1cba15b61038576f82fb648dca88cf916277825a49acd77732d0460723bd0d29",
     "flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": "00c583f796a75e72d3d52ef99ebefd69f443d15e167d01e5aeb028d4ed31f3db",
+    "flows/solar-dashboard--b86cb602995b0261/templates/solar-history.html": "8f18268abf42f94b8d3042dd6ad69296305c1b397549f7bde0ab578a44e674d7",
     "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": "69a76071dae8b4b4cccd3b053fd3f07e316986ad16ff66a9058cf13ecfdc9565",
     "flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus.html": "cb16ca72fbf48bbcc7e2b9ed4b0ad1eeb6c79b4b328c21f9571fe95745bd4afd",
     "flows/solar-dashboard--b86cb602995b0261/templates/solarleistung.html": "43854905a65444a134f9f1b705f93c95fcbf4368465cdd932514a99fac1de236",
@@ -1564,10 +1569,10 @@
     "flows/sub-light-middle--53cbac0a.2b67f4/nodes.json": "4b9766f58bfd570f7096f7e313ba24487370b570f88b4f0dd42a8ebb4849c5b9",
     "flows/system--system_dashboard_flow/functions/phidget-daten-fur-dashboard.js": "d31410dee27e4c2596575665eb4143e6e3a767f406cdc21084e39608580bd9b8",
     "flows/system--system_dashboard_flow/nodes.json": "79b5887df04c71349c18316518c62feb7939db05fd983dfece702d997af9ea63",
-    "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html": "5987b308905425817382fb86da1c47480709b2e8c2a63d25a19ea7beb13dec61",
+    "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html": "4b9a855f4fe5adc656a0967ae16ea33c2d71b04e29b9ccc8efaffc327f9727db",
     "flows/system--system_dashboard_flow/templates/dashboard-theme-picker.html": "31a5290200536dcf745233cc009b8e99f7fe710ba0ab351d76d9045ddf7e5750",
     "flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": "7db76327e1880bb2b46ac75b5b1d5cc3dcbbf86d579110ff0a99f1ac7482c08d",
-    "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": "5258d51d6b39563e731aade9e1f133d2f63bfabb7eef58b442448499cece03f4",
+    "flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": "e9885a462ae729758cef346b7c9ecc7e0b5cf117ac932e6cb95a27ef92f2d96f",
     "flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": "9afed551b5ea9fb831d1625942316d90bd350f3c239b967ab0f4ea75160b0709",
     "flows/system--system_dashboard_flow/templates/verschlusselte-system-zugangsdaten.html": "3886f32b7967c056a921c7d6194345aa63d027ecb8bd922331747a6f405f88e6",
     "flows/system-netzwerk-scan--system_network_flow/functions/hostname-sicher-ubernehmen.js": "958537e2bb109949696e6c31d0f7aa693908bf5b97b14760b4f7359d65e150b7",

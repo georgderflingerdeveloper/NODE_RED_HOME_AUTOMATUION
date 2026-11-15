@@ -1,0 +1,31 @@
+<style>
+.gh-solar-history{padding:14px;color:var(--gh-text);font-size:14px;line-height:1.6}
+.gh-solar-history p{margin:0 0 12px}.gh-solar-history form{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.gh-solar-history label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--gh-muted)}
+.gh-solar-history input,.gh-solar-history select,.gh-solar-history button{box-sizing:border-box;min-height:38px;max-width:100%;border:1px solid var(--gh-border);border-radius:7px;background:var(--gh-inset);color:var(--gh-text);padding:7px 10px}
+.gh-solar-history button{cursor:pointer;font-weight:700}.gh-solar-history .gh-history-status{margin-top:16px;padding-top:12px;border-top:1px solid var(--gh-border)}
+.gh-solar-history .gh-history-warning{font-weight:700;color:#ffd166}
+</style>
+<section class="gh-solar-history">
+ <p><strong>Solar-Historie</strong> · SQLite mit Leistungswerten, Zählerständen und Stundenenergie.</p>
+ <form action="/home-automation/solar/export.csv" method="get">
+  <label>Datensatz<select name="dataset"><option value="power">Leistung · Minutenwerte (W)</option><option value="hourly">Stundenenergie (kWh)</option><option value="meter">Netz-Zählerstände (kWh)</option><option value="inverter">PV-Zählerstände (kWh)</option><option value="daily">Tagesbilanz (kWh)</option><option value="grid">Netz-Tagesvergleich</option><option value="cloud">SolarEdge Cloud (kWh)</option></select></label>
+  <label>Von · UTC<input type="date" name="from" ng-model="historyFrom"></label>
+  <label>Bis einschließlich · UTC<input type="date" name="to" ng-model="historyTo"></label>
+  <button type="submit">CSV herunterladen</button>
+ </form>
+ <p>Ohne Datum wird die gesamte Historie exportiert. CSV mit Semikolon und UTF-8; Leistungswerte etwa jede Minute und bei Statuswechsel. Offline-Zeiten bleiben als solche erkennbar.</p>
+ <div class="gh-history-status" aria-live="polite">
+  <p>{{solarHistory.samples.count || 0}} Leistungswerte · {{solarHistory.hourly.count || 0}} Stundenwerte<br>Stundenhistorie ab {{solarHistory.hourly.first || 'noch keine Daten'}}</p>
+  <p ng-class="{'gh-history-warning':solarHistory.backup.state !== 'ok'}"><strong>Sicherung:</strong> {{solarHistory.backup.message || historyError || 'Status wird geladen …'}}</p>
+  <p ng-if="solarHistory.backup.lastLocalSuccessAt">Lokal: {{solarHistory.backup.lastLocalSuccessAt}}</p>
+  <p ng-if="solarHistory.backup.lastCloudSuccessAt">Google Drive zuletzt erfolgreich: {{solarHistory.backup.lastCloudSuccessAt}}</p>
+ </div>
+</section>
+<script>
+(function(scope){
+ let disposed=false;
+ function refresh(){fetch('/home-automation/solar/history-status',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(!disposed)scope.$evalAsync(()=>{scope.solarHistory=data;scope.historyError='';});}).catch(()=>{if(!disposed)scope.$evalAsync(()=>{scope.historyError='Historienstatus nicht erreichbar.';});});}
+ refresh();const timer=setInterval(refresh,60000);scope.$on('$destroy',()=>{disposed=true;clearInterval(timer);});
+})(scope);
+</script>

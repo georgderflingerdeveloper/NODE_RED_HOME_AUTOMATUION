@@ -1,0 +1,11 @@
+[Unit]
+Description=Tägliche Solar-Historiensicherung um 02:30
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 Europe/Vienna
+Persistent=true
+RandomizedDelaySec=120
+Unit=home-automation-solar-backup.service
+
+[Install]
+WantedBy=timers.target

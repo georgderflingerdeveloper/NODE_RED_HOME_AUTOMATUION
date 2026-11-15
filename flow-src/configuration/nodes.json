@@ -2591,5 +2591,16 @@
     "disp": true,
     "width": "24",
     "collapse": false
+  },
+  {
+    "id": "solar_history_group",
+    "type": "ui_group",
+    "name": "HISTORIE & SICHERUNG",
+    "tab": "1132541c42ce2a8d",
+    "order": 2,
+    "disp": true,
+    "width": 12,
+    "collapse": false,
+    "className": ""
   }
 ]

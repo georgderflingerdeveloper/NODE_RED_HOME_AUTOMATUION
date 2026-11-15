@@ -484,5 +484,28 @@
     "wires": [
       []
     ]
+  },
+  {
+    "id": "solar_history_dashboard",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "solar_history_group",
+    "name": "Solar-Historie und Export",
+    "order": 1,
+    "width": 12,
+    "height": 8,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/solar-history.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 560,
+    "y": 600,
+    "wires": [
+      []
+    ]
   }
 ]

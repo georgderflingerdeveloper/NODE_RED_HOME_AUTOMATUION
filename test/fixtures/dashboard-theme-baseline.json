@@ -16,8 +16,8 @@
     "markup": "b5731d87968ac984dd23ad8a8a83bd29455586b6ea5410f2ae94fe10940edd0f"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": {
-    "scripts": "9f6553239e05360d7a6b601f50cfac0af539e57fa8f85a35a96186ec04a4c93b",
-    "markup": "9f6553239e05360d7a6b601f50cfac0af539e57fa8f85a35a96186ec04a4c93b"
+    "scripts": "76b21dbbe2e321bf73c8fa6168f6ddf11c58009d633e80853fd0d3b72fa9f953",
+    "markup": "76b21dbbe2e321bf73c8fa6168f6ddf11c58009d633e80853fd0d3b72fa9f953"
   },
   "flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

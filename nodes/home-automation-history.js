@@ -1,3 +1,4 @@
+const { streamExport, historyStatus } = require("./solar-history-export.cjs");
 const { createCloudStore, effectiveRows, compareSources, METRICS } = require("./solaredge-cloud.cjs");
 const { monthRange, saveBill, readBill } = require("./monthly-bills.cjs");
 const { parseRange, calculateRange } = require("./energy-range.cjs");
@@ -51,6 +52,18 @@ function sortDashboardRows(rows) {
 }
 
 module.exports = function registerHistoryStore(RED) {
+  let activeDatabasePath = null;
+  if (RED.httpNode?.get) {
+    RED.httpNode.get('/home-automation/solar/export.csv', (request,response) => {
+      if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
+      return streamExport(activeDatabasePath,request,response);
+    });
+    RED.httpNode.get('/home-automation/solar/history-status', (_request,response) => {
+      if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
+      try { response.set('Cache-Control','no-store'); response.json(historyStatus(activeDatabasePath)); }
+      catch { response.status(500).json({error:'Historienstatus nicht lesbar.'}); }
+    });
+  }
   function HistoryStoreNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
@@ -63,6 +76,14 @@ module.exports = function registerHistoryStore(RED) {
     fs.mkdirSync(backupDirectory, { recursive: true });
     const database = new DatabaseSync(databasePath);
     database.exec(fs.readFileSync(path.join(__dirname, "home-automation-history.schema.sql"), "utf8"));
+
+    activeDatabasePath = databasePath;
+    const insertPowerSample = database.prepare(`INSERT OR IGNORE INTO solar_power_samples
+      (observed_at,received_at,online,pv_power_w,house_consumption_w,grid_import_w,grid_export_w,raw_json)
+      VALUES (?,?,?,?,?,?,?,?)`);
+    let lastPowerSampleMs = null;
+    let lastPowerOnline = null;
+    const powerNumber = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
 
     const cloud = createCloudStore(database, {
       siteId: config.cloudSiteId || process.env.SOLAREDGE_SITE_ID || '',
@@ -856,6 +877,14 @@ module.exports = function registerHistoryStore(RED) {
 
         if (msg.topic === "history/source/energy") {
           const energyState = integrateEnergy(payload || {});
+          const sampleMs = Date.parse(energyState.observedAt);
+          if(lastPowerSampleMs === null || sampleMs-lastPowerSampleMs >= 60000 || lastPowerOnline !== energyState.online) {
+            const reading = field => energyState.online ? powerNumber(field) : null;
+            insertPowerSample.run(energyState.observedAt,new Date().toISOString(),Number(energyState.online),
+              reading(payload?.PvPowerWatt),reading(payload?.HouseConsumptionWatt),
+              reading(payload?.GridImportWatt),reading(payload?.FeedInWatt ?? payload?.ExcessPowerWatt),JSON.stringify(payload || {}));
+            lastPowerSampleMs=sampleMs; lastPowerOnline=energyState.online;
+          }
           const errorText = payload?.OfflineReason || payload?.ErrorReason || "";
           const stateChanged = lastEnergyOnlineState !== energyState.online;
           if (stateChanged || Date.now() - lastEnergySourceWriteMs >= 60_000) {
@@ -963,6 +992,7 @@ module.exports = function registerHistoryStore(RED) {
     node.on("close", () => {
       cloudClosed=true;clearTimeout(cloudStart);clearInterval(cloudTimer);cloud.close();
       persistEnergyAccumulator();
+      if(activeDatabasePath === databasePath) activeDatabasePath=null;
       database.close();
     });
   }

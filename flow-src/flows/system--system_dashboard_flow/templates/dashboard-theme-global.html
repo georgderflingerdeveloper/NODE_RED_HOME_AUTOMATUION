@@ -41,6 +41,56 @@ body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="wb_cloudy"])::
 body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="home"])::after{content:"RÄUME"}
 body.nr-dashboard-theme md-sidenav md-list-item:has(ui-icon[icon="wb_cloudy"])::after{content:"SYSTEM & DIENSTE"}
 body.nr-dashboard-theme md-sidenav md-list-item .md-button:focus-visible{outline:2px solid var(--gh-text);outline-offset:-3px}
+
+  #home-automation-project-status { display:flex; align-items:center; gap:8px; flex:1; min-width:0; margin-left:12px; font-family:Roboto,Arial,sans-serif; }
+  #home-automation-project-status .ha-status-name { max-width:260px;font-size:15px;letter-spacing:.025em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+  #home-automation-project-status .ha-status-chip { color:#fff; font-size:12px; line-height:18px; white-space:nowrap; }
+  #home-automation-project-status .ha-status-branch { max-width:280px; overflow:hidden; text-overflow:ellipsis; }
+  #home-automation-project-info-button { min-width:30px; width:30px; height:30px; margin:0 4px 0 0; padding:0; border:1px solid rgba(255,255,255,.8); border-radius:50%; background:transparent; color:#fff; font-size:17px; font-weight:700; cursor:pointer; }
+  #home-automation-project-info-panel { position:fixed; z-index:10000; top:56px; right:12px; width:min(620px,calc(100vw - 24px)); max-height:calc(100vh - 72px); overflow:auto; box-sizing:border-box; padding:16px; border:1px solid var(--gh-border,#626262); border-radius:11px; background:var(--gh-card,#303030); color:var(--gh-text,#f1f1f1); box-shadow:0 10px 28px rgba(0,0,0,.45); font-family:Roboto,Arial,sans-serif; }
+  #home-automation-project-info-panel[hidden] { display:none; }
+  #home-automation-project-info-panel h3 { margin:0 0 5px; color:#fff; font-size:17px; }
+  #home-automation-project-info-panel .ha-branch-name { margin:0 0 9px; color:var(--gh-muted,#c6c6c6); font-family:monospace; overflow-wrap:anywhere; }
+  #home-automation-project-info-panel .ha-branch-purpose { margin:0 0 14px; padding:10px 12px; border-left:3px solid var(--gh-muted,#c6c6c6); background:var(--gh-inset,#242424); line-height:1.45; }
+  #home-automation-project-info-panel .ha-info-grid { display:grid; grid-template-columns:repeat(2,minmax(200px,1fr)); gap:0 18px; }
+  #home-automation-project-info-panel .ha-info-row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--gh-control,#444444); font-size:12px; }
+  #home-automation-project-info-panel .ha-info-label { color:var(--gh-muted,#c6c6c6); }
+  #home-automation-project-info-panel .ha-info-value { color:#fff; text-align:right; font-family:monospace; overflow-wrap:anywhere; }
+  #home-automation-project-info-panel .ha-overview { margin:12px 0 0; padding-left:20px; color:var(--gh-muted,#c6c6c6); font-size:12px; line-height:1.6; }
+  #nr-dashboard-toolbar { gap:8px; padding:0 16px; }
+  #nr-dashboard-toolbar h1 { flex-shrink:0; margin:0; font-size:21px; font-weight:750; letter-spacing:.02em; white-space:nowrap; }
+  #home-automation-project-status .ha-status-project, #home-automation-project-status .ha-status-branch { display:none; }
+  #home-automation-project-status .ha-status-version { padding:2px 7px; border:1px solid var(--gh-border,#626262); border-radius:6px; font-size:11px; }
+  #home-automation-project-info-button { flex-shrink:0; width:25px; min-width:25px; height:25px; font-size:14px; margin:0; }
+  #home-automation-project-hash { order:10; flex-shrink:0; color:var(--gh-muted,#c6c6c6); font:11px/1.4 monospace; letter-spacing:.03em; margin-left:8px; white-space:nowrap; }
+  #dashboard-reconnect-button { min-width:30px; padding:0 6px; font-size:11px; letter-spacing:.02em; }
+  #clock { white-space:nowrap; font-size:13px; line-height:1.35; margin:0; font-variant-numeric:tabular-nums; }
+  @media (max-width:1100px) { #home-automation-project-status .ha-status-name { display:none; } }
+  @media (max-width:700px) { #nr-dashboard-toolbar { flex-wrap:wrap; height:auto; min-height:64px; padding:8px 12px; gap:6px; } #nr-dashboard-toolbar h1 { font-size:17px; } #home-automation-project-status { margin-left:4px; } #dashboard-reconnect-button { font-size:0; width:28px; min-width:28px; margin:0!important; } #dashboard-reconnect-button::after { content:"↻"; font-size:19px; } #clock { font-size:11px; } #home-automation-project-hash { font-size:10px; margin-left:auto; } }
+  @media (max-width:520px) { #home-automation-project-info-panel .ha-info-grid { grid-template-columns:1fr; } }
+
+/* GEORGSHOME GRAUSTUFEN v0.14.2: Fokus und Bedienzustände zentral anpassen.
+   Keine Größen-/Layoutänderungen; Statusfarben bleiben in den Fachtemplates. */
+body.nr-dashboard-theme :is(button,input,select,textarea,a,summary):focus-visible {
+ outline:2px solid #f0f0f0 !important;outline-offset:3px;
+}
+body.nr-dashboard-theme :is(button,input,select,textarea):disabled {
+ cursor:not-allowed;opacity:.55;
+}
+body.nr-dashboard-theme :is(input,select,textarea) {color-scheme:dark;}
+body.nr-dashboard-theme button:not(:disabled):hover {filter:brightness(1.13);}
+body.nr-dashboard-theme button:not(:disabled):active {filter:brightness(.90);}
+body.nr-dashboard-theme table {font-variant-numeric:tabular-nums;}
+
+@media (max-width:700px) {
+ body.nr-dashboard-theme md-toolbar { height:88px!important; min-height:88px!important; }
+ #nr-dashboard-toolbar { display:grid; grid-template-columns:minmax(0,1fr) auto auto; grid-template-rows:32px 28px; height:88px!important; box-sizing:border-box; }
+ #nr-dashboard-toolbar h1:not(.ng-hide) { grid-column:1; grid-row:1; font-size:16px; }
+ #home-automation-project-status { grid-column:2 / 4; grid-row:1; margin:0; gap:6px; }
+ #dashboard-reconnect-button { grid-column:1; grid-row:2; justify-self:start; }
+ #nr-dashboard-toolbar > div:has(> #clock) { grid-column:2; grid-row:2; margin:0!important; }
+ #home-automation-project-hash { grid-column:3; grid-row:2; margin:0 0 0 8px; }
+}
 </style>
 <script>
 (function(){

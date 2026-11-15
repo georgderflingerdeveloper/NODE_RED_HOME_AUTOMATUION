@@ -1,0 +1,10 @@
+[Unit]
+Description=Homeautomation Solar: SQLite und CSV nach Google Drive sichern
+After=network-online.target
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/python3 %h/Projekte/NODE_RED_HOME_AUTOMATUION/tools/backup/solar-backup.py --config %h/.config/home-automation/solar-backup.json
+TimeoutStartSec=30min
+SuccessExitStatus=2

@@ -17,6 +17,6 @@ test('Preis- und LED-Signalfarben bleiben erhalten; Tastaturfokus sichtbar',()=>
  for(const color of ['#a4f6a0','#ffe27a','#ffb46b','#ff9292'])assert.ok(cost.includes(color));
  const io=fs.readFileSync('flow-src/flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html','utf8');
  for(const color of ['#82ef7b','#ffd166','#ff7171'])assert.ok(io.includes(color));
- const global=fs.readFileSync('flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html','utf8');
+ const global=fs.readFileSync('flow-src/flows/system--system_dashboard_flow/templates/dashboard-theme-global.html','utf8');
  assert.ok(global.includes(':focus-visible'));assert.ok(global.includes('outline-offset:3px'));
 });
