@@ -26,11 +26,11 @@ module.exports=RED=>{
   let rows=[],lastSuccess=null,status='idle',message='Noch keine Cloud-Abfrage',storageError='',busy=false,closed=false,child,timer;
   try{const saved=JSON.parse(fs.readFileSync(file,'utf8'));if(!Array.isArray(saved.rows))throw Error();rows=saved.rows.map(r=>({...r,quality:'stale'}));lastSuccess=saved.lastSuccess||null;}
   catch(e){if(e.code!=='ENOENT')storageError='Gespeicherter Bestand konnte nicht gelesen werden';}
-  function emit(){
+  function emit(cloudConnected){
    if(closed)return;
    if((storageError||historyError)&&status==='running')status='warning';
    node.status({fill:status==='running'?'green':status==='error'?'red':status==='warning'?'yellow':'grey',shape:'dot',text:message});
-   node.send({topic:'homematic-ip/state',payload:{schemaVersion:1,provider:'homematic-ip-cloud',readOnly:true,status,message,storageError,historyError,lastSuccess,intervalMs:interval,nextAttemptAt:gate.nextAttemptAt,errorCode:gate.errorCode,rows}});
+   node.send({topic:'homematic-ip/state',payload:{schemaVersion:1,provider:'homematic-ip-cloud',readOnly:true,status,message,storageError,historyError,lastSuccess,cloudConnected,intervalMs:interval,nextAttemptAt:gate.nextAttemptAt,errorCode:gate.errorCode,rows}});
   }
   function schedule(){clearTimeout(timer);if(!closed)timer=setTimeout(poll,Math.max(1000,gate.nextAttemptAt-Date.now(),storageError?interval:0));}
   function save(){try{fs.mkdirSync(root,{recursive:true,mode:0o700});fs.writeFileSync(file+'.tmp',JSON.stringify({rows,lastSuccess}),{mode:0o600});fs.renameSync(file+'.tmp',file);storageError='';}catch(e){storageError='Bestand konnte nicht gespeichert werden';}}
@@ -51,10 +51,12 @@ module.exports=RED=>{
    busy=true;
    child=execFile(python,[bridge,'snapshot'],{timeout:45000,maxBuffer:8*1024*1024,env:{...process.env,NODE_RED_USER_DIR:userDir}},(error,stdout)=>{
     busy=false;child=null;if(closed)return;
+    let cloudConnected=null;
     try{
      const result=JSON.parse(stdout||'null');
      if(error||result?.error)throw Object.assign(Error('cloud'),{cloudError:result?.error});
      const data=normalize(result);
+     cloudConnected=data.connected;
      rows=mergeRows(rows,data.rows);lastSuccess=Date.now();
      status=data.connected===false||rows.some(r=>r.quality!=='current'||r.lowBattery===true)?'warning':'running';
      message=data.connected===false?'Cloud erreichbar, HAP offline':'Cloud-Abfrage erfolgreich';gate={nextAttemptAt:Date.now()+interval,failures:0,errorCode:''};save();recordHistory(true);
@@ -68,7 +70,7 @@ module.exports=RED=>{
      status=limited?'warning':'error';message=limited?'Homematic drosselt die Cloud-Abfragen – automatische Abfragepause':'Cloud-Abfrage fehlgeschlagen – automatische Wiederholung nach Wartezeit';recordHistory(false);
     }
     try{writeGate();}catch{storageError='Abfragesperre konnte nicht gespeichert werden';status='error';message='Cloud-Abfragen pausiert: lokaler Speicherfehler';}
-    emit();schedule();
+    emit(storageError?null:cloudConnected);schedule();
    });
   }
   node.on('input',(msg,send,done)=>{

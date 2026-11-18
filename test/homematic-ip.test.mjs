@@ -116,3 +116,12 @@ test('HAP: wiederholte Cloudfehler verlängern Pause; beschädigte Sperrdatei ve
   h.timers.at(-1)();assert.equal(h.calls.length,2);assert.match(h.sent.at(-1).payload.message,/Speicherfehler/);h.events.close(false,()=>{});
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+test('HAP: Kanal 0 liefert den Status auch ohne DEVICE_BASE-Typ',()=>{
+ const raw=sample();
+ raw.devices.dev1.functionalChannels[0]={functionalChannelType:'HEATING_DEVICE',unreach:true,lowBat:false};
+ const [device]=normalize(raw).rows;
+ assert.equal(device.reachable,false);
+ assert.equal(device.quality,'offline');
+ assert.equal(device.lowBattery,false);
+});

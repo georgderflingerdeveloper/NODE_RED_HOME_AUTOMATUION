@@ -25,9 +25,11 @@ function normalize(raw, now=Date.now()){
   const points=primitives(channels);
   // Some device families publish values at device level, others in functionalChannels.
   for(const [k,v] of Object.entries(d))if(k!=='functionalChannels' && !secret.test(k) && (v===null||['boolean','number','string'].includes(typeof v)))points.push({name:k,value:v,unit:units[k]||''});
-  const base=Object.values(channels).find(c=>c.functionalChannelType==='DEVICE_BASE')||d;
-  const reach=typeof base.unreach==='boolean'?!base.unreach:null;
-  const low=typeof base.lowBat==='boolean'?base.lowBat:null;
+  const base=Object.values(channels).find(c=>c?.functionalChannelType==='DEVICE_BASE');
+  const flag=key=>[base?.[key],channels[0]?.[key],d[key]].find(value=>typeof value==='boolean');
+  const unreach=flag('unreach');
+  const reach=unreach===undefined?null:!unreach;
+  const low=flag('lowBat')??null;
   return {id,name:String(d.label||id),model:String(d.modelType||d.type||''),
    serial:String(d.serializedGlobalTradeItemNumber||d.serialNumber||''),rooms:rooms.join(', '),
    reachable:reach,lowBattery:low,points,lastSeen:now,quality:raw.connected===false?'stale':reach===false?'offline':'current'};

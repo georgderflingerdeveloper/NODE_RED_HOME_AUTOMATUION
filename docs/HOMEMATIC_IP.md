@@ -1,8 +1,8 @@
-# Homematic IP · v0.16.0
+# Homematic IP
 
 ## Umfang
 Eigener Flow HOMEMATIC IP und Dashboard-Menü Homematic IP. HmIP-HAP über die
-Homematic-IP-Cloud, ausschließlich lesend. Keine direkte lokale Geräte-API am HAP.
+Homematic-IP-Cloud mit lesendem Zugriff. Der Home-PC hat zusätzlich eine lokale HAP-Neustartautomatik.
 Keine Änderungen an Lichtsteuerung, Scheduler, Phidgets, Messdaten oder Abrechnungen.
 
 Community-SDK: homematicip 2.19.1 (Python >=3.12), GPL-3.0-or-later:
@@ -69,7 +69,31 @@ als missing erhalten. Nach Neustart niemals sofort als aktuell markieren.
 UI-Suchtext/offene Zeilen bleiben bei Datenupdates erhalten (nicht browserübergreifend).
 Anzeigezeit im Browser in dessen lokaler Zeitzone; Zeitstempel als Unix-Millisekunden.
 
+## Automatischer HAP-Neustart auf dem Home-PC
+
+Drei frische Cloud-Meldungen „HAP offline“ über mindestens vier Minuten lösen
+einen lokalen Neustartversuch pro Störung aus. Online-Meldungen, Cloud-Fehler
+oder eine Lücke von mehr als fünf Minuten setzen die Bestätigung zurück.
+Der Helfer prüft, ob der HAP lokal antwortet und den Home-PC als Gateway nutzt.
+Zwischen Neustartbefehlen liegt auch über Node-RED-Neustarts hinweg mindestens
+eine Stunde. Der Flow protokolliert die Geräteantwort im Node-RED-Journal.
+Die Cloud-Autorisierung und der bereits eingerichtete lokale HAP-Zugang werden
+beide benötigt.
+
 ## Link-Schnittstellen
+
+Der Link-Ausgang **Homematic IP · Gerätewerte alle 5 s** sendet
+`msg.topic = "homematic-ip/devices"`. `msg.payload.devices` enthält pro
+Gerät `id`, `name`, `model`, `rooms`, `status`, `quality`,
+`lastKnownReachable`, `lastReadAt`, `lowBattery` und `values`.
+Jeder Datenpunkt unter `values` enthält `name`, `value` und `unit`.
+Messwerte, Booleans und Null bleiben typisiert. Der Status lautet `online`,
+`offline` oder bei unbekannter Erreichbarkeit, veralteten Werten oder
+verschwundenen Geräten `unknown`.
+`publishedAt` und `cloudReadAt` sind Unix-Millisekunden. Die Ausgabe nutzt
+den letzten Bestand der regulären Cloud-Abfrage und zeigt `cloudStatus`
+sowie `cloudError`. Bis zum ersten Bestand ist die Geräteliste leer.
+
 Eingang `Homematic IP · get / refresh`:
 - msg.topic = homematic-ip/get: letzten Bestand sofort ausgeben, ohne Cloudzugriff.
 - msg.topic = homematic-ip/refresh: Abfrage, sofern Mindestintervall abgelaufen.

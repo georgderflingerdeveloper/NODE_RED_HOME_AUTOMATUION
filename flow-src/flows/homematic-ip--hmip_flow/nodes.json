@@ -4,7 +4,7 @@
     "type": "tab",
     "label": "HOMEMATIC IP",
     "disabled": false,
-    "info": "Lesende Cloud-Anbindung. Anleitung: docs/HOMEMATIC_IP.md. Schaltbefehle werden nicht verarbeitet."
+    "info": "Lesende Cloud-Anbindung. Anleitung: docs/HOMEMATIC_IP.md. Schaltbefehle werden nicht verarbeitet. Lokaler HAP-Neustart bei bestätigtem Cloud-Offline-Status auf dem Home-PC."
   },
   {
     "id": "hmip_link_in",
@@ -32,7 +32,9 @@
       [
         "hmip_link_out",
         "hmip_ui",
-        "hmip_trends_ui"
+        "hmip_trends_ui",
+        "hmip_reboot_check",
+        "hmip_device_snapshot"
       ]
     ],
     "historyDays": 365
@@ -77,7 +79,7 @@
     "id": "hmip_comment",
     "type": "comment",
     "z": "hmip_flow",
-    "name": "Nur lesend · kein automatisches Schalten · Link-Schnittstellen für spätere Erweiterungen",
+    "name": "Cloud lesen · HAP-Neustart bei bestätigter Störung",
     "info": "Zugangsdaten ausschließlich im Node-RED userDir/homematic-ip. Siehe docs/HOMEMATIC_IP.md.",
     "x": 430,
     "y": 40,
@@ -107,5 +109,125 @@
         "hmip_reader"
       ]
     ]
+  },
+  {
+    "id": "hmip_reboot_check",
+    "type": "function",
+    "z": "hmip_flow",
+    "name": "HAP offline bestätigen",
+    "func": {
+      "$flowSource": "flows/homematic-ip--hmip_flow/functions/check-hap-offline--hmip_reboot_check.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 410,
+    "y": 340,
+    "wires": [
+      [
+        "hmip_reboot_exec"
+      ]
+    ]
+  },
+  {
+    "id": "hmip_reboot_exec",
+    "type": "exec",
+    "z": "hmip_flow",
+    "command": "/usr/bin/python3 /home/georgshomepc/Projekte/NODE_RED_HOME_AUTOMATUION/tools/homematic/reboot-homepc-hap.py",
+    "addpay": false,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "20",
+    "winHide": false,
+    "oldrc": false,
+    "name": "HAP lokal neu starten",
+    "x": 660,
+    "y": 340,
+    "wires": [
+      [
+        "hmip_reboot_log"
+      ],
+      [
+        "hmip_reboot_log"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "hmip_reboot_log",
+    "type": "debug",
+    "z": "hmip_flow",
+    "name": "HAP-Neustart protokollieren",
+    "active": true,
+    "tosidebar": true,
+    "console": true,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload",
+    "statusType": "auto",
+    "x": 930,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "hmip_snapshot_tick",
+    "type": "inject",
+    "z": "hmip_flow",
+    "name": "Alle 5 Sekunden",
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "5",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "homematic-ip/snapshot/tick",
+    "x": 150,
+    "y": 420,
+    "wires": [
+      [
+        "hmip_device_snapshot"
+      ]
+    ]
+  },
+  {
+    "id": "hmip_device_snapshot",
+    "type": "function",
+    "z": "hmip_flow",
+    "name": "Gerätewerte und Status",
+    "func": {
+      "$flowSource": "flows/homematic-ip--hmip_flow/functions/publish-device-snapshot--hmip_device_snapshot.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 430,
+    "y": 420,
+    "wires": [
+      [
+        "hmip_snapshot_out"
+      ]
+    ]
+  },
+  {
+    "id": "hmip_snapshot_out",
+    "type": "link out",
+    "z": "hmip_flow",
+    "name": "Homematic IP · Gerätewerte alle 5 s",
+    "mode": "link",
+    "links": [],
+    "x": 685,
+    "y": 420,
+    "wires": []
   }
 ]

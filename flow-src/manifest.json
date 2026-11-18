@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "1630bcbbdbdc88b32eae43baf6471fe856bdab7991db0240a54d62242bc7f8cc",
+  "flowSha256": "84476b2fa2182028b5910991a7bbc3dfa4eb22ef5759a2043fe09333ba0caa91",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -653,7 +653,13 @@
     "host_monitor_error",
     "host_monitor_note",
     "solar_history_group",
-    "solar_history_dashboard"
+    "solar_history_dashboard",
+    "hmip_reboot_check",
+    "hmip_reboot_exec",
+    "hmip_reboot_log",
+    "hmip_snapshot_tick",
+    "hmip_device_snapshot",
+    "hmip_snapshot_out"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -967,6 +973,12 @@
     "hmip_ui": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_comment": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_trends_ui": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_reboot_check": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_reboot_exec": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_reboot_log": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_snapshot_tick": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_device_snapshot": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_snapshot_out": "flows/homematic-ip--hmip_flow/nodes.json",
     "host_monitor_tick": "flows/hostrechner--host_monitor_flow/nodes.json",
     "host_monitor_collect": "flows/hostrechner--host_monitor_flow/nodes.json",
     "host_monitor_json": "flows/hostrechner--host_monitor_flow/nodes.json",
@@ -1316,6 +1328,8 @@
     "global/function.js": "d026bba53afcdec70a5b8ff3c7fa908747b2a26096a82c78d87227b562d2ae74",
     "heater-kid-room/heater-kid.js": "76288c5bdfa2fc79cef2709f49365bd056d5fd078c9895cf2cc8155c13e01b15",
     "home/command-all.js": "ca9a3fc0569c7ee069f9aa664c41f1209a3c4809352a751f7a4723e3023e8e45",
+    "homematic-ip/geratewerte-und-status.js": "cb13e3bd5282eb86ce5317303fb2e5a1db6bc197e9d34076536d1d8a57cea568",
+    "homematic-ip/hap-offline-bestatigen.js": "a83c3b803f21fe810c0b6bc140dbe234fc3c8d8959d9a5575315afeefb351101",
     "kosten/aktuellen-awattar-tarif-aufbereiten.js": "07d5e27b8277d4380c14191483d17787f471915b7ab3187220909ddf6c4247cf",
     "kosten/route-cost-dashboard-request.js": "73e4f0bc1d15a45e077447e3819e0bc7fb7bd49cfd220c948b7b3245bf7e3d7e",
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
@@ -1428,8 +1442,10 @@
     "flows/home--7fa0f8f.5a71708/functions/command-all.js": "663d6e9773279c8ac283507d8805d7a3c4eeb917c578e7d1a00f2e8b1c28b768",
     "flows/home--7fa0f8f.5a71708/nodes.json": "19cf90e3db3bc6a08b70dd8a446bf4e7fb5fc62740913a75dca9cc7d1c8ea5eb",
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
-    "flows/homematic-ip--hmip_flow/nodes.json": "040094047a33d8191f551d8d9df46d444cafdf39712c04478af0924024c4f0db",
-    "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "34f0d6488fdd87e878a79974d6f8d99cade7c2b1eb62a3a4f2874bba0282b755",
+    "flows/homematic-ip--hmip_flow/functions/check-hap-offline--hmip_reboot_check.js": "e2c5a6f36bb72a2bed9aa171af0d3d5afdf7a366bd207222e3e769a5d55932a7",
+    "flows/homematic-ip--hmip_flow/functions/publish-device-snapshot--hmip_device_snapshot.js": "7a42912cea92deeed54408db703d4bee08fa4f71b05bb15391cc054eaf86fae6",
+    "flows/homematic-ip--hmip_flow/nodes.json": "402f5f2e3dc7c26b90bb6e2023c1ac555baa27d67147e4b4ec236b6a1300ffaa",
+    "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "1f78119ca033d57aa5315da4d262b868bf9727b3d5ab343f8b947e779f94f9ff",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-trends.html": "2fbd8e700640aca1bc1dd7aed4b4e132926b57c0c04637636c67d367eeda922a",
     "flows/hostrechner--host_monitor_flow/nodes.json": "aa471261aa9f830b4049ae8f474462777ce3c5aeb04168278cd0187e10424563",
     "flows/hostrechner--host_monitor_flow/templates/hostrechner-live-ubersicht.html": "7b11cf4f45079f72ac58482994e95ea46fd4b857585da2c2b9193b7c82227790",
