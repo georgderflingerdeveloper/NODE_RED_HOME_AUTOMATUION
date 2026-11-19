@@ -13,7 +13,7 @@
   },
   "flow-src/flows/system--system_dashboard_flow/templates/technisches-hausnetz.html": {
     "scripts": "b7f3b565beeabd9157dab43d0c07dc98e01d3a05f0940659dd724396d84b7660",
-    "markup": "b5731d87968ac984dd23ad8a8a83bd29455586b6ea5410f2ae94fe10940edd0f"
+    "markup": "3b55b14ecbbec40bcec53da0cd6925249d31048dd69a546456ff319a690168a1"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": {
     "scripts": "1cdd2b75e25c0194a95e0f6cad9669880793ac6fee84538e74db501b8c3db0e8",

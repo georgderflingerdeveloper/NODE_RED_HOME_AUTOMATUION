@@ -24,6 +24,37 @@
   .sys-badge.online { background: #14613f; color: #b9ffdc; }
   .sys-badge.offline { background: #71342d; color: #ffd1c7; }
   @media (max-width: 900px) { .sys-summary { grid-template-columns: repeat(2, 1fr); } }
+  /* SYSTEM uses a single group. Let each widget grow with the available width. */
+  #Tab_SYSTEM, #Tab_SYSTEM ui-card-panel, #Tab_SYSTEM .nr-dashboard-cardpanel,
+  #Tab_SYSTEM .nr-dashboard-cardcontainer, #Tab_SYSTEM md-card.nr-dashboard-template {
+    position: relative !important; inset: auto !important; transform: none !important;
+    width: 100% !important; max-width: 100%; min-width: 0; height: auto !important;
+    box-sizing: border-box;
+  }
+  #Tab_SYSTEM ui-card-panel { display: block; }
+  #Tab_SYSTEM .nr-dashboard-cardcontainer { display: flex; flex-direction: column; gap: 8px; }
+  #Tab_SYSTEM md-card.nr-dashboard-template { margin: 0; }
+  .sys-card { container-type: inline-size; }
+  .sys-card .sys-panel { box-sizing: border-box; }
+  .sys-card .sys-field-label { display: none; }
+  @media (max-width: 700px) {
+    body:has(#Tab_SYSTEM) md-sidenav.md-locked-open { position: absolute !important; z-index: 65 !important; }
+    body:has(#Tab_SYSTEM) md-sidenav.md-locked-open.md-closed {
+      transform: translateX(-110%) !important; visibility: hidden !important;
+    }
+    body:has(#Tab_SYSTEM) button[aria-label="menu button"] { display: inline-flex !important; }
+  }
+  @container (max-width: 46rem) {
+    .sys-summary { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem),1fr)); }
+    .sys-card .sys-table-wrap { border: 0; background: transparent; overflow: visible; }
+    .sys-table, .sys-table tbody { display: block; min-width: 0; }
+    .sys-table thead { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+    .sys-table tbody tr { display: block; padding: .55rem .85rem; margin-bottom: .75rem;
+      border: 1px solid var(--gh-border,#626262); border-radius: .85rem; background: var(--gh-card,#303030); }
+    .sys-table td { display: block; padding: .5rem 0; font-size: .95rem; overflow-wrap: anywhere; }
+    .sys-table td:first-child { border: 0; font-size: 1.1rem; }
+    .sys-card .sys-field-label { display: block; margin-bottom: .15rem; font-size: .78rem; color: var(--gh-muted,#ccc); }
+  }
 </style>
 
 <script>
@@ -95,12 +126,12 @@
       <thead><tr><th>Hostname</th><th>IP</th><th>System</th><th>Temperatur</th><th>Systemstart / Laufzeit</th><th>Letzte Antwort</th><th>Status</th></tr></thead>
       <tbody><tr ng-repeat="device in systemView.devices">
         <td class="sys-device-name">{{device.name}}<br><span class="sys-muted">{{device.hostname || 'kein Hostname'}}</span></td>
-        <td>{{device.ip}}</td>
-        <td>{{device.model || '—'}}<br><span class="sys-muted">{{device.operatingSystem}}</span></td>
-        <td>{{device.temperatureC === null || device.temperatureC === undefined ? '—' : (device.temperatureC | number:1) + ' °C'}}<br><span class="sys-muted" ng-if="device.temperatureSource === 'inventory'">Inventarwert vom {{device.inventoryObservedAt}} · keine Live-Messung</span></td>
-        <td>{{bootAt(device) !== null ? (bootAt(device) | date:'dd.MM.yyyy HH:mm') : '—'}}<br><span class="sys-muted">{{uptimeLabel(device.uptimeSeconds)}}{{device.uptimeSeconds === null || device.uptimeSeconds === undefined ? ' · SSH-Livewert fehlt' : ''}}</span></td>
-        <td>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td>
-        <td><span class="sys-badge" ng-class="stateClass(device.state)">{{stateLabel(device.state)}}</span></td>
+        <td><span class="sys-field-label" aria-hidden="true">IP</span>{{device.ip}}</td>
+        <td><span class="sys-field-label" aria-hidden="true">System</span>{{device.model || '—'}}<br><span class="sys-muted">{{device.operatingSystem}}</span></td>
+        <td><span class="sys-field-label" aria-hidden="true">Temperatur</span>{{device.temperatureC === null || device.temperatureC === undefined ? '—' : (device.temperatureC | number:1) + ' °C'}}<br><span class="sys-muted" ng-if="device.temperatureSource === 'inventory'">Inventarwert vom {{device.inventoryObservedAt}} · keine Live-Messung</span></td>
+        <td><span class="sys-field-label" aria-hidden="true">Systemstart / Laufzeit</span>{{bootAt(device) !== null ? (bootAt(device) | date:'dd.MM.yyyy HH:mm') : '—'}}<br><span class="sys-muted">{{uptimeLabel(device.uptimeSeconds)}}{{device.uptimeSeconds === null || device.uptimeSeconds === undefined ? ' · SSH-Livewert fehlt' : ''}}</span></td>
+        <td><span class="sys-field-label" aria-hidden="true">Letzte Antwort</span>{{device.lastSeen ? (device.lastSeen | date:'dd.MM. HH:mm:ss') : '—'}}</td>
+        <td><span class="sys-field-label" aria-hidden="true">Status</span><span class="sys-badge" ng-class="stateClass(device.state)">{{stateLabel(device.state)}}</span></td>
       </tr></tbody>
     </table>
   </div>
