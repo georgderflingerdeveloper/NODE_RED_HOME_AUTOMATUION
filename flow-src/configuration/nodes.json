@@ -2406,7 +2406,7 @@
     "type": "ui_tab",
     "name": "SOLAR",
     "icon": "wb_sunny",
-    "order": 10,
+    "order": 11,
     "disabled": false,
     "hidden": false
   },
@@ -2426,7 +2426,7 @@
     "type": "ui_tab",
     "name": "WETTER",
     "icon": "wb_cloudy",
-    "order": 9,
+    "order": 10,
     "disabled": false,
     "hidden": false
   },
@@ -2446,7 +2446,7 @@
     "type": "ui_tab",
     "name": "KOSTEN",
     "icon": "euro_symbol",
-    "order": 11,
+    "order": 12,
     "disabled": false,
     "hidden": false
   },
@@ -2466,7 +2466,7 @@
     "type": "ui_tab",
     "name": "SYSTEM",
     "icon": "dns",
-    "order": 12,
+    "order": 13,
     "disabled": false,
     "hidden": false
   },
@@ -2486,7 +2486,7 @@
     "type": "ui_tab",
     "name": "Schedulers",
     "icon": "schedule",
-    "order": 13,
+    "order": 14,
     "disabled": false,
     "hidden": false
   },
@@ -2512,7 +2512,7 @@
     "type": "ui_tab",
     "name": "Darstellung",
     "icon": "palette",
-    "order": 17,
+    "order": 18,
     "disabled": false,
     "hidden": false
   },
@@ -2531,7 +2531,7 @@
     "type": "ui_tab",
     "name": "Homematic IP",
     "icon": "devices",
-    "order": 14,
+    "order": 15,
     "disabled": false,
     "hidden": false
   },
@@ -2558,7 +2558,7 @@
     "type": "ui_tab",
     "name": "SolarEdge Vergleich",
     "icon": "compare_arrows",
-    "order": 15,
+    "order": 16,
     "disabled": false,
     "hidden": false
   },
@@ -2585,7 +2585,7 @@
     "type": "ui_tab",
     "name": "HOSTRECHNER",
     "icon": "computer",
-    "order": 16,
+    "order": 17,
     "disabled": false,
     "hidden": false
   },
@@ -2621,8 +2621,8 @@
     "id": "sissi_room_tab",
     "type": "ui_tab",
     "name": "Sissis Zimmer",
-    "icon": "lightbulb_outline",
-    "order": 18,
+    "icon": "girl",
+    "order": 9,
     "disabled": false,
     "hidden": false
   },

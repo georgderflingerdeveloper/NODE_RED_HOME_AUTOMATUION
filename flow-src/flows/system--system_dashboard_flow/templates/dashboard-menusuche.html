@@ -1,0 +1,196 @@
+<style>
+  #dashboard-menu-search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 10px;
+    background: var(--gh-inset, #252525);
+    color: var(--gh-text, #fff);
+  }
+  #dashboard-menu-search input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--gh-border, #777);
+    border-radius: 6px;
+    background: var(--gh-card, #333);
+    color: inherit;
+    font: inherit;
+  }
+  #dashboard-menu-search [role="status"]:not(:empty) { display: block; margin-top: 6px; }
+  body.nr-dashboard-theme md-sidenav md-list-item.dashboard-search-match ui-icon {
+    outline: 2px solid #ffca55;
+    background: #ffca55;
+    color: #252525;
+  }
+  #dashboard-page-search {
+    position: sticky; top: 0; z-index: 3; display: flex; align-items: center;
+    gap: 8px; padding: 6px 12px; background: var(--gh-inset, #252525);
+    color: var(--gh-text, #fff);
+  }
+  #dashboard-page-search input { min-width: 0; width: min(100%, 24em); padding: 6px; }
+  #dashboard-page-search button { cursor: pointer; }
+  .dashboard-element-match { outline: 3px solid #ffca55 !important; outline-offset: -2px; scroll-margin: 64px; }
+</style>
+<script>
+(function() {
+  var stopWords = new Set(["wo", "ist", "sind", "das", "die", "der", "den", "ein", "eine",
+    "finde", "finden", "ich", "bitte", "zeige", "mir", "suche", "nach", "zum", "zur"]);
+
+  function normalize(text) {
+    return text.toLocaleLowerCase("de").replace(/ä/g, "ae").replace(/ö/g, "oe")
+      .replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, " ").trim();
+  }
+
+  function queryTerms(input) {
+    return normalize(input.value).split(" ").filter(function(term) {
+      return term && !stopWords.has(term);
+    });
+  }
+
+  function installPageSearch() {
+    var content = document.querySelector(".masonry-container");
+    if (!content) return null;
+    var existing = document.getElementById("dashboard-page-search");
+    if (existing) return existing.querySelector("input");
+
+    var form = document.createElement("form");
+    form.id = "dashboard-page-search";
+    form.setAttribute("role", "search");
+    form.innerHTML = '<input type="search" placeholder="In diesem Bereich suchen" aria-label="Elemente und Anzeigen durchsuchen">' +
+      '<button type="submit" hidden>Weiter</button><span role="status"></span>';
+    content.before(form);
+    var input = form.querySelector("input");
+    var status = form.querySelector("[role=status]");
+    var current = null;
+
+    function findMatches() {
+      var terms = queryTerms(input);
+      if (!terms.length) return [];
+      var matches = [];
+      content.querySelectorAll("*").forEach(function(el) {
+        if (el.matches("script,style,option") || !el.getClientRects().length || el.closest("[aria-hidden=true], [hidden]")) return;
+        var words = Array.from(el.childNodes).filter(function(node) {
+          return node.nodeType === Node.TEXT_NODE;
+        }).map(function(node) { return node.textContent; });
+        ["aria-label", "title", "placeholder", "alt"].forEach(function(attr) {
+          if (el.hasAttribute(attr)) words.push(el.getAttribute(attr));
+        });
+        var label = normalize(words.join(" "));
+        if (terms.every(function(term) { return label.includes(term); })) {
+          var target = el.closest("button,md-switch,[role=switch],label") || el;
+          if (!matches.includes(target)) matches.push(target);
+        }
+      });
+      return matches;
+    }
+
+    function update(advance, scroll) {
+      var matches = findMatches();
+      var index = matches.indexOf(current);
+      if (current) current.classList.remove("dashboard-element-match");
+      if (index < 0) index = 0;
+      else if (advance) index = (index + 1) % matches.length;
+      current = matches[index] || null;
+      if (current) {
+        current.classList.add("dashboard-element-match");
+        if (scroll) current.scrollIntoView({block: "center"});
+      }
+      status.textContent = current ? (index + 1) + " von " + matches.length
+        : queryTerms(input).length ? "Kein Treffer" : "";
+      form.querySelector("button").hidden = matches.length < 2;
+    }
+
+    input.addEventListener("input", function() { update(false, true); });
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      update(true, true);
+    });
+    var pending;
+    var changes = new MutationObserver(function() {
+      if (input.value && !pending) pending = setTimeout(function() {
+        pending = null;
+        update(false, false);
+      }, 250);
+    });
+    changes.observe(content, {subtree: true, childList: true, characterData: true});
+    return input;
+  }
+
+  function installSearch() {
+    var list = document.querySelector("md-sidenav md-list");
+    if (!list) return false;
+    if (document.getElementById("dashboard-menu-search")) return true;
+
+    var form = document.createElement("form");
+    form.id = "dashboard-menu-search";
+    form.setAttribute("role", "search");
+    form.innerHTML = '<input type="search" aria-label="Dashboard-Menü durchsuchen" ' +
+      'placeholder="Wo ist das Kinderzimmer?" autocomplete="off">' +
+      '<span role="status"></span>';
+    list.before(form);
+
+    var input = form.querySelector("input");
+    var status = form.querySelector("[role=status]");
+
+    function highlight(scrollToMatch) {
+      var terms = queryTerms(input);
+      var results = Array.from(list.querySelectorAll("md-list-item")).map(function(item) {
+        var label = normalize(item.querySelector("p")?.textContent || "");
+        var score = 0;
+        if (terms.length && terms.every(function(term) { return label.includes(term); })) {
+          score = label === terms.join(" ") ? 2 : 1;
+        }
+        return {item: item, score: score};
+      });
+      var best = Math.max(0, ...results.map(function(result) { return result.score; }));
+      var matches = [];
+      results.forEach(function(result) {
+        var match = best > 0 && result.score === best;
+        result.item.classList.toggle("dashboard-search-match", match);
+        if (match) matches.push(result.item);
+      });
+      status.textContent = !terms.length ? "" : matches.length
+        ? matches.length === 1 ? "1 Treffer" : matches.length + " Treffer"
+        : "Kein Treffer";
+      if (scrollToMatch && matches[0]) matches[0].scrollIntoView({block: "nearest"});
+    }
+
+    input.addEventListener("input", function() { highlight(true); });
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      var match = list.querySelector(".dashboard-search-match button");
+      if (!match) return;
+      match.click();
+      setTimeout(function() {
+        var field = installPageSearch();
+        if (field) { field.focus(); field.select(); }
+      }, 350);
+    });
+    var items = new MutationObserver(function() { highlight(false); });
+    items.observe(list, {childList: true, subtree: true, characterData: true});
+    return true;
+  }
+
+  function install() {
+    installSearch();
+    installPageSearch();
+  }
+
+  install();
+  var host = document.querySelector("body");
+  if (host) {
+    var navigation = new MutationObserver(function() {
+      if (!document.getElementById("dashboard-page-search")) installPageSearch();
+    });
+    navigation.observe(host, {childList: true, subtree: true});
+  }
+  if (!document.getElementById("dashboard-menu-search") || !host) {
+    var ready = new MutationObserver(function() {
+      install();
+      if (document.getElementById("dashboard-menu-search") && document.getElementById("dashboard-page-search")) ready.disconnect();
+    });
+    ready.observe(document.documentElement, {childList: true, subtree: true});
+  }
+})();
+</script>

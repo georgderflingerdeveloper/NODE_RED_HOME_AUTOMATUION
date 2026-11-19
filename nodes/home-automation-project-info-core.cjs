@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require("node:fs");
+const { hostname } = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
@@ -27,6 +28,7 @@ function activeProjectName(userDir) {
   return configuration?.activeProject
     || configuration?.active
     || configuration?.projects?.active
+    || configuration?.projects?.activeProject
     || null;
 }
 
@@ -47,6 +49,31 @@ function resolveProjectRoot(settings) {
   const active = activeProjectName(userDir);
   if (active) return path.join(userDir, "projects", active);
   return userDir;
+}
+
+// Die Laufzeitdatei kann außerhalb des Git-Projekts liegen.
+function deploymentTime(settings) {
+  const userDir = path.resolve(configured(settings, "userDir") || process.cwd());
+  const flowFile = configured(settings, "flowFile");
+  const active = configured(settings, "editorTheme")?.projects?.enabled === true
+    ? activeProjectName(userDir) : null;
+  let filePath;
+  if (active) {
+    const projectDir = path.join(userDir, "projects", active);
+    const projectPackage = readJson(path.join(projectDir, "package.json"));
+    const projectFlow = projectPackage?.["node-red"]?.settings?.flowFile;
+    if (!projectFlow) return null;
+    filePath = path.join(projectDir, projectFlow);
+  } else if (flowFile) {
+    const local = path.resolve(flowFile);
+    filePath = flowFile.startsWith("./") || fs.existsSync(local)
+      ? local : path.resolve(userDir, flowFile);
+  } else {
+    filePath = path.join(userDir, `flows_${hostname()}.json`);
+  }
+
+  const stat = fs.statSync(filePath, { throwIfNoEntry: false });
+  return stat?.isFile() ? stat.mtime.toISOString() : null;
 }
 
 // Führt einen Git-Befehl im gewählten Projektverzeichnis aus und liefert die
@@ -83,6 +110,7 @@ function projectInfo(settings, options = {}) {
       version: packageData.version || "unbekannt",
     },
     runtime: {
+      deployedAt: deploymentTime(settings),
       nodeRedVersion: options.nodeRedVersion || "unbekannt",
       nodeVersion: process.version,
       platform: `${process.platform} ${process.arch}`,

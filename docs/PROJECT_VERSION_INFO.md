@@ -12,7 +12,7 @@ nicht committete Änderungen ohne Terminal sofort erkennbar.
 2. Der nur lesende Endpunkt `/home-automation/project-info` stellt diese
    ungefährlichen Versionsdaten dem Dashboard bereit.
 3. `project-version-and-branch-info.html` liest den Endpunkt beim Laden und jede Minute,
-   setzt Version, Branch und den Info-Schalter in die oberste
+   setzt Version, Branch, Deploy-Zeit und den Info-Schalter in die oberste
    Dashboard-Statusleiste und zeigt den aufklappbaren Überblick.
 
 Der vorhandene Flow-Aufruf bleibt zusätzlich für Node-RED-Diagnose und
@@ -30,10 +30,14 @@ Branch noch Dateien. Passwörter und Tresordaten werden nicht ausgeliefert.
 | aktives Projekt | absolute Flow-Datei oder `.config.projects.json` |
 | Branch | `git branch --show-current` |
 | Commit | `git rev-parse --short=8 HEAD` |
+| Letzter Deploy | Änderungszeit der aktiven Node-RED-Flow-Datei, angezeigt in Wiener Ortszeit |
 | Änderungen | `git status --porcelain` |
 | Branch-Zweck | `homeAutomation.branchPurposes` in `package.json` |
 | Node-RED-Version | laufende Node-RED-Instanz |
 | Node.js/Plattform | laufender Prozess |
+
+Ein reiner Neustart behält die Zeit bei. Wird die aktive Flow-Datei manuell
+ersetzt oder wiederhergestellt, gilt der Zeitstempel dieser Datei.
 
 ## Versionierung
 
@@ -113,7 +117,7 @@ So kann ein neuer Branch beschrieben werden, ohne Dashboard- oder Node-Code zu
 Neue Metadaten werden zuerst in
 `nodes/home-automation-project-info-core.cjs` ergänzt. Die Darstellung bleibt in
 `flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html`.
-Für jede neue Erkennung ist ein Test in `test/home-automation-project-info.test.mjs` hinzuzufügen.
+Für jede neue Erkennung ist ein Test in `test/project-info.test.mjs` hinzuzufügen.
 # 0.8.10
 
 `ScenarioApply` ergänzt, Dashboard wendet eine Dropdown-Auswahl sofort an.

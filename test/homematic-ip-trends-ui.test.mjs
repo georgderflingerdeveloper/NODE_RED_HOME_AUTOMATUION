@@ -33,3 +33,18 @@ test('Homematic-Trends: Historie bleibt bei Live-Updates unverändert; Live wird
  u.scope.useLive();assert.equal(u.sent.at(-1).payload.mode,'live');u.receive({topic:'homematic-ip/state',payload:{status:'error',lastSuccess:123,historyError:'Speicherfehler'}});catalog(u);assert.equal(u.scope.historyError,'Speicherfehler');assert.equal(u.sent.at(-1).payload.mode,'live');
  u.scope.form.mode='history';Object.assign(u.scope.form,{fromDate:'2026-10-21',fromTime:'00:00',toDate:'2026-10-20',toTime:'00:00'});const count=u.sent.length;u.scope.loadBase();assert.equal(u.sent.length,count);assert.match(u.scope.error,/Bis muss/);
 });
+test('Zoom hält die Mitte und Live-Abfragen lassen das untersuchte Fenster stehen',()=>{
+ const u=ui();catalog(u);result(u);
+ u.scope.zoom(2);
+ assert.equal(u.scope.graph.start,start+H/4);
+ assert.equal(u.scope.graph.end,start+3*H/4);
+ u.flush();
+ const requests=u.sent.length;
+ catalog(u);
+ assert.equal(u.sent.length,requests);
+ u.scope.pan(.5);
+ assert.equal(u.scope.graph.start,start+H/2);
+ u.scope.zoom(.5);
+ assert.equal(u.scope.graph.start,start);
+ assert.equal(u.scope.graph.end,start+H);
+});

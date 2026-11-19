@@ -1,0 +1,10 @@
+<md-button class="md-raised" ng-click="showRestartDialog()">Node-RED neu starten</md-button>
+<script>
+(function(scope) {
+  scope.showRestartDialog = function() {
+    window.georgConfirmNodeRedRestart(function() {
+      scope.send({topic: "node-red-restart", payload: true});
+    });
+  };
+})(scope);
+</script>

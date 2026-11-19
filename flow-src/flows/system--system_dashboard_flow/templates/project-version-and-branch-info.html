@@ -1,6 +1,10 @@
 <script>
 (function() {
   var latest = null;
+  var deployFormat = new Intl.DateTimeFormat("de-AT", {
+    timeZone: "Europe/Vienna", day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit"
+  });
 
   function element(tag, className) {
     var item = document.createElement(tag);
@@ -44,6 +48,7 @@
       status.id = "home-automation-project-status";
       status.innerHTML = '<span class="ha-status-name"></span><span class="ha-status-chip ha-status-version"></span>' +
         '<span class="ha-status-chip ha-status-project"></span><span class="ha-status-chip ha-status-branch"></span>' +
+        '<span class="ha-status-chip ha-status-deploy"></span>' +
         '<button id="home-automation-project-info-button" type="button" title="Was macht dieser Branch?" aria-label="Branch-Kurzinfo öffnen" aria-expanded="false">i</button>';
       status.querySelector("button").addEventListener("click", function() {
         var panel = ensurePanel();
@@ -78,6 +83,12 @@
     value(status, ".ha-status-project", source.project || "—");
     value(status, ".ha-status-branch", source.branch || "—");
     status.querySelector(".ha-status-branch").title = "Branch: " + (source.branch || "unbekannt");
+
+    var deployedAt = runtime.deployedAt ? new Date(runtime.deployedAt) : null;
+    var deployTime = deployedAt && Number.isFinite(deployedAt.getTime())
+      ? deployFormat.format(deployedAt) : "unbekannt";
+    value(status, ".ha-status-deploy", "Deploy " + deployTime);
+    status.querySelector(".ha-status-deploy").title = "Letzter Deploy (Europe/Vienna)";
 
     var panel = ensurePanel();
     value(panel, ".ha-branch-name", source.branch);

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createRequire } from "node:module";
@@ -46,6 +46,24 @@ test("aktive Node-RED-Projektkonfiguration bestimmt das angezeigte Projekt", (t)
   assert.equal(info.runtime.nodeRedVersion, "5.0.6");
 });
 
+test("Deploy-Zeit folgt der Laufzeitdatei außerhalb des Git-Projekts", (t) => {
+  const fixture = repositoryFixture(); t.after(fixture.dispose);
+  const settings = { userDir: fixture.userDir, projectDir: fixture.projectRoot, flowFile: "runtime-flows.json",
+    editorTheme: { projects: { enabled: false } } };
+  assert.equal(projectInfo(settings).runtime.deployedAt, null);
+
+  const runtimeFlow = join(fixture.userDir, settings.flowFile);
+  writeFileSync(runtimeFlow, "[]");
+  const deployedAt = new Date("2026-11-19T19:00:00.000Z");
+  utimesSync(runtimeFlow, deployedAt, deployedAt);
+
+  const updatedSource = new Date("2026-11-19T20:00:00.000Z");
+  const sourceFlow = join(fixture.projectRoot, settings.flowFile);
+  writeFileSync(sourceFlow, "[]");
+  utimesSync(sourceFlow, updatedSource, updatedSource);
+  assert.equal(projectInfo(settings).runtime.deployedAt, deployedAt.toISOString());
+});
+
 test("unbekannter Branch erhält eine verständliche neutrale Kurzinfo", () => {
   assert.match(branchPurpose({}, "eigener-branch"), /Arbeitsstand der Hausautomation/);
 });
@@ -56,6 +74,8 @@ test("Versionsinfo wird in der obersten Dashboard-Statusleiste installiert", () 
     "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html",
   ), "utf8");
   assert.match(template, /querySelector\("\.md-toolbar-tools"\)/);
+  assert.match(template, /runtime\.deployedAt/);
+  assert.match(template, /ha-status-deploy/);
   assert.match(template, /Was macht dieser Branch\?/);
   assert.match(template, /fetch\("\/home-automation\/project-info"/);
 });

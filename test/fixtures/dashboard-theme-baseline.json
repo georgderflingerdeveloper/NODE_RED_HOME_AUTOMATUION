@@ -16,8 +16,8 @@
     "markup": "b5731d87968ac984dd23ad8a8a83bd29455586b6ea5410f2ae94fe10940edd0f"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": {
-    "scripts": "76b21dbbe2e321bf73c8fa6168f6ddf11c58009d633e80853fd0d3b72fa9f953",
-    "markup": "76b21dbbe2e321bf73c8fa6168f6ddf11c58009d633e80853fd0d3b72fa9f953"
+    "scripts": "1cdd2b75e25c0194a95e0f6cad9669880793ac6fee84538e74db501b8c3db0e8",
+    "markup": "1cdd2b75e25c0194a95e0f6cad9669880793ac6fee84538e74db501b8c3db0e8"
   },
   "flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -40,8 +40,8 @@
     "markup": "75f74e54352d111d945f60208ab3bab837c137f5fad796893ba9db00f597b635"
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": {
-    "scripts": "3203fbf9823ffed77b0a7463a58d3b8fa82067372c2a4b16095f4ee26fc01f20",
-    "markup": "0510601cec5fda5b8f1e47cda6573a63c6f3911589623b9cce2650a61ed74f2c"
+    "scripts": "98b426c40ec9acd6f323f606e9f2e85c5127d6b7fa02cf56ce2ea4cec95a79e2",
+    "markup": "bc22294c597121855cb4a862d653c80361e6d6a71b42d74f5200e776c052318d"
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

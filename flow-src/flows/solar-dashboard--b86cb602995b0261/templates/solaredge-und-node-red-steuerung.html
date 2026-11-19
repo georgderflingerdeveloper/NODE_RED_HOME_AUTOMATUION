@@ -14,9 +14,9 @@
     scope.send({topic:"modbus-reconnect", payload:true});
   };
   scope.restartNodeRed = function() {
-    if (window.confirm("Node-RED wirklich neu starten? Alle Automations-Flows sind kurzzeitig unterbrochen.")) {
+    window.georgConfirmNodeRedRestart(function() {
       scope.send({topic:"node-red-restart", payload:true});
-    }
+    });
   };
 })(scope);
 </script>

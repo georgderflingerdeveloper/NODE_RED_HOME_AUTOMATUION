@@ -113,3 +113,44 @@ body.nr-dashboard-theme table {font-variant-numeric:tabular-nums;}
  service.dispose=function(){window.removeEventListener('storage',storage);};
 })();
 </script>
+
+<style>
+ md-sidenav ui-icon[icon="girl"] > * {display:none}
+ md-sidenav ui-icon[icon="girl"]::before {content:"👧";font:22px/1 "Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}
+ dialog.gh-restart {
+   width:min(390px,calc(100vw - 32px));box-sizing:border-box;padding:24px;
+   border:1px solid var(--gh-border,#636363);border-radius:18px;
+   background:var(--gh-card,#303030);color:var(--gh-text,#fff);
+   box-shadow:0 22px 70px #0008;font:inherit;text-align:left;
+ }
+ dialog.gh-restart::backdrop {background:rgba(10,12,16,.68)}
+ .gh-restart .gh-restart-icon {display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#ffdfad;color:#503009;font-size:28px}
+ .gh-restart h2 {margin:16px 0 8px;font-size:22px;line-height:1.25}
+ .gh-restart p {margin:0;color:var(--gh-muted,#ddd);font-size:15px;line-height:1.5}
+ .gh-restart footer {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:24px}
+ .gh-restart button {min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid var(--gh-border,#777);background:transparent;color:inherit;font:inherit;cursor:pointer}
+ .gh-restart button[value=yes] {background:#ffcf89;color:#352305;border-color:#ffcf89;font-weight:650}
+</style>
+<script>
+window.georgConfirmNodeRedRestart = function(onConfirm) {
+  if (document.querySelector("dialog.gh-restart")) return;
+  var dialog = document.createElement("dialog");
+  dialog.className = "gh-restart";
+  dialog.setAttribute("aria-labelledby", "gh-restart-heading");
+  dialog.setAttribute("aria-describedby", "gh-restart-message");
+  dialog.innerHTML = '<span class="gh-restart-icon" aria-hidden="true">↻</span>' +
+    '<h2 id="gh-restart-heading">Node-RED neu starten?</h2>' +
+    '<p id="gh-restart-message">Alle Automationen und das Dashboard werden kurz unterbrochen.</p>' +
+    '<footer><button type="button" value="no" autofocus>Nein</button>' +
+    '<button type="button" value="yes">Ja, neu starten</button></footer>';
+  dialog.addEventListener("click", function(event) {
+    if (event.target.matches("button")) dialog.close(event.target.value);
+  });
+  dialog.addEventListener("close", function() {
+    dialog.remove();
+    if (dialog.returnValue === "yes") onConfirm();
+  }, {once:true});
+  document.body.appendChild(dialog);
+  dialog.showModal();
+};
+</script>

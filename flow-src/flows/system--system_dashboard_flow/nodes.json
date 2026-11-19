@@ -316,5 +316,65 @@
     "wires": [
       []
     ]
+  },
+  {
+    "id": "system_node_red_restart_button",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "system_dashboard_group",
+    "name": "Node-RED neu starten",
+    "order": 0,
+    "width": 0,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/node-red-neu-starten.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 530,
+    "y": 120,
+    "wires": [
+      [
+        "system_node_red_restart_out"
+      ]
+    ]
+  },
+  {
+    "id": "system_node_red_restart_out",
+    "type": "link out",
+    "z": "system_dashboard_flow",
+    "name": "Bestätigter Node-RED-Neustart",
+    "mode": "link",
+    "links": [
+      "se_node_red_restart_in"
+    ],
+    "x": 750,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "system_dashboard_menu_search",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "",
+    "name": "Dashboard-Menüsuchfeld",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/dashboard-menusuche.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "global",
+    "x": 800,
+    "y": 950,
+    "wires": [
+      []
+    ]
   }
 ]

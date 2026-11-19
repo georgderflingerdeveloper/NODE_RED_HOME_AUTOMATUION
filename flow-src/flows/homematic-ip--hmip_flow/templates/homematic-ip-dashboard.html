@@ -19,9 +19,10 @@
 .hmip-panel .hmip-metric strong{display:block;font-size:21px;line-height:1.5}.hmip-panel .hmip-badges{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .hmip-panel .hmip-badge{border:1px solid var(--gh-border,#626262);padding:4px 8px;border-radius:5px}.hmip-panel .hmip-alert{color:#ffd166}.hmip-panel select{background:var(--gh-control,#444);color:inherit;padding:8px;border:1px solid var(--gh-border,#626262);border-radius:6px}
 .hmip-panel .hmip-toolbar label{display:flex;align-items:center;gap:6px}.hmip-panel .hmip-points td{overflow-wrap:anywhere}.hmip-panel .hmip-points{margin-top:10px}
+.hmip-panel summary{cursor:pointer;font-weight:650;padding:10px 0}.hmip-panel .hmip-summary{display:flex;flex-wrap:wrap;gap:8px}.hmip-panel .hmip-summary>div{padding:7px 12px}.hmip-panel .hmip-summary strong{font-size:20px}
 </style>
 <div class="hmip-panel">
- <h3>Homematic IP · Geräte und Datenpunkte</h3>
+ <h3>Gerätestatus</h3>
  <div class="hmip-status"><span class="hmip-led" ng-class="state.status" aria-hidden="true"></span><strong>{{state.message || 'Status wird geladen …'}}</strong></div>
  <p ng-if="state.storageError">{{state.storageError}}</p>
  <p ng-if="state.historyError">{{state.historyError}}</p>
@@ -34,6 +35,8 @@
   <div><small>Batterie schwach</small><strong>{{summary.battery}}</strong></div>
   <div><small>Status unbekannt</small><strong>{{summary.stale}}</strong></div>
  </div>
+ <p class="hmip-alert" ng-if="attention.length">Prüfen: {{attention.join(' · ')}}</p>
+ <details><summary>Geräte und Messwerte ansehen ({{state.rows.length}})</summary>
  <div class="hmip-toolbar">
   <input ng-model="query" aria-label="Geräte durchsuchen" placeholder="Name, Raum, Seriennummer …">
   <select ng-model="room" aria-label="Raum filtern"><option value="">Alle Räume</option><option ng-repeat="r in rooms track by r" value="{{r}}">{{r}}</option></select>
@@ -45,16 +48,17 @@
  <div class="hmip-grid">
   <article class="hmip-card" ng-repeat="d in visibleRows track by d.id">
    <div class="hmip-card-head"><div><h4>{{d.name}}</h4><small>{{d.rooms || 'Raum nicht gemeldet'}}</small></div><span><span class="hmip-led" ng-class="qualityClass(d)" aria-hidden="true"></span> {{qualityText(d)}}</span></div>
-   <div class="hmip-metrics" ng-if="d.metrics.length"><div class="hmip-metric" ng-repeat="m in d.metrics track by m.name"><small>{{m.label}}<span ng-if="m.channel"> · Kanal {{m.channel}}</span></small><strong>{{m.text}} <small>{{m.unit}}</small></strong></div></div>
+   <div class="hmip-metrics" ng-if="d.metrics.length"><div class="hmip-metric" ng-repeat="m in d.metrics | limitTo:(expanded[d.id] ? d.metrics.length : 2) track by m.name"><small>{{m.label}}<span ng-if="m.channel"> · Kanal {{m.channel}}</span></small><strong>{{m.text}} <small>{{m.unit}}</small></strong></div></div>
    <p ng-if="!d.metrics.length"><small>Keine unterstützten Messwerte gemeldet. Weitere Angaben unter Datenpunkte.</small></p>
-   <div class="hmip-badges"><span class="hmip-badge">Erreichbarkeit: {{deviceStatus(d)}}</span><span class="hmip-badge" ng-class="{'hmip-alert':d.lowBattery}">Batterie: {{d.lowBattery === true ? 'Schwach' : d.lowBattery === false ? 'OK' : 'Unbekannt'}}</span></div>
-   <small>{{d.model}} · {{d.serial || 'Seriennummer nicht gemeldet'}}<br>Letzter Datenstand: {{d.lastSeen ? (d.lastSeen | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
+   <div class="hmip-badges" ng-if="expanded[d.id] || d.lowBattery"><span class="hmip-badge">Erreichbarkeit: {{deviceStatus(d)}}</span><span class="hmip-badge" ng-class="{'hmip-alert':d.lowBattery}">Batterie: {{d.lowBattery === true ? 'Schwach' : d.lowBattery === false ? 'OK' : 'Unbekannt'}}</span></div>
+   <small ng-if="expanded[d.id]">{{d.model}} · {{d.serial || 'Seriennummer nicht gemeldet'}}<br>Letzter Datenstand: {{d.lastSeen ? (d.lastSeen | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
    <p class="hmip-alert" ng-if="d.quality !== 'current'">{{qualityText(d)}} – angezeigte Werte entsprechen dem letzten bekannten Stand.</p>
-   <div><button ng-click="expanded[d.id]=!expanded[d.id]" aria-expanded="{{!!expanded[d.id]}}">{{d.points.length}} Datenpunkte {{expanded[d.id] ? '▴' : '▾'}}</button></div>
+   <div><button ng-click="expanded[d.id]=!expanded[d.id]" aria-expanded="{{!!expanded[d.id]}}">Details · {{d.points.length}} Datenpunkte {{expanded[d.id] ? '▴' : '▾'}}</button></div>
    <div class="hmip-points" ng-show="expanded[d.id]"><table><thead><tr><th>Datenpunkt</th><th>Wert</th></tr></thead><tbody><tr ng-repeat="p in d.points track by p.name"><td>{{p.name}}</td><td><strong>{{display(p.value)}}</strong> {{p.unit}}</td></tr></tbody></table></div>
   </article>
  </div>
- <small>Grün: abgefragt · Gelb: Warnung / veraltet · Rot: Abfragefehler / Gerät offline · Grau: noch kein Status. Werte sind Cloud-Zustände, keine garantierte Echtzeitmessung.</small>
+ </details>
+
 </div>
 <script>
 (function(scope){
@@ -65,7 +69,7 @@
  var words={OPEN:'Offen',CLOSED:'Geschlossen',TILTED:'Gekippt',AUTO:'Automatik',AUTOMATIC:'Automatik',MANUAL:'Manuell',NORMAL:'Normal',ECO:'Eco',HEATING:'Heizen',COOLING:'Kühlen',OFF:'Aus',ON:'Ein',IDLE:'Inaktiv',NONE:'Keine',NO_ALARM:'Kein Alarm',PERMANENT:'Dauerhaft'};
  function metrics(points){
   var counts={};points.forEach(function(p){var k=p.name.split('.').pop();if(fields[k]&&p.value!==null&&p.value!==undefined)counts[k]=(counts[k]||0)+1;});
-  return points.filter(function(p){return fields[p.name.split('.').pop()]&&p.value!==null&&p.value!==undefined;}).map(function(p){
+  return points.slice().sort((a,b)=>Object.keys(fields).indexOf(a.name.split('.').pop())-Object.keys(fields).indexOf(b.name.split('.').pop())).filter(function(p){return fields[p.name.split('.').pop()]&&p.value!==null&&p.value!==undefined;}).map(function(p){
    var parts=p.name.split('.'),key=parts.pop(),f=fields[key],v=p.value;
    var text=typeof v==='number'?(Number.isFinite(v)?(Math.round(v*(f[2]||1)*10)/10).toLocaleString('de-AT'):'—'):typeof v==='boolean'?(key==='on'?(v?'Ein':'Aus'):(v?'Ja':'Nein')):(words[v]||v);
    return {name:p.name,label:f[0],text:text,unit:f[1],channel:counts[key]>1?(parts.join('.')||'Gerät'):''};
@@ -82,6 +86,7 @@
   scope.state=Object.assign({},msg.payload,{rows:msg.payload.rows.map(function(d){return Object.assign({},d,{metrics:metrics(d.points||[])});})});
   var summary={current:0,offline:0,battery:0,stale:0};var rooms=[];
   scope.state.rows.forEach(function(d){if(d.quality==='current'&&d.reachable===true)summary.current++;else if(d.quality==='offline')summary.offline++;else summary.stale++;if(d.lowBattery===true)summary.battery++;if(d.rooms&&rooms.indexOf(d.rooms)===-1)rooms.push(d.rooms);});
+  scope.attention=scope.state.rows.filter(d=>scope.deviceStatus(d)!=='Online'||d.lowBattery).map(d=>d.name);
   scope.summary=summary;scope.rooms=rooms.sort(function(a,b){return a.localeCompare(b,'de');});filterRows();
  }});
  scope.send({topic:'homematic-ip/get'});

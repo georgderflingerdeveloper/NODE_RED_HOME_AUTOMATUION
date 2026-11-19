@@ -433,14 +433,14 @@
     "id": "se_node_red_restart_exec",
     "type": "exec",
     "z": "b86cb602995b0261",
-    "command": "/bin/launchctl kickstart -k gui/503/com.georg.node-red",
+    "command": "case \"$(uname -s)\" in Linux) systemctl --user --no-block restart node-red.service ;; Darwin) /bin/launchctl kickstart -k gui/503/com.georg.node-red ;; *) exit 1 ;; esac",
     "addpay": false,
     "append": "",
     "useSpawn": "false",
     "timer": "10",
     "winHide": false,
     "oldrc": false,
-    "name": "Node-RED über launchd neu starten",
+    "name": "Node-RED-Dienst neu starten",
     "x": 1150,
     "y": 980,
     "wires": [
@@ -506,6 +506,22 @@
     "y": 600,
     "wires": [
       []
+    ]
+  },
+  {
+    "id": "se_node_red_restart_in",
+    "type": "link in",
+    "z": "b86cb602995b0261",
+    "name": "Node-RED-Neustart aus SYSTEM",
+    "links": [
+      "system_node_red_restart_out"
+    ],
+    "x": 575,
+    "y": 980,
+    "wires": [
+      [
+        "se_control_router"
+      ]
     ]
   }
 ]
