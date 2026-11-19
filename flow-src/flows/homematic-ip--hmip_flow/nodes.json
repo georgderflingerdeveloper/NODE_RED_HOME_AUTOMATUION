@@ -1,12 +1,5 @@
 [
   {
-    "id": "hmip_flow",
-    "type": "tab",
-    "label": "HOMEMATIC IP",
-    "disabled": false,
-    "info": "Lesende Cloud-Anbindung. Anleitung: docs/HOMEMATIC_IP.md. Schaltbefehle werden nicht verarbeitet. Lokaler HAP-Neustart bei bestätigtem Cloud-Offline-Status auf dem Home-PC."
-  },
-  {
     "id": "hmip_link_in",
     "type": "link in",
     "z": "hmip_flow",
@@ -25,7 +18,7 @@
     "type": "home-automation-homematic-ip",
     "z": "hmip_flow",
     "name": "HAP · Cloud lesen",
-    "intervalMs": 120000,
+    "intervalMs": 600000,
     "x": 350,
     "y": 100,
     "wires": [

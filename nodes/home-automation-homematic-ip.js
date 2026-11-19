@@ -2,6 +2,9 @@
 const fs=require('node:fs'),path=require('node:path'),{execFile}=require('node:child_process');
 const {normalize,mergeRows}=require('./homematic-ip-core.cjs');
 const {createHistory}=require('./homematic-ip-history.cjs');
+const MIN_POLL_INTERVAL_MS = 10 * 60_000;
+const THROTTLE_BACKOFF_MS = 60 * 60_000;
+const MAX_THROTTLE_BACKOFF_MS = 24 * THROTTLE_BACKOFF_MS;
 module.exports=RED=>{
  function Hmip(config){
   RED.nodes.createNode(this,config);const node=this;
@@ -10,7 +13,7 @@ module.exports=RED=>{
   const python=path.join(userDir,'homematic-ip-runtime/bin/python');
   const bridge=path.join(__dirname,'homematic-ip-bridge.py');
   const configuredInterval=Number(config.intervalMs);
-  const interval=Number.isFinite(configuredInterval)?Math.min(86400000,Math.max(120000,configuredInterval)):120000;
+  const interval=Number.isFinite(configuredInterval)?Math.min(86400000,Math.max(MIN_POLL_INTERVAL_MS,Math.ceil(configuredInterval))):MIN_POLL_INTERVAL_MS;
   let history=null,historyError='';
   try{history=createHistory(path.join(root,node.id+'-history.sqlite'),{intervalMs:interval,retentionDays:config.historyDays});}catch{historyError='Historisches Messarchiv konnte nicht geöffnet werden';}
   function recordHistory(success){try{if(history){history.record(rows,Date.now(),success);historyError='';}}catch{historyError='Historische Messwerte konnten nicht gespeichert werden';}}
@@ -64,7 +67,7 @@ module.exports=RED=>{
      rows=rows.map(r=>({...r,quality:'stale'}));
      const limited=e.cloudError?.code==='rate_limited';
      gate.failures=Math.min(20,gate.failures+1);gate.errorCode=limited?'rate_limited':'cloud_error';
-     const delay=Math.min(7200000,(limited?900000:interval)*2**(gate.failures-1));
+     const delay=Math.min(limited?MAX_THROTTLE_BACKOFF_MS:7200000,(limited?THROTTLE_BACKOFF_MS:interval)*2**(gate.failures-1));
      const retry=Number(e.cloudError?.retryAfterMs);
      gate.nextAttemptAt=Date.now()+Math.max(interval,delay,Number.isFinite(retry)&&retry>0?Math.min(retry,2147480000):0);
      status=limited?'warning':'error';message=limited?'Homematic drosselt die Cloud-Abfragen – automatische Abfragepause':'Cloud-Abfrage fehlgeschlagen – automatische Wiederholung nach Wartezeit';recordHistory(false);

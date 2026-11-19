@@ -38,11 +38,11 @@ Ohne Python-SDK oder Zugang bleibt der Flow grau / Einrichtung ausstehend.
 setup.sh benötigt Internet; installieren.sh und --pruefen führen keine Cloudzugriffe aus.
 
 ## Daten und Status
-Mindestens 120 Sekunden zwischen regulären Abfragen, auch bei manuellem Refresh.
-Bei HTTP 429 / SDK-Drosselung mindestens 15 Minuten Pause; wiederholte Fehler
-verdoppeln die Pause bis auf zwei Stunden. Ein verfügbares längeres Retry-After
-wird berücksichtigt (maximal knapp 25 Tage). Sonstige Fehler starten bei zwei
-Minuten mit derselben Verdopplung. Erfolg setzt die Fehlerpause zurück.
+Mindestens zehn Minuten zwischen regulären Abfragen, auch bei manuellem Refresh.
+Bei HTTP 429 / SDK-Drosselung mindestens eine Stunde Pause; wiederholte Drosselung
+verdoppelt die Pause bis auf 24 Stunden. Ein verfügbares längeres Retry-After
+wird berücksichtigt (maximal knapp 25 Tage). Sonstige Fehler starten beim regulären Abfrageintervall
+und verdoppeln die Wartezeit bis auf zwei Stunden, sofern das Intervall darunter liegt. Erfolg setzt die Fehlerpause zurück.
 Der nächste erlaubte Versuch und der Fehlerzähler liegen gemeinsam für alle
 Homematic-Nodes im userDir unter homematic-ip/cloud-poll-state.json. Neustarts
 und Aktualisieren umgehen die Pause nicht. Bei fehlerhaftem Sperrspeicher
@@ -71,9 +71,10 @@ Anzeigezeit im Browser in dessen lokaler Zeitzone; Zeitstempel als Unix-Millisek
 
 ## Automatischer HAP-Neustart auf dem Home-PC
 
-Drei frische Cloud-Meldungen „HAP offline“ über mindestens vier Minuten lösen
-einen lokalen Neustartversuch pro Störung aus. Online-Meldungen, Cloud-Fehler
-oder eine Lücke von mehr als fünf Minuten setzen die Bestätigung zurück.
+Drei frische Cloud-Meldungen „HAP offline“ über mindestens zwei Abfrageintervalle
+(standardmäßig 20 Minuten) lösen einen lokalen Neustartversuch pro Störung aus.
+Online-Meldungen, Cloud-Fehler oder eine Lücke von mehr als dem 1,5-Fachen des
+Abfrageintervalls (standardmäßig 15 Minuten) setzen die Bestätigung zurück.
 Der Helfer prüft, ob der HAP lokal antwortet und den Home-PC als Gateway nutzt.
 Zwischen Neustartbefehlen liegt auch über Node-RED-Neustarts hinweg mindestens
 eine Stunde. Der Flow protokolliert die Geräteantwort im Node-RED-Journal.

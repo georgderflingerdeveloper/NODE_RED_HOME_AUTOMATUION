@@ -1,0 +1,117 @@
+[
+  {
+    "id": "sissi_ewelink_tick",
+    "type": "inject",
+    "z": "sissi_zigbee_flow",
+    "name": "Gerätestatus jede Minute",
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "60",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 1,
+    "topic": "sissi/poll",
+    "x": 170,
+    "y": 80,
+    "wires": [
+      [
+        "sissi_ewelink_control"
+      ]
+    ]
+  },
+  {
+    "id": "sissi_ewelink_control",
+    "type": "function",
+    "z": "sissi_zigbee_flow",
+    "name": "eWeLink · Gerätestatus und Relais",
+    "func": {
+      "$flowSource": "flows/sissis-zimmer-zigbee--sissi_zigbee_flow/functions/ewelink-geratestatus-und-relais.js"
+    },
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 460,
+    "y": 120,
+    "wires": [
+      [
+        "sissi_light_ui"
+      ],
+      [
+        "sissi_ewelink_http"
+      ]
+    ]
+  },
+  {
+    "id": "sissi_ewelink_http",
+    "type": "http request",
+    "z": "sissi_zigbee_flow",
+    "name": "eWeLink API · Europa",
+    "method": "use",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 770,
+    "y": 180,
+    "wires": [
+      [
+        "sissi_ewelink_control"
+      ]
+    ]
+  },
+  {
+    "id": "sissi_ewelink_catch",
+    "type": "catch",
+    "z": "sissi_zigbee_flow",
+    "name": "eWeLink Transportfehler",
+    "scope": [
+      "sissi_ewelink_http"
+    ],
+    "uncaught": false,
+    "x": 170,
+    "y": 180,
+    "wires": [
+      [
+        "sissi_ewelink_control"
+      ]
+    ]
+  },
+  {
+    "id": "sissi_light_ui",
+    "type": "ui_template",
+    "z": "sissi_zigbee_flow",
+    "group": "sissi_room_group",
+    "name": "Lichtschalter und Zigbee-Status",
+    "order": 1,
+    "width": 8,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/sissis-zimmer-zigbee--sissi_zigbee_flow/templates/lichtschalter-und-zigbee-status.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 800,
+    "y": 80,
+    "wires": [
+      [
+        "sissi_ewelink_control"
+      ]
+    ]
+  }
+]

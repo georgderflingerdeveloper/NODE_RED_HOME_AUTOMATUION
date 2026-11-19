@@ -1,0 +1,88 @@
+<style>
+.sissi-room {
+    --muted: #bbc5cf;
+    background: #202a34;
+    border: 1px solid #435363;
+    border-radius: 16px;
+    color: #f6f8fa;
+    padding: 20px;
+    max-width: 680px;
+}
+.sissi-room .sissi-light {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #435363;
+}
+.sissi-room .sissi-icon {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+    border-radius: 14px;
+    background: #344350;
+    color: var(--muted);
+}
+.sissi-room .sissi-icon.is-on { background: #ffd584; color: #382807; }
+.sissi-room .sissi-name { flex: 1; min-width: 0; }
+.sissi-room .sissi-name strong { display: block; font-size: 18px; }
+.sissi-room .sissi-muted { color: var(--muted); }
+.sissi-room .sissi-switch {
+    width: 60px;
+    height: 36px;
+    flex: 0 0 60px;
+    border: 1px solid #8494a4;
+    border-radius: 20px;
+    padding: 3px;
+    background: #344350;
+    cursor: pointer;
+}
+.sissi-room .sissi-switch:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.sissi-room .sissi-switch:disabled { opacity: .55; cursor: default; }
+.sissi-room .sissi-switch span {
+    display: block;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .16s ease;
+}
+.sissi-room .sissi-switch[aria-checked="true"] { background: #9b650c; border-color: #ffd584; }
+.sissi-room .sissi-switch[aria-checked="true"] span { transform: translateX(24px); }
+.sissi-room dl { margin: 14px 0 0; }
+.sissi-room .sissi-device { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; }
+.sissi-room dd { margin: 0; color: var(--muted); }
+.sissi-room dd.online { color: #9ee6ba; }
+.sissi-room dd.offline { color: #ffb0ae; }
+.sissi-room p { margin: 12px 0 0; }
+@media (prefers-reduced-motion: reduce) {
+    .sissi-room .sissi-switch span { transition: none; }
+}
+</style>
+<section class="sissi-room" aria-label="Licht und Zigbee-Geräte in Sissis Zimmer">
+    <div class="sissi-light">
+        <span class="sissi-icon" ng-class="{'is-on': msg.payload.light === true}" aria-hidden="true">
+            <i class="material-icons">lightbulb_outline</i>
+        </span>
+        <div class="sissi-name">
+            <strong>Zimmerlicht</strong>
+            <span class="sissi-muted" aria-live="polite">{{msg.payload.pending ? 'Schaltet …' : msg.payload.light === true ? 'Ein' : msg.payload.light === false ? 'Aus' : 'Zustand unbekannt'}}</span>
+        </div>
+        <button type="button" class="sissi-switch" role="switch" aria-label="Zimmerlicht"
+                ng-attr-aria-checked="{{msg.payload.light === true ? 'true' : 'false'}}"
+                ng-disabled="!msg.payload.canSwitch"
+                ng-click="send({topic: 'sissi/light', payload: msg.payload.light === false})">
+            <span></span>
+        </button>
+    </div>
+    <dl aria-label="Verbindungsstatus laut eWeLink">
+        <div class="sissi-device" ng-repeat="device in [{key:'bridge', name:'Zigbee-Bridge'}, {key:'button', name:'Funktaster'}, {key:'relay', name:'Lichtrelais'}]">
+            <dt>{{device.name}}</dt>
+            <dd ng-class="msg.payload.devices[device.key]">{{msg.payload.devices[device.key] === 'online' ? 'Online' : msg.payload.devices[device.key] === 'offline' ? 'Offline' : 'Unbekannt'}}</dd>
+        </div>
+    </dl>
+    <p class="sissi-muted" role="status" ng-if="msg.payload.message">{{msg.payload.message}}</p>
+    <p class="sissi-muted" ng-if="msg.payload.updated">Letzte eWeLink-Antwort {{msg.payload.updated | date:'dd.MM. HH:mm:ss'}}</p>
+</section>

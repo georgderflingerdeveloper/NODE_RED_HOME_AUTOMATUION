@@ -2547,6 +2547,13 @@
     "className": ""
   },
   {
+    "id": "hmip_flow",
+    "type": "tab",
+    "label": "HOMEMATIC IP",
+    "disabled": false,
+    "info": "Lesende Cloud-Anbindung. Anleitung: docs/HOMEMATIC_IP.md. Schaltbefehle werden nicht verarbeitet. Lokaler HAP-Neustart bei bestätigtem Cloud-Offline-Status auf dem Home-PC."
+  },
+  {
     "id": "solaredge_compare_tab",
     "type": "ui_tab",
     "name": "SolarEdge Vergleich",
@@ -2600,6 +2607,33 @@
     "order": 2,
     "disp": true,
     "width": 12,
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "sissi_zigbee_flow",
+    "type": "tab",
+    "label": "SISSIS ZIMMER · ZIGBEE",
+    "disabled": false,
+    "info": "eWeLink EU Open API. SISSI_EWELINK_APP_ID und SISSI_EWELINK_ACCESS_TOKEN im Node-RED-Dienst hinterlegen. SISSI_EWELINK_BRIDGE_ID, SISSI_EWELINK_BUTTON_ID und SISSI_EWELINK_RELAY_ID müssen drei eigene Geräte desselben Kontos identifizieren. Unterstützt ein Relais mit params.switch on/off."
+  },
+  {
+    "id": "sissi_room_tab",
+    "type": "ui_tab",
+    "name": "Sissis Zimmer",
+    "icon": "lightbulb_outline",
+    "order": 18,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "sissi_room_group",
+    "type": "ui_group",
+    "name": "Licht und Geräte",
+    "tab": "sissi_room_tab",
+    "order": 1,
+    "disp": false,
+    "width": "8",
     "collapse": false,
     "className": ""
   }
