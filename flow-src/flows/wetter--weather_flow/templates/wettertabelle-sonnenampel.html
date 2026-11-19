@@ -168,6 +168,47 @@
       font-size: 17px
     }
   }
+  #Tab_WETTER, #Tab_WETTER ui-card-panel, #Tab_WETTER .nr-dashboard-cardpanel,
+  #Tab_WETTER .nr-dashboard-cardcontainer, #Tab_WETTER md-card.nr-dashboard-template {
+    position: relative !important; inset: auto !important; transform: none !important;
+    width: 100% !important; max-width: 100%; min-width: 0; height: auto !important;
+    box-sizing: border-box;
+  }
+  #Tab_WETTER ui-card-panel { display: block; }
+  #Tab_WETTER .nr-dashboard-cardcontainer { display: flex; flex-direction: column; gap: 8px; }
+  #Tab_WETTER md-card.nr-dashboard-template { margin: 0; }
+  @media (max-width: 700px) {
+    body:has(#Tab_WETTER) md-sidenav.md-locked-open { position: absolute !important; z-index: 65 !important; }
+    body:has(#Tab_WETTER) md-sidenav.md-locked-open.md-closed {
+      transform: translateX(-110%) !important; visibility: hidden !important;
+    }
+    body:has(#Tab_WETTER) button[aria-label="menu button"] { display: inline-flex !important; }
+  }
+  .weather-card { container-type: inline-size; overflow-wrap: anywhere; }
+  .weather-legend { flex-wrap: wrap; }
+  .weather-card .weather-kpi span, .weather-card .weather-suntimes { color: #505964; }
+  @container (max-width: 40rem) {
+    .weather-kpis { grid-template-columns: repeat(auto-fit,minmax(min(100%,8rem),1fr)); }
+    .weather-table-wrap { overflow: visible; border: 0; }
+    .weather-table, .weather-table tbody { display: block; min-width: 0; background: transparent; }
+    .weather-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .weather-table tbody tr {
+      display: block; padding: .45rem .85rem; margin-bottom: .65rem;
+      border: 1px solid var(--gh-border,#626262); border-radius: .85rem;
+      background: var(--gh-card,#303030); color: var(--gh-text,#fff);
+    }
+    .weather-table tbody tr td, .weather-table tbody tr:nth-child(even) td,
+    .weather-table tbody tr.night-row td {
+      display: flex; align-items: baseline; justify-content: space-between; gap: .6rem;
+      padding: .45rem 0; font-size: .95rem; color: inherit; background: transparent;
+      border-color: var(--gh-border,#626262);
+    }
+    .weather-table tbody tr td:first-child { font-weight: 700; border: 0; }
+    .weather-table td[data-label]::before {
+      content: attr(data-label); font-size: .84rem; font-weight: 400; color: var(--gh-muted,#ccc);
+    }
+    .weather-table .night-label { font-size: .8rem; }
+  }
 </style>
 <div class="weather-card">
   <div class="weather-head">
@@ -209,10 +250,10 @@
         <tr ng-repeat="hour in msg.payload.ForecastNext6Hours track by $index"
           ng-class="{'night-row': !hour.IsDaylight}">
           <td>{{hour.TimeLabel}}<span class="night-label" ng-if="!hour.IsDaylight">Nacht</span></td>
-          <td class="sun-cell">{{hour.SunshinePercent}} % · {{hour.SunshineMinutes | number:1}} min</td>
-          <td>{{hour.TemperatureC | number:1}} °C</td>
-          <td>{{hour.CloudCoverPercent}} %</td>
-          <td>{{hour.PrecipitationProbabilityPercent}} %</td>
+          <td class="sun-cell" data-label="Sonnendauer">{{hour.SunshinePercent}} % · {{hour.SunshineMinutes | number:1}} min</td>
+          <td data-label="Temperatur am Ende">{{hour.TemperatureC | number:1}} °C</td>
+          <td data-label="Wolken am Ende">{{hour.CloudCoverPercent}} %</td>
+          <td data-label="Regenrisiko">{{hour.PrecipitationProbabilityPercent}} %</td>
         </tr>
       </tbody>
     </table>

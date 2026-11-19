@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "5534ca863c3fb580385c2c9f1ef9bc8c9ba8c5cf1dedeba34205713d8f5b503f",
+  "flowSha256": "f81cb5baba670b19726cddb54a4636e08618b570aba8291832f413881cb55130",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1637,6 +1637,6 @@
     "flows/wetter--weather_flow/functions/wetterdaten-veroffentlichen.js": "40d6f42311f34803356593deb4795ecca26bde3146bdf4b152632c54b46309d1",
     "flows/wetter--weather_flow/functions/wetterubersicht-nach-verbindung-aktualisieren.js": "98bb02159f606f37629187b4ada352c19011e289664abee734e17e64b191978a",
     "flows/wetter--weather_flow/nodes.json": "71c52b11a6626ed1bc16c783c3bc13cb3ee452a1e51c6b412fad1898a5ba5c6d",
-    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "c19b19e3ee782b69f3b2e923b5de893dc149e7c1ba4c34bf5f058672f75366fc"
+    "flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": "075b1934d941fad52cf882ad51550c1355cb8c0d6fb4384eaf0b346f2c978c23"
   }
 }

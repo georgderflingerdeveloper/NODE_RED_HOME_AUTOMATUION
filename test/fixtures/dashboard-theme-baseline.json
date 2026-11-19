@@ -21,7 +21,7 @@
   },
   "flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "markup": "ecb8650cf2f33013fa75f9246bda6f6ed453b9fae095c165aa482c5c2c55787f"
+    "markup": "e9d7bb1adb9e6b949cfe17e993a7148b143be587f2018c63a813bd5ae103a2a0"
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solarleistung.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
