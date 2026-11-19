@@ -17,19 +17,28 @@
     color: inherit;
     font: inherit;
   }
+  #dashboard-menu-search input { min-width:0; }
   #dashboard-menu-search [role="status"]:not(:empty) { display: block; margin-top: 6px; }
   body.nr-dashboard-theme md-sidenav md-list-item.dashboard-search-match ui-icon {
     outline: 2px solid #ffca55;
     background: #ffca55;
     color: #252525;
   }
-  #dashboard-page-search {
+  #dashboard-menu-search, #dashboard-page-search {
     position: sticky; top: 0; z-index: 3; display: flex; align-items: center;
-    gap: 8px; padding: 6px 12px; background: var(--gh-inset, #252525);
+    gap: 8px; padding: 5px; margin: 6px 10px;
+    width: fit-content; max-width: calc(100% - 20px); box-sizing: border-box;
+    border: 1px solid var(--gh-border,#777); border-radius: 15px; background: var(--gh-inset, #252525);
     color: var(--gh-text, #fff);
   }
-  #dashboard-page-search input { min-width: 0; width: min(100%, 24em); padding: 6px; }
+  #dashboard-page-search input { min-width: 0; width: min(45vw, 24em); padding: 6px 10px; border-radius: 9px; }
   #dashboard-page-search button { cursor: pointer; }
+  #dashboard-menu-search [hidden], #dashboard-page-search [hidden] { display:none; }
+  #dashboard-menu-search .menu-search-toggle, #dashboard-page-search .page-search-toggle {
+    display:grid; place-items:center; flex-shrink:0; width:34px; height:34px; padding:0;
+    border:0; border-radius:9px;
+    background:var(--gh-card,#333); color:var(--gh-muted,#ccc);
+  }
   .dashboard-element-match { outline: 3px solid #ffca55 !important; outline-offset: -2px; scroll-margin: 64px; }
 </style>
 <script>
@@ -48,6 +57,30 @@
     });
   }
 
+
+
+  function installToggle(form, input) {
+    var toggle = form.querySelector("button[type=button]");
+    function setOpen(open) {
+      input.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+      if (open) {
+        input.focus();
+      } else {
+        input.value = "";
+        input.dispatchEvent(new Event("input"));
+        toggle.focus();
+      }
+    }
+    toggle.addEventListener("click", function() { setOpen(input.hidden); });
+    form.addEventListener("keydown", function(event) {
+      if (event.key === "Escape" && !input.hidden) {
+        event.preventDefault();
+        setOpen(false);
+      }
+    });
+  }
+
   function installPageSearch() {
     var content = document.querySelector(".masonry-container");
     if (!content) return null;
@@ -57,13 +90,14 @@
     var form = document.createElement("form");
     form.id = "dashboard-page-search";
     form.setAttribute("role", "search");
-    form.innerHTML = '<input type="search" placeholder="In diesem Bereich suchen" aria-label="Elemente und Anzeigen durchsuchen">' +
+    form.innerHTML = '<button class="page-search-toggle" type="button" aria-controls="dashboard-page-search-input" ' +
+      'aria-expanded="false" aria-label="Bereichssuche" title="In diesem Bereich suchen"><span class="material-icons" aria-hidden="true">search</span></button>' +
+      '<input id="dashboard-page-search-input" hidden type="search" placeholder="In diesem Bereich suchen" aria-label="Elemente und Anzeigen durchsuchen">' +
       '<button type="submit" hidden>Weiter</button><span role="status"></span>';
     content.before(form);
     var input = form.querySelector("input");
     var status = form.querySelector("[role=status]");
     var current = null;
-
     function findMatches() {
       var terms = queryTerms(input);
       if (!terms.length) return [];
@@ -98,9 +132,10 @@
       }
       status.textContent = current ? (index + 1) + " von " + matches.length
         : queryTerms(input).length ? "Kein Treffer" : "";
-      form.querySelector("button").hidden = matches.length < 2;
+      form.querySelector("button[type=submit]").hidden = matches.length < 2;
     }
 
+    installToggle(form, input);
     input.addEventListener("input", function() { update(false, true); });
     form.addEventListener("submit", function(event) {
       event.preventDefault();
@@ -125,13 +160,27 @@
     var form = document.createElement("form");
     form.id = "dashboard-menu-search";
     form.setAttribute("role", "search");
-    form.innerHTML = '<input type="search" aria-label="Dashboard-Menü durchsuchen" ' +
+    form.innerHTML = '<button class="menu-search-toggle" type="button" aria-controls="dashboard-menu-search-input" ' +
+      'aria-expanded="false" aria-label="Menüsuche" title="Menü durchsuchen"><span class="material-icons" aria-hidden="true">search</span></button>' +
+      '<input hidden id="dashboard-menu-search-input" type="search" aria-label="Dashboard-Menü durchsuchen" ' +
       'placeholder="Wo ist das Kinderzimmer?" autocomplete="off">' +
       '<span role="status"></span>';
     list.before(form);
 
+    list.addEventListener("click", function(event) {
+      if (!event.target.closest("md-list-item")) return;
+      var field = installPageSearch();
+      if (!field) return;
+      field.hidden = true;
+      field.form.querySelector(".page-search-toggle").setAttribute("aria-expanded", "false");
+      field.value = "";
+      field.dispatchEvent(new Event("input"));
+    }, true);
+
     var input = form.querySelector("input");
     var status = form.querySelector("[role=status]");
+
+    installToggle(form, input);
 
     function highlight(scrollToMatch) {
       var terms = queryTerms(input);
@@ -164,7 +213,7 @@
       match.click();
       setTimeout(function() {
         var field = installPageSearch();
-        if (field) { field.focus(); field.select(); }
+        if (field) field.form.querySelector(".page-search-toggle").focus();
       }, 350);
     });
     var items = new MutationObserver(function() { highlight(false); });
