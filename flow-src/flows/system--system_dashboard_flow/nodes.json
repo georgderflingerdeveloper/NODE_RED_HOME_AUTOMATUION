@@ -376,5 +376,27 @@
     "wires": [
       []
     ]
+  },
+  {
+    "id": "gh_mobile_layout",
+    "type": "ui_template",
+    "z": "system_dashboard_flow",
+    "group": "",
+    "name": "Handy · alle Dashboard-Bereiche",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system--system_dashboard_flow/templates/dashboard-mobile.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "global",
+    "x": 820,
+    "y": 910,
+    "wires": [
+      []
+    ]
   }
 ]

@@ -1,0 +1,120 @@
+<script>
+(function () {
+  const phone = window.matchMedia('(max-width: 700px)');
+  const requested = new URLSearchParams(location.search).get('handy') === '1';
+  function apply() {
+    document.documentElement.classList.toggle('gh-mobile', requested || phone.matches);
+  }
+  if (window.georgMobileLayoutCleanup) window.georgMobileLayoutCleanup();
+  apply();
+  phone.addEventListener('change', apply);
+  const toggle = document.createElement('button');
+  toggle.id = 'gh-mobile-pages';
+  toggle.type = 'button';
+  toggle.setAttribute('aria-expanded', 'false');
+  function collapse() {
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  function syncMenu() {
+    const nav = document.querySelector('md-sidenav');
+    if (!nav) return;
+    if (toggle.parentNode !== nav) nav.prepend(toggle);
+    const current = nav.querySelector('.nr-menu-item-active p')?.textContent.trim();
+    const label = 'Bereiche · ' + (current || 'Auswählen');
+    if (toggle.textContent !== label) toggle.textContent = label;
+  }
+  toggle.onclick = () => toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') !== 'true'));
+  function handleClick(event) {
+    if (event.target.closest('md-sidenav md-list-item')) collapse();
+  }
+  function handleKey(event) {
+    if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      collapse();
+      toggle.focus();
+    }
+  }
+  const observer = new MutationObserver(syncMenu);
+  // Listen for dashboard startup and navigation without observing live widget data.
+  function attach() {
+    syncMenu();
+    if (toggle.parentNode) {
+      observer.disconnect();
+      observer.observe(toggle.parentNode, {subtree:true, attributes:true, attributeFilter:['class']});
+    }
+  }
+  const mounted = new MutationObserver(() => {
+    if (document.querySelector('md-sidenav')) { attach(); mounted.disconnect(); }
+  });
+  if (document.querySelector('md-sidenav')) attach();
+  else mounted.observe(document.documentElement, {subtree:true, childList:true});
+  document.addEventListener('click', handleClick);
+  document.addEventListener('keydown', handleKey);
+  window.georgMobileLayoutCleanup = () => {
+    phone.removeEventListener('change', apply);
+    mounted.disconnect();
+    observer.disconnect();
+    document.removeEventListener('click', handleClick);
+    document.removeEventListener('keydown', handleKey);
+    toggle.remove();
+  };
+})();
+</script>
+<style>
+#gh-mobile-pages { display:none; }
+html.gh-mobile #nr-dashboard .gh-solar-history .sh-mobile-menu { display:none; }
+html.gh-mobile #nr-dashboard #nr-dashboard-toolbar button[aria-label="menu button"] { display:none !important; }
+html.gh-mobile #nr-dashboard section:has(> md-sidenav) { flex-direction:column; min-height:0; }
+html.gh-mobile #nr-dashboard section > md-sidenav:has(#gh-mobile-pages) {
+  visibility:visible !important; pointer-events:auto !important;
+  position:relative !important; display:block; transform:none !important;
+  inset:auto !important; width:100% !important; max-width:none; min-width:0;
+  flex:0 0 auto; height:auto !important; max-height:50%; overflow:auto;
+}
+html.gh-mobile #nr-dashboard section > md-content { min-width:0; min-height:0; }
+html.gh-mobile #gh-mobile-pages {
+  display:flex; align-items:center; justify-content:space-between; width:100%; min-height:46px;
+  padding:8px 18px; border:0; border-bottom:1px solid var(--gh-border);
+  background:var(--gh-inset); color:var(--gh-text); font:600 16px/1.4 system-ui; cursor:pointer;
+}
+html.gh-mobile #gh-mobile-pages::after { content:'▾'; }
+html.gh-mobile #gh-mobile-pages[aria-expanded="true"]::after { content:'▴'; }
+html.gh-mobile #gh-mobile-pages[aria-expanded="false"] ~ * { display:none !important; }
+/* The desktop dashboard positions groups and widgets in pixels. Use document
+   flow on phones so expanding a widget also moves every following control. */
+html.gh-mobile #nr-dashboard .masonry-container {
+  display:flex !important; flex-direction:column; align-items:stretch;
+  box-sizing:border-box; width:100% !important; max-width:48rem !important;
+  margin:0 auto !important; padding:8px !important; gap:12px;
+  height:auto !important; min-height:0 !important;
+}
+html.gh-mobile #nr-dashboard .masonry-container > ui-card-panel,
+html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardpanel,
+html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardcontainer,
+html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardcontainer > md-card {
+  position:relative !important; inset:auto !important; transform:none !important;
+  width:100% !important; min-width:0 !important; max-width:100% !important;
+  height:auto !important; min-height:0 !important; box-sizing:border-box;
+  margin:0 !important;
+}
+html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardcontainer {
+  display:flex !important; flex-direction:column; gap:6px; padding:4px;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-cardcontainer > md-card {
+  flex:none; min-height:48px !important;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-cardcontainer > md-card.nr-dashboard-template {
+  overflow-x:auto; display:block; overflow-wrap:anywhere;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-template > :is(div,section,article),
+html.gh-mobile #nr-dashboard md-card.vault-dashboard-widget .vault {
+  max-width:100% !important; width:100% !important; min-width:0 !important; box-sizing:border-box;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-template :is(input,select,textarea,canvas,img,svg) {
+  max-width:100%; box-sizing:border-box;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-template :is(button,select,summary),
+html.gh-mobile #nr-dashboard .nr-dashboard-button button { min-height:44px; }
+html.gh-mobile #nr-dashboard .nr-dashboard-template :is(.lc-grid,.lc-form-row,.host-grid,.host-process-grid,.sh-cards,.vault-form,.cost-forecast-grid) {
+  grid-template-columns:minmax(0,1fr);
+}
+</style>
