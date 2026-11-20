@@ -39,14 +39,39 @@ class Tests(unittest.TestCase):
         self.assertEqual(bridge.cloud_error(RuntimeError('secret')), {'error': {'code': 'cloud_error'}})
     def test_bridge_copies_match(self):
         self.assertEqual(pathlib.Path('tools/homematic/bridge.py').read_bytes(), pathlib.Path('nodes/homematic-ip-bridge.py').read_bytes())
+    def test_poll_reservation(self):
+        with tempfile.TemporaryDirectory() as d, patch.object(bridge, 'ROOT', pathlib.Path(d)), patch.dict(bridge.os.environ, {}, clear=True):
+            self.assertFalse(bridge.has_poll_reservation())
+            gate = bridge.ROOT / 'cloud-poll-state.json'
+            gate.write_text(json.dumps({'reservation': 'scheduled', 'nextAttemptAt': 2000}))
+            with patch.object(bridge.time, 'time', return_value=1):
+                bridge.os.environ['HMIP_POLL_RESERVATION'] = 'old'
+                self.assertFalse(bridge.has_poll_reservation())
+                bridge.os.environ['HMIP_POLL_RESERVATION'] = 'scheduled'
+                self.assertTrue(bridge.has_poll_reservation())
+            self.assertFalse(bridge.has_poll_reservation())
+
     def test_sdk_snapshot(self):
         class FakeHome:
-            async def init_async(self, access, token):
-                assert access=='access' and token=='secret'
+            def init_with_context(self, context, httpx_client_session):
+                assert context == 'context' and httpx_client_session is session
             async def download_configuration_async(self):
                 return {'home':{'connected':True,'location':'private'},'clients':{'token':'secret'},'devices':{'a':{'label':'Lampe','authToken':'secret'}},'groups':{}}
+        class Session:
+            async def __aenter__(self):
+                return self
+            async def __aexit__(self, *args):
+                pass
+        session = Session()
+        def client(event_hooks):
+            self.assertEqual(event_hooks, {'response': [bridge.check_throttle]})
+            return session
+        async def build(access, auth_token, httpx_client_session):
+            assert access == 'access' and auth_token == 'secret' and httpx_client_session is session
+            return 'context'
+        context_module = types.SimpleNamespace(ConnectionContextBuilder=types.SimpleNamespace(build_context_async=build))
         fake=types.ModuleType('homematicip.async_home');fake.AsyncHome=FakeHome
-        with tempfile.TemporaryDirectory() as d, patch.object(bridge,'ROOT',pathlib.Path(d)), patch.dict(sys.modules,{'homematicip':types.ModuleType('homematicip'),'homematicip.async_home':fake}):
+        with tempfile.TemporaryDirectory() as d, patch.object(bridge,'ROOT',pathlib.Path(d)), patch.dict(sys.modules,{'homematicip':types.ModuleType('homematicip'),'homematicip.async_home':fake, 'httpx':types.SimpleNamespace(AsyncClient=client), 'homematicip.connection.connection_context':context_module}):
             (bridge.ROOT/'credentials.json').write_text(json.dumps({'accessPoint':'access','authToken':'secret'}))
             output=io.StringIO()
             with contextlib.redirect_stdout(output):asyncio.run(bridge.snapshot())

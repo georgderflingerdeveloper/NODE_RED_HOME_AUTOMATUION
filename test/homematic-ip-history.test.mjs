@@ -34,3 +34,14 @@ test('Historie: ungültige Bereiche, unbekannte Trends und gemischte Einheiten a
 test('Historie: Aufbewahrung löscht abgelaufene Messungen, nicht den Trendkatalog',()=>setup(h=>{
  h.record([row([{name:'1.actualTemperature',value:20}])],start);h.record([row([{name:'1.actualTemperature',value:22}])],start+3*86400000);const s=h.catalog().series.find(s=>s.kind==='temperature');assert.equal(s.firstAt,start+3*86400000);
 },{retentionDays:1,now:()=>start+4*86400000}));
+test('Raummittel je Abfragezeit aus Istwerten aller Geräte des Raums',()=>setup(h=>{
+ const sensor=(id,room,point,value)=>({...row([{name:point,value},{name:'1.setPointTemperature',value:30}]),id,rooms:room});
+ const a=sensor('a','EG','1.actualTemperature',20),b=sensor('b','EG','1.valveActualTemperature',24);
+ h.record([a,b,sensor('c','OG','1.actualTemperature',10)],start);
+ h.record([b],start+M);
+ h.record([],start+2*M,false);
+ const target=h.catalog().series.find(s=>s.deviceId==='a'&&s.point.endsWith('setPointTemperature'));
+ const result=h.query({seriesIds:[target.id],from:start,to:start+3*M});
+ assert.equal(result.roomMeans.length,1);
+ assert.deepEqual(result.roomMeans[0].points.map(p=>p.value),[22,24,null]);
+}));

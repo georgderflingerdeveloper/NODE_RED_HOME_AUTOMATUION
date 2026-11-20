@@ -25,7 +25,7 @@ test('HAP: Offline, HAP offline, verschwundene Geräte und Wiederkehr',()=>{
 function harness(dir){
  const events={},sent=[],timers=[],calls=[],delays=[];let Type,clock=Date.now();
  const RED={settings:{userDir:dir},nodes:{createNode(node){node.id='test';node.on=(k,f)=>events[k]=f;node.send=m=>sent.push(structuredClone(m));node.status=()=>{};node.warn=()=>{};},registerType(_name,ctor){Type=ctor;}}};
- const customRequire=id=>id==='node:child_process'?{execFile:(exe,args,options,callback)=>{calls.push({exe,args,options,callback,killed:false});return {kill(){calls.at(-1).killed=true;}};}}:id==='./homematic-ip-core.cjs'?{normalize,mergeRows}:id==='./homematic-ip-history.cjs'?require('../nodes/homematic-ip-history.cjs'):require(id);
+ const customRequire=id=>id==='node:child_process'?{execFile:(exe,args,options,callback)=>{calls.push({exe,args,options,callback,killed:false});return {kill(){calls.at(-1).killed=true;}};}}:id==='./homematic-ip-core.cjs'?{normalize,mergeRows}:id==='./homematic-ip-history.cjs'?require('../nodes/homematic-ip-history.cjs'):id==='./homematic-ip-polling.cjs'?require('../nodes/homematic-ip-polling.cjs'):require(id);
  const box={module:{exports:{}},require:customRequire,__dirname:'/runtime/nodes',process:{env:{}},setTimeout:(fn,delay)=>{const due=clock+delay;delays.push(delay);timers.push(()=>{clock=Math.max(clock,due);fn();});return timers.length;},clearTimeout:()=>{},Date:class extends Date{static now(){return clock;}}};
  vm.runInNewContext(fs.readFileSync('nodes/home-automation-homematic-ip.js','utf8'),box);box.module.exports(RED);new Type({intervalMs:1});return {events,sent,timers,calls,delays};
 }
@@ -36,8 +36,10 @@ test('HAP runtime: Snapshot, Neustart veraltet, Rate-Limit auch nach Fehlern, ke
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hmip-test-'));try{
   fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
   const h=harness(dir);h.timers[0]();assert.equal(h.calls.length,1);assert.equal(h.calls[0].options.timeout,45000);assert.deepEqual(Array.from(h.calls[0].args),['/runtime/nodes/homematic-ip-bridge.py','snapshot']);
+  const reservation=h.calls[0].options.env.HMIP_POLL_RESERVATION;assert.ok(reservation);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'homematic-ip/cloud-poll-state.json'))).reservation,reservation);
   h.events.input({topic:'homematic-ip/refresh'});assert.equal(h.calls.length,1);
-  h.calls[0].callback(null,JSON.stringify(sample()));assert.equal(h.sent.at(-1).payload.status,'running');assert.equal(h.sent.at(-1).payload.intervalMs,600000);
+  h.calls[0].callback(null,JSON.stringify(sample()));assert.equal(h.sent.at(-1).payload.status,'running');assert.equal(h.sent.at(-1).payload.intervalMs,3600000);
   const saved=JSON.parse(fs.readFileSync(path.join(dir,'homematic-ip/test-snapshot.json')));assert.equal(saved.rows.length,1);
   h.events.input({topic:'homematic-ip/refresh'});assert.equal(h.calls.length,1);
   h.timers.at(-1)();h.calls[1].callback(Error('secret token'),'', 'secret token');assert.equal(h.sent.at(-1).payload.status,'error');assert.equal(h.sent.at(-1).payload.rows[0].quality,'stale');assert.ok(!JSON.stringify(h.sent).includes('secret token'));
@@ -93,18 +95,18 @@ test('HAP: Drosselung pausiert Klicks, weitere Nodes und Neustarts; Retry-After 
  try{
   fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
   const h=harness(dir);h.timers[0]();
-  h.calls[0].callback(Error('secret'),JSON.stringify({error:{code:'rate_limited',retryAfterMs:5400000}}));
-  assert.equal(h.sent.at(-1).payload.errorCode,'rate_limited');assert.equal(h.sent.at(-1).payload.status,'warning');assert.equal(h.delays.at(-1),5400000);
+  h.calls[0].callback(Error('secret'),JSON.stringify({error:{code:'rate_limited',retryAfterMs:28800000}}));
+  assert.equal(h.sent.at(-1).payload.errorCode,'rate_limited');assert.equal(h.sent.at(-1).payload.status,'warning');assert.equal(h.delays.at(-1),28800000);
   for(let i=0;i<20;i++)h.events.input({topic:'homematic-ip/refresh'});
   assert.equal(h.calls.length,1);
   const next=harness(dir);next.timers[0]();assert.equal(next.calls.length,0);assert.equal(next.sent.at(-1).payload.errorCode,'rate_limited');next.events.close(false,()=>{});
   h.timers.at(-1)();assert.equal(h.calls.length,2);
-  h.calls[1].callback(Error('secret'),JSON.stringify({error:{code:'rate_limited'}}));assert.equal(h.delays.at(-1),7200000);
-  h.timers.at(-1)();h.calls[2].callback(null,JSON.stringify(sample()));assert.equal(h.delays.at(-1),600000);assert.equal(h.sent.at(-1).payload.errorCode,'');
+  h.calls[1].callback(Error('secret'),JSON.stringify({error:{code:'rate_limited'}}));assert.equal(h.delays.at(-1),43200000);
+  h.timers.at(-1)();h.calls[2].callback(null,JSON.stringify(sample()));assert.equal(h.delays.at(-1),7200000);assert.equal(h.sent.at(-1).payload.errorCode,'');
   h.events.input({topic:'homematic-ip/refresh'});assert.equal(h.calls.length,3);
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'homematic-ip/cloud-poll-state.json'))).failures,0);
   h.timers.at(-1)();h.calls[3].callback(Error('throttle'),JSON.stringify({error:{code:'rate_limited',retryAfterMs:1800000}}));
-  assert.equal(h.delays.at(-1),3600000);
+  assert.equal(h.delays.at(-1),21600000);
   assert.ok(!JSON.stringify(h.sent).includes('secret'));h.events.close(false,()=>{});
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
@@ -112,8 +114,8 @@ test('HAP: wiederholte Cloudfehler verlängern Pause; beschädigte Sperrdatei ve
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hmip-backoff-'));
  try{
   fs.mkdirSync(path.join(dir,'homematic-ip-runtime/bin'),{recursive:true});fs.writeFileSync(path.join(dir,'homematic-ip-runtime/bin/python'),'');fs.mkdirSync(path.join(dir,'homematic-ip'));fs.writeFileSync(path.join(dir,'homematic-ip/credentials.json'),'secret');
-  const h=harness(dir);h.timers[0]();h.calls[0].callback(Error('timeout'),'');assert.equal(h.delays.at(-1),600000);
-  h.timers.at(-1)();h.calls[1].callback(Error('timeout'),'');assert.equal(h.delays.at(-1),1200000);
+  const h=harness(dir);h.timers[0]();h.calls[0].callback(Error('timeout'),'');assert.equal(h.delays.at(-1),3600000);
+  h.timers.at(-1)();h.calls[1].callback(Error('timeout'),'');assert.equal(h.delays.at(-1),7200000);
   fs.writeFileSync(path.join(dir,'homematic-ip/cloud-poll-state.json'),'broken');
   h.timers.at(-1)();assert.equal(h.calls.length,2);assert.match(h.sent.at(-1).payload.message,/Speicherfehler/);h.events.close(false,()=>{});
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
@@ -126,4 +128,26 @@ test('HAP: Kanal 0 liefert den Status auch ohne DEVICE_BASE-Typ',()=>{
  assert.equal(device.reachable,false);
  assert.equal(device.quality,'offline');
  assert.equal(device.lowBattery,false);
+});
+test('Adaptive Abfrage lernt über Wochen, übersteht Neustarts und unterscheidet Drosselung von Offline',()=>{
+ const {loadLearning,observe,summary}=require('../nodes/homematic-ip-polling.cjs');
+ const minute=60000,hour=60*minute,day=24*hour;
+ let clock=day,state=loadLearning(undefined,hour);
+ const record=outcome=>{clock+=state.interval;observe(state,outcome,clock);};
+ for(let i=0;i<72;i++)record('ok');
+ assert.equal(state.interval,hour);
+ record('offline');record('cloud_error');
+ for(let i=0;i<73;i++)record('ok');
+ assert.equal(state.interval,45*minute);
+ record('rate_limited');
+ assert.equal(state.interval,hour);
+ state=loadLearning(JSON.parse(JSON.stringify(state)),hour);
+ for(let i=0;i<29*24;i++)record('ok');
+ assert.equal(state.interval,hour);
+ assert.equal(summary(state,clock).find(s=>s.minutes===45).rate_limited,1);
+ for(let i=0;i<24+2;i++)record('ok');
+ assert.equal(state.interval,45*minute);
+ for(let i=0;i<1200;i++)record('ok');
+ assert.equal(state.interval,15*minute);
+ assert.ok(state.events.every(e=>e.at>=clock-30*day));
 });

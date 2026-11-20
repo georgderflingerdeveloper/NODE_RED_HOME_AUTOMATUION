@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { runFunctionNode } from "./helpers/function-node-harness.mjs";
 
-function sample(lastSuccess, cloudConnected, previous) {
+function sample(lastSuccess, cloudConnected, previous, intervalMs = 600000) {
     return runFunctionNode("hmip_reboot_check", {
-        msg: { topic: "homematic-ip/state", payload: { lastSuccess, cloudConnected, intervalMs: 600000 } },
+        msg: { topic: "homematic-ip/state", payload: { lastSuccess, cloudConnected, intervalMs } },
         contextValues: { offline: previous?.context.get("offline") },
     });
 }
@@ -27,5 +27,16 @@ test("online, unknown and gaps reset the offline confirmations", async () => {
         result = await sample(at, status, result);
         result = await sample(at + 600000, false, result);
         assert.equal(result.result, null);
+    }
+});
+
+test("hourly offline reports retry through a persistent outage", async () => {
+    let previous;
+    for (const [time, status, trigger] of [
+        [1000, false, true], [1000, false, false], [3601000, false, true],
+        [7201000, true, false], [10801000, null, false], [14401000, false, true],
+    ]) {
+        previous = await sample(time, status, previous, 3600000);
+        assert.deepEqual(previous.result, trigger ? {} : null);
     }
 });

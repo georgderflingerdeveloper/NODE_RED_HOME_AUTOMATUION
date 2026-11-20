@@ -61,12 +61,37 @@ async def authorize():
     save_credentials({'accessPoint': access, 'authToken': token})
     print('Autorisierung gespeichert. Kein Token ausgegeben.')
 
+def has_poll_reservation():
+    reservation = os.environ.get('HMIP_POLL_RESERVATION')
+    if not reservation:
+        return False
+    gate = json.loads((ROOT / 'cloud-poll-state.json').read_text())
+    return gate.get('reservation') == reservation and gate['nextAttemptAt'] > time.time() * 1000
+
+
+class CloudThrottleError(Exception):
+    def __init__(self, response):
+        super().__init__('rate_limited')
+        self.response = response
+
+
+async def check_throttle(response):
+    # The SDK drops the response headers when raising its own throttling error.
+    if response.status_code == 429:
+        raise CloudThrottleError(response)
+
+
 async def snapshot():
+    import httpx
     from homematicip.async_home import AsyncHome
+    from homematicip.connection.connection_context import ConnectionContextBuilder
     credentials = json.loads((ROOT / 'credentials.json').read_text())
     home = AsyncHome()
-    await home.init_async(credentials['accessPoint'], credentials['authToken'])
-    raw = await home.download_configuration_async()
+    async with httpx.AsyncClient(event_hooks={'response': [check_throttle]}) as session:
+        context = await ConnectionContextBuilder.build_context_async(
+            credentials['accessPoint'], auth_token=credentials['authToken'], httpx_client_session=session)
+        home.init_with_context(context, httpx_client_session=session)
+        raw = await home.download_configuration_async()
     if not isinstance(raw, dict) or not isinstance(raw.get('devices'), dict):
         raise ValueError('SCHEMA')
     # Home clients, security journals, location and authentication metadata are not exported.
@@ -102,6 +127,9 @@ if __name__ == '__main__':
         if sys.argv[1:] == ['authorize']:
             asyncio.run(authorize())
         elif sys.argv[1:] == ['snapshot']:
+            if not has_poll_reservation():
+                print('Cloud-Abfrage benötigt eine aktuelle Node-RED-Reservierung. Für Diagnosen lokalen Snapshot lesen.', file=sys.stderr)
+                sys.exit(2)
             asyncio.run(asyncio.wait_for(snapshot(), timeout=40))
         else:
             raise ValueError('COMMAND')

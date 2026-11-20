@@ -1,7 +1,7 @@
 {
     "name": "node-red-project",
     "description": "GEORGSHOME Home Automation",
-    "version": "0.32.0",
+    "version": "0.36.0",
     "private": true,
     "homeAutomation": {
         "branchPurposes": {

@@ -27,7 +27,11 @@
  <p ng-if="state.storageError">{{state.storageError}}</p>
  <p ng-if="state.historyError">{{state.historyError}}</p>
  <small ng-if="state.nextAttemptAt">Nächste Cloud-Abfrage frühestens: {{state.nextAttemptAt | date:'dd.MM.yyyy HH:mm:ss'}}</small>
- <small>Nur lesend · Cloud-Abfrage alle {{(state.intervalMs || 600000)/1000}} s · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
+ <small>Nur lesend · Adaptives Intervall {{(state.intervalMs || 3600000)/60000}} min · Letzte erfolgreiche Abfrage: {{state.lastSuccess ? (state.lastSuccess | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
+ <details><summary>Abfrageintervalle der letzten 30 Tage</summary>
+  <p ng-if="!state.pollRates.length">Noch keine Rückmeldungen erfasst.</p>
+  <p ng-repeat="r in state.pollRates track by r.minutes"><b>{{r.minutes}} min</b> · {{r.ok}} mit aktuellen Werten · {{r.offline}} ohne aktuelle Werte · {{r.rate_limited}} Cloud-Drosselungen · {{r.cloud_error}} sonstige Fehler · {{r.reported}} manuell gemeldete Drosselungen<span ng-if="r.unknown"> · {{r.unknown}} Archivlücken mit unbekannter Ursache</span></p>
+ </details>
  <div class="hmip-summary" aria-label="Geräteübersicht">
   <div><small>Geräte gesamt</small><strong>{{state.rows.length}}</strong></div>
   <div><small>Online</small><strong>{{summary.current}}</strong></div>

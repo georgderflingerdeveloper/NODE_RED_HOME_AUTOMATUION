@@ -38,8 +38,8 @@ Ohne Python-SDK oder Zugang bleibt der Flow grau / Einrichtung ausstehend.
 setup.sh benötigt Internet; installieren.sh und --pruefen führen keine Cloudzugriffe aus.
 
 ## Daten und Status
-Mindestens zehn Minuten zwischen regulären Abfragen, auch bei manuellem Refresh.
-Bei HTTP 429 / SDK-Drosselung mindestens eine Stunde Pause; wiederholte Drosselung
+Start mit dem konfigurierten Intervall (Standard 60 Minuten). Automatische und manuelle Abrufe teilen eine persistente Sperre. Der Reader vergleicht die letzten 30 Tage je Intervall. Nach mindestens 72 Stunden regelmäßig erfolgreicher Abrufe mit aktuellen Werten erprobt er die nächstkürzere Stufe (60, 45, 30, 20, 15 Minuten). Bei bestätigter Drosselung wechselt er nach der Pause auf die nächstlangsamere Stufe, bei Bedarf bis 24 Stunden. Eine bestätigte Drosselung schließt das betroffene Intervall und kürzere Stufen für 30 Tage als neue Versuche aus. Offline-Antworten, sonstige Fehler und größere Unterbrechungen unterbrechen die Erfolgsserie. Benutzermeldungen werden separat gezählt. Die Übersicht im Dashboard zeigt die Rückmeldungen je Intervall.
+Bei HTTP 429 / SDK-Drosselung mindestens sechs Stunden Pause; wiederholte Drosselung
 verdoppelt die Pause bis auf 24 Stunden. Ein verfügbares längeres Retry-After
 wird berücksichtigt (maximal knapp 25 Tage). Sonstige Fehler starten beim regulären Abfrageintervall
 und verdoppeln die Wartezeit bis auf zwei Stunden, sofern das Intervall darunter liegt. Erfolg setzt die Fehlerpause zurück.
@@ -47,6 +47,7 @@ Der nächste erlaubte Versuch und der Fehlerzähler liegen gemeinsam für alle
 Homematic-Nodes im userDir unter homematic-ip/cloud-poll-state.json. Neustarts
 und Aktualisieren umgehen die Pause nicht. Bei fehlerhaftem Sperrspeicher
 bleiben Cloud-Abfragen aus; das Dashboard zeigt den Speicherfehler.
+Die Python-Bridge prüft vor dem Cloudzugriff die aktuelle Reservierung des Nodes. Für manuelle Diagnosen den lokalen Gerätesnapshot und cloud-poll-state.json lesen.
 Im Dashboard werden Drosselung und frühester nächster Versuch angezeigt.
 Eine Abfrage maximal 45 Sekunden, nie überlappend. Kein WebSocket-Livestream.
 „Abgefragt“ bezeichnet den Cloudbestand, nicht eine garantierte physische Live-Messung.
@@ -71,10 +72,11 @@ Anzeigezeit im Browser in dessen lokaler Zeitzone; Zeitstempel als Unix-Millisek
 
 ## Automatischer HAP-Neustart auf dem Home-PC
 
-Drei frische Cloud-Meldungen „HAP offline“ über mindestens zwei Abfrageintervalle
-(standardmäßig 20 Minuten) lösen einen lokalen Neustartversuch pro Störung aus.
-Online-Meldungen, Cloud-Fehler oder eine Lücke von mehr als dem 1,5-Fachen des
-Abfrageintervalls (standardmäßig 15 Minuten) setzen die Bestätigung zurück.
+Beim stündlichen Abruf löst eine frische ausdrückliche Offline-Meldung einen
+lokalen Neustartversuch aus. Bleibt der HAP offline, wird der Versuch bei
+weiteren bestätigten Offline-Meldungen frühestens nach einer Stunde wiederholt.
+Bei kürzeren Intervallen sind drei Offline-Meldungen über zwei Intervalle
+erforderlich. Online-Meldungen, Cloud-Fehler und Abfragelücken setzen diese Folge zurück.
 Der Helfer prüft, ob der HAP lokal antwortet und den Home-PC als Gateway nutzt.
 Zwischen Neustartbefehlen liegt auch über Node-RED-Neustarts hinweg mindestens
 eine Stunde. Der Flow protokolliert die Geräteantwort im Node-RED-Journal.

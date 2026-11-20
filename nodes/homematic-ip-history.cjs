@@ -12,7 +12,7 @@ function definition(point){
  if(!kind)return null;
  return {label:(f?f[0]:key)+' · '+point.name,unit:f?f[1]:String(point.unit||''),kind,scale:f&&f[2]||1};
 }
-function createHistory(file,{intervalMs=60000,retentionDays=365,now=Date.now}={}){
+function createHistory(file,{intervalMs:cadence=60000,retentionDays=365,now=Date.now}={}){
  fs.mkdirSync(path.dirname(file),{recursive:true,mode:0o700});
  const db=new DatabaseSync(file);fs.chmodSync(file,0o600);
  db.exec(`PRAGMA journal_mode=WAL;
@@ -51,6 +51,7 @@ function createHistory(file,{intervalMs=60000,retentionDays=365,now=Date.now}={}
   }catch(e){db.exec('ROLLBACK');throw e;}
  }
  function catalog(){
+  const intervalMs=typeof cadence==='function'?cadence():cadence;
   const rows=db.prepare(`SELECT s.*,(SELECT min(observed_at) FROM samples p WHERE p.series_id=s.id) AS first_at,
    (SELECT value FROM samples p WHERE p.series_id=s.id ORDER BY observed_at DESC LIMIT 1) AS latest_value,
    (SELECT text_value FROM samples p WHERE p.series_id=s.id ORDER BY observed_at DESC LIMIT 1) AS latest_text,
@@ -58,6 +59,7 @@ function createHistory(file,{intervalMs=60000,retentionDays=365,now=Date.now}={}
   return {series:rows.map(s=>({id:s.id,deviceId:s.device_id,deviceName:s.device_name,rooms:s.rooms,point:s.point_name,label:s.label,unit:s.unit,kind:s.kind,states:JSON.parse(s.states_json),firstAt:s.first_at,lastAt:s.latest_at,latestValue:s.latest_value,latestText:s.latest_text})),retentionDays:retention,intervalMs};
  }
  function query(request={}){
+  const intervalMs=typeof cadence==='function'?cadence():cadence;
   const ids=request.seriesIds;
   if(!Array.isArray(ids)||!ids.length||ids.length>6||ids.some(id=>typeof id!=='string')||new Set(ids).size!==ids.length)throw Error('Bitte ein bis sechs unterschiedliche Trends auswählen.');
   let from,to;
@@ -70,8 +72,9 @@ function createHistory(file,{intervalMs=60000,retentionDays=365,now=Date.now}={}
   const first=selected[0];if(selected.some(s=>s.unit!==first.unit||(['state','binary'].includes(first.kind)?s.kind!==first.kind:s.kind==='state'||s.kind==='binary'))||first.kind==='state'&&selected.length>1)throw Error('Trends mit gleicher Einheit wählen; Textzustände bitte einzeln anzeigen.');
   // Keep first/minimum/maximum/last and gap marker per bucket. Never draw across a bucket containing gaps.
   const bucketMs=Math.max(1,Math.ceil((to-from)/320));
-  const sql=db.prepare(`WITH raw AS (
-    SELECT observed_at,value,text_value,quality,LAG(observed_at) OVER (ORDER BY observed_at) AS previous_at FROM samples WHERE series_id=? AND observed_at>=? AND observed_at<?
+  function readSeries(s,source,args){
+   const sql=db.prepare(`WITH observations AS (${source}), raw AS (
+    SELECT observed_at,value,text_value,quality,LAG(observed_at) OVER (ORDER BY observed_at) AS previous_at FROM observations
    ), ranked AS (
     SELECT *,CAST((observed_at-?)/? AS INTEGER) AS bucket,
     ROW_NUMBER() OVER(PARTITION BY CAST((observed_at-?)/? AS INTEGER) ORDER BY observed_at) AS first_rank,
@@ -82,12 +85,28 @@ function createHistory(file,{intervalMs=60000,retentionDays=365,now=Date.now}={}
     MAX(CASE WHEN value IS NULL OR observed_at-previous_at>? THEN 1 ELSE 0 END) OVER(PARTITION BY CAST((observed_at-?)/? AS INTEGER)) AS has_gap
     FROM raw
    ) SELECT observed_at,value,text_value,quality,has_gap FROM ranked WHERE first_rank=1 OR last_rank=1 OR min_rank=1 OR max_rank=1 OR gap_rank=1 ORDER BY observed_at`);
-  const series=selected.map(s=>{
-   const points=sql.all(s.id,from,to,...Array.from({length:6},()=>[from,bucketMs]).flat(),intervalMs*2.5,from,bucketMs).map(p=>({at:p.observed_at,value:p.value,text:p.text_value,quality:p.quality,breakBefore:!!p.has_gap}));
-   const stats=db.prepare('SELECT count(value) count,min(value) min,max(value) max,avg(value) average FROM samples WHERE series_id=? AND observed_at>=? AND observed_at<?').get(s.id,from,to);
+   const points=sql.all(...args,...Array.from({length:6},()=>[from,bucketMs]).flat(),intervalMs*2.5,from,bucketMs).map(p=>({at:p.observed_at,value:p.value,text:p.text_value,quality:p.quality,breakBefore:!!p.has_gap}));
+   const stats=db.prepare('SELECT count(value) count,min(value) min,max(value) max,avg(value) average FROM ('+source+')').get(...args);
    return {...s,points,stats};
-  });
-  return {from,to,series,bucketMs,intervalMs,retentionDays:retention,observed:true};
+  }
+  const series=selected.map(s=>readSeries(s,'SELECT observed_at,value,text_value,quality FROM samples WHERE series_id=? AND observed_at>=? AND observed_at<?',[s.id,from,to]));
+  const roomsOf=s=>s.rooms.split(', ').filter(Boolean);
+  const rooms=new Set(selected.filter(s=>s.kind==='temperature').flatMap(roomsOf));
+  const roomMeans=[];
+  for(const room of rooms){
+   const sensors=new Map();
+   for(const s of all){
+    if(!roomsOf(s).includes(room)||!/(?:^|\.)(actualTemperature|valveActualTemperature)$/.test(s.point))continue;
+    if(!sensors.has(s.deviceId)||/(?:^|\.)actualTemperature$/.test(s.point))sensors.set(s.deviceId,s.id);
+   }
+   if(!sensors.size)continue;
+   const source=`SELECT observed_at,avg(value) AS value,NULL AS text_value,
+    CASE WHEN count(value)>0 THEN 'current' ELSE 'missing' END AS quality
+    FROM samples WHERE series_id IN (${Array.from(sensors,()=>'?').join(',')})
+    AND observed_at>=? AND observed_at<? GROUP BY observed_at`;
+   roomMeans.push(readSeries({id:'mean:'+room,rooms:room,deviceName:room,label:'Raummittelwert',point:'roomMean',kind:'temperature',unit:'°C',roomMean:true},source,[...sensors.values(),from,to]));
+  }
+  return {from,to,series,roomMeans,bucketMs,intervalMs,retentionDays:retention,observed:true};
  }
  return {record,catalog,query,close(){if(!closed){closed=true;db.close();}}};
 }

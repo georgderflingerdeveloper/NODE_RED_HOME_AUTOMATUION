@@ -16,6 +16,7 @@ test('Homematic-Trends: dynamischer Katalog, Soll/Ist-Vorauswahl und kompatible 
 test('Homematic-Trends: Cursor zeigt Originalmessung, Lücken und Temperaturfarben',()=>{
  const u=ui();catalog(u);result(u);const event=t=>({clientX:75+905*(t-start)/H,currentTarget:{getBoundingClientRect:()=>({left:0,width:1000})}});
  u.scope.hover(event(start+M));assert.equal(u.scope.plotted[0].cursorValue,22);assert.equal(u.scope.plotted[0].cursorAt,start+M);
+ assert.ok(u.scope.graph.lines[0].width>u.scope.graph.lines[1].width);assert.ok(u.scope.cursor.tipStyle.left);
  u.scope.hover(event(start+2*M));assert.equal(u.scope.plotted[0].cursorValue,null);
  assert.equal(u.scope.temperatureColor(-5),u.scope.temperatureColor(0));assert.equal(u.scope.temperatureColor(35),u.scope.temperatureColor(50));assert.notEqual(u.scope.temperatureColor(0),u.scope.temperatureColor(35));
  assert.equal(u.scope.valueText(actual,0,null),'0,00 °C');assert.equal(u.scope.valueText({...actual,kind:'binary'},0,null),'Nein / Aus');assert.equal(u.scope.valueText({...actual,kind:'state',states:['CLOSED']},0,'CLOSED'),'Geschlossen');
