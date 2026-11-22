@@ -13356,5 +13356,297 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "presence_flow",
+        "type": "tab",
+        "label": "MELDER",
+        "disabled": false,
+        "info": "Bewegungen von PIENTRY, PIEAST und PIWEST empfangen und speichern."
+    },
+    {
+        "id": "presence_tab",
+        "type": "ui_tab",
+        "name": "Melder",
+        "icon": "directions_walk",
+        "order": 19,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "presence_group",
+        "type": "ui_group",
+        "name": "PIENTRY",
+        "tab": "presence_tab",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "presence_udp",
+        "type": "udp in",
+        "z": "presence_flow",
+        "name": "PIENTRY und PIEAST · UDP 10001",
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "presence_store",
+                "presence_store_east"
+            ]
+        ],
+        "iface": "",
+        "port": "10001",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "utf8"
+    },
+    {
+        "id": "presence_refresh",
+        "type": "inject",
+        "z": "presence_flow",
+        "name": "Stundenansicht aktualisieren",
+        "x": 170,
+        "y": 180,
+        "wires": [
+            [
+                "presence_store",
+                "presence_store_east",
+                "presence_store_west"
+            ]
+        ],
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "presence/refresh",
+        "repeat": "60",
+        "once": true,
+        "onceDelay": 1,
+        "crontab": ""
+    },
+    {
+        "id": "presence_store",
+        "type": "home-automation-motion",
+        "z": "presence_flow",
+        "name": "PIENTRY · Bewegungshistorie",
+        "x": 470,
+        "y": 120,
+        "wires": [
+            [
+                "presence_widget",
+                "presence_widget_capture"
+            ]
+        ],
+        "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite"
+    },
+    {
+        "id": "presence_widget",
+        "type": "ui_template",
+        "z": "presence_flow",
+        "name": "Bewegungsverlauf",
+        "x": 750,
+        "y": 120,
+        "wires": [
+            []
+        ],
+        "group": "presence_group",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "format": "<style>\n.gh-motion{padding:12px 14px;box-sizing:border-box;width:100%;font-variant-numeric:tabular-nums}\n.gh-motion h3{font-size:1rem;font-weight:600;margin:0 0 6px}.gh-motion p{margin:0 0 5px}\n.gh-motion .activity{font-size:1.35rem;font-weight:600}.gh-motion figure{margin:24px 0 0}\n.gh-motion figcaption{margin-bottom:10px}.gh-motion .bars{height:110px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid currentColor}\n.gh-motion .column{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}\n.gh-motion .bar{width:100%;background:currentColor;opacity:.78;border-radius:2px 2px 0 0}\n.gh-motion .axis{display:flex;justify-content:space-between;font-size:.8rem;margin-top:5px}\n.gh-motion details{margin-top:12px}.gh-motion summary{cursor:pointer}.gh-motion ol{max-height:9rem;overflow:auto}\n</style>\n<section class=\"gh-motion\" ng-if=\"msg.payload.bins\">\n  <h3>Letzte Aktivität</h3>\n  <p class=\"activity\">{{msg.payload.last || 'Noch keine Bewegung empfangen'}}</p>\n  <p>{{msg.payload.detector}} <span ng-if=\"msg.payload.last\">· Wiener Zeit</span></p>\n  <details class=\"gh-reception\"><summary>Empfang am Home-PC</summary>\n    <p>{{msg.payload.reception.source}}</p><p>{{msg.payload.reception.detail}}</p>\n    <p ng-if=\"msg.payload.reception.log\">Eingangsprotokoll per SSH · {{msg.payload.reception.log}}</p>\n  </details>\n  <figure><figcaption>Bewegungen pro Stunde · {{msg.payload.total}} im dargestellten Zeitraum</figcaption>\n    <div class=\"bars\" aria-hidden=\"true\"><div class=\"column\" ng-repeat=\"b in msg.payload.bins track by b.time\" title=\"{{b.label}} Uhr · {{b.count}} Bewegungen\"><div class=\"bar\" ng-style=\"{'height': (100*b.count/msg.payload.peak)+'%'}\"></div></div></div>\n    <div class=\"axis\" aria-hidden=\"true\"><span>{{msg.payload.bins[0].label}}</span><span>{{msg.payload.bins[12].label}}</span><span>{{msg.payload.bins[23].label}}</span></div>\n  </figure>\n  <details><summary>24 Stunden im Detail</summary><ol><li ng-repeat=\"b in msg.payload.bins track by b.time\">{{b.label}} Uhr · {{b.count}}</li></ol></details>\n</section>\n"
+    },
+    {
+        "id": "presence_group_east",
+        "type": "ui_group",
+        "name": "PIEAST",
+        "tab": "presence_tab",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "presence_widget_east",
+        "type": "ui_template",
+        "z": "presence_flow",
+        "name": "PIEAST · Bewegungsverlauf",
+        "x": 750,
+        "y": 400,
+        "wires": [
+            []
+        ],
+        "group": "presence_group_east",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "format": "<style>\n.gh-motion{padding:12px 14px;box-sizing:border-box;width:100%;font-variant-numeric:tabular-nums}\n.gh-motion h3{font-size:1rem;font-weight:600;margin:0 0 6px}.gh-motion p{margin:0 0 5px}\n.gh-motion .activity{font-size:1.35rem;font-weight:600}.gh-motion figure{margin:24px 0 0}\n.gh-motion figcaption{margin-bottom:10px}.gh-motion .bars{height:110px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid currentColor}\n.gh-motion .column{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}\n.gh-motion .bar{width:100%;background:currentColor;opacity:.78;border-radius:2px 2px 0 0}\n.gh-motion .axis{display:flex;justify-content:space-between;font-size:.8rem;margin-top:5px}\n.gh-motion details{margin-top:12px}.gh-motion summary{cursor:pointer}.gh-motion ol{max-height:9rem;overflow:auto}\n</style>\n<section class=\"gh-motion\" ng-if=\"msg.payload.bins\">\n  <h3>Letzte Aktivität</h3>\n  <p class=\"activity\">{{msg.payload.last || 'Noch keine Bewegung empfangen'}}</p>\n  <p>{{msg.payload.detector}} <span ng-if=\"msg.payload.last\">· Wiener Zeit</span></p>\n  <details class=\"gh-reception\"><summary>Empfang am Home-PC</summary>\n    <p>{{msg.payload.reception.source}}</p><p>{{msg.payload.reception.detail}}</p>\n    <p ng-if=\"msg.payload.reception.log\">Eingangsprotokoll per SSH · {{msg.payload.reception.log}}</p>\n  </details>\n  <figure><figcaption>Bewegungen pro Stunde · {{msg.payload.total}} im dargestellten Zeitraum</figcaption>\n    <div class=\"bars\" aria-hidden=\"true\"><div class=\"column\" ng-repeat=\"b in msg.payload.bins track by b.time\" title=\"{{b.label}} Uhr · {{b.count}} Bewegungen\"><div class=\"bar\" ng-style=\"{'height': (100*b.count/msg.payload.peak)+'%'}\"></div></div></div>\n    <div class=\"axis\" aria-hidden=\"true\"><span>{{msg.payload.bins[0].label}}</span><span>{{msg.payload.bins[12].label}}</span><span>{{msg.payload.bins[23].label}}</span></div>\n  </figure>\n  <details><summary>24 Stunden im Detail</summary><ol><li ng-repeat=\"b in msg.payload.bins track by b.time\">{{b.label}} Uhr · {{b.count}}</li></ol></details>\n</section>\n"
+    },
+    {
+        "id": "presence_store_east",
+        "type": "home-automation-motion",
+        "z": "presence_flow",
+        "name": "PIEAST · Bewegungshistorie",
+        "x": 470,
+        "y": 400,
+        "wires": [
+            [
+                "presence_widget_east"
+            ]
+        ],
+        "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+        "detector": "DetectorPiEast"
+    },
+    {
+        "id": "presence_group_west",
+        "type": "ui_group",
+        "name": "PIWEST",
+        "tab": "presence_tab",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "presence_widget_west",
+        "type": "ui_template",
+        "z": "presence_flow",
+        "name": "PIWEST · Bewegungsverlauf",
+        "x": 750,
+        "y": 500,
+        "wires": [
+            []
+        ],
+        "group": "presence_group_west",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "format": "<style>\n.gh-motion{padding:12px 14px;box-sizing:border-box;width:100%;font-variant-numeric:tabular-nums}\n.gh-motion h3{font-size:1rem;font-weight:600;margin:0 0 6px}.gh-motion p{margin:0 0 5px}\n.gh-motion .activity{font-size:1.35rem;font-weight:600}.gh-motion figure{margin:24px 0 0}\n.gh-motion figcaption{margin-bottom:10px}.gh-motion .bars{height:110px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid currentColor}\n.gh-motion .column{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}\n.gh-motion .bar{width:100%;background:currentColor;opacity:.78;border-radius:2px 2px 0 0}\n.gh-motion .axis{display:flex;justify-content:space-between;font-size:.8rem;margin-top:5px}\n.gh-motion details{margin-top:12px}.gh-motion summary{cursor:pointer}.gh-motion ol{max-height:9rem;overflow:auto}\n</style>\n<section class=\"gh-motion\" ng-if=\"msg.payload.bins\">\n  <h3>Letzte Aktivität</h3>\n  <p class=\"activity\">{{msg.payload.last || 'Noch keine Bewegung empfangen'}}</p>\n  <p>{{msg.payload.detector}} <span ng-if=\"msg.payload.last\">· Wiener Zeit</span></p>\n  <details class=\"gh-reception\"><summary>Empfang am Home-PC</summary>\n    <p>{{msg.payload.reception.source}}</p><p>{{msg.payload.reception.detail}}</p>\n    <p ng-if=\"msg.payload.reception.log\">Eingangsprotokoll per SSH · {{msg.payload.reception.log}}</p>\n  </details>\n  <figure><figcaption>Bewegungen pro Stunde · {{msg.payload.total}} im dargestellten Zeitraum</figcaption>\n    <div class=\"bars\" aria-hidden=\"true\"><div class=\"column\" ng-repeat=\"b in msg.payload.bins track by b.time\" title=\"{{b.label}} Uhr · {{b.count}} Bewegungen\"><div class=\"bar\" ng-style=\"{'height': (100*b.count/msg.payload.peak)+'%'}\"></div></div></div>\n    <div class=\"axis\" aria-hidden=\"true\"><span>{{msg.payload.bins[0].label}}</span><span>{{msg.payload.bins[12].label}}</span><span>{{msg.payload.bins[23].label}}</span></div>\n  </figure>\n  <details><summary>24 Stunden im Detail</summary><ol><li ng-repeat=\"b in msg.payload.bins track by b.time\">{{b.label}} Uhr · {{b.count}}</li></ol></details>\n</section>\n"
+    },
+    {
+        "id": "presence_store_west",
+        "type": "home-automation-motion",
+        "z": "presence_flow",
+        "name": "PIWEST · Bewegungshistorie",
+        "x": 470,
+        "y": 500,
+        "wires": [
+            [
+                "presence_widget_west"
+            ]
+        ],
+        "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+        "detector": "DetectorPiWest"
+    },
+    {
+        "id": "presence_west_udp",
+        "type": "udp in",
+        "z": "presence_flow",
+        "name": "PIWEST · Eingang 5 · UDP 5020",
+        "x": 160,
+        "y": 500,
+        "wires": [
+            [
+                "presence_store_west"
+            ]
+        ],
+        "iface": "",
+        "port": "5020",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "utf8"
+    },
+    {
+        "id": "presence_east_poll",
+        "type": "inject",
+        "z": "presence_flow",
+        "name": "PIEAST · Eingangsprotokoll lesen",
+        "x": 170,
+        "y": 350,
+        "wires": [
+            [
+                "presence_east_read"
+            ]
+        ],
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "presence/east-log",
+        "repeat": "60",
+        "once": true,
+        "onceDelay": 3,
+        "crontab": ""
+    },
+    {
+        "id": "presence_east_read",
+        "type": "exec",
+        "z": "presence_flow",
+        "name": "PIEAST · Protokoll per SSH lesen",
+        "command": "node /home/georgshomepc/Homeautomation-Recovery/remote.cjs 192.168.0.104 \"tail -n 4096 /home/pi/ha/ramdisk/lightlog.txt\"",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "25",
+        "winHide": false,
+        "oldrc": false,
+        "x": 240,
+        "y": 400,
+        "wires": [
+            [
+                "presence_store_east"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "presence_group_capture",
+        "type": "ui_group",
+        "name": "Broadcast-Messung",
+        "tab": "presence_tab",
+        "order": 4,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "presence_widget_capture",
+        "type": "ui_template",
+        "z": "presence_flow",
+        "name": "Broadcasts im Messfenster",
+        "x": 750,
+        "y": 595,
+        "wires": [
+            []
+        ],
+        "group": "presence_group_capture",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "format": "<style>\n.gh-observation {padding:12px 14px;font-variant-numeric:tabular-nums}\n.gh-observation p {margin:0 0 10px}\n.gh-observation table {border-collapse:collapse;width:100%;text-align:left}\n.gh-observation th,.gh-observation td {vertical-align:top;padding:8px 5px;border-bottom:1px solid rgba(128,128,128,.35)}\n.gh-observation small {display:block}\n.gh-observation summary {cursor:pointer}\n</style>\n<section class=\"gh-observation\" ng-if=\"msg.payload.capture\">\n  <p>{{msg.payload.capture.start}} bis {{msg.payload.capture.end}} · Wien</p>\n  <table aria-label=\"Empfangene UDP-Broadcasts im Messzeitraum\">\n    <thead><tr><th>Sender</th><th>Telegramm</th><th>Anzahl</th></tr></thead>\n    <tbody><tr ng-repeat=\"r in msg.payload.capture.rows\">\n      <td><strong>{{r.name}}</strong><small ng-if=\"r.name !== r.ip\">{{r.ip}}</small></td>\n      <td>{{r.kind}}<small>UDP {{r.port}}</small></td><td>{{r.count}}</td>\n    </tr></tbody>\n  </table>\n  <details><summary>Adressen und Empfangszeiten</summary>\n    <p ng-repeat=\"r in msg.payload.capture.rows\">{{r.name}} · {{r.mac}} · UDP {{r.port}} · {{r.first}}–{{r.last}}</p>\n  </details>\n</section>\n"
     }
 ]

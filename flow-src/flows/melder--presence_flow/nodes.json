@@ -1,0 +1,246 @@
+[
+  {
+    "id": "presence_udp",
+    "type": "udp in",
+    "z": "presence_flow",
+    "name": "PIENTRY und PIEAST · UDP 10001",
+    "x": 160,
+    "y": 100,
+    "wires": [
+      [
+        "presence_store",
+        "presence_store_east"
+      ]
+    ],
+    "iface": "",
+    "port": "10001",
+    "ipv": "udp4",
+    "multicast": "false",
+    "group": "",
+    "datatype": "utf8"
+  },
+  {
+    "id": "presence_refresh",
+    "type": "inject",
+    "z": "presence_flow",
+    "name": "Stundenansicht aktualisieren",
+    "x": 170,
+    "y": 180,
+    "wires": [
+      [
+        "presence_store",
+        "presence_store_east",
+        "presence_store_west"
+      ]
+    ],
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "topic": "presence/refresh",
+    "repeat": "60",
+    "once": true,
+    "onceDelay": 1,
+    "crontab": ""
+  },
+  {
+    "id": "presence_store",
+    "type": "home-automation-motion",
+    "z": "presence_flow",
+    "name": "PIENTRY · Bewegungshistorie",
+    "x": 470,
+    "y": 120,
+    "wires": [
+      [
+        "presence_widget",
+        "presence_widget_capture"
+      ]
+    ],
+    "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite"
+  },
+  {
+    "id": "presence_widget",
+    "type": "ui_template",
+    "z": "presence_flow",
+    "name": "Bewegungsverlauf",
+    "x": 750,
+    "y": 120,
+    "wires": [
+      []
+    ],
+    "group": "presence_group",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "format": {
+      "$flowSource": "flows/melder--presence_flow/templates/bewegungsverlauf.html"
+    }
+  },
+  {
+    "id": "presence_widget_east",
+    "type": "ui_template",
+    "z": "presence_flow",
+    "name": "PIEAST · Bewegungsverlauf",
+    "x": 750,
+    "y": 400,
+    "wires": [
+      []
+    ],
+    "group": "presence_group_east",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "format": {
+      "$flowSource": "flows/melder--presence_flow/templates/bewegungsverlauf.html"
+    }
+  },
+  {
+    "id": "presence_store_east",
+    "type": "home-automation-motion",
+    "z": "presence_flow",
+    "name": "PIEAST · Bewegungshistorie",
+    "x": 470,
+    "y": 400,
+    "wires": [
+      [
+        "presence_widget_east"
+      ]
+    ],
+    "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+    "detector": "DetectorPiEast"
+  },
+  {
+    "id": "presence_widget_west",
+    "type": "ui_template",
+    "z": "presence_flow",
+    "name": "PIWEST · Bewegungsverlauf",
+    "x": 750,
+    "y": 500,
+    "wires": [
+      []
+    ],
+    "group": "presence_group_west",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "format": {
+      "$flowSource": "flows/melder--presence_flow/templates/bewegungsverlauf.html"
+    }
+  },
+  {
+    "id": "presence_store_west",
+    "type": "home-automation-motion",
+    "z": "presence_flow",
+    "name": "PIWEST · Bewegungshistorie",
+    "x": 470,
+    "y": 500,
+    "wires": [
+      [
+        "presence_widget_west"
+      ]
+    ],
+    "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+    "detector": "DetectorPiWest"
+  },
+  {
+    "id": "presence_west_udp",
+    "type": "udp in",
+    "z": "presence_flow",
+    "name": "PIWEST · Eingang 5 · UDP 5020",
+    "x": 160,
+    "y": 500,
+    "wires": [
+      [
+        "presence_store_west"
+      ]
+    ],
+    "iface": "",
+    "port": "5020",
+    "ipv": "udp4",
+    "multicast": "false",
+    "group": "",
+    "datatype": "utf8"
+  },
+  {
+    "id": "presence_east_poll",
+    "type": "inject",
+    "z": "presence_flow",
+    "name": "PIEAST · Eingangsprotokoll lesen",
+    "x": 170,
+    "y": 350,
+    "wires": [
+      [
+        "presence_east_read"
+      ]
+    ],
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "topic": "presence/east-log",
+    "repeat": "60",
+    "once": true,
+    "onceDelay": 3,
+    "crontab": ""
+  },
+  {
+    "id": "presence_east_read",
+    "type": "exec",
+    "z": "presence_flow",
+    "name": "PIEAST · Protokoll per SSH lesen",
+    "command": "node /home/georgshomepc/Homeautomation-Recovery/remote.cjs 192.168.0.104 \"tail -n 4096 /home/pi/ha/ramdisk/lightlog.txt\"",
+    "addpay": false,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "25",
+    "winHide": false,
+    "oldrc": false,
+    "x": 240,
+    "y": 400,
+    "wires": [
+      [
+        "presence_store_east"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "presence_widget_capture",
+    "type": "ui_template",
+    "z": "presence_flow",
+    "name": "Broadcasts im Messfenster",
+    "x": 750,
+    "y": 595,
+    "wires": [
+      []
+    ],
+    "group": "presence_group_capture",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "storeOutMessages": true,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "format": {
+      "$flowSource": "flows/melder--presence_flow/templates/broadcast-messung.html"
+    }
+  }
+]

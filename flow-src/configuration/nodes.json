@@ -2636,5 +2636,61 @@
     "width": "8",
     "collapse": false,
     "className": ""
+  },
+  {
+    "id": "presence_flow",
+    "type": "tab",
+    "label": "MELDER",
+    "disabled": false,
+    "info": "Bewegungen von PIENTRY, PIEAST und PIWEST empfangen und speichern."
+  },
+  {
+    "id": "presence_tab",
+    "type": "ui_tab",
+    "name": "Melder",
+    "icon": "directions_walk",
+    "order": 19,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "presence_group",
+    "type": "ui_group",
+    "name": "PIENTRY",
+    "tab": "presence_tab",
+    "order": 1,
+    "disp": true,
+    "width": "12",
+    "collapse": false
+  },
+  {
+    "id": "presence_group_east",
+    "type": "ui_group",
+    "name": "PIEAST",
+    "tab": "presence_tab",
+    "order": 2,
+    "disp": true,
+    "width": "12",
+    "collapse": false
+  },
+  {
+    "id": "presence_group_west",
+    "type": "ui_group",
+    "name": "PIWEST",
+    "tab": "presence_tab",
+    "order": 3,
+    "disp": true,
+    "width": "12",
+    "collapse": false
+  },
+  {
+    "id": "presence_group_capture",
+    "type": "ui_group",
+    "name": "Broadcast-Messung",
+    "tab": "presence_tab",
+    "order": 4,
+    "disp": true,
+    "width": "12",
+    "collapse": false
   }
 ]

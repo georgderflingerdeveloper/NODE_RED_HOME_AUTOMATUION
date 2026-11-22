@@ -1,0 +1,21 @@
+<style>
+.gh-observation {padding:12px 14px;font-variant-numeric:tabular-nums}
+.gh-observation p {margin:0 0 10px}
+.gh-observation table {border-collapse:collapse;width:100%;text-align:left}
+.gh-observation th,.gh-observation td {vertical-align:top;padding:8px 5px;border-bottom:1px solid rgba(128,128,128,.35)}
+.gh-observation small {display:block}
+.gh-observation summary {cursor:pointer}
+</style>
+<section class="gh-observation" ng-if="msg.payload.capture">
+  <p>{{msg.payload.capture.start}} bis {{msg.payload.capture.end}} · Wien</p>
+  <table aria-label="Empfangene UDP-Broadcasts im Messzeitraum">
+    <thead><tr><th>Sender</th><th>Telegramm</th><th>Anzahl</th></tr></thead>
+    <tbody><tr ng-repeat="r in msg.payload.capture.rows">
+      <td><strong>{{r.name}}</strong><small ng-if="r.name !== r.ip">{{r.ip}}</small></td>
+      <td>{{r.kind}}<small>UDP {{r.port}}</small></td><td>{{r.count}}</td>
+    </tr></tbody>
+  </table>
+  <details><summary>Adressen und Empfangszeiten</summary>
+    <p ng-repeat="r in msg.payload.capture.rows">{{r.name}} · {{r.mac}} · UDP {{r.port}} · {{r.first}}–{{r.last}}</p>
+  </details>
+</section>

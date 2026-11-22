@@ -1,0 +1,24 @@
+<style>
+.gh-motion{padding:12px 14px;box-sizing:border-box;width:100%;font-variant-numeric:tabular-nums}
+.gh-motion h3{font-size:1rem;font-weight:600;margin:0 0 6px}.gh-motion p{margin:0 0 5px}
+.gh-motion .activity{font-size:1.35rem;font-weight:600}.gh-motion figure{margin:24px 0 0}
+.gh-motion figcaption{margin-bottom:10px}.gh-motion .bars{height:110px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid currentColor}
+.gh-motion .column{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}
+.gh-motion .bar{width:100%;background:currentColor;opacity:.78;border-radius:2px 2px 0 0}
+.gh-motion .axis{display:flex;justify-content:space-between;font-size:.8rem;margin-top:5px}
+.gh-motion details{margin-top:12px}.gh-motion summary{cursor:pointer}.gh-motion ol{max-height:9rem;overflow:auto}
+</style>
+<section class="gh-motion" ng-if="msg.payload.bins">
+  <h3>Letzte Aktivität</h3>
+  <p class="activity">{{msg.payload.last || 'Noch keine Bewegung empfangen'}}</p>
+  <p>{{msg.payload.detector}} <span ng-if="msg.payload.last">· Wiener Zeit</span></p>
+  <details class="gh-reception"><summary>Empfang am Home-PC</summary>
+    <p>{{msg.payload.reception.source}}</p><p>{{msg.payload.reception.detail}}</p>
+    <p ng-if="msg.payload.reception.log">Eingangsprotokoll per SSH · {{msg.payload.reception.log}}</p>
+  </details>
+  <figure><figcaption>Bewegungen pro Stunde · {{msg.payload.total}} im dargestellten Zeitraum</figcaption>
+    <div class="bars" aria-hidden="true"><div class="column" ng-repeat="b in msg.payload.bins track by b.time" title="{{b.label}} Uhr · {{b.count}} Bewegungen"><div class="bar" ng-style="{'height': (100*b.count/msg.payload.peak)+'%'}"></div></div></div>
+    <div class="axis" aria-hidden="true"><span>{{msg.payload.bins[0].label}}</span><span>{{msg.payload.bins[12].label}}</span><span>{{msg.payload.bins[23].label}}</span></div>
+  </figure>
+  <details><summary>24 Stunden im Detail</summary><ol><li ng-repeat="b in msg.payload.bins track by b.time">{{b.label}} Uhr · {{b.count}}</li></ol></details>
+</section>

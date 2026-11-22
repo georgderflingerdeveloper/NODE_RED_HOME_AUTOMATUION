@@ -20,6 +20,8 @@ const files = [
   "solaredge-cloud.cjs",
   "monthly-bills.cjs",
   "home-automation-history.js",
+  "home-automation-motion.js",
+  "home-automation-motion.html",
   "solar-history-export.cjs",
   "solar-trend.cjs",
   "home-automation-history.html",
