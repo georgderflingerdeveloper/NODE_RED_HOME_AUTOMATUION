@@ -81,13 +81,23 @@ Start-/Endtermine lösen zusätzlich an der konfigurierten Minute aus.
 
 ## Persistenz und Bedienung
 
-Datei: `<Node-RED-userDir>/scheduler-data/<Scheduler-Node-ID>.json`.
+Datei: `<Node-RED-userDir>/scheduler-data/scheduler-setup.json`.
 Enthält Zeitpläne, Zielbeschreibungen, Aktivierung, Pausen, Revision und
 Ereignis-Merker. Schreiben erfolgt atomar mit fsync vor dem Versand von Befehlen.
 Bei einer beschädigten Datei wird der Scheduler gesperrt; nichts wird durch
 eine leere Standardkonfiguration ersetzt. Erst sichern und Ursache prüfen.
 Die feste Node-ID `scheduler_engine` beibehalten, damit die gespeicherten Daten
 bei Updates wiedergefunden werden. Runtime-/Onlineinformationen sind flüchtig.
+
+Beim ersten Start ab 0.50.0 übernimmt der Scheduler die bisherige Datei
+`scheduler_engine.json` nach erfolgreichem Laden unter dem neuen Namen.
+Der Assistent „Gerät mit Zeitplan verbinden“ bietet registrierte Geräte und passende
+Einzel- und Mehrgerätepläne an. Die Zuordnung wird mit „Ja, speichern“ übernommen.
+Der Timer `georg-scheduler-backup.timer` prüft rund einmal pro Minute auf Änderungen.
+Im Drive-Ordner `HOMEPC_LINUX_RECOVERY/Scheduler` liegt die aktuelle Setup-Datei,
+unter `Versionen` liegen die gesicherten Stände nach SHA-256. Die Bestätigung
+im Dashboard folgt auf den bytegenauen Vergleich mit der heruntergeladenen Kopie.
+Bei einem Drive-Ausfall wiederholt der Timer den Versuch mit dem aktuellen Stand.
 
 Der Editor besitzt einen eigenen Entwurf. Live-Status überschreibt keine Felder.
 Bei paralleler Bearbeitung in zwei Browsern verhindert eine Revision das stille
@@ -96,6 +106,21 @@ Sonnenkoordinaten werden nicht geraten. Ohne richtige Koordinaten lässt sich de
 Sonnenplan nicht speichern. Ziele ohne passende Fähigkeit erhalten keinen Befehl.
 
 ## Weitere Räume / Steckdosen hinzufügen
+
+Ab 0.52.0 erscheinen Meldungen aus Phidget-Erkennung, Homematic-IP-Inventar und
+Netzwerkscan automatisch unter **Von Node-RED entdeckte Geräte**. Die Setup-Datei
+merkt sich Name, Quelle, Kennung und Ortsangabe. Der Netzwerkscan identifiziert
+einen Eintrag über die IP-Adresse, die beiden anderen Quellen über ihre
+Inventarkennung. Jeder Fund bleibt auch nach einem Neustart sichtbar.
+Passende Dashboard-Schalter erscheinen direkt mit **Zeitsteuerung einrichten**.
+
+Unter **Gerät hinzufügen** lassen sich verdrahtete Ein/Aus-Schalter aus dem
+laufenden Dashboard auswählen. Die Suche enthält Gerät und Dashboard-Gruppe.
+Der Scheduler übernimmt den gewählten Schalter erst nach Bestätigung. Die
+Verknüpfung verwendet die stabile Node-ID. Entfernte Schalter erscheinen offline.
+Unterstützt sind boolesche Dashboard-Schalter mit Durchleitung und erreichbarem
+UDP-, MQTT- oder Digitalausgang. Eine Versandbestätigung bezieht sich auf die
+Übergabe an den Dashboard-Schalter. Die physische Rückmeldung hängt vom Gerät ab.
 
 Ein neuer Adapter wird über dieselben Link-Out-/Link-In-Nodes verbunden. Die
 Scheduler-Verwaltung oder das Dashboard müssen dafür nicht geändert werden.
@@ -177,7 +202,7 @@ Dateien werden nicht überschrieben. Eingabewarnungen enden beim nächsten gült
 Status. Nach 60 Sekunden ohne Status zeigt das Dashboard Gelb statt altem Grün.
 
 Aktivierung, Pläne, Zielbeschreibungen, Pausen und Ausführungsmarker bleiben in
-`<Node-RED-userDir>/scheduler-data/<Node-ID>.json` erhalten. Ampel, Erreichbarkeit
+`<Node-RED-userDir>/scheduler-data/scheduler-setup.json` erhalten. Ampel, Erreichbarkeit
 und Tick-Zeit sind Live-Daten: Nach Neustart müssen sich Zeitgeber und Geräte neu
 melden. Die Node-ID `scheduler_engine` bleibt unverändert.
 

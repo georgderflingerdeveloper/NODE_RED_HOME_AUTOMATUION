@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "9cea2bf4da19a518d84527becb8a381d8f4f73135b20d3d5a3841b4ebf70e160",
+  "flowSha256": "f1185b11a78e47f4895ecc118bbe21d2566173f66f97ee76c217168900b5eb39",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -694,7 +694,9 @@
     "kosten_tarif_auswahl",
     "se_dashboard_connect",
     "se_auto_reconnect",
-    "se_countdown_popup"
+    "se_countdown_popup",
+    "hmip_scheduler_inventory",
+    "scheduler_inventory_in"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -1023,6 +1025,7 @@
     "hmip_snapshot_tick": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_device_snapshot": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_snapshot_out": "flows/homematic-ip--hmip_flow/nodes.json",
+    "hmip_scheduler_inventory": "flows/homematic-ip--hmip_flow/nodes.json",
     "host_monitor_tick": "flows/hostrechner--host_monitor_flow/nodes.json",
     "host_monitor_collect": "flows/hostrechner--host_monitor_flow/nodes.json",
     "host_monitor_json": "flows/hostrechner--host_monitor_flow/nodes.json",
@@ -1165,6 +1168,7 @@
     "scheduler_bad_in": "flows/schedulers--schedulers_flow/nodes.json",
     "scheduler_wohnzimmer_out": "flows/schedulers--schedulers_flow/nodes.json",
     "scheduler_wohnzimmer_in": "flows/schedulers--schedulers_flow/nodes.json",
+    "scheduler_inventory_in": "flows/schedulers--schedulers_flow/nodes.json",
     "se_read_power": "flows/se-grid-power--tab_read_feedin/nodes.json",
     "calc_feedin": "flows/se-grid-power--tab_read_feedin/nodes.json",
     "dbg_feedin": "flows/se-grid-power--tab_read_feedin/nodes.json",
@@ -1515,7 +1519,7 @@
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
     "flows/homematic-ip--hmip_flow/functions/check-hap-offline--hmip_reboot_check.js": "d325880b410bc7e12b19999402b90cdab538c5576354067538dfdc3d14abca97",
     "flows/homematic-ip--hmip_flow/functions/publish-device-snapshot--hmip_device_snapshot.js": "7a42912cea92deeed54408db703d4bee08fa4f71b05bb15391cc054eaf86fae6",
-    "flows/homematic-ip--hmip_flow/nodes.json": "20f5f4b676bdc691bb35a451e56ffeb2191baf4d555dd5c3a5bbab2c76b48b7f",
+    "flows/homematic-ip--hmip_flow/nodes.json": "a0d9ef6c800d6f62a1af9d2d7b64c4598dc0ecff4eb8cbb959d0bf201a88afd9",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "0d5a26c1c458166f1d2db9ca0b00ea83ce59afb344cb45c52fde20b6bb9202c5",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-trends.html": "db9e9de651b88397d36630171d3ec4d14b6e392c99ab20f3018c815bd4d4bf76",
     "flows/hostrechner--host_monitor_flow/nodes.json": "aa471261aa9f830b4049ae8f474462777ce3c5aeb04168278cd0187e10424563",
@@ -1610,8 +1614,8 @@
     "flows/scenarios--77dda60a.d7efe8/functions/make-adventure.js": "8f0bf09640d018ba9ac3e3d341526667fa9a8add762639a1f91056265625cabd",
     "flows/scenarios--77dda60a.d7efe8/functions/make-dimm.js": "7c3a09f59f959190433f3541814115ff3621b0ca40862d0392f9e871a40daaf7",
     "flows/scenarios--77dda60a.d7efe8/nodes.json": "cca181e9c1013062ded56492464b95552e6bfb961979271704db6c0b1892ec91",
-    "flows/schedulers--schedulers_flow/nodes.json": "71a5dd9dc3721a4a3e14c69463ac860f7a69b0f933f3ebc4048709bc4ae05cb7",
-    "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "eb1c4cbcf417f2a030b9c8e4de2c31258d5560e7fdb9e13cfb159eab8c5925f2",
+    "flows/schedulers--schedulers_flow/nodes.json": "02e73fa848a76721285ebe6f884963b9570631f6e779096137340f8009f3597c",
+    "flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": "ad49039aa5bff4fdd6ca63dc48827fd05383852c9708397b8f343c2eea84e969",
     "flows/se-grid-power--tab_read_feedin/functions/netzleistung-aufteilen-import-einspeisung.js": "e0e40830c27ae870adf8bd8c2c2b724d9ef1e405660772515e853652b23fd521",
     "flows/se-grid-power--tab_read_feedin/functions/parse-solaredge-meter-energy-totals.js": "67cd7e0fce08aa4b84f10d61ff8457ca5edec53d604995417a72a7451fe1128f",
     "flows/se-grid-power--tab_read_feedin/functions/solaredge-meter-offline-sichere-nullwerte.js": "4389b20908d64a47af787541c3b2b0f38510d1cf773058b257cab7a6554ae762",
@@ -1676,8 +1680,8 @@
     "flows/system-netzwerk-scan--system_network_flow/functions/lokales-24-scan-netz-sicher-ableiten.js": "f03b3e60c544b06c1480fdf03df254a8d01ec9883d62379a3de82a4b6bf838d4",
     "flows/system-netzwerk-scan--system_network_flow/functions/online-liste-mit-hostnamen-bilden.js": "3cfeb4d8a570affe995aa66a51354c204639dce23b119275323fdf83e6273b08",
     "flows/system-netzwerk-scan--system_network_flow/functions/ping-ergebnis-sicher-auswerten.js": "94e91fed8a8a60fe57a0dece3e50062ac055f603e3164eac5494b67a3860817c",
-    "flows/system-netzwerk-scan--system_network_flow/nodes.json": "bac6af6c5957a7bda1626b187df4e8e2583a6f278e31eceff5405790d64ef07e",
-    "flows/system-phidget-discovery--ph_discovery_tab/nodes.json": "726c334e34dac219b3cd613ed263ab478c9719bd5c31afc29496d354ffa1b347",
+    "flows/system-netzwerk-scan--system_network_flow/nodes.json": "017be5a7c8db27fe69c17f48b8de3e47d2c2e9a25a06d09eabb1a2ee02ab5b10",
+    "flows/system-phidget-discovery--ph_discovery_tab/nodes.json": "8b0d3d100783ff851ce984dab84ec51debdc92ad5f86598ead3b1b7dd2755e39",
     "flows/templates--d10e2758.4eed68/nodes.json": "c33b6f252557b7bc949d5488b84f196ec2eb0c53088f68e8b88c9530951428c2",
     "flows/unit-tests--3a481bd8.00eb44/nodes.json": "26c3fe1742fccb8ae51635b777cfe47bab2e537adb09eabc7b28a2ade54d6d71",
     "flows/wetter--weather_flow/functions/sicherer-ausfall-wetterwerte-auf-0.js": "9fbf0f524194d90c025a73cefb0cad7ffc43c7ea3360e66c69e0cf513a2e7d82",

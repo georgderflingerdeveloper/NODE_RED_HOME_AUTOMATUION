@@ -1,6 +1,7 @@
 'use strict';
 
 // Zeitentscheidungen ohne Node-RED/Dateisystem: mit festen Zeitpunkten testbar.
+const { discoveredRows, mergeDiscovered } = require('./scheduler-inventory.cjs');
 const VERSION = 1;
 const ACTIONS = ['brightness', 'on', 'off', 'scenario'];
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -25,9 +26,12 @@ function validatePlan(input) {
     p.name = p.name.trim();
     check(typeof p.enabled === 'boolean', 'Aktiv muss true/false sein.');
     check(Number.isInteger(p.priority) && p.priority >= 0 && p.priority <= 100, 'Priorität muss 0–100 sein.');
-    check(['device', 'room', 'group', 'all'].includes(p.target?.scope), 'Ungültiger Zielbereich.');
+    check(['device', 'devices', 'room', 'group', 'all'].includes(p.target?.scope), 'Ungültiger Zielbereich.');
     check(typeof p.target.kind === 'string' && p.target.kind.length > 0, 'Geräteart fehlt.');
-    if (p.target.scope !== 'all') check(identifier(p.target.id), 'Ziel-ID fehlt.');
+    if (p.target.scope === 'devices') {
+        const ids = p.target.ids;
+        check(Array.isArray(ids) && ids.length > 0 && ids.every(identifier) && new Set(ids).size === ids.length, 'Bitte Geräte für den Zeitplan auswählen.');
+    } else if (p.target.scope !== 'all') check(identifier(p.target.id), 'Ziel-ID fehlt.');
     check(ACTIONS.includes(p.action?.type), 'Aktion wird nicht unterstützt.');
     if (p.action.type === 'brightness') check(percent(p.action.value), 'Helligkeit muss 0–100 sein.');
     if (p.action.type === 'scenario') check(typeof p.action.value === 'string' && p.action.value.trim().length > 0 && p.action.value.length <= 100, 'Szenarioname fehlt.');
@@ -60,7 +64,7 @@ function windowValue(plan, local) {
 }
 function matches(target, device) {
     return (target.kind === '*' || target.kind === device.kind) && (
-        target.scope === 'all' || (target.scope === 'device' && target.id === device.id) ||
+        target.scope === 'all' || (target.scope === 'devices' && target.ids.includes(device.id)) || (target.scope === 'device' && target.id === device.id) ||
         (target.scope === 'room' && target.id === device.room) || (target.scope === 'group' && device.groups.includes(target.id)));
 }
 function supports(device, action) {
@@ -172,18 +176,26 @@ class Scheduler {
         // Static watchdog survives remove-all-dynamic and supplies restart reconciliation.
         return [{ topic: 'remove-all-dynamic' }, ...(options.length ? [{ payload: { command: 'add', ...options[0] } }, ...options.slice(1).map(option => ({ payload: { command: 'add', ...option } }))] : []), { topic: 'list-all' }];
     }
+    acknowledge(p, now) {
+        const pending = this.live.pending[p.requestId];
+        if (pending && pending.targetId === p.targetId) {
+            this.live.feedback[p.targetId] = { at: now, ok: p.ok === true, text: String(p.text || '').slice(0, 240), requestId: p.requestId };
+            const last = this.live.planCommands[pending.scheduleId];
+            if (last?.requestId === p.requestId) last.ok = p.ok === true;
+            delete this.live.pending[p.requestId];
+        }
+    }
     handle(message, now = Date.now()) {
         const p = message.payload || {};
+        const discovered = discoveredRows(message.topic, p);
+        if (discovered !== null) {
+            if (discovered.length) this.state.discovered = mergeDiscovered(this.state.discovered || [], discovered);
+            return {commands:[], cron:[], status:this.status(now)};
+        }
         let commands = [], rebuild = false, notice = '';
         if (message.topic === 'scheduler/register') this.register(p, now);
         else if (message.topic === 'scheduler/ack') {
-            const pending = this.live.pending[p.requestId];
-            if (pending && pending.targetId === p.targetId) {
-                this.live.feedback[p.targetId] = { at: now, ok: p.ok === true, text: String(p.text || '').slice(0, 240), requestId: p.requestId };
-                const last = this.live.planCommands[pending.scheduleId];
-                if (last?.requestId === p.requestId) last.ok = p.ok === true;
-                delete this.live.pending[p.requestId];
-            }
+            this.acknowledge(p, now);
         } else if (message.topic === 'scheduler/cron-error') {
             notice = `Zeitgeberfehler: ${message.error?.message || p.message || 'unbekannt'}`;
             this.live.errors = [notice];
@@ -198,6 +210,13 @@ class Scheduler {
             if (p.command !== 'List' && p.command !== 'PauseTarget' && p.command !== 'ResumeTarget') check(p.revision === this.state.revision, 'Zeitpläne wurden inzwischen geändert. Liste laden und erneut bearbeiten.');
             switch (p.command) {
                 case 'List': break;
+                case 'AddDevice':
+                    check(p.device?.switchId && p.id === p.device.id, 'Ungültiger Geräteeintrag.');
+                    check(!this.state.targets.some(t => t.id === p.id), 'Gerät bereits hinzugefügt.');
+                    this.register(p.device, now);
+                    this.state.revision++;
+                    notice = 'Gerät hinzugefügt.';
+                    break;
                 case 'Save': {
                     const plan = validatePlan(p.plan);
                     const index = this.state.plans.findIndex(item => item.id === plan.id);
@@ -299,7 +318,7 @@ class Scheduler {
         if (!health && plan.type==='window' && targets.every(t=>this.windows(t,now)[0]?.plan.id!==plan.id)) health=result('idle','Durch höher priorisierten Zeitplan übersteuert.');
         if (!health && !next) health=result('error','Kein zukünftiger Trigger vom Zeitgeber gemeldet.');
         if (!health) health=result('running','Zeitplan bereit.');
-        return {health,next, matchedTargets:targets.length,
+        return {health,next, matchedTargets:targets.length, matchedTargetIds:targets.map(t=>t.id),
             lastCommand:clone(this.live.planCommands[plan.id] || null),
             currentAction:plan.type==='window' ? {type:'brightness',value:windowValue(plan,localTime(now,this.state.timeZone)).value} : clone(plan.action),
             cycleText:plan.type==='window' ? 'Prüfung alle 15 s; Versand bei Änderung' : plan.type==='interval' ? `Befehl alle ${plan.intervalMinutes} min` : 'Befehl zum geplanten Termin'};
@@ -308,7 +327,7 @@ class Scheduler {
         return { revision: this.state.revision, enabled: this.state.enabled, timeZone: this.state.timeZone,
             plans: this.state.plans.map(p => ({...clone(p), ...this.planStatus(p,now)})), targets: this.state.targets.map(t => ({ ...clone(t), online: this.online(t.id, now), pausedUntil: this.state.pauses[t.id] || 0, feedback: this.live.feedback[t.id] || null,
                 effective: this.windows(t, now)[0] ? { plan: this.windows(t, now)[0].plan.name, value: this.windows(t, now)[0].value } : null })),
-            now, notice, health: this.health(now), errors: clone(this.live.errors), cronStatus: clone(this.live.cronStatus) };
+            now, notice, discovered:this.state.discovered || [], health: this.health(now), errors: clone(this.live.errors), cronStatus: clone(this.live.cronStatus) };
     }
 }
 module.exports = { Scheduler, initialState, validatePlan, localTime, windowValue, matches, supports };

@@ -1,0 +1,10 @@
+[Unit]
+Description=GeorgsHome Scheduler-Setup in Google Drive sichern
+After=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/georg-scheduler-backup
+StateDirectory=georg-scheduler-backup
+StateDirectoryMode=0755
+UMask=0077
+PrivateTmp=true

@@ -173,3 +173,26 @@ test('Befehle tragen Raum-ID des registrierten Empfängers; fehlendes ACK wird r
  assert.equal(engine.command(engine.state.plans[0],target,{type:'off'},now).payload.roomId,'kitchen');
  engine.reconcile(now+15001);assert.equal(engine.status(now+15001).health.state,'error');
 });
+
+test('Explizite Gerätezuordnung erreicht nur ausgewählte kompatible Empfänger und erscheint in der Übersicht',()=>{
+ const {engine,now}=setup();
+ for(const id of ['zweites','drittes']) engine.register({...target,id},now);
+ const p={...engine.state.plans[0],target:{scope:'devices',kind:'*',ids:[target.id,'zweites']}};
+ save(engine,p,now);
+ const status=engine.status(now).plans.find(plan=>plan.id===p.id);
+ assert.deepEqual(status.matchedTargetIds,[target.id,'zweites']);
+ assert.equal(engine.windows(engine.state.targets.find(t=>t.id==='drittes'),now).length,0);
+ for(const ids of [[],['zweites','zweites'],['__proto__']])assert.throws(()=>validatePlan({...p,target:{...p.target,ids}}));
+});
+
+test('Geräteerkennung erscheint automatisch, behält Zuordnungen und löst keine Schaltung aus',()=>{
+ const engine=new Scheduler();
+ function discover(topic,payload){const out=engine.handle({topic,payload});assert.deepEqual(out.commands,[]);return out.status.discovered;}
+ discover('phidgets/discovery',{inventory:{devices:[{key:'7|1',name:'Modul',serial:'7',port:1}]}});
+ discover('homematic-ip/state',{rows:[{id:'7|1',name:'Thermostat',rooms:'Bad'}]});
+ discover('system/network/overview',{system:{devices:[{name:'Pi',ip:'192.168.0.20'}]}});
+ const rows=discover('homematic-ip/state',{rows:[{id:'7|1',name:'Thermostat Bad'}]});
+ assert.equal(rows.length,3);assert(rows.some(d=>d.name==='Thermostat Bad'));
+ assert.deepEqual(new Scheduler(engine.state).status(Date.now()).discovered,rows);
+ assert.deepEqual(engine.state.targets,[]);assert.equal(engine.state.revision,0);
+});

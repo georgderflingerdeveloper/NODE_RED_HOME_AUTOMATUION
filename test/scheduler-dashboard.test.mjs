@@ -45,3 +45,46 @@ test('Countdown läuft ohne Senden und bewahrt Entwurf; veralteter Status wird r
  assert.equal(scope.countdown(plan),'Umschalten in 00:00:10');advance(1000);tick();assert.equal(scope.countdown(plan),'Umschalten in 00:00:09');assert.equal(sent.length,count);assert.equal(scope.draft.name,'Bleibt');
  advance(60000);tick();assert.equal(scope.planHealth(plan).state,'error');assert.equal(scope.countdown(plan),'—');
 });
+
+test('Mobile Uhrzeit- und Datumswahl speichern Wiener Termine und behalten Zeitregeln beim Bearbeiten',()=>{
+ const {scope,sent}=ui();scope.newPlan();assert.equal(scope.draft.type,'weekly');
+ scope.fields.start=new Date('1970-01-01T08:45:00Z');scope.syncField('start');assert.equal(scope.draft.start,'08:45');
+ scope.fields.validFrom=new Date('2027-01-02T00:00:00Z');scope.syncField('validFrom');assert.equal(scope.draft.validFrom,'2027-01-02');
+ scope.draft.type='once';scope.fields.at=new Date('2027-07-05T21:00:00Z');scope.syncField('at');scope.savePlan();
+ assert.equal(sent.at(-1).payload.plan.at,'2027-07-05T19:00:00.000Z');
+ scope.editPlan(scope.draft);assert.equal(scope.fields.at.toISOString(),'2027-07-05T21:00:00.000Z');
+ for(const stamp of ['2027-03-28T02:30:00Z','2027-10-31T02:30:00Z']){
+  scope.fields.at=new Date(stamp);scope.syncField('at');assert.ok(scope.timeError);assert.equal(scope.draft.at,'');
+ }
+});
+
+test('Geräteübersicht aktualisiert Zuordnungen und ergänzt einen vorhandenen Plan ohne andere Geräte zu entfernen',()=>{
+ const {scope,sent,update}=ui();
+ const device=id=>({id,name:id,online:true,kind:'light',actions:['on','off'],scenarios:[]});
+ const a=device('a'),b=device('b');
+ scope.newPlan(a);scope.savePlan(true);
+ const plan={...sent.at(-1).payload.plan,matchedTargetIds:['a']};
+ assert.ok(plan.name);assert.equal(plan.enabled,true);
+ update({revision:3,targets:[a,b],plans:[plan]});
+ assert.equal(scope.devices[0].plans.length,1);assert.equal(scope.devices[1].available.length,1);
+ scope.addDevice(plan,b);scope.savePlan();
+ assert.deepEqual(sent.at(-1).payload.plan.target.ids,['a','b']);
+ assert.equal(sent.at(-1).payload.revision,3);assert.equal(plan.target.ids.length,1);
+});
+
+test('Assistent hält Entwurf bis zur Bestätigung und wartet auf die passende Speicherantwort',()=>{
+ const {scope,sent,update}=ui();
+ const device={id:'dose',name:'Steckdose',actions:['on','off'],scenarios:[]};
+ update({revision:4,targets:[device],plans:[]});
+ scope.beginGuide(device);scope.guideCreate();
+ scope.guideStep('time');scope.guideStep('activate');scope.reviewOrSave(false);
+ scope.guideBack();assert.equal(scope.guide.step,'activate');
+ scope.reviewOrSave(false);
+ assert.equal(sent.length,1);
+ scope.guideSave();scope.guideSave();
+ assert.equal(sent.length,2);
+ const req=sent.at(-1).payload;
+ assert.deepEqual(req.plan.target.ids,['dose']);assert.equal(req.plan.enabled,false);
+ update({ack:{id:req.plan.id,token:'fremd',revision:5}});assert.equal(scope.guide.pending,true);
+ update({ack:{id:req.plan.id,token:req.token,revision:5}});assert.equal(scope.guide,null);
+});

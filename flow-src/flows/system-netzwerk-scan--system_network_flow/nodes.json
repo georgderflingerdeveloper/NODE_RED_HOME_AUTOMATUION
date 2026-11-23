@@ -198,7 +198,8 @@
     "name": "Online-Geräteliste an SYSTEM-Dashboard",
     "mode": "link",
     "links": [
-      "system_dashboard_data_in"
+      "system_dashboard_data_in",
+      "scheduler_inventory_in"
     ],
     "x": 1095,
     "y": 220,

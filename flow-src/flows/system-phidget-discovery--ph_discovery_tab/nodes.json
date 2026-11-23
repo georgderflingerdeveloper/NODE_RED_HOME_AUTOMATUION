@@ -39,7 +39,8 @@
     "name": "Inventar → Systemdashboard",
     "mode": "link",
     "links": [
-      "ph_discovery_result_in"
+      "ph_discovery_result_in",
+      "scheduler_inventory_in"
     ],
     "x": 720,
     "y": 160,

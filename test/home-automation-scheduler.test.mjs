@@ -6,9 +6,9 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const register=require('../nodes/home-automation-scheduler.js');
-function runtime(dir) {
+function runtime(dir, graph = []) {
     let Ctor;const handlers={},sent=[];
-    register({settings:{userDir:dir},nodes:{registerType(_,ctor){Ctor=ctor;},createNode(node){Object.assign(node,{id:'test',on:(name,cb)=>handlers[name]=cb,status(){},error(){},warn(){},send:msg=>sent.push(msg)});}}});
+    register({settings:{userDir:dir},nodes:{eachNode:cb=>graph.forEach(cb),getNode:id=>graph.find(n=>n.id===id),registerType(_,ctor){Ctor=ctor;},createNode(node){Object.assign(node,{id:'test',on:(name,cb)=>handlers[name]=cb,status(){},error(){},warn(){},send:msg=>sent.push(msg)});}}});
     new Ctor({});return {input:msg=>handlers.input(msg,msg=>sent.push(msg),()=>{}),sent,close:()=>handlers.close()};
 }
 test('Speicherfehler verhindert Befehle und rollt die Änderung zurück',()=>{
@@ -44,4 +44,29 @@ test('Speicherfehler bleibt rot bis erfolgreicher Wiederholung; kein Überschrei
   fs.unlinkSync(blocked);node.input({topic:'scheduler/manage',payload:{command:'List'}});
   assert.equal(node.sent.at(-1)[2].payload.health.state,'idle');node.close();
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('Schalter zur Laufzeit finden, aufnehmen, wiederherstellen und über den vorhandenen Ausgang schalten',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'scheduler-discover-'));
+ const delivered=[];
+ const graph=[{id:'socket1',z:'room',type:'ui_switch',passthru:true,onvalueType:'bool',offvalueType:'bool',
+   onvalue:'true',offvalue:'false',label:'Teststeckdose',topic:'switch',wires:[['wire1']],receive:m=>delivered.push(m)}];
+ const manage=(node,command,args={})=>{node.input({topic:'scheduler/manage',payload:{command,...args}});return node.sent.at(-1)[2].payload;};
+ try {
+  let node=runtime(dir,graph);
+  assert.equal(manage(node,'List').availableDevices.length,0);
+  graph.push({id:'wire1',type:'mqtt out'});
+  const id=manage(node,'List').availableDevices[0].id;
+  const added=manage(node,'AddDevice',{id,revision:0,token:'add'});
+  assert.equal(added.targets[0].id,id);assert.equal(added.availableDevices.length,0);assert.deepEqual(delivered,[]);
+  node.close();node=runtime(dir,graph);
+  assert.equal(manage(node,'List').targets[0].online,true);
+  const now=Date.now();
+  manage(node,'Save',{revision:1,plan:{id:'pulse',name:'Test',type:'interval',intervalMinutes:1,enabled:true,priority:10,target:{scope:'device',kind:'switch',id},action:{type:'on'}}});
+  node.input({payload:{triggerTimestamp:now,config:{name:'schedule-pulse'}}});
+  return new Promise((resolve,reject)=>setTimeout(()=>{
+    try{assert.deepEqual(delivered,[{topic:'switch',payload:true}]);graph.pop();assert.equal(manage(node,'List').targets[0].online,false);resolve();}
+    catch(e){reject(e);}finally{node.close();fs.rmSync(dir,{recursive:true,force:true});}
+  },120));
+ }catch(e){fs.rmSync(dir,{recursive:true,force:true});throw e;}
 });

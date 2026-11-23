@@ -27,7 +27,8 @@
         "hmip_ui",
         "hmip_trends_ui",
         "hmip_reboot_check",
-        "hmip_device_snapshot"
+        "hmip_device_snapshot",
+        "hmip_scheduler_inventory"
       ]
     ],
     "historyDays": 365
@@ -221,6 +222,19 @@
     "links": [],
     "x": 685,
     "y": 420,
+    "wires": []
+  },
+  {
+    "id": "hmip_scheduler_inventory",
+    "type": "link out",
+    "z": "hmip_flow",
+    "name": "Gerätebestand → Zeitsteuerung",
+    "mode": "link",
+    "links": [
+      "scheduler_inventory_in"
+    ],
+    "x": 850,
+    "y": 520,
     "wires": []
   }
 ]

@@ -294,5 +294,23 @@
         "scheduler_engine"
       ]
     ]
+  },
+  {
+    "id": "scheduler_inventory_in",
+    "type": "link in",
+    "z": "schedulers_flow",
+    "name": "Geräteerkennung → Zeitsteuerung",
+    "links": [
+      "ph_discovery_result_out",
+      "system_dashboard_data_out",
+      "hmip_scheduler_inventory"
+    ],
+    "x": 220,
+    "y": 360,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
   }
 ]
