@@ -131,5 +131,5 @@ test("Kosten-Dashboard zeigt den provider-neutralen Prognosevertrag", () => {
   assert.match(template, /energy\/forecast\/read/);
   assert.match(template, /energy\/forecast\/result/);
   assert.deepEqual(templateNode.wires, [["kosten_dashboard_request_router"]]);
-  assert.deepEqual(router.wires, [["kosten_history_query_out"], ["kosten_forecast_query_out"]]);
+  assert.deepEqual(router.wires, [["kosten_history_query_out"], ["kosten_forecast_query_out"], ["kosten_tarif_auswahl"]]);
 });

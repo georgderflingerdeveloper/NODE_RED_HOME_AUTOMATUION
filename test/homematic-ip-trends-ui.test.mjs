@@ -7,7 +7,7 @@ function ui(){const sent=[],timers=new Map();let receive,cleanup,timerId=0;const
  const flush=()=>{const fns=[...timers.values()];timers.clear();fns.forEach(fn=>fn());};return {scope,sent,receive,html,flush,destroy:()=>cleanup()};
 }
 function catalog(u,list=[actual,target,humidity]){const request=u.sent.filter(m=>m.topic.endsWith('/catalog')).at(-1);u.receive({topic:'homematic-ip/history/catalog/result',payload:{requestId:request.payload.requestId,series:list,retentionDays:365,intervalMs:M}});}
-function result(u){const request=u.sent.filter(m=>m.topic.endsWith('/query')).at(-1);const series=[actual,target].filter(s=>request.payload.seriesIds.includes(s.id)).map((s,i)=>({...s,points:[{at:start,value:20+i},{at:start+M,value:22+i},{at:start+2*M,value:null,breakBefore:true},{at:start+3*M,value:25+i,breakBefore:true}],stats:{count:3,min:20+i,max:25+i,average:22+i}}));u.receive({topic:'homematic-ip/history/query/result',payload:{requestId:request.payload.requestId,from:start,to:start+H,series,bucketMs:1000,retentionDays:365,intervalMs:M}});}
+function result(u){const request=u.sent.filter(m=>m.topic.endsWith('/query')).at(-1);const series=[actual,target].filter(s=>request.payload.seriesIds.includes(s.id)).map((s,i)=>({...s,canInterpolate:s.id===actual.id,points:[{at:start,value:20+i},{at:start+M,value:22+i},{at:start+2*M,value:null,breakBefore:true},{at:start+3*M,value:25+i,breakBefore:true}],stats:{count:3,min:20+i,max:25+i,average:22+i}}));u.receive({topic:'homematic-ip/history/query/result',payload:{requestId:request.payload.requestId,from:start,to:start+H,series,bucketMs:1000,retentionDays:365,intervalMs:M}});}
 test('Homematic-Trends: dynamischer Katalog, Soll/Ist-Vorauswahl und kompatible Trendwahl',()=>{
  const u=ui();assert.equal(u.sent[0].topic,'homematic-ip/history/catalog');catalog(u);assert.deepEqual(Array.from(u.scope.selectedIds()),['actual','target']);assert.equal(u.scope.devices.length,1);result(u);assert.equal(u.scope.graph.temperature,true);assert.equal(u.scope.graph.lines.length,2);assert.equal(u.scope.graph.lines[1].dash,'8 4');assert.match(u.scope.graph.lines[0].stroke,/url\(#hmip-heat-/);
  u.scope.selected.humidity=true;u.scope.selectTrend(humidity);assert.equal(u.scope.selected.humidity,false);assert.match(u.scope.error,/gleicher Einheit/);
@@ -17,7 +17,7 @@ test('Homematic-Trends: Cursor zeigt Originalmessung, Lücken und Temperaturfarb
  const u=ui();catalog(u);result(u);const event=t=>({clientX:75+905*(t-start)/H,currentTarget:{getBoundingClientRect:()=>({left:0,width:1000})}});
  u.scope.hover(event(start+M));assert.equal(u.scope.plotted[0].cursorValue,22);assert.equal(u.scope.plotted[0].cursorAt,start+M);
  assert.ok(u.scope.graph.lines[0].width>u.scope.graph.lines[1].width);assert.ok(u.scope.cursor.tipStyle.left);
- u.scope.hover(event(start+2*M));assert.equal(u.scope.plotted[0].cursorValue,null);
+ u.scope.hover(event(start+2*M));assert.equal(u.scope.plotted[0].cursorValue,23.5);assert.equal(u.scope.plotted[0].cursorEstimated,true);assert.equal(u.scope.plotted[1].cursorValue,null);assert.ok(u.scope.graph.lines[0].estimatePath);assert.equal(u.scope.graph.lines[1].estimatePath,'');
  assert.equal(u.scope.temperatureColor(-5),u.scope.temperatureColor(0));assert.equal(u.scope.temperatureColor(35),u.scope.temperatureColor(50));assert.notEqual(u.scope.temperatureColor(0),u.scope.temperatureColor(35));
  assert.equal(u.scope.valueText(actual,0,null),'0,00 °C');assert.equal(u.scope.valueText({...actual,kind:'binary'},0,null),'Nein / Aus');assert.equal(u.scope.valueText({...actual,kind:'state',states:['CLOSED']},0,'CLOSED'),'Geschlossen');
  assert.ok((u.scope.graph.lines[0].path.match(/M /g)||[]).length>=3);
@@ -48,4 +48,17 @@ test('Zoom hält die Mitte und Live-Abfragen lassen das untersuchte Fenster steh
  u.scope.zoom(.5);
  assert.equal(u.scope.graph.start,start);
  assert.equal(u.scope.graph.end,start+H);
+});
+
+test('Interpolationsgrenze bei acht Stunden, keine Verlängerung über die letzte Messung',()=>{
+ const u=ui();catalog(u);
+ const request=u.sent.at(-1);
+ function plot(distance){
+  u.receive({topic:'homematic-ip/history/query/result',payload:{requestId:request.payload.requestId,from:start,to:start+10*H,
+   series:[{...actual,canInterpolate:true,points:[{at:start,value:0},{at:start+distance,value:8,breakBefore:true}]}],
+   bucketMs:1000,intervalMs:M}});
+ }
+ plot(8*H);assert.ok(u.scope.graph.hasEstimates);
+ plot(8*H+1);assert.equal(u.scope.graph.hasEstimates,false);
+ plot(H);assert.equal(u.scope.plotted[0].estimates[0].right.at,start+H);
 });

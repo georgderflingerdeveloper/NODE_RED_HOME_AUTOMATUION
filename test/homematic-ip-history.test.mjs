@@ -45,3 +45,14 @@ test('Raummittel je Abfragezeit aus Istwerten aller Geräte des Raums',()=>setup
  assert.equal(result.roomMeans.length,1);
  assert.deepEqual(result.roomMeans[0].points.map(p=>p.value),[22,24,null]);
 }));
+
+test('Randmessungen für Interpolation zählen nicht zur Fensterstatistik',()=>setup(h=>{
+ for(const [minutes,value] of [[0,18],[60,24]]) {
+  h.record([row([{name:'1.actualTemperature',value},{name:'1.setPointTemperature',value:22}])],start+minutes*M);
+ }
+ const {series,roomMeans}=h.query({seriesIds:h.catalog().series.filter(s=>s.unit==='°C').map(s=>s.id),from:start+15*M,to:start+45*M});
+ for(const s of [series.find(s=>s.point.endsWith('actualTemperature')),roomMeans[0]]){
+  assert.equal(s.before.value,18);assert.equal(s.after.value,24);assert.equal(s.stats.count,0);assert.equal(s.points.length,0);
+ }
+ assert.equal(series.find(s=>s.point.endsWith('setPointTemperature')).canInterpolate,false);
+}));

@@ -3,7 +3,7 @@
     "id": "kosten_tarif_zeitplan",
     "type": "inject",
     "z": "kosten_flow",
-    "name": "aWATTar Tarif alle 5 Minuten abrufen",
+    "name": "Stromtarif aktualisieren",
     "props": [
       {
         "p": "payload"
@@ -13,18 +13,18 @@
         "vt": "str"
       }
     ],
-    "repeat": "300",
-    "crontab": "",
+    "repeat": "",
+    "crontab": "*/5 * * * *",
     "once": true,
     "onceDelay": "2",
-    "topic": "aWATTar/tariff/request",
+    "topic": "tariff/tick",
     "payload": "",
     "payloadType": "date",
     "x": 150,
     "y": 60,
     "wires": [
       [
-        "kosten_awattar_api"
+        "kosten_tarif_auswahl"
       ]
     ]
   },
@@ -70,10 +70,7 @@
     "y": 120,
     "wires": [
       [
-        "kosten_tarif_debug",
-        "kosten_dashboard_template",
-        "kosten_history_out",
-        "kosten_forecast_provider_out"
+        "kosten_tarif_auswahl"
       ]
     ]
   },
@@ -229,7 +226,7 @@
     "func": {
       "$flowSource": "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js"
     },
-    "outputs": 2,
+    "outputs": 3,
     "timeout": 0,
     "noerr": 0,
     "initialize": "",
@@ -243,6 +240,9 @@
       ],
       [
         "kosten_forecast_query_out"
+      ],
+      [
+        "kosten_tarif_auswahl"
       ]
     ]
   },
@@ -323,7 +323,7 @@
     "y": 420,
     "wires": [
       [
-        "kosten_forecast_provider_out"
+        "kosten_tarif_auswahl"
       ]
     ]
   },
@@ -349,6 +349,27 @@
     "wires": [
       [
         "kosten_dashboard_request_router"
+      ]
+    ]
+  },
+  {
+    "id": "kosten_tarif_auswahl",
+    "type": "home-automation-tariff",
+    "z": "kosten_flow",
+    "name": "Vertragstarif und Onlinepreis",
+    "x": 475,
+    "y": 70,
+    "wires": [
+      [
+        "kosten_dashboard_template",
+        "kosten_history_out",
+        "kosten_forecast_provider_out"
+      ],
+      [
+        "kosten_dashboard_template"
+      ],
+      [
+        "kosten_awattar_api"
       ]
     ]
   }

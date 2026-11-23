@@ -250,7 +250,7 @@
   <p>{{billDifference()}}</p>
   <p ng-repeat="warning in billComparison.warnings track by $index">{{warning}}</p>
   <p>{{billComparison.error}}</p>
-  <p>Rechnungsbetrag enthält möglicherweise Netzgebühren, Steuern und Zuschläge; kein direkter Vergleich mit dem Börsenpreis.</p>
+  <p>Rechnungsbetrag enthält möglicherweise Netzgebühren, Steuern und Zuschläge; kein direkter Vergleich mit den berechneten Energiekosten.</p>
  </div>
 </div>
 <script>
@@ -463,6 +463,21 @@
     scope.rangeResult=null;scope.priceChartOpen=false;scope.rangeError='';scope.rangePending=true;
     scope.send({topic:'history/dashboard',payload:{action:'range',requestId:++rangeSequence,from:from,to:to}});
   };
+  scope.resetTariff = function() {
+    const s = scope.tariffState.selected;
+    scope.tariffDraft = {mode:s.mode, work:s.work, base:s.base, revision:s.id};
+  };
+  scope.useOnlineTariff = function() {
+    Object.assign(scope.tariffDraft, scope.tariffState.offer);
+  };
+  scope.confirmTariff = function() {
+    const d = scope.tariffDraft;
+    if (window.confirm('Tarifwahl speichern? ' + (d.mode === 'loyal' ? 'Energie AG Ökostrom Loyal' : 'aWATTar') +
+        '. Hinterlegte Loyal-Preise: ' + d.work + ' ct/kWh und ' + d.base + ' €/Monat brutto.')) {
+      scope.send({topic:'tariff/confirm',payload:Object.assign({}, d, {confirmed:true})});
+    }
+  };
+  scope.send({topic:'tariff/read',payload:{}});
   scope.$watch("msg", function(msg) {
     if (!msg || !msg.payload) return;
     if (msg.topic === 'history/bill/result') {
@@ -481,10 +496,16 @@
     if (msg.payload === "connect" || (msg.payload === "change" && msg.name === "KOSTEN")) {
       scope.send({ topic: "history/dashboard", payload: { period: scope.view.period } });
       requestEnergyForecast();
+      scope.send({topic:"tariff/read",payload:{}});
       scheduleCostLayoutRefresh();
       return;
     }
-    if (msg.topic === "aWATTar/tariff/current") {
+    if (msg.topic === "tariff/state") {
+      scope.tariffState = msg.payload;
+      if (!scope.tariffDraft || scope.tariffDraft.revision !== msg.payload.selected.id) scope.resetTariff();
+      return;
+    }
+    if (msg.topic === "energy/tariff/current") {
       scope.view.tariff = msg.payload;
     }
     if (msg.topic === "history/dashboard/result") {
@@ -526,11 +547,30 @@
     </div>
   </div>
 
+  <details ng-if="tariffState">
+    <summary>Stromtarif wählen · Ökostrom Loyal / aWATTar</summary>
+    <p>Gespeichert: {{tariffState.selected.mode === 'loyal' ? 'Energie AG Ökostrom Loyal' : 'aWATTar'}} ab
+      {{tariffState.selected.effective | date:'dd.MM.yyyy HH:mm':'+0100'}} MEZ.
+      Loyal: {{tariffState.selected.work | number:2}} ct/kWh und {{tariffState.selected.base | number:2}} €/Monat brutto.</p>
+    <p>Online-Abgleich: {{tariffState.checkedAt ? (tariffState.checkedAt | date:'short') : 'läuft …'}}
+      <span ng-if="tariffState.offer"> · {{tariffState.offer.work | number:2}} ct/kWh · {{tariffState.offer.base | number:2}} €/Monat brutto</span>
+      {{tariffState.error}}</p>
+    <button ng-click="send({topic:'tariff/refresh',payload:{}})">Online prüfen</button>
+    <button ng-if="tariffState.offer" ng-click="useOnlineTariff()">Onlinepreise in Entwurf übernehmen</button>
+    <form ng-submit="confirmTariff()">
+      <label>Tarif <select ng-model="tariffDraft.mode"><option value="loyal">Energie AG Ökostrom Loyal</option><option value="market">aWATTar</option></select></label>
+      <label>Loyal-Arbeitspreis brutto (ct/kWh) <input type="number" min="0" max="1000" step="any" required ng-model="tariffDraft.work"></label>
+      <label>Loyal-Grundpreis brutto (€/Monat) <input type="number" min="0" max="1000" step="any" required ng-model="tariffDraft.base"></label>
+      <button type="submit">Änderung bestätigen …</button>
+    </form>
+    <p>Änderungen gelten ab der nächsten vollen Stunde, frühestens ab 04.12.2026. Der Grundpreis wird separat ausgewiesen.</p>
+    <p role="status">{{tariffState.message}}</p>
+  </details>
   <div class="cost-head">
     <div class="cost-kpi">
-      <div class="cost-kpi-label">Aktueller aWATTar-Preis</div>
-      <div class="cost-kpi-value">{{(view.history.live.priceCtPerKWh || view.tariff.priceCtPerKWh) | number:2}} ct/kWh</div>
-      <div class="cost-kpi-note">reiner Börsenpreis, ohne Gebühren</div>
+      <div class="cost-kpi-label">Aktueller Preis · {{view.tariff.provider || view.history.live.provider}}</div>
+      <div class="cost-kpi-value">{{(view.tariff ? view.tariff.priceCtPerKWh : view.history.live.priceCtPerKWh) | number:2}} ct/kWh</div>
+      <div class="cost-kpi-note">{{view.tariff.tariffType || view.history.live.tariffType}}</div>
     </div>
     <div class="cost-kpi cost-house-power" ng-style="housePowerStyle(view.history.live.houseConsumptionWatt)">
       <div class="cost-kpi-label">Hausleistung jetzt</div>
@@ -555,8 +595,8 @@
 
   <div class="cost-info">
     <b>Berechnung:</b> Der Verbrauchswert bewertet die gesamte gemessene Hausenergie mit dem gültigen
-    aWATTar-Stundenpreis. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen
-    nur Energie aus dem Stromnetz. Netzentgelte, Steuern, Abgaben und individuelle Aufschläge sind nicht enthalten.
+    Arbeitspreis des aktiven Tarifs. Die tatsächlichen Netzbezugskosten werden zusätzlich separat ausgewiesen und berücksichtigen
+    nur Energie aus dem Stromnetz. Ökostrom Loyal enthält die Umsatzsteuer auf Energie. Grundpreis, Netzentgelte und weitere Abgaben sind in den Verbrauchskosten ausgenommen.
     Offline-Zeiten werden sichtbar markiert und nicht als Nullverbrauch bewertet.
   </div>
 
@@ -645,7 +685,7 @@
       Einspeisung {{view.history.latestReconciliation.fallbackExportKWh | number:3}} kWh ·
       PV {{view.history.latestReconciliation.fallbackPvProductionKWh | number:3}} kWh ·
       Hausverbrauch {{view.history.latestReconciliation.fallbackHouseConsumptionKWh | number:3}} kWh.
-      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:2}} ct/kWh Börsenpreis;
+      Vergleich mit {{view.history.latestReconciliation.averageTariffCtPerKWh | number:2}} ct/kWh Energiepreis;
       keine Netzentgelte und keine vertragliche Einspeisevergütung.
     </div>
     <div class="cost-anchor-grid" ng-if="view.history.latestReconciliation.quality === 'partial-day'">

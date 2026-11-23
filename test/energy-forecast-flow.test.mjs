@@ -31,5 +31,5 @@ test("Tariff provider failures are normalized before entering the forecast flow"
 
   assert.equal(payloadRule.tot, "json");
   assert.deepEqual(JSON.parse(payloadRule.to), { provider: "aWATTar", online: false, slots: [] });
-  assert.deepEqual(failure.wires, [["kosten_forecast_provider_out"]]);
+  assert.deepEqual(failure.wires, [["kosten_tarif_auswahl"]]);
 });

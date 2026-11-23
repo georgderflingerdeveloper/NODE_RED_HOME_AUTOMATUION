@@ -85,6 +85,18 @@ module.exports = function registerHistoryStore(RED) {
     const database = new DatabaseSync(databasePath);
     database.exec(fs.readFileSync(path.join(__dirname, "home-automation-history.schema.sql"), "utf8"));
 
+    // Vertragliche Fixpreise haben keinen Börsenkurs. Alte Archive behalten alle Tarifzeilen.
+    if (database.prepare("PRAGMA table_info(tariff_slots)").all().some(c => c.name === "market_price_eur_mwh" && c.notnull)) {
+      database.exec(`BEGIN IMMEDIATE;
+        ALTER TABLE tariff_slots RENAME TO tariff_slots_old;
+        CREATE TABLE tariff_slots(valid_from TEXT PRIMARY KEY, valid_until TEXT NOT NULL,
+          provider TEXT NOT NULL, market_price_eur_mwh REAL, price_ct_kwh REAL NOT NULL,
+          fetched_at TEXT NOT NULL, raw_json TEXT NOT NULL);
+        INSERT INTO tariff_slots SELECT * FROM tariff_slots_old;
+        DROP TABLE tariff_slots_old;
+        CREATE INDEX tariff_slots_valid_until_idx ON tariff_slots(valid_until);
+        COMMIT;`);
+    }
     activeDatabasePath = databasePath;
     const insertPowerSample = database.prepare(`INSERT OR IGNORE INTO solar_power_samples
       (observed_at,received_at,online,pv_power_w,house_consumption_w,grid_import_w,grid_export_w,raw_json)
@@ -763,6 +775,8 @@ module.exports = function registerHistoryStore(RED) {
           exportComparisonValueEur: reconciliations.reduce((sum, row) => sum + finite(row.exportComparisonValueEur), 0),
         },
         live: {
+          provider: tariff?.payload?.provider,
+          tariffType: tariff?.payload?.tariffType,
           priceCtPerKWh,
           gridImportWatt,
           houseConsumptionWatt,
@@ -971,21 +985,35 @@ module.exports = function registerHistoryStore(RED) {
           JSON.stringify(payload)
         );
 
-        if (msg.topic === "aWATTar/tariff/current" && payload?.validFrom && payload?.validUntil) {
-          const slots = Array.isArray(payload.slots) && payload.slots.length ? payload.slots : [payload];
-          for (const slot of slots) {
-            if (!slot?.validFrom || !slot?.validUntil || !Number.isFinite(Number(slot.priceCtPerKWh))) continue;
-            insertTariff.run(
-              slot.validFrom,
-              slot.validUntil,
-              payload.provider || "aWATTar",
-              slot.marketPriceEurPerMWh,
-              slot.priceCtPerKWh,
-              payload.fetchedAt || receivedAt,
-              JSON.stringify(slot)
-            );
+        if (msg.topic === "energy/tariff/current" || (msg.topic === "aWATTar/tariff/current" && payload?.validFrom && payload?.validUntil)) {
+          database.exec("SAVEPOINT tariff_update");
+          try {
+            if (msg.topic === "energy/tariff/current") {
+              database.prepare("DELETE FROM tariff_slots WHERE provider='Energie AG' AND valid_from>=?").run(hourStartIso(payload.fetchedAt));
+            }
+            const slots = Array.isArray(payload.slots) && payload.slots.length ? payload.slots : [payload];
+            for (const slot of slots) {
+              if (!slot?.validFrom || !slot?.validUntil || !Number.isFinite(Number(slot.priceCtPerKWh))) continue;
+              if (slot.provider === "Energie AG") {
+                database.prepare("DELETE FROM tariff_slots WHERE valid_from>=? AND valid_from<? AND provider='aWATTar'")
+                  .run(slot.validFrom, slot.validUntil);
+              }
+              insertTariff.run(
+                slot.validFrom,
+                slot.validUntil,
+                slot.provider || payload.provider || "aWATTar",
+                slot.marketPriceEurPerMWh ?? null,
+                slot.priceCtPerKWh,
+                payload.fetchedAt || receivedAt,
+                JSON.stringify(slot)
+              );
+            }
+            storeSource("tariff", payload, asIso(payload.fetchedAt || payload.validFrom), payload.online !== false);
+            database.exec("RELEASE tariff_update");
+          } catch (e) {
+            database.exec("ROLLBACK TO tariff_update; RELEASE tariff_update");
+            throw e;
           }
-          storeSource("tariff", payload, asIso(payload.fetchedAt || payload.validFrom), true);
         }
 
         msg.history = { action: "stored", eventId: Number(result.lastInsertRowid), databasePath };

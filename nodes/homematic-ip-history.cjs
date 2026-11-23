@@ -87,7 +87,16 @@ function createHistory(file,{intervalMs:cadence=60000,retentionDays=365,now=Date
    ) SELECT observed_at,value,text_value,quality,has_gap FROM ranked WHERE first_rank=1 OR last_rank=1 OR min_rank=1 OR max_rank=1 OR gap_rank=1 ORDER BY observed_at`);
    const points=sql.all(...args,...Array.from({length:6},()=>[from,bucketMs]).flat(),intervalMs*2.5,from,bucketMs).map(p=>({at:p.observed_at,value:p.value,text:p.text_value,quality:p.quality,breakBefore:!!p.has_gap}));
    const stats=db.prepare('SELECT count(value) count,min(value) min,max(value) max,avg(value) average FROM ('+source+')').get(...args);
-   return {...s,points,stats};
+   const canInterpolate=s.roomMean===true || (s.kind==='temperature' && !/setPointTemperature$/.test(s.point)) ||
+    /(?:^|\.)(humidity|vaporAmount|power|illumination|voltage)$/.test(s.point);
+   function neighbor(start,end,order){
+    return db.prepare('SELECT observed_at AS at,value FROM ('+source+') WHERE value IS NOT NULL ORDER BY observed_at '+order+' LIMIT 1')
+     .get(...args.slice(0,-2),start,end) || null;
+   }
+   const margin=8*3600000;
+   return {...s,points,stats,canInterpolate,
+    before:canInterpolate?neighbor(from-margin,from,'DESC'):null,
+    after:canInterpolate?neighbor(to,to+margin+1,'ASC'):null};
   }
   const series=selected.map(s=>readSeries(s,'SELECT observed_at,value,text_value,quality FROM samples WHERE series_id=? AND observed_at>=? AND observed_at<?',[s.id,from,to]));
   const roomsOf=s=>s.rooms.split(', ').filter(Boolean);

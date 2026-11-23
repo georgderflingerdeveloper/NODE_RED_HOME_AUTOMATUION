@@ -7,6 +7,9 @@ const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const nodeRedUserDirectory = process.env.NODE_RED_USER_DIR || join(homedir(), ".node-red");
 const targetDirectory = join(nodeRedUserDirectory, "nodes");
 const files = [
+  "home-automation-tariff.js",
+  "home-automation-tariff.html",
+  "loyal-tariff.cjs",
   "home-automation-homematic-ip.js",
   "home-automation-homematic-ip.html",
   "homematic-ip-core.cjs",

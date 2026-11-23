@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS tariff_slots (
   valid_from TEXT PRIMARY KEY,
   valid_until TEXT NOT NULL,
   provider TEXT NOT NULL,
-  market_price_eur_mwh REAL NOT NULL,
+  market_price_eur_mwh REAL,
   price_ct_kwh REAL NOT NULL,
   fetched_at TEXT NOT NULL,
   raw_json TEXT NOT NULL

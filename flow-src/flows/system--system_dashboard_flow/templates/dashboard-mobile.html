@@ -103,7 +103,7 @@ html.gh-mobile #nr-dashboard .nr-dashboard-cardcontainer > md-card {
   flex:none; min-height:48px !important;
 }
 html.gh-mobile #nr-dashboard .nr-dashboard-cardcontainer > md-card.nr-dashboard-template {
-  overflow-x:auto; display:block; overflow-wrap:anywhere;
+  overflow-x:clip; display:block; overflow-wrap:anywhere;
 }
 html.gh-mobile #nr-dashboard .nr-dashboard-template > :is(div,section,article),
 html.gh-mobile #nr-dashboard md-card.vault-dashboard-widget .vault {
@@ -116,5 +116,19 @@ html.gh-mobile #nr-dashboard .nr-dashboard-template :is(button,select,summary),
 html.gh-mobile #nr-dashboard .nr-dashboard-button button { min-height:44px; }
 html.gh-mobile #nr-dashboard .nr-dashboard-template :is(.lc-grid,.lc-form-row,.host-grid,.host-process-grid,.sh-cards,.vault-form,.cost-forecast-grid) {
   grid-template-columns:minmax(0,1fr);
+}
+
+/* Keep cards anchored to the phone viewport while the page scrolls vertically. */
+html.gh-mobile #nr-dashboard .masonry-container {
+  touch-action:pan-y pinch-zoom; overflow-x:clip;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-template table {
+  min-width:0; width:100%; max-width:100%; table-layout:fixed;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-template :is(td,th) {
+  min-width:0; white-space:normal; overflow-wrap:anywhere;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-template :is(.ht-scroll,.cost-chart-scroll,.se-graph-scroll) svg {
+  min-width:0; width:100%;
 }
 </style>
