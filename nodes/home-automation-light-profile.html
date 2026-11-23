@@ -1,0 +1,4 @@
+<script type="text/javascript">
+RED.nodes.registerType('home-automation-light-profile',{category:'function',color:'#99c7b3',defaults:{name:{value:''},adapter:{value:'controller'}},inputs:1,outputs:5,icon:'light.svg',label:function(){return this.name||'Lichtprofil';},outputLabels:['Gerätebefehl','Raum-Dashboard','Profil-Dialog','Einstellungen','PWM-Kanäle (0–1)']});
+</script>
+<script type="text/html" data-template-name="home-automation-light-profile"><label for="node-input-name">Name</label><input id="node-input-name"><label for="node-input-adapter">Adapter</label><select id="node-input-adapter"><option value="controller">LightController</option><option value="room">Raum-PLC</option></select></script>

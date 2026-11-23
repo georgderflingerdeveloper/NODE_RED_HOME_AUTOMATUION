@@ -1,0 +1,99 @@
+<style>
+.gz-light {
+  --gz-accent: #90d4c1;
+  box-sizing: border-box;
+  padding: 8px 10px 12px;
+  width: 100%;
+  color: inherit;
+  font: inherit;
+}
+.gz-light .gz-power {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(100, 114, 118, .18);
+}
+.gz-light .gz-power button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gz-light .gz-power button[aria-pressed=true] {
+  background: var(--gz-accent);
+  color: #132d26;
+}
+.gz-light :is(button,input,select):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.gz-light .gz-field { display: block; margin: 16px 0 0; }
+.gz-light .gz-label { display: flex; align-items: baseline; justify-content: space-between; font-weight: 600; }
+.gz-light .gz-number { font-variant-numeric: tabular-nums; font-weight: 500; }
+.gz-light input[type=range] {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 0;
+  height: 44px;
+  accent-color: var(--gz-accent);
+  cursor: pointer;
+}
+.gz-light .gz-scene { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; margin: 0; }
+.gz-light select {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.gz-light option { color: #161e1c; background: #fff; }
+</style>
+<div class="gz-light" ng-if="!msg.payload.scenarios" role="status">{{msg.payload.error || 'Verbindung zu PICENTER2 wird geprüft …'}}</div>
+<div class="gz-light" ng-if="msg.payload.scenarios">
+  <div class="gz-power" role="group" aria-label="Raumlicht">
+    <button type="button" ng-attr-aria-pressed="{{msg.payload.on}}" ng-click="send({topic:'georgszimmer/set',payload:{type:'on'}})">
+      <i class="fa fa-lightbulb-o" aria-hidden="true"></i> Ein
+    </button>
+    <button type="button" ng-attr-aria-pressed="{{!msg.payload.on}}" ng-click="send({topic:'georgszimmer/set',payload:{type:'off'}})">
+      <i class="fa fa-power-off" aria-hidden="true"></i> Aus
+    </button>
+  </div>
+  <label class="gz-field">
+    <span class="gz-label">Helligkeit <span class="gz-number">{{controls.level}} %</span></span>
+    <input aria-label="Helligkeit in Prozent" type="range" min="0" max="100" step="1"
+      ng-model="controls.level" ng-model-options="{updateOn:'change'}"
+      ng-change="send({topic:'georgszimmer/set',payload:{type:'brightness',value:controls.level}})">
+  </label>
+  <label class="gz-scene"><span class="gz-label">Lichtszene</span>
+    <select aria-label="Manuell oder Lichtszene" ng-model="controls.scene" ng-options="s for s in msg.payload.scenarios"
+      ng-change="send({topic:'georgszimmer/set',payload:{type:'scenario',value:controls.scene}})"></select>
+  </label>
+</div>
+<script>
+(function(scope) {
+    scope.controls = {};
+    scope.$watch('msg.payload', function(p) {
+        if (p && p.scenarios) {
+            scope.controls.level = p.brightness;
+            scope.controls.scene = p.scenario;
+        }
+    });
+})(scope);
+</script>

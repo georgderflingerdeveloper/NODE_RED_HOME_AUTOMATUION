@@ -165,5 +165,252 @@
         "c2a31090.8735d"
       ]
     ]
+  },
+  {
+    "id": "georg_room_commands",
+    "type": "link in",
+    "z": "c28cf7ba.34de98",
+    "name": "Scheduler → Raumlicht",
+    "x": 120,
+    "y": 350,
+    "wires": [
+      [
+        "kid_profile"
+      ]
+    ],
+    "links": [
+      "scheduler_kinderzimmer_out"
+    ]
+  },
+  {
+    "id": "georg_room_register",
+    "type": "link out",
+    "z": "c28cf7ba.34de98",
+    "name": "Raumlicht → Scheduler",
+    "x": 1060,
+    "y": 440,
+    "wires": [],
+    "links": [
+      "scheduler_kinderzimmer_in"
+    ],
+    "mode": "link"
+  },
+  {
+    "id": "georg_room_poll",
+    "type": "inject",
+    "z": "c28cf7ba.34de98",
+    "name": "Raumzustand lesen",
+    "x": 150,
+    "y": 410,
+    "wires": [
+      [
+        "kid_profile"
+      ]
+    ],
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "topic": "georgszimmer/read",
+    "repeat": "15",
+    "once": true,
+    "onceDelay": 1
+  },
+  {
+    "id": "georg_room_request",
+    "type": "function",
+    "z": "c28cf7ba.34de98",
+    "name": "Lichtbefehl an PICENTER2",
+    "x": 390,
+    "y": 390,
+    "wires": [
+      [
+        "georg_room_http"
+      ]
+    ],
+    "outputs": 1,
+    "func": {
+      "$flowSource": "flows/flow-kidroom--c28cf7ba.34de98/functions/lichtbefehl-an-picenter2.js"
+    }
+  },
+  {
+    "id": "georg_room_http",
+    "type": "http request",
+    "z": "c28cf7ba.34de98",
+    "name": "PICENTER2 · Raumlicht",
+    "x": 610,
+    "y": 390,
+    "wires": [
+      [
+        "georg_room_feedback"
+      ]
+    ],
+    "method": "use",
+    "ret": "obj",
+    "url": "http://192.168.0.150:1880/georgszimmer/light",
+    "senderr": true,
+    "persist": false
+  },
+  {
+    "id": "georg_room_error",
+    "type": "catch",
+    "z": "c28cf7ba.34de98",
+    "name": "Verbindungsfehler",
+    "x": 620,
+    "y": 450,
+    "wires": [
+      [
+        "georg_room_feedback"
+      ]
+    ],
+    "scope": [
+      "georg_room_http"
+    ],
+    "uncaught": false
+  },
+  {
+    "id": "georg_room_feedback",
+    "type": "function",
+    "z": "c28cf7ba.34de98",
+    "name": "PLC-Status und Scheduler-Bestätigung",
+    "x": 830,
+    "y": 390,
+    "wires": [
+      [
+        "kid_profile"
+      ],
+      [
+        "georg_room_register"
+      ]
+    ],
+    "outputs": 2,
+    "func": {
+      "$flowSource": "flows/flow-kidroom--c28cf7ba.34de98/functions/plc-status-und-scheduler-bestatigung.js"
+    }
+  },
+  {
+    "id": "georg_room_ui",
+    "type": "ui_template",
+    "z": "c28cf7ba.34de98",
+    "name": "Georgszimmer · Licht und Szenen",
+    "x": 360,
+    "y": 500,
+    "wires": [
+      [
+        "kid_profile"
+      ]
+    ],
+    "group": "georg_room_group",
+    "order": 1,
+    "width": 6,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/flow-kidroom--c28cf7ba.34de98/templates/georgszimmer-licht-und-szenen.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local"
+  },
+  {
+    "id": "kid_profile",
+    "type": "home-automation-light-profile",
+    "z": "c28cf7ba.34de98",
+    "name": "Lichtprofil · Kinderzimmer",
+    "adapter": "room",
+    "x": 600,
+    "y": 620,
+    "wires": [
+      [
+        "georg_room_request"
+      ],
+      [
+        "georg_room_ui"
+      ],
+      [
+        "kid_profile_ui"
+      ],
+      [
+        "kid_profile_save"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "kid_profile_save",
+    "type": "link out",
+    "z": "c28cf7ba.34de98",
+    "name": "Profil speichern",
+    "mode": "link",
+    "links": [
+      "profiles_config_in"
+    ],
+    "x": 860,
+    "y": 640,
+    "wires": []
+  },
+  {
+    "id": "kid_profile_settings",
+    "type": "link in",
+    "z": "c28cf7ba.34de98",
+    "name": "Profile laden",
+    "links": [
+      "profiles_config_out"
+    ],
+    "x": 280,
+    "y": 640,
+    "wires": [
+      [
+        "kid_profile"
+      ]
+    ]
+  },
+  {
+    "id": "kid_profile_ui",
+    "type": "ui_template",
+    "z": "c28cf7ba.34de98",
+    "name": "Lichtprofil und Rampe",
+    "x": 895,
+    "y": 600,
+    "wires": [
+      [
+        "kid_profile"
+      ]
+    ],
+    "group": "georg_room_group",
+    "order": 8,
+    "width": 6,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/flow-kidroom--c28cf7ba.34de98/templates/lichtprofil-und-rampe.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local"
+  },
+  {
+    "id": "georg_room_output_ui",
+    "type": "ui_template",
+    "z": "c28cf7ba.34de98",
+    "name": "Georgszimmer · Aktive Lichter",
+    "x": 365,
+    "y": 550,
+    "wires": [
+      []
+    ],
+    "group": "9f9a8a62.d54b98",
+    "order": 1,
+    "width": 6,
+    "height": 1,
+    "format": {
+      "$flowSource": "flows/flow-kidroom--c28cf7ba.34de98/templates/georgszimmer-aktive-lichter.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local"
   }
 ]

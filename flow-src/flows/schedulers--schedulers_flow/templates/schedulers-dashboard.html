@@ -125,6 +125,10 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
    <label>Aktion<select ng-model="draft.action.type" ng-options="a as actionNames[a] for a in guideDevice().actions" ng-change="guideActionChanged()"></select></label>
    <label ng-if="draft.action.type==='brightness'">Helligkeit (%)<input type="number" min="0" max="100" ng-model="draft.action.value"></label>
    <label ng-if="draft.action.type==='scenario'">Szenario<select ng-model="draft.action.value" ng-options="s for s in guideDevice().scenarios"></select></label>
+   <details ng-if="(draft.action.type==='on' || draft.action.type==='off') && profileOptions().length"><summary>Lichtprofil (optional)</summary>
+   <label>Profil<select ng-model="draft.action.profile" ng-options="name for name in profileOptions()"><option value="">Aktuelles Profil</option></select></label>
+   <label class="sc-toggle"><input type="checkbox" ng-model="draft.action.ramp" ng-true-value="false" ng-false-value="true"> Für diesen Befehl sofort schalten</label>
+  </details>
    <button class="sc-primary" ng-disabled="incompatible() || (draft.action.type==='brightness' && draft.action.value==null)" ng-click="guideStep('time')">Weiter zur Uhrzeit</button>
   </div>
   <div ng-if="guide.step==='time'">
@@ -176,6 +180,10 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
    <label ng-if="draft.action.type === 'brightness'">Helligkeit (%)<input type="number" min="0" max="100" ng-model="draft.action.value"></label>
    <label ng-if="draft.action.type === 'scenario'">Szenarioname<input ng-model="draft.action.value" placeholder="Exakter gespeicherter Name"></label>
   </div>
+  <details ng-if="(draft.action.type==='on' || draft.action.type==='off') && profileOptions().length"><summary>Lichtprofil (optional)</summary>
+   <label>Profil<select ng-model="draft.action.profile" ng-options="name for name in profileOptions()"><option value="">Aktuelles Profil</option></select></label>
+   <label class="sc-toggle"><input type="checkbox" ng-model="draft.action.ramp" ng-true-value="false" ng-false-value="true"> Für diesen Befehl sofort schalten</label>
+  </details>
   <details><summary>Weitere Einstellungen</summary><div class="sc-row" ng-if="existing"><label class="sc-toggle"><input type="checkbox" ng-model="draft.enabled"> Zeitplan aktiv</label></div>   <label>Aktion<select ng-model="draft.action.type"><option value="brightness">Gesamthelligkeit</option><option value="on" ng-if="draft.type !== 'window'">Alle Lichter / Gerät einschalten</option><option value="off" ng-if="draft.type !== 'window'">Ausschalten</option><option value="scenario" ng-if="draft.type !== 'window'">Szenario auswählen</option></select></label><label>Name<input ng-model="draft.name" maxlength="100"></label>   <label>Zeitregel<select ng-model="draft.type" ng-change="typeChanged()"><option value="window">Helligkeitsfenster (Nacht/Tag)</option><option value="weekly">Wochentage / Uhrzeit</option><option value="once">Einmaltermin</option><option value="interval">Intervall</option><option value="solar">Sonnenauf-/untergang</option></select></label>  <div class="sc-row">
    <label>Zielbereich<select ng-model="draft.target.scope" ng-change="targetScopeChanged()"><option value="devices">Geräteauswahl</option><option value="device" ng-if="draft.target.scope==='device'">Einzelgerät</option><option value="room">Raum</option><option value="group">Raumgruppe</option><option value="all">Alle Räume</option></select></label>
    <label ng-if="draft.target.scope === 'room' || draft.target.scope === 'group'">Ziel<select ng-model="draft.target.id" ng-options="item.id as item.name for item in targetOptions()"></select></label>
@@ -371,10 +379,15 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
   scope.typeChanged = function() { if(scope.draft.type==='window')scope.draft.action={type:'brightness',value:30}; };
   scope.targetScopeChanged = function() { const t=scope.draft.target;scope.draft.target=t.scope==='devices'?{scope:'devices',kind:'*',ids:[]}:{scope:t.scope,kind:t.kind,id:''}; };
   scope.selectedDevice=function(id){const t=scope.draft.target;return t.scope==='device'?t.id===id:t.ids?.includes(id);};
+  scope.profileOptions=function(){
+    if(!scope.draft || !['device','devices'].includes(scope.draft.target.scope))return [];
+    const ds=scope.status.targets.filter(d=>scope.selectedDevice(d.id));
+    return ds.length?(ds[0].scenarios||[]).filter(n=>ds.every(d=>d.scenarios.includes(n))):[];
+  };
   scope.incompatible=function(){
     if(!scope.draft || !['device','devices'].includes(scope.draft.target.scope))return '';
     const a=scope.draft.action;
-    return scope.status.targets.filter(d=>scope.selectedDevice(d.id) && (!d.actions.includes(a.type)||(a.type==='scenario'&&!d.scenarios.includes(a.value)))).map(d=>d.name).join(', ');
+    return scope.status.targets.filter(d=>scope.selectedDevice(d.id) && (!d.actions.includes(a.type)||(['on','off'].includes(a.type)&&a.profile&&!d.scenarios.includes(a.profile))||(a.type==='scenario'&&!d.scenarios.includes(a.value)))).map(d=>d.name).join(', ');
   };
   scope.toggleDevice=function(id){
     const t=scope.draft.target;

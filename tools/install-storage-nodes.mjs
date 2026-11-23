@@ -7,6 +7,11 @@ const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const nodeRedUserDirectory = process.env.NODE_RED_USER_DIR || join(homedir(), ".node-red");
 const targetDirectory = join(nodeRedUserDirectory, "nodes");
 const files = [
+  "home-automation-light-profile.js",
+  "home-automation-light-profile.html",
+  "light-output-browser.mjs",
+  "light-output-http.cjs",
+  "light-profile-curve.cjs",
   "home-automation-tariff.js",
   "home-automation-tariff.html",
   "loyal-tariff.cjs",

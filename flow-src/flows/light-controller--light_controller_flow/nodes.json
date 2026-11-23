@@ -18,7 +18,7 @@
     "wires": [
       [
         "lightcontroller_led_status",
-        "lightcontroller_kitchen_dashboard",
+        "kitchen_profile",
         "scheduler_kitchen_status"
       ]
     ]
@@ -61,7 +61,7 @@
     "y": 160,
     "wires": [
       [
-        "lightcontrollerkitchen"
+        "kitchen_profile"
       ]
     ]
   },
@@ -105,7 +105,7 @@
     "y": 280,
     "wires": [
       [
-        "lightcontrollerkitchen"
+        "kitchen_profile"
       ]
     ]
   },
@@ -130,7 +130,7 @@
     "y": 100,
     "wires": [
       [
-        "lightcontrollerkitchen"
+        "kitchen_profile"
       ]
     ]
   },
@@ -155,7 +155,7 @@
     "y": 160,
     "wires": [
       [
-        "lightcontrollerkitchen"
+        "kitchen_profile"
       ]
     ]
   },
@@ -193,7 +193,7 @@
     "y": 660,
     "wires": [
       [
-        "lightcontrollerkitchen"
+        "kitchen_profile"
       ],
       [
         "scheduler_kitchen_feedback"
@@ -260,7 +260,85 @@
     "y": 580,
     "wires": [
       [
+        "kitchen_profile"
+      ]
+    ]
+  },
+  {
+    "id": "kitchen_profile",
+    "type": "home-automation-light-profile",
+    "z": "light_controller_flow",
+    "name": "Lichtprofil · Küche",
+    "adapter": "controller",
+    "x": 600,
+    "y": 620,
+    "wires": [
+      [
         "lightcontrollerkitchen"
+      ],
+      [
+        "lightcontroller_kitchen_dashboard"
+      ],
+      [
+        "kitchen_profile_ui"
+      ],
+      [
+        "kitchen_profile_save"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "kitchen_profile_save",
+    "type": "link out",
+    "z": "light_controller_flow",
+    "name": "Profil speichern",
+    "mode": "link",
+    "links": [
+      "profiles_config_in"
+    ],
+    "x": 860,
+    "y": 640,
+    "wires": []
+  },
+  {
+    "id": "kitchen_profile_settings",
+    "type": "link in",
+    "z": "light_controller_flow",
+    "name": "Profile laden",
+    "links": [
+      "profiles_config_out"
+    ],
+    "x": 280,
+    "y": 640,
+    "wires": [
+      [
+        "kitchen_profile"
+      ]
+    ]
+  },
+  {
+    "id": "kitchen_profile_ui",
+    "type": "ui_template",
+    "z": "light_controller_flow",
+    "group": "3dbc8c98.083aa4",
+    "name": "Lichtprofil und Rampe",
+    "order": 8,
+    "width": 6,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/light-controller--light_controller_flow/templates/lichtprofil-und-rampe.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 895,
+    "y": 600,
+    "wires": [
+      [
+        "kitchen_profile"
       ]
     ]
   }

@@ -33,6 +33,8 @@ function validatePlan(input) {
         check(Array.isArray(ids) && ids.length > 0 && ids.every(identifier) && new Set(ids).size === ids.length, 'Bitte Geräte für den Zeitplan auswählen.');
     } else if (p.target.scope !== 'all') check(identifier(p.target.id), 'Ziel-ID fehlt.');
     check(ACTIONS.includes(p.action?.type), 'Aktion wird nicht unterstützt.');
+    if (p.action.profile!=null)check(typeof p.action.profile==='string' && p.action.profile.trim().length>0 && p.action.profile.length<=100, 'Ungültiger Profilname.');
+    if (p.action.ramp!=null)check(typeof p.action.ramp==='boolean','Ungültige Rampenoption.');
     if (p.action.type === 'brightness') check(percent(p.action.value), 'Helligkeit muss 0–100 sein.');
     if (p.action.type === 'scenario') check(typeof p.action.value === 'string' && p.action.value.trim().length > 0 && p.action.value.length <= 100, 'Szenarioname fehlt.');
     check(['window', 'weekly', 'once', 'interval', 'solar'].includes(p.type), 'Unbekannte Zeitregel.');
@@ -68,7 +70,7 @@ function matches(target, device) {
         (target.scope === 'room' && target.id === device.room) || (target.scope === 'group' && device.groups.includes(target.id)));
 }
 function supports(device, action) {
-    return device.actions.includes(action.type) && (action.type !== 'scenario' || device.scenarios.includes(action.value));
+    return device.actions.includes(action.type) && (!['on','off'].includes(action.type) || !action.profile || device.scenarios.includes(action.profile)) && (action.type !== 'scenario' || device.scenarios.includes(action.value));
 }
 function initialState() {
     return { schemaVersion: VERSION, revision: 0, enabled: true, timeZone: 'Europe/Vienna', targets: [], pauses: {}, fired: {}, sequence: 0,
@@ -210,6 +212,28 @@ class Scheduler {
             if (p.command !== 'List' && p.command !== 'PauseTarget' && p.command !== 'ResumeTarget') check(p.revision === this.state.revision, 'Zeitpläne wurden inzwischen geändert. Liste laden und erneut bearbeiten.');
             switch (p.command) {
                 case 'List': break;
+                case 'SetRampProfile': {
+                    const profile=p.profile;
+                    check(identifier(p.room) && typeof profile?.name==='string' && profile.name.trim() && profile.name.length<=100, 'Ungültiges Profil.');
+                    check(typeof profile.enabled==='boolean' && [profile.onSeconds,profile.offSeconds].every(s=>Number.isFinite(s) && s>=0 && s<=3600), 'Rampenzeit muss zwischen 0 und 3600 Sekunden liegen.');
+                    const rooms=this.state.rampProfiles ||= {};
+                    const entries=(rooms[p.room]?.entries || []).slice();
+                    const levels=profile.levels ?? rooms[p.room]?.entries.find(e=>e.name===profile.name)?.levels;
+                    if(levels!==undefined)check(Array.isArray(levels) && levels.length>0 && levels.length<=16 && levels.every(percent), 'Ungültige Kanalhelligkeit.');
+                    const pulseSeconds=profile.pulseSeconds ?? rooms[p.room]?.entries.find(e=>e.name===profile.name)?.pulseSeconds;
+                    if(pulseSeconds!==undefined)check(Number.isFinite(pulseSeconds) && pulseSeconds>=2 && pulseSeconds<=60,'Pulsdauer muss zwischen 2 und 60 Sekunden liegen.');
+                    const entry={...(pulseSeconds!==undefined?{pulseSeconds}:{}),name:profile.name,enabled:profile.enabled,onSeconds:profile.onSeconds,offSeconds:profile.offSeconds,...(levels?{levels}: {})};
+                    const index=entries.findIndex(e=>e.name===profile.name);
+                    const selected=p.keepSelection ? rooms[p.room]?.selected || '' : profile.name;
+                    if(index<0 || JSON.stringify(entries[index])!==JSON.stringify(entry) || selected!==rooms[p.room]?.selected){
+                        if(index<0)entries.push(entry);
+                        else entries[index]=entry;
+                        rooms[p.room]={selected,entries};
+                        this.state.revision++;
+                    }
+                    notice='Lichtprofil gespeichert.';
+                    break;
+                }
                 case 'AddDevice':
                     check(p.device?.switchId && p.id === p.device.id, 'Ungültiger Geräteeintrag.');
                     check(!this.state.targets.some(t => t.id === p.id), 'Gerät bereits hinzugefügt.');
@@ -327,7 +351,7 @@ class Scheduler {
         return { revision: this.state.revision, enabled: this.state.enabled, timeZone: this.state.timeZone,
             plans: this.state.plans.map(p => ({...clone(p), ...this.planStatus(p,now)})), targets: this.state.targets.map(t => ({ ...clone(t), online: this.online(t.id, now), pausedUntil: this.state.pauses[t.id] || 0, feedback: this.live.feedback[t.id] || null,
                 effective: this.windows(t, now)[0] ? { plan: this.windows(t, now)[0].plan.name, value: this.windows(t, now)[0].value } : null })),
-            now, notice, discovered:this.state.discovered || [], health: this.health(now), errors: clone(this.live.errors), cronStatus: clone(this.live.cronStatus) };
+            now, notice, rampProfiles:clone(this.state.rampProfiles || {}), discovered:this.state.discovered || [], health: this.health(now), errors: clone(this.live.errors), cronStatus: clone(this.live.cronStatus) };
     }
 }
 module.exports = { Scheduler, initialState, validatePlan, localTime, windowValue, matches, supports };

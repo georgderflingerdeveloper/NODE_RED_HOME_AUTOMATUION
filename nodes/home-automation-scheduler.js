@@ -80,6 +80,7 @@ module.exports = function(RED) {
                 engine.state = JSON.parse(previousState); engine.live = JSON.parse(previousLive);
                 const status = engine.status(Date.now(), error.message);
                 status.failedToken = msg?.payload?.token;
+                if(msg?.payload?.command==='SetRampProfile')status.profileErrorRoom=msg.payload.room;
                 // Eingabefehler sind Warnungen; fehlgeschlagene Speicherung ist ein Fehler.
                 const failed = storageError || status.health.state === 'error';
                 status.health = {state:failed ? 'error' : 'warning',label:failed ? 'Fehler' : 'Warnung',color:failed ? 'red' : 'yellow',reasons:[error.message,...(failed ? status.health.reasons : [])]};

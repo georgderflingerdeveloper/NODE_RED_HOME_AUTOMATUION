@@ -18,6 +18,7 @@
   {
     "id": "cf228ba3.464208",
     "type": "ui_switch",
+    "className": "gz-room-lamp gz-channel-5",
     "z": "5841569b.a2c378",
     "name": "Light5",
     "label": "MANSARDE3",

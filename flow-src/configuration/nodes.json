@@ -2278,7 +2278,7 @@
     "type": "ui_group",
     "name": "LICHTER",
     "tab": "17e38b6a.856c95",
-    "order": 1,
+    "order": 2,
     "disp": true,
     "width": "6",
     "collapse": true
@@ -2288,7 +2288,7 @@
     "type": "ui_group",
     "name": "HEIZUNG",
     "tab": "17e38b6a.856c95",
-    "order": 2,
+    "order": 3,
     "disp": true,
     "width": "6",
     "collapse": true
@@ -2636,6 +2636,16 @@
     "width": "8",
     "collapse": false,
     "className": ""
+  },
+  {
+    "id": "georg_room_group",
+    "type": "ui_group",
+    "name": "Georgszimmer · Raumlicht",
+    "tab": "17e38b6a.856c95",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
   },
   {
     "id": "presence_flow",

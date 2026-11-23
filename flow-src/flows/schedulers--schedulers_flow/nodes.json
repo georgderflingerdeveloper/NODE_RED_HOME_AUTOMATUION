@@ -15,7 +15,8 @@
         "scheduler_cron"
       ],
       [
-        "scheduler_dashboard"
+        "scheduler_dashboard",
+        "profiles_config_out"
       ]
     ]
   },
@@ -226,7 +227,9 @@
     "z": "schedulers_flow",
     "name": "Kinderzimmer → Gerätebefehle (hier verbinden)",
     "mode": "link",
-    "links": [],
+    "links": [
+      "georg_room_commands"
+    ],
     "x": 1080,
     "y": 460,
     "wires": []
@@ -236,7 +239,9 @@
     "type": "link in",
     "z": "schedulers_flow",
     "name": "Kinderzimmer ← Registrierung / Bestätigung (hier verbinden)",
-    "links": [],
+    "links": [
+      "georg_room_register"
+    ],
     "x": 220,
     "y": 460,
     "wires": [
@@ -312,5 +317,36 @@
         "scheduler_engine"
       ]
     ]
+  },
+  {
+    "id": "profiles_config_in",
+    "type": "link in",
+    "z": "schedulers_flow",
+    "name": "Lichtprofile speichern",
+    "links": [
+      "kitchen_profile_save",
+      "kid_profile_save"
+    ],
+    "x": 300,
+    "y": 420,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "profiles_config_out",
+    "type": "link out",
+    "z": "schedulers_flow",
+    "name": "Gespeicherte Lichtprofile",
+    "mode": "link",
+    "links": [
+      "kitchen_profile_settings",
+      "kid_profile_settings"
+    ],
+    "x": 880,
+    "y": 400,
+    "wires": []
   }
 ]

@@ -32,14 +32,14 @@ export function kitchenNodes() {
     ];
 }
 
-// Freie Link-Enden für spätere Adapter. Keine Geräte werden vorab registriert.
+// Raumanschlüsse. Georgszimmer registriert sich nach einer Antwort von PICENTER2.
 export function preparedRoomNodes() {
     const rooms = [['kinderzimmer','Kinderzimmer'],['bad','Bad'],['wohnzimmer','Wohnzimmer']];
     return [
         {id:'scheduler_room_router',type:'switch',z:schedulerFlow,name:'Erweiterungen nach roomId',property:'payload.roomId',propertyType:'msg',rules:rooms.map(([id])=>({t:'eq',v:id,vt:'str'})),checkall:'true',repair:false,outputs:3,x:820,y:460,wires:rooms.map(([id])=>['scheduler_'+id+'_out'])},
         ...rooms.flatMap(([id,name],index)=>[
-            {id:'scheduler_'+id+'_out',type:'link out',z:schedulerFlow,name:name+' → Gerätebefehle (hier verbinden)',mode:'link',links:[],x:1080,y:460+index*60,wires:[]},
-            {id:'scheduler_'+id+'_in',type:'link in',z:schedulerFlow,name:name+' ← Registrierung / Bestätigung (hier verbinden)',links:[],x:220,y:460+index*60,wires:[['scheduler_engine']]}
+            {id:'scheduler_'+id+'_out',type:'link out',z:schedulerFlow,name:name+' → Gerätebefehle (hier verbinden)',mode:'link',links:id==='kinderzimmer'?['georg_room_commands']:[],x:1080,y:460+index*60,wires:[]},
+            {id:'scheduler_'+id+'_in',type:'link in',z:schedulerFlow,name:name+' ← Registrierung / Bestätigung (hier verbinden)',links:id==='kinderzimmer'?['georg_room_register']:[],x:220,y:460+index*60,wires:[['scheduler_engine']]}
         ])
     ];
 }

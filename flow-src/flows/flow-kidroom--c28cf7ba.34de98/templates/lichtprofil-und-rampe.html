@@ -1,0 +1,115 @@
+<style>
+.gz-profile{color:inherit;padding:6px;box-sizing:border-box}
+.gz-profile *{box-sizing:border-box}
+.gz-profile button,.gz-profile input,.gz-profile select{font:inherit;color:inherit}
+.gz-profile button{cursor:pointer;min-height:44px;padding:8px 14px;border-radius:10px;background:var(--gh-control,#414749);border:1px solid var(--gh-border,#666)}
+.gz-profile button:disabled{opacity:.5;cursor:default}
+.gz-profile .gz-open{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between}
+.gz-profile dialog{padding:0;color:var(--gh-text,#eee);background:var(--gh-card,#303030);width:min(470px,calc(100vw - 20px));max-height:90vh;max-height:90dvh;border:1px solid var(--gh-border,#666);border-radius:18px;box-shadow:0 18px 70px #0007;overflow:auto;overscroll-behavior:contain}
+.gz-profile dialog::backdrop{background:rgba(12,16,20,.65);backdrop-filter:blur(3px)}
+.gz-profile header,.gz-profile footer{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--gh-card,#303030);position:sticky;z-index:1}
+.gz-profile header{top:0;justify-content:space-between;border-bottom:1px solid var(--gh-border,#666)}
+.gz-profile h3{margin:0;font-size:1.18rem}.gz-profile footer{bottom:0;border-top:1px solid var(--gh-border,#666);flex-wrap:wrap}
+.gz-profile main{padding:14px 18px}.gz-profile label{display:block;margin:0 0 12px}
+.gz-profile select,.gz-profile input:not([type=checkbox]):not([type=range]){display:block;margin-top:5px;width:100%;min-height:44px;font-size:16px;border:1px solid var(--gh-border,#666);border-radius:8px;background:var(--gh-inset,#242424);padding:7px 10px}
+.gz-profile .gz-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gz-profile .gz-pages{margin:2px 0 14px}.gz-profile .gz-pages button[aria-pressed=true],.gz-profile .gz-primary{background:#9ed8c9;color:#152824;font-weight:650}
+.gz-profile .gz-toggle{display:flex;align-items:center;gap:8px;min-height:44px}.gz-profile input{accent-color:#84caba}
+.gz-profile .gz-toggle input{width:22px;height:22px}.gz-profile .gz-level{display:grid;grid-template-columns:6em minmax(0,1fr) 3.4em;align-items:center;gap:8px;min-height:44px;margin:0}
+.gz-profile input[type=range]{width:100%;margin:0;min-height:44px}.gz-profile output{text-align:right;font-variant-numeric:tabular-nums}
+.gz-profile footer small{flex:1}.gz-profile :focus-visible{outline:2px solid #9ed8c9;outline-offset:2px}
+</style>
+<div class="gz-profile">
+<button class="gz-open" type="button" aria-haspopup="dialog" ng-click="openEditor($event)">Lichtprofil konfigurieren <span aria-hidden="true">›</span></button>
+<dialog aria-label="Lichtprofil im Georgszimmer">
+<header><h3>Georgszimmer · Lichtprofil</h3><button type="button" aria-label="Schließen" ng-click="closeEditor()">✕</button></header>
+<main>
+<label>Profil<select ng-model="form.name" ng-options="s for s in info.scenes" ng-change="loadProfile()"></select></label>
+<div class="gz-pair gz-pages" role="group" aria-label="Einstellungen">
+<button ng-click="section='ramp'" ng-attr-aria-pressed="{{section==='ramp'}}">Rampe</button><button ng-click="section='scene'" ng-attr-aria-pressed="{{section==='scene'}}">Szene</button></div>
+<div ng-show="section==='ramp'">
+<label class="gz-toggle"><input type="checkbox" ng-model="form.enabled" ng-change="edited()">Rampenbetrieb</label>
+<label ng-if="form.enabled && info.routines[form.name]">{{form.name==='Gute Nacht'?'Zeit bis dunkel':form.name==='Morgenwecker'?'Pulsieren bis Dauerlicht':'Zeit bis volle Helligkeit'}} (Sekunden)<input type="number" min="0" max="3600" step="any" ng-model="form.onSeconds" ng-change="routineTime()"></label>
+<label ng-if="form.enabled && form.name==='Morgenwecker'">Dauer pro Lichtpuls (Sekunden)<input type="number" min="2" max="60" step="any" ng-model="form.pulseSeconds" ng-change="edited()"></label>
+<div class="gz-pair" ng-if="form.enabled && !info.routines[form.name]"><label>Einblenden (s)<input type="number" min="0" max="3600" step="any" ng-model="form.onSeconds" ng-change="edited()"></label><label>Ausblenden (s)<input type="number" min="0" max="3600" step="any" ng-model="form.offSeconds" ng-change="edited()"></label></div>
+<div class="gz-pair"><button ng-disabled="!form.name || dirty" ng-click="testPower('on')">{{info.routines[form.name]?'Starten':'Ein testen'}}</button><button ng-disabled="!form.name || dirty" ng-click="testPower('off')">{{info.routines[form.name]?'Sofort aus':'Aus testen'}}</button></div>
+</div>
+<div ng-show="section==='scene'">
+<label>Szenenname<input ng-model="scene.name" maxlength="100"></label>
+<label class="gz-level" ng-repeat="v in scene.levels track by $index"><span>{{lampNames[$index]}}</span><input type="range" min="0" max="100" ng-attr-aria-label="Helligkeit {{lampNames[$index]}}" ng-model="scene.levels[$index]"><output>{{scene.levels[$index]}} %</output></label>
+</div></main>
+<footer><small role="status">{{info.error || notice}}</small>
+<button class="gz-primary" ng-if="section==='ramp'" ng-disabled="!info.ready || !form.name || form.onSeconds==null || form.offSeconds==null || (form.enabled && form.name==='Morgenwecker' && form.pulseSeconds==null)" ng-click="save()">Profil speichern</button>
+<button class="gz-primary" ng-if="section==='scene'" ng-disabled="!scene.name.trim() || !info.ready" ng-click="saveScene()">Szene speichern</button></footer>
+</dialog></div>
+<script>
+(function(s){
+ let dialog;
+ const lampNames=['Decke','Rechts','Mansarde 1','Mansarde 2','Mansarde 3'];
+ s.lampNames=lampNames;
+ s.openEditor=function(event){
+   dialog=event.currentTarget.parentNode.querySelector('dialog');
+   s.section='ramp';s.notice='';
+   if(!dialog.open)dialog.showModal();
+ };
+ s.closeEditor=function(){dialog?.close();};
+ s.$on('$destroy',function(){if(dialog?.open)dialog.close();});
+ s.form={};s.info={};s.scene={levels:[]};
+ let pendingScene;
+ s.saveScene=function(){
+   const draft={name:s.scene.name.trim(),levels:s.scene.levels.map(Number)};
+   if(JSON.stringify(draft)===JSON.stringify(pendingScene))return;
+   pendingScene=draft;
+   s.send({topic:'profile/scene',payload:draft});
+   s.notice='Szene wird gespeichert …';
+ };
+ s.edited=function(){s.dirty=true;s.notice='Zum Testen zuerst speichern.';};
+ function loadRamp(){
+   const minutes=s.info.routines?.[s.form.name];
+   const p=s.info.profiles[s.form.name] || {enabled:!!minutes,onSeconds:minutes?minutes*60:2,offSeconds:minutes?(s.form.name==='Gute Nacht'?minutes*60:1):2};
+   Object.assign(s.form,{enabled:p.enabled,onSeconds:p.onSeconds,offSeconds:p.offSeconds,pulseSeconds:p.pulseSeconds ?? 4});
+ }
+ s.loadProfile=function(){
+   loadRamp();
+   s.scene={name:s.form.name,levels:(s.info.sceneLevels[s.form.name] || []).slice()};
+   s.dirty=false;s.pending=false;pendingScene=null;s.notice='';
+ };
+ s.$watch('msg',function(m){
+   if(m?.topic!=='profile/view')return;
+   const prev=s.info.profiles?.[s.form.name];
+   const previousLevels=s.info.sceneLevels?.[s.form.name];
+   const pristine=!pendingScene && s.scene.name===s.form.name && JSON.stringify(s.scene.levels)===JSON.stringify(previousLevels);
+   s.info=m.payload;
+   if(pristine && s.info.sceneLevels[s.form.name])s.scene.levels=s.info.sceneLevels[s.form.name].slice();
+   if(!s.form.name && s.info.scenes.length){
+     s.form.name=s.info.selected || s.info.active || s.info.scenes[0];s.loadProfile();
+   }
+   const p=s.info.profiles[s.form.name];
+   if(!s.dirty && !s.pending && JSON.stringify(prev)!==JSON.stringify(p))loadRamp();
+   if(s.pending && p && (s.form.name!=='Morgenwecker' || (p.pulseSeconds ?? 4)===(s.form.pulseSeconds ?? 4)) && ['enabled','onSeconds','offSeconds'].every(k=>s.form[k]===p[k])){
+     s.pending=false;s.dirty=false;s.notice='Profil gespeichert.';
+   }
+   if(pendingScene){
+     const {name,levels}=pendingScene;
+     if(s.info.error){pendingScene=null;s.notice='';}
+     else if([s.info.profiles[name]?.levels,s.info.sceneLevels[name]].every(values=>JSON.stringify(values)===JSON.stringify(levels))){
+       pendingScene=null;s.notice='Szene gespeichert.';
+     }
+   }
+ });
+ s.routineTime=function(){s.form.offSeconds=s.form.name==='Gute Nacht'?s.form.onSeconds:1;s.edited();};
+ s.save=function(){s.pending=true;const {name,enabled,onSeconds,offSeconds}=s.form;
+ const payload={name,enabled,onSeconds,offSeconds};
+ if(name==='Morgenwecker')payload.pulseSeconds=s.form.pulseSeconds ?? 4;
+ s.send({topic:'profile/save',payload});};
+ s.testPower=function(type){
+  const payload={type,profile:s.form.name};
+  if(type==='off' && s.info.routines?.[s.form.name])payload.ramp=false;
+  s.closeEditor();
+  document.querySelector('.gz-channel-1')?.focus();
+  document.querySelector('.gz-channel-1')?.scrollIntoView({block:'center'});
+  s.send({topic:'profile/test',payload});
+ };
+ s.send({topic:'profile/list'});
+})(scope);
+</script>

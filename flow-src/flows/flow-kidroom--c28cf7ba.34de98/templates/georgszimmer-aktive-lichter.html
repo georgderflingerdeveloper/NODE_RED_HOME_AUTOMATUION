@@ -1,0 +1,21 @@
+<style>
+.gz-room-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;height:100%;box-sizing:border-box;font-variant-numeric:tabular-nums}
+.gz-room-summary strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gz-room-summary small{flex-shrink:0}
+.gz-room-lamp .gz-reading{display:grid;text-align:right;line-height:1.2;margin-inline:auto 12px;font-variant-numeric:tabular-nums;pointer-events:none}
+.gz-room-lamp .gz-reading strong{font-size:14px}.gz-room-lamp .gz-reading small{font-size:12px}
+.gz-room-lamp[data-state="on"] .gz-reading strong{color:var(--gh-text,inherit)}
+.gz-room-lamp[data-state] .fa-lightbulb-o{
+  color:var(--gz-lamp-color);
+  background:radial-gradient(ellipse 20% 23% at 50% 35%,var(--gz-lamp-fill) 65%,transparent 100%);
+  text-shadow:0 0 var(--gz-lamp-glow) var(--gz-lamp-color)
+}
+</style>
+<gz-room-outputs class="gz-room-summary"><strong>Ausgänge werden geladen …</strong><small></small></gz-room-outputs>
+<script>
+(function(scope){
+    import('/home-automation/light-output.mjs').catch(()=>{
+        const label=document.querySelector('gz-room-outputs strong');
+        if(label)label.textContent='Ausgangsdaten fehlen';
+    });
+})(scope);
+</script>

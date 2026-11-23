@@ -118,8 +118,10 @@ test('Kitchen-Dashboard ist bidirektional mit dem echten LightController verbund
     assert.equal(dashboard.type, 'ui_template');
     assert.equal(dashboard.group, '3dbc8c98.083aa4');
     assert.equal(dashboard.fwdInMessages, false);
-    assert.ok(controller.wires[0].includes(dashboard.id));
-    assert.deepEqual(dashboard.wires, [[controller.id]]);
+    const profile = nodes.find(n=>n.id==='kitchen_profile');
+    assert.ok(controller.wires[0].includes(profile.id));
+    assert.deepEqual(dashboard.wires, [[profile.id]]);
+    assert.deepEqual(profile.wires.slice(0,2),[[controller.id],[dashboard.id]]);
 });
 
 test('Importierbares Beispiel enthält denselben ausführbaren Dashboard-Inhalt', () => {

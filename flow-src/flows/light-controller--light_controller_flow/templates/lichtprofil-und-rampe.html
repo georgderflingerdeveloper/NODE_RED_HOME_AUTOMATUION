@@ -1,0 +1,44 @@
+<style>
+.gh-profile{padding:8px;color:inherit}.gh-profile summary,.gh-profile button,.gh-profile select,.gh-profile input{min-height:44px}
+.gh-profile summary{cursor:pointer;font-weight:600}.gh-profile label{display:block;margin:8px 0}.gh-profile select,.gh-profile input[type=number]{width:100%;background:var(--gh-inset,#242424);color:inherit;padding:8px;border:1px solid var(--gh-border,#777);border-radius:8px;box-sizing:border-box}
+.gh-profile .pr-row{display:flex;gap:8px}.gh-profile .pr-row>*{flex:1;min-width:0}.gh-profile button{background:var(--gh-control,#444);color:inherit;border:0;border-radius:8px;padding:6px 12px}.gh-profile input[type=checkbox]{vertical-align:middle}
+.gh-profile dialog{background:var(--gh-card,#303030);color:inherit;width:min(460px,calc(100vw - 24px));box-sizing:border-box;max-height:90dvh;overflow:auto;border-radius:16px;border:1px solid var(--gh-border,#666);padding:18px}
+.gh-profile dialog::backdrop{background:#101418a8;backdrop-filter:blur(3px)}.gh-profile header{display:flex;align-items:center;justify-content:space-between}.gh-profile h3{margin:0}.gh-profile>button{width:100%;text-align:left}
+</style>
+<div class="gh-profile"><button type="button" aria-haspopup="dialog" ng-click="openRamp($event)">Lichtprofil und Rampenbetrieb</button>
+<dialog aria-label="Rampenbetrieb in der Küche"><header><h3>Küche · Lichtprofil</h3><button type="button" aria-label="Schließen" ng-click="closeRamp()">✕</button></header>
+<label>Profil<select ng-model="form.name" ng-options="s for s in info.scenes" ng-change="loadProfile()"></select></label>
+<label><input type="checkbox" ng-model="form.enabled" ng-change="edited()"> Rampenbetrieb</label>
+<div class="pr-row" ng-if="form.enabled"><label>Ein (Sekunden)<input type="number" min="0" max="3600" step="any" ng-model="form.onSeconds" ng-change="edited()"></label><label>Aus (Sekunden)<input type="number" min="0" max="3600" step="any" ng-model="form.offSeconds" ng-change="edited()"></label></div>
+<button ng-disabled="!info.ready || !form.name || form.onSeconds==null || form.offSeconds==null" ng-click="save()">Profil speichern</button>
+<room-light-output local label="Küche · berechnete Helligkeit und PWM"></room-light-output>
+<div class="pr-row"><button ng-disabled="!form.name || dirty" ng-click="testPower('on')">Ein testen</button><button ng-disabled="!form.name || dirty" ng-click="testPower('off')">Aus testen</button></div>
+<details><summary>Szene bearbeiten oder anlegen</summary>
+ <label>Name<input ng-model="scene.name" maxlength="100"></label>
+ <label ng-repeat="v in scene.levels track by $index">LED {{$index+1}} · {{scene.levels[$index]}} %<input type="range" min="0" max="100" ng-model="scene.levels[$index]"></label>
+ <button ng-disabled="!scene.name || !info.ready" ng-click="saveScene()">Szene speichern</button>
+ </details><small role="status">{{info.error || notice}}</small></dialog></div>
+<script>
+(function(s){
+ let dialog, output=[];
+ import('/home-automation/light-output.mjs').catch(()=>s.$evalAsync(()=>s.notice='PWM-Anzeige konnte nicht geladen werden.'));
+ s.openRamp=function(ev){dialog=ev.currentTarget.parentNode.querySelector('dialog');dialog.querySelector('room-light-output').readValues=()=>output;dialog.showModal();};
+ s.closeRamp=function(){dialog?.close();};s.$on('$destroy',()=>{if(dialog?.open)dialog.close();});
+ s.form={};s.info={};s.scene={levels:[]};
+ s.saveScene=function(){s.send({topic:'profile/scene',payload:{name:s.scene.name,levels:s.scene.levels.map(Number)}});s.notice='Szene gesendet.';};
+ s.edited=function(){s.dirty=true;s.notice='Zum Testen zuerst speichern.';};
+ s.loadProfile=function(){const p=s.info.profiles[s.form.name]||{enabled:false,onSeconds:2,offSeconds:2};Object.assign(s.form,{enabled:p.enabled,onSeconds:p.onSeconds,offSeconds:p.offSeconds});s.dirty=false;s.notice='';s.scene={name:s.form.name,levels:(s.info.sceneLevels[s.form.name]||[]).slice()};};
+ s.$watch('msg',function(m){
+ if(m?.topic==='profile/output'){output=m.payload;return;}
+ if(m?.topic!=='profile/view')return;
+ output=m.payload.duty || [];
+ const prev=s.info.profiles?.[s.form.name];s.info=m.payload;
+ if(s.form.name && !s.dirty && !s.pending && JSON.stringify(prev)!==JSON.stringify(s.info.profiles?.[s.form.name]))s.loadProfile();
+ if(!s.form.name && s.info.scenes.length){s.form.name=s.info.selected||s.info.active||s.info.scenes[0];s.loadProfile();}
+ const p=s.info.profiles[s.form.name];if(s.pending && p && ['enabled','onSeconds','offSeconds'].every(k=>s.form[k]===p[k])){s.pending=false;s.dirty=false;s.notice='Profil gespeichert.';}
+ });
+ s.save=function(){s.pending=true;s.send({topic:'profile/save',payload:{...s.form}});};
+ s.testPower=function(type){s.send({topic:'profile/test',payload:{type,profile:s.form.name}});};
+ s.send({topic:'profile/list'});
+})(scope);
+</script>

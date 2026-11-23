@@ -18,6 +18,7 @@
   {
     "id": "6e8e5be3.73c834",
     "type": "ui_switch",
+    "className": "gz-room-lamp gz-channel-1",
     "z": "749feb8f.103b04",
     "name": "LIGHT CEILING",
     "label": "DECKE",
