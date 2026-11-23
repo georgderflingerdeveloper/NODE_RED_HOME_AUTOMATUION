@@ -5,6 +5,15 @@
 :root[data-gh-theme="blues"]{--gh-page:#17212c;--gh-card:#253647;--gh-inset:#1d2c3b;--gh-control:#3c536c;--gh-border:#8196ae;--gh-text:#f0f5fb;--gh-muted:#c4d3e3;}
 :root[data-gh-theme="greens"]{--gh-page:#1b2420;--gh-card:#2c3b33;--gh-inset:#223029;--gh-control:#445b4c;--gh-border:#8b9e8f;--gh-text:#f1f6f1;--gh-muted:#cad8cc;}
 
+:root[data-gh-theme="kaminfeuer"] {
+  --gh-page:#211b19; --gh-card:#342a26; --gh-inset:#2b211e; --gh-control:#513c32;
+  --gh-border:#896b59; --gh-text:#f7ede1; --gh-muted:#cab7a6;
+}
+html.gh-mobile[data-gh-theme="kaminfeuer"] #nr-dashboard { --gh-area-accent:#dfa473; }
+:root[data-gh-theme="kaminfeuer"] #nr-dashboard-toolbar {
+  background-image:linear-gradient(110deg,#443028,#2b211e 65%);
+}
+
 /* Nur Dashboard-Flächen, keine Statuslampen oder Leistungsanzeigen überschreiben. */
 body.nr-dashboard-theme,body.nr-dashboard-theme md-content{background-color:var(--gh-page)!important;color:var(--gh-text)!important}
 body.nr-dashboard-theme md-toolbar,body.nr-dashboard-theme md-sidenav,body.nr-dashboard-theme md-sidenav md-content{background-color:var(--gh-inset)!important;color:var(--gh-text)!important}
@@ -98,7 +107,7 @@ body.nr-dashboard-theme table {font-variant-numeric:tabular-nums;}
  // Globales Head-Template: kein Angular-scope. Vorhandene Instanz sauber ablösen.
  if(window.GeorgDashboardTheme && window.GeorgDashboardTheme.dispose)window.GeorgDashboardTheme.dispose();
  const KEY='georgshome.dashboard.theme.v1';
- const allowed=['grays','dark','blues','greens'];
+ const allowed=['grays','dark','blues','greens','kaminfeuer'];
  const normalize=value=>allowed.indexOf(value)>=0?value:'grays';
  const service={current:'grays',warning:'',apply:function(value,persist){
   this.current=normalize(value);this.warning='';

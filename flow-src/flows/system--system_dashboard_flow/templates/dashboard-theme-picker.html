@@ -9,7 +9,7 @@
 </div>
 <script>
 (function(scope){
- scope.themes=[{"id": "grays", "name": "Grays", "colors": ["#1c1c1c", "#303030", "#242424", "#444444"]}, {"id": "dark", "name": "Dark Mode", "colors": ["#111316", "#202328", "#181b1f", "#353b43"]}, {"id": "blues", "name": "Blues", "colors": ["#17212c", "#253647", "#1d2c3b", "#3c536c"]}, {"id": "greens", "name": "Moderate Greens", "colors": ["#1b2420", "#2c3b33", "#223029", "#445b4c"]}];
+ scope.themes=[{"id": "grays", "name": "Grays", "colors": ["#1c1c1c", "#303030", "#242424", "#444444"]}, {"id": "dark", "name": "Dark Mode", "colors": ["#111316", "#202328", "#181b1f", "#353b43"]}, {"id": "blues", "name": "Blues", "colors": ["#17212c", "#253647", "#1d2c3b", "#3c536c"]}, {"id": "greens", "name": "Moderate Greens", "colors": ["#1b2420", "#2c3b33", "#223029", "#445b4c"]}, {"id": "kaminfeuer", "name": "Kaminfeuer", "colors": ["#211b19", "#342a26", "#513c32", "#dfa473"]}];
  function sync(){const service=window.GeorgDashboardTheme;scope.selectedTheme=service?service.current:'grays';scope.themeWarning=service?service.warning:'Design-Dienst wird geladen …';}
  function changed(){scope.$evalAsync(sync);}
  scope.chooseTheme=function(id){const service=window.GeorgDashboardTheme;if(service){service.apply(id,true);sync();}};

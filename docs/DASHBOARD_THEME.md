@@ -18,7 +18,7 @@ Getestet: unveränderte Scripts und Markup, Statusfarben, bestehende Unit-Tests,
 Flow-Prüfung und Roundtrip. Browserdarstellung auf dem Zielgerät noch prüfen.
 
 ## Design-Menü v0.15.0
-Unter Darstellung stehen Grays, Dark Mode, Blues und Moderate Greens zur Wahl.
+Unter Darstellung stehen Grays, Dark Mode, Blues, Moderate Greens und Kaminfeuer zur Wahl.
 Die Auswahl greift sofort, ohne Deploy oder Neustart. localStorage speichert
 sie unter georgshome.dashboard.theme.v1 pro Browser/Origin (Adresse + Port).
 Andere Geräte/Browser haben eine unabhängige Auswahl; ein Wechsel von IP zu
