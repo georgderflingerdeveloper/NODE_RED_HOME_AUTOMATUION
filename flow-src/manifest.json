@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "ca5afb84ab07d99c0485c03b4b5833fe68e7d6207947288bd49eb14e08354e81",
+  "flowSha256": "cf9a4685f5fd332e17058fd8757083f943991aa4a069878b966fc6fa9eee9159",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -1657,7 +1657,7 @@
     "flows/system--system_dashboard_flow/functions/phidget-daten-fur-dashboard.js": "d31410dee27e4c2596575665eb4143e6e3a767f406cdc21084e39608580bd9b8",
     "flows/system--system_dashboard_flow/nodes.json": "cab454c832861892ff51e56b5cd102712fb258e4c7e1ae6060f700ae500c53a9",
     "flows/system--system_dashboard_flow/templates/dashboard-menusuche.html": "bc1ee393afb162288eb532d2372becf870b47a5f87d8e29f21c7a80a6d09cc89",
-    "flows/system--system_dashboard_flow/templates/dashboard-mobile.html": "d53a9243c4014ddc242c9196624ddf2155d0cced4715415496eb32e203f7e8ec",
+    "flows/system--system_dashboard_flow/templates/dashboard-mobile.html": "987fb957444df803f8e7f61f7f8dbc08fc362d6ff6a3f45cb9766e913e453e31",
     "flows/system--system_dashboard_flow/templates/dashboard-theme-global.html": "13703f5d32bc8c2d4e027ff170e2efc04b362479971de850dc9575472992ad6a",
     "flows/system--system_dashboard_flow/templates/dashboard-theme-picker.html": "31a5290200536dcf745233cc009b8e99f7fe710ba0ab351d76d9045ddf7e5750",
     "flows/system--system_dashboard_flow/templates/node-red-neu-starten.html": "4850be3dc2619b997340f6f64682b4b10fe38af6c2aafb78cea89ddbe0d63bb7",

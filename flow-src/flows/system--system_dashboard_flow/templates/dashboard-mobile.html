@@ -67,15 +67,20 @@ html.gh-mobile #nr-dashboard section:has(> md-sidenav) { flex-direction:column; 
 html.gh-mobile #nr-dashboard section > md-sidenav:has(#gh-mobile-pages) {
   visibility:visible !important; pointer-events:auto !important;
   position:relative !important; display:block; transform:none !important;
-  inset:auto !important; width:100% !important; max-width:none; min-width:0;
+  inset:auto !important; width:100% !important; max-width:100% !important; min-width:0 !important; box-sizing:border-box;
   flex:0 0 auto; height:auto !important; max-height:50%; overflow:auto;
 }
 html.gh-mobile #nr-dashboard section > md-content { min-width:0; min-height:0; }
 html.gh-mobile #gh-mobile-pages {
-  display:flex; align-items:center; justify-content:space-between; width:100%; min-height:46px;
-  padding:8px 18px; border:0; border-bottom:1px solid var(--gh-border);
-  background:var(--gh-inset); color:var(--gh-text); font:600 16px/1.4 system-ui; cursor:pointer;
+  display:flex; align-items:center; justify-content:space-between; width:100%; min-height:48px; box-sizing:border-box;
+  padding:10px 16px; border:0; border-inline-start:4px solid var(--gh-area-accent); border-bottom:1px solid var(--gh-border);
+  background:var(--gh-control); color:var(--gh-text); font:700 16px/1.4 system-ui; cursor:pointer;
 }
+html.gh-mobile #nr-dashboard { --gh-area-accent:#9bcaf0; }
+html.gh-mobile #nr-dashboard md-sidenav .nr-menu-item-active {
+  box-shadow:inset 4px 0 var(--gh-area-accent);
+}
+html.gh-mobile #gh-mobile-pages:focus-visible { outline:2px solid var(--gh-area-accent); outline-offset:-3px; }
 html.gh-mobile #gh-mobile-pages::after { content:'▾'; }
 html.gh-mobile #gh-mobile-pages[aria-expanded="true"]::after { content:'▴'; }
 html.gh-mobile #gh-mobile-pages[aria-expanded="false"] ~ * { display:none !important; }
@@ -95,6 +100,15 @@ html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardcontainer > md
   width:100% !important; min-width:0 !important; max-width:100% !important;
   height:auto !important; min-height:0 !important; box-sizing:border-box;
   margin:0 !important;
+}
+html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardpanel {
+  border:1px solid var(--gh-border) !important; border-radius:10px;
+}
+html.gh-mobile #nr-dashboard .nr-dashboard-cardpanel > .nr-dashboard-cardtitle {
+  box-sizing:border-box; width:100% !important; margin:0; padding:9px 12px;
+  height:auto; min-height:38px; line-height:1.35; font-size:1rem; font-weight:700;
+  white-space:normal; overflow-wrap:anywhere; background:var(--gh-inset);
+  border-inline-start:4px solid var(--gh-area-accent); border-radius:9px 9px 0 0;
 }
 html.gh-mobile #nr-dashboard .masonry-container .nr-dashboard-cardcontainer {
   display:flex !important; flex-direction:column; gap:6px; padding:4px;
