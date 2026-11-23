@@ -145,4 +145,27 @@ html.gh-mobile #nr-dashboard .nr-dashboard-template :is(td,th) {
 html.gh-mobile #nr-dashboard .nr-dashboard-template :is(.ht-scroll,.cost-chart-scroll,.se-graph-scroll) svg {
   min-width:0; width:100%;
 }
+
+html.gh-mobile #nr-dashboard .nr-dashboard-template table[data-mobile-records],
+html.gh-mobile #nr-dashboard table[data-mobile-records] tbody { display:block; width:100%; }
+html.gh-mobile #nr-dashboard table[data-mobile-records] thead {
+  position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%);
+}
+html.gh-mobile #nr-dashboard table[data-mobile-records] tbody tr {
+  display:block; margin:8px 0; padding:4px 10px; border:1px solid var(--gh-border,#607177);
+  border-radius:8px;
+}
+html.gh-mobile #nr-dashboard table[data-mobile-records] td {
+  display:grid; grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr); gap:8px;
+  align-items:baseline; width:auto; padding:6px 0; border:0; text-align:start;
+  font-size:14px; line-height:1.4; white-space:normal; overflow-wrap:anywhere;
+}
+html.gh-mobile #nr-dashboard table[data-mobile-records] td::before {
+  content:attr(data-label); color:var(--gh-text-muted,inherit); font-weight:400;
+}
+html.gh-mobile #nr-dashboard table[data-mobile-records] td:first-child {
+  display:block; font-weight:700; border-bottom:1px solid var(--gh-border,#607177);
+}
+html.gh-mobile #nr-dashboard table[data-mobile-records] td:first-child::before { content:none; }
+html.gh-mobile #nr-dashboard table[data-mobile-records] .gh-record-value { min-width:0; }
 </style>

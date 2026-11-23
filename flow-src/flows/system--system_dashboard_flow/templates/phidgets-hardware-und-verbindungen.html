@@ -15,6 +15,19 @@
 .ph-discovery .io-led.led-error{background:#ff7171;box-shadow:0 0 6px #ff717166}
 .ph-discovery .io-led-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0;font-size:12px}
 .ph-discovery .io-led-cell{white-space:nowrap;min-width:130px}
+
+.ph-discovery .io-search{display:block;font-weight:600}
+.ph-discovery .io-search input{width:100%;max-width:32rem;min-height:44px;box-sizing:border-box;margin:4px 0}
+.ph-discovery .io-device{border:1px solid var(--gh-border);border-radius:9px;margin:10px 0;overflow:hidden}
+.ph-discovery .io-device>summary{padding:12px;background:var(--gh-inset);cursor:pointer;font-weight:700}
+.ph-discovery .io-device>summary small{margin-left:1.2em;font-weight:normal}
+.ph-discovery .io-point{padding:10px 12px;border-top:1px solid var(--gh-border);overflow-wrap:anywhere}
+.ph-discovery .io-reading{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
+.ph-discovery .io-reading b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.ph-discovery .io-point .io-led{width:11px;height:11px;margin-right:5px}
+.ph-discovery .io-point summary{min-height:44px;display:flex;align-items:center;color:var(--gh-muted);cursor:pointer}
+.ph-discovery .io-point summary::before{content:'▸';margin-right:6px}
+.ph-discovery .io-point details[open] summary::before{content:'▾'}
 </style>
 <div class="ph-discovery">
 <h3>PHIDGETS · Server und Hardware</h3>
@@ -34,10 +47,24 @@
 <h4>IO-Datenpunkte · nur lesen</h4>
 <div ng-if="io.error" class="io-error">{{io.error}}</div>
 <div ng-if="io.storageError" class="io-error">Speicherfehler: {{io.storageError}}</div>
-<div class="io-led-legend"><span><i class="io-led led-on" aria-hidden="true"></i>TRUE / Analogwert gültig</span><span><i class="io-led led-off" aria-hidden="true"></i>FALSE / unbekannt</span><span><i class="io-led led-stale" aria-hidden="true"></i>Veraltet</span><span><i class="io-led led-error" aria-hidden="true"></i>Fehler</span></div>
-<label>Filter: <input ng-model="ioFilter" placeholder="Server, Seriennummer, Kanaltyp …"></label>
-<small>FALSE ist ein gültiger Wert. — bedeutet unbekannt. PWM: State gemäß Phidget-API, Duty Cycle separat. Ausgangswerte sind Serverwerte, keine elektrische Rückmessung.</small>
-<div class="scroll"><table><thead><tr><th>Server / Gerät</th><th>Seriennummer</th><th>Port / Kanal</th><th>Typ</th><th>LED / Status</th><th>Wert</th><th>Qualität / zuletzt gelesen</th></tr></thead>
+<div class="io-led-legend" ng-if="!ioMobile"><span><i class="io-led led-on" aria-hidden="true"></i>TRUE / Analogwert gültig</span><span><i class="io-led led-off" aria-hidden="true"></i>FALSE / unbekannt</span><span><i class="io-led led-stale" aria-hidden="true"></i>Veraltet</span><span><i class="io-led led-error" aria-hidden="true"></i>Fehler</span></div>
+<label class="io-search">Datenpunkte suchen<input type="search" ng-model="ioFilter" ng-change="updateGroups()" placeholder="Gerät, Server oder Kanaltyp"></label>
+<small ng-if="!ioMobile">FALSE ist ein gültiger Wert. — bedeutet unbekannt. PWM: State gemäß Phidget-API, Duty Cycle separat. Ausgangswerte sind Serverwerte, keine elektrische Rückmessung.</small>
+<div ng-if="ioMobile && io.rows.length">
+ <small>{{ioCount}} von {{io.rows.length}} Datenpunkten</small>
+ <p ng-if="!ioCount">Keine passenden Datenpunkte.</p>
+ <details class="io-device" ng-repeat="g in ioGroups track by g.key" ng-open="ioGroups.length === 1 || !!ioFilter">
+  <summary>{{g.device}}<small>{{g.server}} · Seriennr. {{g.serial}}<span ng-if="g.port != null"> · Port {{g.port}}</span> · {{g.rows.length}} Kanäle</small></summary>
+  <article class="io-point" ng-repeat="r in g.rows track by r.key">
+   <div class="io-reading"><strong>{{ioName(r)}} · Kanal {{r.index}}</strong><b>{{ioValue(r)}}</b></div>
+   <small><i class="io-led" ng-class="ioLed(r).css" aria-hidden="true"></i>{{ioFresh(r) ? 'Aktuell' : ioLed(r).label}}<span ng-if="r.lastRead"> · {{r.lastRead | date:'HH:mm:ss'}}</span><span ng-if="!ioFresh(r) && r.lastRead"> · letzter bekannter Wert</span></small>
+   <small ng-if="r.className==='DigitalOutput' && r.value != null">PWM-Tastgrad {{ioNumber(r.value)}} %</small>
+   <small class="io-error" ng-if="r.error">{{r.error}}</small>
+   <details><summary>Kanaldetails</summary><small>{{r.type}} · {{r.lastRead ? (r.lastRead | date:'dd.MM.yyyy HH:mm:ss') : 'Noch nicht gelesen'}}</small><small ng-if="r.className==='DigitalOutput'">Ausgangszustand laut Server</small></details>
+  </article>
+ </details>
+</div>
+<div class="scroll" ng-if="!ioMobile"><table><thead><tr><th>Server / Gerät</th><th>Seriennummer</th><th>Port / Kanal</th><th>Typ</th><th>LED / Status</th><th>Wert</th><th>Qualität / zuletzt gelesen</th></tr></thead>
 <tbody><tr ng-repeat="r in io.rows | filter:ioFilter track by r.key">
 <td>{{r.actualServer || r.server}}<small>{{r.device}}</small></td><td>{{r.serial}}</td><td>{{r.port === null ? '—' : r.port}} / {{r.index}}</td><td>{{r.type}}</td>
 <td class="io-led-cell"><span class="io-led" ng-class="ioLed(r).css" role="img" aria-label="{{ioLed(r).label}}" title="{{ioLed(r).label}}"></span><strong>{{ioLed(r).label}}</strong></td>
@@ -76,12 +103,41 @@
   if(r.boolean===false)return {css:'led-off',label:'FALSE'};
   return {css:'led-on',label:'Wert gültig'};
  };
+ const names={DigitalInput:'Digitaleingang',DigitalOutput:'Digitalausgang',TemperatureSensor:'Temperatur',HumiditySensor:'Luftfeuchtigkeit',VoltageInput:'Spannung',VoltageRatioInput:'Spannungsverhältnis',CurrentInput:'Stromstärke',LightSensor:'Beleuchtungsstärke'};
+ scope.ioName=r=>names[r.className]||r.type;
+ const number=new Intl.NumberFormat('de-AT',{maximumFractionDigits:3});
+ scope.ioNumber=value=>number.format(value);
+ scope.ioValue=function(r){
+  if(!r.lastRead || r.value==null)return '—';
+  if(r.boolean===true)return 'Ein';
+  if(r.boolean===false)return 'Aus';
+  return number.format(r.value)+(r.unit?' '+r.unit:'');
+ };
+ scope.updateGroups=function(){
+  const query=String(scope.ioFilter||'').trim().toLowerCase();
+  const groups=new Map();scope.ioCount=0;
+  for(const r of scope.io.rows){
+   const server=r.actualServer||r.server, name=scope.ioName(r);
+   if(query && ![server,r.device,r.serial,r.type,name,'Kanal '+r.index,r.port!=null?'Port '+r.port:''].join(' ').toLowerCase().includes(query))continue;
+   const key=JSON.stringify([server,r.serial,r.port,r.device]);
+   if(!groups.has(key))groups.set(key,{key,server,serial:r.serial,port:r.port,device:r.device,rows:[]});
+   groups.get(key).rows.push(r);scope.ioCount++;
+  }
+  scope.ioGroups=[...groups.values()];
+ };
+ if(typeof window!=='undefined'){
+  const media=window.matchMedia('(max-width:700px)');
+  const forced=new URLSearchParams(window.location.search).get('handy')==='1';
+  const change=()=>scope.$evalAsync(()=>{scope.ioMobile=forced||media.matches;scope.updateGroups();});
+  scope.ioMobile=forced||media.matches;media.addEventListener('change',change);
+  scope.$on('$destroy',()=>media.removeEventListener('change',change));
+ }
  const ioTimer=setInterval(function(){scope.$evalAsync(function(){scope.ioNow=Date.now();});},2000);
  scope.$on('$destroy',function(){clearInterval(ioTimer);});
  scope.ph={inventory:{servers:[],devices:[]},health:{}};
  scope.label=function(s){return s==='online'?'erkannt':s==='offline'?'nicht mehr erkannt':'unbekannt / veraltet';};
  scope.hubCount=function(){return scope.ph.inventory.devices.filter(function(d){return d.hub;}).length;};
- scope.$watch('msg',function(msg){if(msg && msg.payload && msg.payload.discovery)scope.ph=msg.payload;if(msg && msg.payload && msg.payload.io){scope.io=msg.payload;scope.ioNow=Date.now();}});
+ scope.$watch('msg',function(msg){if(msg && msg.payload && msg.payload.discovery)scope.ph=msg.payload;if(msg && msg.payload && msg.payload.io){scope.io=msg.payload;scope.ioNow=Date.now();if(scope.ioMobile)scope.updateGroups();}});
  scope.send({topic:'phidgets/get'});
 })(scope);
 </script>

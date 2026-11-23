@@ -387,7 +387,7 @@
     "y": 840,
     "wires": [
       [
-        "se_control_router"
+        "se_auto_reconnect"
       ]
     ]
   },
@@ -523,5 +523,53 @@
         "se_control_router"
       ]
     ]
+  },
+  {
+    "id": "se_dashboard_connect",
+    "type": "ui_ui_control",
+    "z": "b86cb602995b0261",
+    "name": "Dashboard geladen",
+    "events": "connect",
+    "x": 250,
+    "y": 900,
+    "wires": [
+      [
+        "se_auto_reconnect"
+      ]
+    ]
+  },
+  {
+    "id": "se_auto_reconnect",
+    "type": "solaredge-reconnect-countdown",
+    "z": "b86cb602995b0261",
+    "name": "Verzögerter SolarEdge-Reconnect",
+    "x": 515,
+    "y": 900,
+    "wires": [
+      [
+        "se_control_router"
+      ],
+      [
+        "se_countdown_popup"
+      ]
+    ]
+  },
+  {
+    "id": "se_countdown_popup",
+    "type": "ui_toast",
+    "z": "b86cb602995b0261",
+    "name": "SolarEdge Countdown",
+    "position": "top right",
+    "displayTime": "2",
+    "highlight": "",
+    "outputs": 0,
+    "ok": "OK",
+    "cancel": "",
+    "topic": "SolarEdge",
+    "sendall": true,
+    "raw": false,
+    "x": 805,
+    "y": 860,
+    "wires": []
   }
 ]

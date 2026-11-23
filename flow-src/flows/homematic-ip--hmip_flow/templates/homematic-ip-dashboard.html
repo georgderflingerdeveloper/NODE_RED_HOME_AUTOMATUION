@@ -58,7 +58,7 @@
    <small ng-if="expanded[d.id]">{{d.model}} · {{d.serial || 'Seriennummer nicht gemeldet'}}<br>Letzter Datenstand: {{d.lastSeen ? (d.lastSeen | date:'dd.MM.yyyy HH:mm:ss') : '—'}}</small>
    <p class="hmip-alert" ng-if="d.quality !== 'current'">{{qualityText(d)}} – angezeigte Werte entsprechen dem letzten bekannten Stand.</p>
    <div><button ng-click="expanded[d.id]=!expanded[d.id]" aria-expanded="{{!!expanded[d.id]}}">Details · {{d.points.length}} Datenpunkte {{expanded[d.id] ? '▴' : '▾'}}</button></div>
-   <div class="hmip-points" ng-show="expanded[d.id]"><table><thead><tr><th>Datenpunkt</th><th>Wert</th></tr></thead><tbody><tr ng-repeat="p in d.points track by p.name"><td>{{p.name}}</td><td><strong>{{display(p.value)}}</strong> {{p.unit}}</td></tr></tbody></table></div>
+   <div class="hmip-points" ng-show="expanded[d.id]"><table data-mobile-records><thead><tr><th>Datenpunkt</th><th>Wert</th></tr></thead><tbody><tr ng-repeat="p in d.points track by p.name"><td data-label="Datenpunkt"><div class="gh-record-value">{{p.name}}</div></td><td data-label="Wert"><div class="gh-record-value"><strong>{{display(p.value)}}</strong> {{p.unit}}</div></td></tr></tbody></table></div>
   </article>
  </div>
  </details>

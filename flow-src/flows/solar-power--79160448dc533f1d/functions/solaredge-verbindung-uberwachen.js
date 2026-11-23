@@ -61,10 +61,10 @@ node.status(online
         : {fill:"red", shape:"ring", text:"OFFLINE · Reconnect läuft"});
 
 let reconnectMsg = null;
-if (!communicationHealthy) {
-    const lastReconnectMs = Number(context.get("lastReconnectMs")) || 0;
+if (!communicationHealthy && !global.get("SolarEdgeReconnectDueMs")) {
+    const lastReconnectMs = Number(global.get("SolarEdgeLastReconnectMs")) || 0;
     if (nowMs - lastReconnectMs >= 15000) {
-        context.set("lastReconnectMs", nowMs);
+        global.set("SolarEdgeLastReconnectMs", nowMs);
         reconnectMsg = {
             topic: "SolarEdgeModbusReconnect",
             payload: {

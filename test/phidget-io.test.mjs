@@ -51,6 +51,13 @@ test('Dashboard erhält Filter und markiert Daten nach ausbleibenden Updates als
  assert.equal(scope.ioLed({...live,quality:'error',boolean:true}).css,'led-error');
  assert.equal(scope.ioLed({quality:'unknown'}).label,'Unbekannt');
  assert.equal(scope.ioLed({quality:'unsupported'}).label,'Kein IO-Adapter');
+ scope.ioMobile=true;scope.ioFilter='Spannung';
+ receive({payload:{io:true,rows:[{className:'VoltageInput',type:'Voltage Input',device:'Sensor',server:'a',port:0,index:0,value:0,unit:'V',lastRead:123},
+  {className:'DigitalInput',type:'Digital Input',device:'Taster',server:'b',index:1,value:0,boolean:false,lastRead:123}]}});
+ assert.equal(scope.ioCount,1);assert.equal(scope.ioGroups[0].port,0);
+ assert.equal(scope.ioValue(scope.ioGroups[0].rows[0]),'0 V');
+ assert.equal(scope.ioValue(scope.io.rows[1]),'Aus');
+ assert.equal(scope.ioValue({value:null,lastRead:123}),'—');
  assert.match(source,/track by r.key/);
 });
 

@@ -10,6 +10,8 @@ const files = [
   "home-automation-tariff.js",
   "home-automation-tariff.html",
   "loyal-tariff.cjs",
+  "solaredge-reconnect-countdown.js",
+  "solaredge-reconnect-countdown.html",
   "home-automation-homematic-ip.js",
   "home-automation-homematic-ip.html",
   "homematic-ip-core.cjs",
