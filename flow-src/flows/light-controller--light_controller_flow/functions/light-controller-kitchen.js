@@ -98,12 +98,12 @@ if (msg.topic === "light-controller/configure") {
     msg.payload = controller.getOutput({ event: "configuration_changed" });
     msg.payload.ScenariosChanged = true;
     persistControllerState(msg.payload);
-} else if (msg.sceneCreationId && msg.payload?.Command === "AddScenario") {
+} else if ((msg.sceneCreationId && msg.payload?.Command === "AddScenario") || msg.topic === "kitchen/catalog") {
     const request = msg.payload;
     let added = false;
     try {
         if (!scenarioStore || storeReadFailed) throw new Error("Der Szenenspeicher ist nicht verfügbar.");
-        if (Object.keys(request.ScenarioProperties || {}).length !== controller.getOutput().OutputCount) {
+        if (request.Command !== "DeleteScenario" && Object.keys(request.ScenarioProperties || {}).length !== controller.getOutput().OutputCount) {
             throw new Error("Die Anzahl der LEDs hat sich geändert. Bitte die Helligkeiten prüfen.");
         }
         msg.payload = controller.process(request);

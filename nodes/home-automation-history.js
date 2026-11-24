@@ -55,10 +55,12 @@ function sortDashboardRows(rows) {
 module.exports = function registerHistoryStore(RED) {
   let activeDatabasePath = null;
   if (RED.httpNode?.get) {
-    RED.httpNode.get('/home-automation/solar/export.csv', (request,response) => {
-      if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
-      return streamExport(activeDatabasePath,request,response);
-    });
+    for (const format of ['csv','md']) {
+      RED.httpNode.get('/home-automation/solar/export.'+format, (request,response) => {
+        if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
+        return streamExport(activeDatabasePath,request,response,format);
+      });
+    }
     RED.httpNode.get('/home-automation/solar/trend', (request,response) => {
       if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
       try { trendRequest(request.query); }

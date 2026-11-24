@@ -2712,5 +2712,43 @@
     "disp": true,
     "width": "6",
     "collapse": false
+  },
+  {
+    "id": "room_manager_tab",
+    "type": "ui_tab",
+    "name": "Raummanager",
+    "icon": "fa-sitemap",
+    "order": 21,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "room_manager_group",
+    "type": "ui_group",
+    "name": "Raummanager",
+    "tab": "room_manager_tab",
+    "order": 1,
+    "disp": true,
+    "width": "9",
+    "collapse": false
+  },
+  {
+    "id": "daily_analysis_tab",
+    "type": "ui_tab",
+    "name": "KI-Auswertung",
+    "icon": "fa-line-chart",
+    "order": 22,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "daily_analysis_group",
+    "type": "ui_group",
+    "name": "KI-Auswertung",
+    "tab": "daily_analysis_tab",
+    "order": 1,
+    "disp": false,
+    "width": "14",
+    "collapse": false
   }
 ]

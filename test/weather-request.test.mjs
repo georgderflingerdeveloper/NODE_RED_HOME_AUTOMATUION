@@ -13,7 +13,8 @@ test("Wetterabfrage enthält Standort, Zeitzone und alle benötigten Prognosefel
   assert.equal(url.searchParams.get("latitude"), "47.89464");
   assert.equal(url.searchParams.get("longitude"), "13.7163");
   assert.equal(url.searchParams.get("timezone"), "Europe/Vienna");
-  assert.equal(url.searchParams.get("past_hours"), "1");
+  assert.equal(url.searchParams.get("past_hours"), "25");
+  assert.equal(url.searchParams.get("timeformat"), "unixtime");
   assert.equal(url.searchParams.get("forecast_hours"), "36");
   assert.match(url.searchParams.get("hourly"), /sunshine_duration/);
   assert.match(url.searchParams.get("daily"), /sunrise/);

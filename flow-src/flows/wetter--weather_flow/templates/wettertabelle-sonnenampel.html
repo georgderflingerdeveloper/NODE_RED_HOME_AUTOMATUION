@@ -1,8 +1,8 @@
 <style>
   .weather-card {
     font-family: Roboto, Arial, sans-serif;
-    color: var(--gh-card,#303030);
-    padding: 4px 2px 10px
+    color: var(--gh-text,#eee);
+    box-sizing: border-box; padding: 14px; border: 1px solid var(--gh-border); border-radius:12px; background:var(--gh-card)
   }
 
   .weather-head {
@@ -12,7 +12,7 @@
     margin-bottom: 14px;
     padding: 14px 16px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--gh-text,#f1f1f1), #edf2f7)
+    background: var(--gh-inset); border:1px solid var(--gh-border)
   }
 
   .weather-light {
@@ -43,7 +43,7 @@
 
   .weather-status {
     margin-top: 4px;
-    color: var(--gh-border,#626262)
+    color: var(--gh-muted)
   }
 
   .weather-kpis {
@@ -56,15 +56,15 @@
   .weather-kpi {
     padding: 10px;
     border-radius: 9px;
-    background: #fff;
-    border: 1px solid var(--gh-text,#f1f1f1);
+    background: var(--gh-card);
+    border: 1px solid var(--gh-border);
     text-align: center
   }
 
   .weather-kpi b {
     display: block;
     font-size: 19px;
-    color: var(--gh-card,#303030)
+    color: var(--gh-text,#eee)
   }
 
   .weather-kpi span {
@@ -74,7 +74,7 @@
 
   .weather-table-wrap {
     overflow-x: auto;
-    border: 1px solid var(--gh-text,#f1f1f1);
+    border: 1px solid var(--gh-border);
     border-radius: 9px
   }
 
@@ -82,30 +82,30 @@
     width: 100%;
     border-collapse: collapse;
     min-width: 560px;
-    background: #fff
+    background: var(--gh-card)
   }
 
   .weather-table th {
     padding: 9px 8px;
     text-align: left;
-    background: var(--gh-border,#626262);
-    color: #fff;
+    background: var(--gh-inset);
+    color: var(--gh-text);
     font-size: 12px
   }
 
   .weather-table td {
     padding: 9px 8px;
-    border-top: 1px solid var(--gh-text,#f1f1f1);
+    border-top: 1px solid var(--gh-border);
     font-size: 13px
   }
 
   .weather-table tr:nth-child(even) td {
-    background: var(--gh-text,#f1f1f1)
+    background: var(--gh-inset)
   }
 
   .sun-cell {
     font-weight: 700;
-    color: #9a7400
+    color: var(--gh-text)
   }
 
   .weather-legend {
@@ -149,7 +149,7 @@
   }
 
   .weather-table tr.night-row td {
-    background: var(--gh-text,#f1f1f1);
+    background: var(--gh-inset);
     color: var(--gh-muted,#b8b8b8)
   }
 
@@ -186,7 +186,7 @@
   }
   .weather-card { container-type: inline-size; overflow-wrap: anywhere; }
   .weather-legend { flex-wrap: wrap; }
-  .weather-card .weather-kpi span, .weather-card .weather-suntimes { color: #505964; }
+  .weather-card .weather-kpi span, .weather-card .weather-suntimes { color: var(--gh-muted); }
   @container (max-width: 40rem) {
     .weather-kpis { grid-template-columns: repeat(auto-fit,minmax(min(100%,8rem),1fr)); }
     .weather-table-wrap { overflow: visible; border: 0; }
@@ -201,7 +201,7 @@
     .weather-table tbody tr.night-row td {
       display: flex; align-items: baseline; justify-content: space-between; gap: .6rem;
       padding: .45rem 0; font-size: .95rem; color: inherit; background: transparent;
-      border-color: var(--gh-border,#626262);
+      border-color: var(--gh-muted);
     }
     .weather-table tbody tr td:first-child { font-weight: 700; border: 0; }
     .weather-table td[data-label]::before {
@@ -209,6 +209,7 @@
     }
     .weather-table .night-label { font-size: .8rem; }
   }
+.weather-now td:first-child{border-left:4px solid #9bc9b9;padding-left:8px}.weather-day-title{font-size:1.05rem;margin:16px 0 10px}
 </style>
 <div class="weather-card">
   <div class="weather-head">
@@ -230,12 +231,13 @@
     <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ActualSunshineLastHour + ' %' : '—'}}</b><span>Sonnendauer letzte Stunde (Modell)</span></div>
     <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNextHour + ' %' : '—'}}</b><span>Sonnendauer {{msg.payload.CurrentForecastIntervalLabel || "laufende Stunde"}}</span>
     </div>
-    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNext6Hours + ' %' : '—'}}</b><span>Ø {{msg.payload.ForecastIntervalCount || 6}} angezeigte Stunden</span>
+    <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? msg.payload.ExpectedPercentSunshineNext6Hours + ' %' : '—'}}</b><span>Ø nächste {{msg.payload.ForecastIntervalCount || 6}} Stunden</span>
     </div>
     <div class="weather-kpi"><b>{{msg.payload.HasLastKnownValues ? (msg.payload.Current.TemperatureC | number:1) + ' °C' : '—'}}</b><span>Aktuelle Temperatur</span>
     </div>
   </div>
-  <div class="weather-table-wrap" ng-if="msg.payload.HasLastKnownValues">
+  <h3 class="weather-day-title">Tagesverlauf · {{weatherDayLabel}}</h3>
+  <div class="weather-table-wrap">
     <table class="weather-table">
       <thead>
         <tr>
@@ -247,21 +249,48 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="hour in msg.payload.ForecastNext6Hours track by $index"
-          ng-class="{'night-row': !hour.IsDaylight}">
-          <td>{{hour.TimeLabel}}<span class="night-label" ng-if="!hour.IsDaylight">Nacht</span></td>
-          <td class="sun-cell" data-label="Sonnendauer">{{hour.SunshinePercent}} % · {{hour.SunshineMinutes | number:1}} min</td>
-          <td data-label="Temperatur am Ende">{{hour.TemperatureC | number:1}} °C</td>
-          <td data-label="Wolken am Ende">{{hour.CloudCoverPercent}} %</td>
-          <td data-label="Regenrisiko">{{hour.PrecipitationProbabilityPercent}} %</td>
+        <tr ng-repeat="hour in weatherRows track by hour.StartEpoch"
+          ng-class="{'night-row': hour.IsDaylight===false, 'weather-now':hour.current}">
+          <td>{{hour.TimeLabel}}<span class="night-label" ng-if="hour.IsDaylight===false">Nacht</span> <strong ng-if="hour.current">Jetzt</strong></td>
+          <td class="sun-cell" data-label="Sonnendauer">{{hour.SunshinePercent == null ? "—" : hour.SunshinePercent + " % · " + (hour.SunshineMinutes | number:1) + " min"}}</td>
+          <td data-label="Temperatur am Ende">{{hour.TemperatureC == null ? "—" : (hour.TemperatureC | number:1) + " °C"}}</td>
+          <td data-label="Wolken am Ende">{{hour.CloudCoverPercent == null ? "—" : hour.CloudCoverPercent + " %"}}</td>
+          <td data-label="Regenrisiko">{{hour.PrecipitationProbabilityPercent == null ? "—" : hour.PrecipitationProbabilityPercent + " %"}}</td>
         </tr>
       </tbody>
     </table>
   </div>
-  <p style="font-size:12px;color:#626262">Sonnendauer = Anteil der vollen Stunde (60 Minuten).
+  <p style="font-size:12px;color:var(--gh-muted)">Sonnendauer = Anteil der vollen Stunde (60 Minuten).
     Wolken = bedeckter Himmelsanteil am Stundenende. Beide Werte ergänzen sich nicht zu 100 %.
-    Die erste Zeile zeigt das laufende Stundenintervall; alle Sonnenwerte sind Modellwerte, keine Messung der PV-Leistung.</p>
+    „Jetzt“ markiert die laufende Stunde. Die Sonnenwerte stammen aus dem Wettermodell.</p>
   <div class="weather-legend">
     <span><i class="legend-dot legend-yellow"></i>Sonnenstunden vorhanden</span><span><i class="legend-dot legend-grey"></i>wenig bis keine Sonne</span>
   </div>
 </div>
+
+<script>
+(function(s){
+ const zone='Europe/Vienna',HOUR=3600000;
+ const day=new Intl.DateTimeFormat('sv-SE',{timeZone:zone,dateStyle:'short'});
+ const label=new Intl.DateTimeFormat('de-AT',{timeZone:zone,dateStyle:'full'});
+ const clock=new Intl.DateTimeFormat('de-AT',{timeZone:zone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+ const offset=new Intl.DateTimeFormat('de-AT',{timeZone:zone,timeZoneName:'short'});
+ function abbreviation(t){return offset.formatToParts(t).find(part=>part.type==='timeZoneName').value;}
+ function render(){
+   const now=Date.now(),today=day.format(now),current=Math.floor(now/HOUR)*HOUR;
+   const known=new Map((s.msg?.payload?.DashboardHours||[]).map(h=>[h.StartEpoch,h]));
+   const rows=[];let first=current;
+   while(day.format(first-HOUR)===today)first-=HOUR;
+   for(let t=first;day.format(t)===today;t+=HOUR){
+     const next=t+HOUR,repeat=clock.format(t)===clock.format(t-HOUR)||clock.format(t)===clock.format(next);
+     const start=clock.format(t)+(repeat?' '+abbreviation(t):'');
+     const end=day.format(next)!==today?'24:00':clock.format(next)+(repeat?' '+abbreviation(next):'');
+     rows.push({...known.get(t),StartEpoch:t,TimeLabel:start+'–'+end,current:t===current});
+   }
+   s.weatherRows=rows;s.weatherDayLabel=label.format(now);
+ }
+ s.$watch('msg.payload',render);render();
+ const timer=setInterval(()=>s.$evalAsync(render),60000);
+ s.$on('$destroy',()=>clearInterval(timer));
+})(scope);
+</script>

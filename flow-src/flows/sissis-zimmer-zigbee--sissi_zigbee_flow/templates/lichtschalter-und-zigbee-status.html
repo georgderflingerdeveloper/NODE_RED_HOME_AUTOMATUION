@@ -60,11 +60,21 @@
 @media (prefers-reduced-motion: reduce) {
     .sissi-room .sissi-switch span { transition: none; }
 }
+ .sissi-room{box-sizing:border-box;width:100%;max-width:none;background:var(--gh-card);border:1px solid var(--gh-border);color:var(--gh-text);--muted:var(--gh-muted);padding:14px;border-radius:12px}
+ .sissi-room .sissi-light{border-color:var(--gh-border)}
+ .sissi-room .sissi-icon{width:64px;flex-basis:64px;background:var(--gh-inset)}
+ .sissi-room .sissi-icon.is-on{color:#dba733;background:var(--gh-inset)}
+ .sissi-room .sissi-switch{background:var(--gh-inset);border-color:var(--gh-border)}
+ .sissi-room .sissi-switch[aria-checked="true"]{background:#377d69}
+ .sissi-room .sissi-device{padding:8px 0;border-bottom:1px solid var(--gh-border)}
+ .sissi-room dd.online,.sissi-room dd.offline{color:var(--gh-text)}
+ .sissi-room dd.online::before,.sissi-room dd.offline::before{content:"";display:inline-block;width:.6em;height:.6em;border-radius:50%;background:#46aa7b;margin-right:.5em}
+ .sissi-room dd.offline::before{background:#df726d}
 </style>
 <section class="sissi-room" aria-label="Licht und Zigbee-Geräte in Sissis Zimmer">
     <div class="sissi-light">
         <span class="sissi-icon" ng-class="{'is-on': msg.payload.light === true}" aria-hidden="true">
-            <i class="material-icons">lightbulb_outline</i>
+            <i class="fa fa-fw fa-3x fa-lightbulb-o"></i>
         </span>
         <div class="sissi-name">
             <strong>Zimmerlicht</strong>

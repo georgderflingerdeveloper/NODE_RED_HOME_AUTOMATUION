@@ -16,7 +16,8 @@
       ],
       [
         "scheduler_dashboard",
-        "profiles_config_out"
+        "profiles_config_out",
+        "room_manager_ui"
       ]
     ]
   },
@@ -348,5 +349,51 @@
     "x": 880,
     "y": 400,
     "wires": []
+  },
+  {
+    "id": "room_manager_ui",
+    "type": "ui_template",
+    "z": "schedulers_flow",
+    "group": "room_manager_group",
+    "name": "Raummanager",
+    "order": 1,
+    "width": 9,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/schedulers--schedulers_flow/templates/raummanager.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "x": 690,
+    "y": 540,
+    "wires": [
+      [
+        "scheduler_engine"
+      ]
+    ]
+  },
+  {
+    "id": "room_names_nav",
+    "type": "ui_template",
+    "z": "schedulers_flow",
+    "group": "",
+    "name": "Raumnamen in der Navigation",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/schedulers--schedulers_flow/templates/raumnamen-navigation.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "global",
+    "x": 690,
+    "y": 580,
+    "wires": [
+      []
+    ]
   }
 ]

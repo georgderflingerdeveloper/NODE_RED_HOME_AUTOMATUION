@@ -2,6 +2,7 @@
 
 // Zeitentscheidungen ohne Node-RED/Dateisystem: mit festen Zeitpunkten testbar.
 const { discoveredRows, mergeDiscovered } = require('./scheduler-inventory.cjs');
+const {roomList, manageRooms, confirmKitchenJob, usesScene} = require('./scheduler-rooms.cjs');
 const VERSION = 1;
 const ACTIONS = ['brightness', 'on', 'off', 'scenario'];
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -137,6 +138,7 @@ class Scheduler {
         if (index < 0) this.state.targets.push(descriptor); else this.state.targets[index] = descriptor;
         if (!this.online(target.id, now)) delete this.live.applied[target.id];
         this.live.seen[target.id] = now;
+        confirmKitchenJob(this.state, descriptor);
     }
     fire(name, timestamp, now) {
         if (name === 'scheduler-watchdog') return [];
@@ -212,6 +214,14 @@ class Scheduler {
             if (p.command !== 'List' && p.command !== 'PauseTarget' && p.command !== 'ResumeTarget') check(p.revision === this.state.revision, 'Zeitpläne wurden inzwischen geändert. Liste laden und erneut bearbeiten.');
             switch (p.command) {
                 case 'List': break;
+                case 'RenameRoom':
+                case 'ShareRoomScene':
+                case 'DeleteRoomScene':
+                case 'DeleteKitchenScene':
+                case 'DeleteUniversalScene':
+                    notice = manageRooms(this.state, p, matches);
+                    this.state.revision++;
+                    break;
                 case 'SetRampProfile': {
                     const profile=p.profile;
                     check(identifier(p.room) && typeof profile?.name==='string' && profile.name.trim() && profile.name.length<=100, 'Ungültiges Profil.');
@@ -243,6 +253,18 @@ class Scheduler {
                     break;
                 case 'Save': {
                     const plan = validatePlan(p.plan);
+                    const devices = this.state.targets.filter(t => matches(plan.target,t));
+                    if (plan.action.type === 'scenario' && devices.length) {
+                        const explicit = ['device','devices'].includes(plan.target.scope);
+                        check(explicit ? devices.every(t=>supports(t,plan.action)) : devices.some(t=>supports(t,plan.action)),
+                            'Die gewählte Szene ist am Ziel nicht verfügbar.');
+                    }
+                    const pending = this.state.kitchenSceneJob;
+                    if (pending?.command === 'DeleteScenario' && devices.some(t=>t.id==='kitchen-light')) {
+                        check(!usesScene(plan,pending.name),'Diese Szene wird gerade gelöscht.');
+                    }
+                    if(this.state.kidSceneRemoval && devices.some(t=>t.profileRoom==='kid_profile'))
+                        check(!usesScene(plan,this.state.kidSceneRemoval),'Diese Szene wird gerade gelöscht.');
                     const index = this.state.plans.findIndex(item => item.id === plan.id);
                     check(!this.state.plans.some(item => item.id !== plan.id && item.name === plan.name), 'Zeitplanname bereits vorhanden.');
                     if (index < 0) this.state.plans.push(plan); else this.state.plans[index] = plan;
@@ -348,8 +370,11 @@ class Scheduler {
             cycleText:plan.type==='window' ? 'Prüfung alle 15 s; Versand bei Änderung' : plan.type==='interval' ? `Befehl alle ${plan.intervalMinutes} min` : 'Befehl zum geplanten Termin'};
     }
     status(now, notice = '') {
-        return { revision: this.state.revision, enabled: this.state.enabled, timeZone: this.state.timeZone,
-            plans: this.state.plans.map(p => ({...clone(p), ...this.planStatus(p,now)})), targets: this.state.targets.map(t => ({ ...clone(t), online: this.online(t.id, now), pausedUntil: this.state.pauses[t.id] || 0, feedback: this.live.feedback[t.id] || null,
+        const rooms = roomList(this.state);
+        return { rooms, kitchenSceneIssue:this.state.kitchenSceneIssue, kidSceneRemoval:this.state.kidSceneRemoval, universalScenes:clone(this.state.universalScenes || []), kitchenSceneJob:clone(this.state.kitchenSceneJob || null),
+            revision: this.state.revision, enabled: this.state.enabled, timeZone: this.state.timeZone,
+            plans: this.state.plans.map(p => ({...clone(p), ...this.planStatus(p,now)})), targets: this.state.targets.map(t => ({ ...clone(t),
+                name: this.state.roomNames?.[t.room] && t.profileRoom ? this.state.roomNames[t.room] + ' · Raumlicht' : t.name, online: this.online(t.id, now), pausedUntil: this.state.pauses[t.id] || 0, feedback: this.live.feedback[t.id] || null,
                 effective: this.windows(t, now)[0] ? { plan: this.windows(t, now)[0].plan.name, value: this.windows(t, now)[0].value } : null })),
             now, notice, rampProfiles:clone(this.state.rampProfiles || {}), discovered:this.state.discovered || [], health: this.health(now), errors: clone(this.live.errors), cronStatus: clone(this.live.cronStatus) };
     }

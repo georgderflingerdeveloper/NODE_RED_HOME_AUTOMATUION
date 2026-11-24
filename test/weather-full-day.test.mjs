@@ -1,0 +1,20 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {runFunctionNode} from './helpers/function-node-harness.mjs';
+const template=fs.readFileSync('flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html','utf8');
+const script=template.match(/<script>([\s\S]*?)<\/script>/)[1];
+for(const [date,hrs] of [['2026-03-29',23],['2026-10-25',25],['2026-11-24',24]])test('Wetter zeigt gesamten Wiener Kalendertag '+date,async()=>{
+ const current=Date.parse(date+'T16:25Z'),hour=3600000;
+ const time=Array.from({length:62},(_,i)=>Math.floor(current/hour)*3600+(i-28)*3600);
+ const list=v=>time.map(()=>v);
+ const payload={current:{time:current/1000},hourly:{time,sunshine_duration:list(0),temperature_2m:list(8),cloud_cover:list(55),precipitation_probability:list(null),weather_code:list(0)},daily:{time:[date],sunrise:[date+'T07:00'],sunset:[date+'T18:00']}};
+ const [msg]= (await runFunctionNode('weather_parse',{msg:{statusCode:200,payload}})).result;
+ assert.equal(msg.payload.ForecastNext6Hours.length,6);
+ const scope={msg,$watch(){},$on(){}};
+ vm.runInNewContext(script,{scope,Intl,Date:class extends Date{static now(){return current;}},setInterval:()=>0,clearInterval(){}});
+ assert.equal(scope.weatherRows.length,hrs);assert.equal(scope.weatherRows[0].TimeLabel,'00:00–01:00');assert.equal(scope.weatherRows.at(-1).TimeLabel,'23:00–24:00');
+ assert.equal(scope.weatherRows.filter(r=>r.current).length,1);
+ assert.ok(scope.weatherRows.every(r=>r.TemperatureC===8 && r.PrecipitationProbabilityPercent===null));
+});

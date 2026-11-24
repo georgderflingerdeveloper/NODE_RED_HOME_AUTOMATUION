@@ -372,5 +372,43 @@
         "kosten_awattar_api"
       ]
     ]
+  },
+  {
+    "id": "daily_analysis_worker",
+    "type": "home-automation-daily-analysis",
+    "z": "kosten_flow",
+    "name": "Tagesexport und GPT-Kurzfassung",
+    "databasePath": "projects/NODE_RED_HOME_AUTOMATION_SOLAR/data/home-automation.sqlite",
+    "x": 300,
+    "y": 620,
+    "wires": [
+      [
+        "daily_analysis_ui"
+      ]
+    ]
+  },
+  {
+    "id": "daily_analysis_ui",
+    "type": "ui_template",
+    "z": "kosten_flow",
+    "group": "daily_analysis_group",
+    "name": "KI-Auswertung",
+    "order": 1,
+    "width": 14,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/kosten--kosten_flow/templates/ki-auswertung.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 610,
+    "y": 620,
+    "wires": [
+      [
+        "daily_analysis_worker"
+      ]
+    ]
   }
 ]

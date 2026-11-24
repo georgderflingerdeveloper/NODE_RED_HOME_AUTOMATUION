@@ -9,13 +9,34 @@ module.exports = RED => {
         let lastBrightness=100;
         let profiles = {}, selected = '', scenes = [], active = '', lastStatus, revision, routines={};
         let position = [], timer, lastLevels, lastScene='', sceneLevels={}, catalogPending='';
+        let management, kidRemoval;
+        let kitchenJob, lastAttempt = '', attemptedAt = 0;
         function syncCatalog(send){
+            if (kitchen && kitchenJob && scenes.length) {
+                const {command, name, levels} = kitchenJob;
+                const present = Object.hasOwn(sceneLevels, name);
+                if ((command === 'DeleteScenario') === present) {
+                    const key = JSON.stringify(kitchenJob);
+                    if (key !== lastAttempt || Date.now() - attemptedAt >= 5000) {
+                        lastAttempt = key;
+                        attemptedAt = Date.now();
+                        const properties = levels && Object.fromEntries(levels.map((v,i) => [i+1,v]));
+                        send([{topic:'kitchen/catalog',payload:{Command:command,ScenarioName:name,ScenarioProperties:properties}}]);
+                    }
+                }
+            }
             if(kitchen || !scenes.length)return;
             const entries=Object.values(profiles).filter(p=>p.levels);
-            if(!entries.some(e=>JSON.stringify(e.levels)!==JSON.stringify(sceneLevels[e.name]))){catalogPending='';return;}
+            const removing = kidRemoval && scenes.includes(kidRemoval) && active!==kidRemoval;
+            const reserved = ['Manuell','Hell','Abend','Nacht','Kerzenlicht','Kaminfeuer',...Object.keys(routines)];
+            for (const name of scenes) {
+                if (!reserved.includes(name) && name!==kidRemoval && !entries.some(e=>e.name===name) && sceneLevels[name])
+                    entries.push({name,levels:sceneLevels[name]});
+            }
+            if(!removing && !entries.some(e=>JSON.stringify(e.levels)!==JSON.stringify(sceneLevels[e.name]))){catalogPending='';return;}
             const key=JSON.stringify(entries);
-            if(key===catalogPending)return;
-            catalogPending=key;
+            if(key===catalogPending && Date.now()-attemptedAt<5000)return;
+            catalogPending=key;attemptedAt=Date.now();
             send([{topic:'georgszimmer/set',payload:{type:'profileCatalog',entries}}]);
         }
         function view(error) {
@@ -42,6 +63,15 @@ module.exports = RED => {
             try {
                 const p=msg.payload || {};
                 if(Array.isArray(p.plans) || p.health && !p.LedOutput){
+                    kidRemoval = p.kidSceneRemoval;
+                    if (kitchen) {
+                        management={revision:p.revision,plans:p.plans || [],ack:p.ack,failedToken:p.failedToken,notice:p.notice};
+                        if (lastStatus && (revision!==p.revision || p.ack || p.failedToken)) {
+                            send([null,{...lastStatus,roomManagement:management,payload:{...lastStatus.payload,LedOutput:position}}]);
+                        }
+                    }
+                    kitchenJob = p.kitchenSceneJob;
+                    if (!kitchenJob) lastAttempt = '';
                     if(revision===p.revision && !p.profileErrorRoom){done?.();return;}
                     revision=p.revision;
                     if(!p.rampProfiles){send([null,null,view(p.notice)]);done?.();return;}
@@ -50,6 +80,10 @@ module.exports = RED => {
                     selected=stored.selected || '';
                     syncCatalog(send);
                     send([null,null,view(p.profileErrorRoom===node.id?p.notice:null)]);
+                } else if (kitchen && msg.topic==='light-controller/dashboard' && p.Command==='DeleteScenario'){
+                    send([null,null,null,{topic:'scheduler/manage',payload:{command:'DeleteKitchenScene',targetId:'kitchen-light',revision,name:p.ScenarioName}}]);
+                } else if(msg.topic==='scheduler/manage' && p.command==='DeleteKitchenScene'){
+                    send([null,null,null,msg]);
                 } else if(msg.topic==='profile/scene'){
                     if(typeof p.name!=='string' || !p.name.trim() || p.name.length>100 || p.name in Object.prototype)throw Error('Ungültiger Szenenname.');
                     const name=p.name.trim(), count=Object.values(sceneLevels)[0]?.length;
@@ -80,7 +114,7 @@ module.exports = RED => {
                     syncCatalog(send);
                     const meta=msg.profileTransition;
                     if(kitchen){
-                        lastStatus=msg;
+                        msg.roomManagement=management;lastStatus=msg;
                         const entry=profiles[active || lastScene];
                         const curved=meta ? meta.enabled : !!entry?.enabled;
                         const next=p.LedOutput.map(v=>curved?toDuty(v):v);
@@ -107,10 +141,11 @@ module.exports = RED => {
                     const seconds=enabled?(type==='off'?entry.offSeconds:entry.onSeconds):0;
                     if(kitchen){
                         msg.profileTransition={enabled:!!entry?.enabled,seconds};
-                        if(type==='on' && (entry?.enabled || a.profile)){
+                        if(type==='on' && (a.profile || (!active && entry?.enabled))){
                             msg.payload={Command:'SelectScenario',ScenarioName:name};
                             msg.profileOn=true;
                         } else if(msg.topic==='profile/test')msg.payload={Command:type==='on'?'AllLightsOn':'AllLightsOff'};
+                        if (['AllLightsOn','AllLightsOff'].includes(msg.payload.Command)) msg.payload.KeepScenario=true;
                     } else {
                         const action={...a,rampSeconds:seconds};
                         if(name==='Morgenwecker')action.pulseSeconds=entry?.pulseSeconds ?? 4;

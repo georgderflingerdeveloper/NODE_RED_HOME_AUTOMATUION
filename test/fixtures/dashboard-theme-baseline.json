@@ -1,7 +1,7 @@
 {
   "flow-src/flows/schedulers--schedulers_flow/templates/schedulers-dashboard.html": {
-    "scripts": "76bc428d67efbfcf592c41d6af1b1c91919d3a1fa08bbb6b7d2cec3776b144de",
-    "markup": "04d986103e8e463ea705f50e97940ea84e1a21fa5582455cb1feaa8e2cab9a65"
+    "scripts": "a406a8a69521d83925b045c7f57d9bd09232c89c3372e7712267c44140ef0738",
+    "markup": "908f946d1f351ed4033e9f40e5776e6decc99cc5adc675e198681d7ee4937a26"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/phidgets-hardware-und-verbindungen.html": {
     "scripts": "00337e7f96714502f37cc1d9f12c1a8da1b10b5e5b0397724ed2bf2d19637d32",
@@ -20,8 +20,8 @@
     "markup": "1cdd2b75e25c0194a95e0f6cad9669880793ac6fee84538e74db501b8c3db0e8"
   },
   "flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": {
-    "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "markup": "e9d7bb1adb9e6b949cfe17e993a7148b143be587f2018c63a813bd5ae103a2a0"
+    "scripts": "6da17f972f9b830298f3524dd1a9046a0e46e09e46ccdc2d32bf25fff6e24052",
+    "markup": "c35671fba945a6ae1307f6882ed017c95a0c8a11f73448a0fa40d219395ba09c"
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solarleistung.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

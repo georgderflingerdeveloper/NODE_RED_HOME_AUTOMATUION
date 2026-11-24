@@ -27,6 +27,12 @@ const files = [
   "home-automation-phidget-discovery.html",
   "phidget-discovery-core.cjs",
   "energy-range.cjs",
+  "home-automation-daily-analysis.js",
+  "home-automation-daily-analysis.html",
+  "daily-analysis.cjs",
+  "analysis-periods.cjs",
+  "day-load-patterns.cjs",
+  "skills/georgshome-tagesanalyse/SKILL.md",
   "solaredge-cloud.cjs",
   "monthly-bills.cjs",
   "home-automation-history.js",
@@ -47,6 +53,7 @@ const files = [
 
 await mkdir(targetDirectory, { recursive: true });
 for (const file of files) {
+  await mkdir(dirname(join(targetDirectory, file)), { recursive: true });
   await copyFile(join(projectRoot, "nodes", file), join(targetDirectory, file));
 }
 console.log(`Home-Automation-Speicherknoten installiert: ${targetDirectory}`);

@@ -178,7 +178,7 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
     <button type="button" ng-attr-aria-pressed="{{draft.action.type==='off'}}" ng-click="draft.action.type='off'">Aus</button>
    </div>
    <label ng-if="draft.action.type === 'brightness'">Helligkeit (%)<input type="number" min="0" max="100" ng-model="draft.action.value"></label>
-   <label ng-if="draft.action.type === 'scenario'">Szenarioname<input ng-model="draft.action.value" placeholder="Exakter gespeicherter Name"></label>
+   <label ng-if="draft.action.type === 'scenario'">Lichtszene<select ng-model="draft.action.value" ng-options="name for name in profileOptions()"><option value="">Szene wählen</option></select></label>
   </div>
   <details ng-if="(draft.action.type==='on' || draft.action.type==='off') && profileOptions().length"><summary>Lichtprofil (optional)</summary>
    <label>Profil<select ng-model="draft.action.profile" ng-options="name for name in profileOptions()"><option value="">Aktuelles Profil</option></select></label>
@@ -227,7 +227,7 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
       scope.$evalAsync(function() { scope.health = {state:'warning',label:'Warnung',reasons:['Seit 60 s kein aktueller Scheduler-Status.']}; });
     }
   }, 1000);
-  scope.$on('$destroy', function() { window.clearInterval(healthTimer); });
+  scope.$on('$destroy', function() { window.clearInterval(healthTimer); window.removeEventListener?.('georg-kitchen-plan',openKitchenPlan); });
   scope.clockNow = Date.now();
   scope.planHealth = function(plan) {
     if(Date.now()-lastStatusAt>60000)return {state:'error',label:'Fehler',reason:'Keine aktuelle Statusverbindung.'};
@@ -255,6 +255,7 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
       scope.devices=(p.targets||[]).map(device=>({...device,plans:p.plans.filter(plan=>plan.matchedTargetIds?.includes(device.id)),
         available:p.plans.filter(plan=>['device','devices'].includes(plan.target?.scope) && !(plan.target.scope==='device'?plan.target.id===device.id:plan.target.ids.includes(device.id)) && device.actions.includes(plan.action.type) && (plan.action.type!=='scenario'||device.scenarios.includes(plan.action.value)))}));
     }
+    if (Array.isArray(p.plans)) startKitchenPlan();
     if (p.notice) scope.notice = p.notice;
     else if (!scope.draft) scope.notice = '';
     if (p.ack && p.ack.token === saveToken && scope.draft && p.ack.id === scope.draft.id) {
@@ -380,12 +381,17 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
   scope.targetScopeChanged = function() { const t=scope.draft.target;scope.draft.target=t.scope==='devices'?{scope:'devices',kind:'*',ids:[]}:{scope:t.scope,kind:t.kind,id:''}; };
   scope.selectedDevice=function(id){const t=scope.draft.target;return t.scope==='device'?t.id===id:t.ids?.includes(id);};
   scope.profileOptions=function(){
-    if(!scope.draft || !['device','devices'].includes(scope.draft.target.scope))return [];
-    const ds=scope.status.targets.filter(d=>scope.selectedDevice(d.id));
-    return ds.length?(ds[0].scenarios||[]).filter(n=>ds.every(d=>d.scenarios.includes(n))):[];
+    if(!scope.draft)return [];
+    const t=scope.draft.target, explicit=['device','devices'].includes(t.scope);
+    const ds=scope.status.targets.filter(d=>(t.kind==='*'||t.kind===d.kind) && (explicit ? scope.selectedDevice(d.id) :
+      t.scope==='all' || (t.scope==='room' ? d.room===t.id : d.groups.includes(t.id))));
+    if(!ds.length)return [];
+    return explicit ? ds[0].scenarios.filter(n=>ds.every(d=>d.scenarios.includes(n))) :
+      Array.from(new Set(ds.flatMap(d=>d.scenarios)));
   };
   scope.incompatible=function(){
-    if(!scope.draft || !['device','devices'].includes(scope.draft.target.scope))return '';
+    if(!scope.draft)return '';
+    if(!['device','devices'].includes(scope.draft.target.scope))return scope.draft.action.type==='scenario' && !scope.profileOptions().includes(scope.draft.action.value) ? 'den Zielbereich' : '';
     const a=scope.draft.action;
     return scope.status.targets.filter(d=>scope.selectedDevice(d.id) && (!d.actions.includes(a.type)||(['on','off'].includes(a.type)&&a.profile&&!d.scenarios.includes(a.profile))||(a.type==='scenario'&&!d.scenarios.includes(a.value)))).map(d=>d.name).join(', ');
   };
@@ -394,20 +400,35 @@ html.gh-mobile #nr-dashboard .ha-scheduler .sc-edit{width:100%;margin:6px 0}
     const ids=t.scope==='device'?[t.id]:t.ids;
     scope.draft.target={scope:'devices',kind:'*',ids:ids.includes(id)?ids.filter(key=>key!==id):ids.concat(id)};
   };
+  scope.roomName = id => scope.status.rooms?.find(r=>r.id===id)?.name || id;
   scope.targetOptions = function() {
     if(!scope.draft)return [];
     const type=scope.draft.target.scope;
     if(type==='device')return scope.status.targets;
     const ids=[];scope.status.targets.forEach(function(t){(type==='room'?[t.room]:t.groups).forEach(function(id){if(ids.indexOf(id)<0)ids.push(id);});});
-    return ids.map(function(id){return {id:id,name:id};});
+    return ids.map(function(id){return {id:id,name:type==='room'?scope.roomName(id):id};});
   };
   scope.extraKinds = function() { return scope.status.targets.map(function(t){return t.kind;}).filter(function(kind,index,list){return kind!=='light'&&kind!=='socket'&&list.indexOf(kind)===index;}); };
   scope.targetLabel = function(t) { if(t.scope==='devices')return t.ids.map(id=>scope.status.targets.find(x=>x.id===id)?.name||id).join(', ');const device=t.scope==='device'&&scope.status.targets.find(x=>x.id===t.id);
-    return ({device:'Gerät',room:'Raum',group:'Raumgruppe',all:'Alle Räume'}[t.scope]||t.scope)+(t.scope==='all'?'':' · '+(device?device.name:t.id)); };
+    return ({device:'Gerät',room:'Raum',group:'Raumgruppe',all:'Alle Räume'}[t.scope]||t.scope)+(t.scope==='all'?'':' · '+(device?device.name:t.scope==='room'?scope.roomName(t.id):t.id)); };
   scope.dayText=function(p){if(!['weekly','window','solar'].includes(p.type))return '';const days=scope.weekdays.filter(d=>(p.days||[]).includes(d.id));return days.length===7?'Täglich':days.map(d=>d.name).join(', ');};
   scope.actionLabel=function(a){if(!a)return '—';return {on:'Einschalten',off:'Ausschalten',brightness:'Helligkeit '+a.value+' %',scenario:'Szenario '+a.value}[a.type]||a.type;};
   scope.describe = function(p) { return p.type==='window'?p.start+' → '+p.end+' / '+p.outsideValue+' % außerhalb':p.type==='weekly'?p.start:p.type==='once'?scope.formatDate(p.at):p.type==='interval'?'Alle '+p.intervalMinutes+' Minuten':(p.solarEvent==='sunrise'?'Sonnenaufgang':'Sonnenuntergang')+(p.offsetMinutes?' '+p.offsetMinutes+' min':''); };
   scope.formatDate = function(value) { if(!value)return '—';return new Date(value).toLocaleString('de-AT',{timeZone:'Europe/Vienna'}); };
+  function startKitchenPlan(){
+    if(typeof sessionStorage==='undefined')return;
+    const saved=sessionStorage.getItem('georg-kitchen-plan');
+    const device=scope.devices?.find(d=>d.id==='kitchen-light');
+    if(!saved || !device)return;
+    sessionStorage.removeItem('georg-kitchen-plan');
+    let request;try{request=JSON.parse(saved);}catch{return;}
+    if(Date.now()-request.at>30000 || !device.scenarios.includes(request.name))return;
+    scope.beginGuide(device);scope.guideCreate();
+    scope.draft.action={type:'scenario',value:request.name};
+    scope.guideStep('time');
+  }
+  const openKitchenPlan=()=>scope.$evalAsync(startKitchenPlan);
+  window.addEventListener?.('georg-kitchen-plan',openKitchenPlan);
   scope.refresh();
 })(scope);
 </script>

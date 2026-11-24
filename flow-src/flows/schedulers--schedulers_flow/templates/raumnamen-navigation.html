@@ -1,0 +1,31 @@
+<script>
+(function(){
+  window.georgRoomNamesCleanup?.();
+  let rooms=[], disposed=false;
+  const observer=new MutationObserver(render);
+  function render(){
+    const nav=document.querySelector('md-sidenav');
+    if(!nav)return;
+    const rows=Array.from(nav.querySelectorAll('md-list-item'));
+    for(const row of rows){
+      const room=rooms.find(r=>r.icon===row.querySelector('ui-icon')?.getAttribute('icon'));
+      if(!room)continue;
+      const label=row.querySelector('p'),button=row.querySelector('button');
+      if(label && label.textContent!==room.name)label.textContent=room.name;
+      if(button && button.getAttribute('aria-label')!==room.name)button.setAttribute('aria-label',room.name);
+      if(row.classList.contains('nr-menu-item-active')){
+        const toggle=nav.querySelector('#gh-mobile-pages'), text='Bereiche · '+room.name;
+        if(toggle && toggle.textContent!==text)toggle.textContent=text;
+        const heading=document.querySelector('#nr-dashboard-toolbar h1[node-id]:not([node-id=""])');
+        if(heading && heading.textContent!==room.name)heading.textContent=room.name;
+      }
+    }
+  }
+  function bind(){const nav=document.querySelector('md-sidenav');if(nav){observer.disconnect();observer.observe(nav,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class']});render();}}
+  async function refresh(){try{const res=await fetch('/home-automation/room-names',{cache:'no-store'});if(res.ok){const data=await res.json();if(!disposed){rooms=data;bind();}}}catch{}}
+  function updated(e){rooms=e.detail;bind();}
+  window.addEventListener('georg-room-names',updated);
+  refresh();const timer=setInterval(refresh,15000);
+  window.georgRoomNamesCleanup=()=>{disposed=true;clearInterval(timer);observer.disconnect();window.removeEventListener('georg-room-names',updated);};
+})();
+</script>

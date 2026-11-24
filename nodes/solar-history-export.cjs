@@ -34,7 +34,25 @@ function csvCell(value) {
  if (typeof value === 'string' && /^[=+\-@\t\r]/.test(text)) text = "'" + text;
  return '"' + text.replace(/"/g, '""') + '"';
 }
-async function streamExport(databasePath, request, response) {
+function markdownCell(value) {
+ if (value == null) return 'NULL';
+ return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+  .replaceAll('\\','\\\\').replaceAll('|','\\|').replace(/\r\n|\r|\n/g,'<br>');
+}
+function markdownRow(values) { return '| ' + values.map(markdownCell).join(' | ') + ' |\n'; }
+function markdownHeader(spec,columns,from,to) {
+ const lines=['# Solarhistorie', '', 'Quelle: '+spec.table, 'Zeitraum: '+(from || 'erste Aufzeichnung')+' (inklusive) bis '+(to || 'letzte Aufzeichnung enthalten')+(to ? ' (exklusive)' : ''),
+  'Zeitstempel mit Z sind UTC. Tageswerte verwenden das gespeicherte Kalenderdatum.'];
+ if (spec.dataset==='trend') {
+  lines.push('Messgrößen: '+spec.metrics.map(key=>METRICS[key].label+' ('+spec.unit+')').join(', '),
+   'Statusfilter: '+({all:'alle Datensätze',online:'online',offline:'offline oder unvollständig'}[spec.status]));
+ }
+ lines.push('Einheiten laut Spaltennamen: _w = Watt, _wh = Wattstunden, _kwh = Kilowattstunden.',
+  'NULL = fehlender Wert. 0 ist ein gespeicherter Zahlenwert. Bei online = 0 bzw. Offline-Status fehlen verlässliche Messwerte.',
+  '', '## Aufzeichnungen', '');
+ return lines.join('\n')+'\n'+markdownRow(columns)+markdownRow(columns.map(()=>'---'));
+}
+async function streamExport(databasePath, request, response, format = 'csv') {
  let spec;
  try { spec = request.query?.dataset === 'trend' ? {...trendRequest(request.query),dataset:'trend'} : exportRequest(request.query); }
  catch (error) { response.status(400).json({error: error.message}); return; }
@@ -47,14 +65,18 @@ async function streamExport(databasePath, request, response) {
   const to = dataset === 'trend' ? spec.end : time === 'day' ? spec.to?.slice(0,10) : spec.to;
   const columns = dataset === 'trend' ? [time,spec.statusColumn,...spec.metrics.map(key=>METRICS[key][spec.mode])] : db.prepare(`PRAGMA table_info(${table})`).all().map(row=>row.name);
   const stmt = db.prepare(dataset === 'trend' ? `SELECT ${columns.join(',')} FROM ${table} WHERE ${trendFilter(spec)} ORDER BY ${time}` : `SELECT * FROM ${table} WHERE (? IS NULL OR ${time}>=?) AND (? IS NULL OR ${time}<?) ORDER BY ${time}`);
-  response.set('Content-Type','text/csv; charset=utf-8');
-  response.set('Content-Disposition',`attachment; filename="solar-${dataset}.csv"`);
+  const markdown = format === 'md';
+  response.set('Content-Type', (markdown ? 'text/markdown' : 'text/csv')+'; charset=utf-8');
+  response.set('Content-Disposition',`attachment; filename="solar-${dataset}.${format}"`);
   response.set('Cache-Control','no-store');
-  response.write('\uFEFF' + columns.map(csvCell).join(';') + '\r\n');
+  response.write(markdown ? markdownHeader(spec,columns,from,to) : '\uFEFF' + columns.map(csvCell).join(';') + '\r\n');
+  let count=0;
   const parameters=dataset === 'trend' ? [from,to] : [from||null,from||null,to||null,to||null];
   for (const row of stmt.iterate(...parameters)) {
    if (response.destroyed) break;
-   if (!response.write(columns.map(key=>csvCell(row[key])).join(';')+'\r\n')) {
+   count++;
+   const values=columns.map(key=>row[key]);
+   if (!response.write(markdown ? markdownRow(values) : values.map(csvCell).join(';')+'\r\n')) {
     await new Promise(resolve => {
      const finish=()=>{response.off('drain',finish);response.off('close',finish);resolve();};
      response.once('drain',finish);response.once('close',finish);
@@ -62,6 +84,7 @@ async function streamExport(databasePath, request, response) {
     });
    }
   }
+  if(markdown && !response.destroyed)response.write('\nAnzahl der Aufzeichnungen: '+count+'\n');
   response.end();
  } catch (error) {
   if (response.headersSent) response.destroy(error);

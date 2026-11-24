@@ -37,7 +37,7 @@ kitchen-room-outputs { display: block; }
 .kr-channel .gz-reading { display: grid; margin-left: auto; text-align: right; line-height: 1.25; font-variant-numeric: tabular-nums; }
 .kr-channel small, .kr-output-title small, .kr-details { color: var(--gh-muted,#c6c6c6); }
 .kr-channel .fa-lightbulb-o {
-  width: 28px; text-align: center; font-size: 24px; color: var(--gz-lamp-color);
+  flex: none; text-align: center; font-size: 48px; color: var(--gz-lamp-color);
   background: radial-gradient(ellipse 20% 23% at 50% 35%,var(--gz-lamp-fill) 65%,transparent 100%);
   text-shadow: 0 0 var(--gz-lamp-glow) var(--gz-lamp-color);
 }
@@ -85,6 +85,9 @@ kitchen-room-outputs { display: block; }
     <button type="button" class="kr-create" aria-haspopup="dialog" ng-click="openWizard($event)">
       <i class="fa fa-plus" aria-hidden="true"></i> Szene erstellen
     </button>
+    <button type="button" class="kr-create" ng-if="room.scene" ng-click="planScene()">Szene planen</button>
+    <button type="button" class="kr-create" ng-click="openDelete($event)" aria-haspopup="dialog">Szene löschen</button>
+    <div class="kr-saved" role="status" ng-if="deleteNotice">{{deleteNotice}}</div>
     <div role="status" class="kr-saved" ng-if="createdScene">„{{createdScene}}“ wurde gespeichert.</div>
     <div class="kr-output-title">LED-Ausgänge <small>{{room.active}} von {{room.values.length}} aktiv</small></div>
     <kitchen-room-outputs ng-attr-values="{{room.values | json}}" aria-label="Berechnete LED-Ausgänge der Küche" role="list">{{outputNotice}}</kitchen-room-outputs>
@@ -116,6 +119,16 @@ kitchen-room-outputs { display: block; }
       </footer>
     </form>
   </dialog>
+  <dialog class="kr-wizard kr-delete" aria-label="Küchenszene löschen">
+    <h2>Szene löschen</h2>
+    <label ng-if="room.editable.length">Eigene Szene<select ng-model="deletion.name" ng-options="s for s in room.editable"></select></label>
+    <p ng-if="!room.editable.length">Es gibt noch keine eigene Küchenszene.</p>
+    <p ng-if="scenePlans().length">Zuerst diese Zeitpläne ändern: {{scenePlans().join(', ')}}.</p>
+    <p ng-if="deletion.name && !scenePlans().length">„{{deletion.name}}“ dauerhaft aus der Küche löschen?</p>
+    <p role="status">{{deletion.notice}}</p>
+    <footer><button type="button" ng-click="closeDelete()">Schließen</button>
+      <button type="button" ng-disabled="!deletion.name || deletion.pending || !manager || scenePlans().length" ng-click="deleteScene()">Endgültig löschen</button></footer>
+  </dialog>
   <button type="button" class="kr-details" ng-attr-aria-expanded="{{!!detailsOpen}}" aria-controls="KÜCHE_KÜCHE" ng-click="detailsOpen = !detailsOpen">
     <i class="fa fa-chevron-right" aria-hidden="true"></i> Weitere Küchensteuerung
   </button>
@@ -124,8 +137,33 @@ kitchen-room-outputs { display: block; }
 (function(scope) {
   scope.room = {};
   scope.command = function(payload) { scope.send({topic:'light-controller/dashboard', payload}); };
+  scope.planScene = () => {
+    const link=document.querySelector('md-sidenav md-list-item:has(ui-icon[icon="schedule"]) button');
+    if(!link)return;
+    sessionStorage.setItem('georg-kitchen-plan', JSON.stringify({name:scope.room.scene,at:Date.now()}));
+    link.click();
+    window.dispatchEvent(new Event('georg-kitchen-plan'));
+  };
   let dialog;
-  let saveTimer;
+  let saveTimer, deleteDialog;
+  scope.deletion = {};
+  scope.openDelete = function(event) {
+    scope.deletion = {name: scope.room.editable.includes(scope.room.scene) ? scope.room.scene : scope.room.editable[0]};
+    scope.deleteNotice = '';
+    deleteDialog = event.currentTarget.closest('.kr-room').querySelector('.kr-delete');
+    deleteDialog.showModal();
+  };
+  scope.closeDelete = () => deleteDialog.close();
+  scope.scenePlans = () => (scope.manager?.plans || []).filter(p => p.matchedTargetIds?.includes('kitchen-light') &&
+    (p.action.type==='scenario' ? p.action.value : p.action.profile)===scope.deletion.name).map(p=>p.name);
+  scope.deleteScene = function() {
+    const d=scope.deletion;
+    if (!d.name || d.pending || scope.scenePlans().length) return;
+    d.pending = 'delete-'+Date.now()+'-'+Math.random();
+    d.notice = 'Löschen wird angefordert …';
+    scope.send({topic:'scheduler/manage', payload:{command:'DeleteKitchenScene',targetId:'kitchen-light',name:d.name,
+      token:d.pending,revision:scope.manager.revision}});
+  };
   function focusStep() {
     window.requestAnimationFrame(() => {
       if (!dialog?.open) return;
@@ -183,6 +221,13 @@ kitchen-room-outputs { display: block; }
     if (dialog?.open) dialog.close();
   });
   scope.$watch('msg.payload', function(status) {
+    const management=scope.msg?.roomManagement;
+    if (management) {
+      scope.manager = management;
+      const d=scope.deletion;
+      if (d.pending && management.failedToken===d.pending) { d.pending=null; d.notice=management.notice; }
+      if (d.pending && management.ack?.token===d.pending) d.notice='Warte auf die Bestätigung der Küche …';
+    }
     if (!Array.isArray(status?.LedOutput)) return;
     scope.room = {
       ready: true,
@@ -190,9 +235,14 @@ kitchen-room-outputs { display: block; }
       level: status.DutyCycle,
       scene: status.ScenarioName,
       scenes: status.ScenarioList,
+      editable: status.ScenarioList.filter(s=>s.ScenarioType==='user').map(s=>s.ScenarioName),
       values: status.LedOutput,
       active: status.LedOutput.filter(value => value > 0).length
     };
+    if (scope.deletion.pending && !scope.room.editable.includes(scope.deletion.name)) {
+      scope.deleteNotice='„'+scope.deletion.name+'“ wurde gelöscht.';
+      scope.createdScene=''; scope.deletion.pending=null; deleteDialog?.close();
+    }
     const draft = scope.draft;
     if (!draft || !dialog?.open) return;
     if (draft.pending && scope.msg.sceneCreationId === draft.pending &&
@@ -215,6 +265,7 @@ kitchen-room-outputs { display: block; }
       }
     }
   });
+  scope.command({Command:'ListScenarios'});
   import('/home-automation/light-output.mjs').catch(() =>
     scope.$evalAsync(() => scope.outputNotice = 'LED-Anzeigen konnten nicht geladen werden.')
   );

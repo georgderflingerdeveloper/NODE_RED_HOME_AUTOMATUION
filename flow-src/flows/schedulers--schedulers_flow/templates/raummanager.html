@@ -1,0 +1,81 @@
+<style>
+#Tab_Raummanager .nr-dashboard-cardcontainer:has(.rm-panel),#Tab_Raummanager md-card:has(.rm-panel){height:auto!important;min-height:340px}
+#Tab_Raummanager md-card:has(.rm-panel){position:relative!important}
+.rm-panel{box-sizing:border-box;min-height:340px;padding:18px 14px 30px;color:inherit}.rm-panel section+section{border-top:1px solid var(--gh-border);margin-top:26px;padding-top:18px}
+.rm-panel label{display:grid;gap:4px;margin:10px 0}.rm-panel button,.rm-panel select,.rm-panel input{box-sizing:border-box;min-height:44px;padding:6px 10px;font:inherit;color:inherit;background:var(--gh-inset);border:1px solid var(--gh-border);border-radius:8px}
+.rm-panel select,.rm-panel input{width:100%}.rm-panel button{cursor:pointer}.rm-panel button:disabled{opacity:.55}.rm-panel p{overflow-wrap:anywhere}
+</style>
+<div class="rm-panel">
+ <section><h3><i class="fa fa-sitemap" aria-hidden="true"></i> Raum umbenennen</h3>
+  <label>Raum<select ng-model="edit.room" ng-options="r.id as r.name for r in state.rooms" ng-change="selectRoom()"><option value="">Raum wählen</option></select></label>
+  <form ng-if="edit.room" ng-submit="rename()"><label>Anzeigename<input type="text" ng-model="edit.name" maxlength="60" ng-attr-placeholder="{{originalName()}}"></label>
+   <button ng-disabled="busy">Namen speichern</button></form>
+ </section>
+ <section><h3>Universalszenen</h3>
+  <label>Quelle<select ng-model="transfer.source" ng-change="resetSource()"><option value="">Quelle wählen</option>
+   <option ng-repeat="t in lights track by t.id" ng-value="t.id">{{t.name}}</option>
+   <option value="library" ng-if="state.universalScenes.length">Gespeicherte Vorlagen</option></select></label>
+  <div ng-if="transfer.source"><label>Lichtszene<select ng-model="transfer.scene" ng-options="n for n in sourceNames()" ng-change="selectScene()"><option value="">Szene wählen</option></select></label></div>
+  <div ng-if="transfer.scene"><label>Zielraum<select ng-model="transfer.target"><option value="">Raum wählen</option>
+   <option ng-repeat="t in lights track by t.id" ng-if="t.id !== transfer.source" ng-value="t.id">{{t.name}}</option></select></label>
+   <label>Name der Raumkopie und Vorlage<input ng-model="transfer.name" maxlength="100"></label>
+   <p ng-if="destination()">Übernommen werden die LED-Werte in Kanalreihenfolge und die gespeicherten Ein-/Ausblendzeiten. {{destination().channels}} Zielkanäle: {{preview()}}. Raumeigene Lichteffekte laufen im Ursprungsraum.</p>
+   <button ng-disabled="busy || !destination() || !transfer.name" ng-click="share()">Szene weitergeben</button>
+   <button ng-if="removable()" ng-disabled="busy" ng-click="removeRoomScene()">Raumszene löschen</button>
+   <button ng-if="transfer.source==='library'" ng-disabled="busy" ng-click="removeTemplate()">Vorlage löschen</button>
+  </div>
+ </section>
+ <p role="status">{{feedback}}</p>
+ <p ng-if="state.kitchenSceneJob">Die Küchensteuerung bestätigt „{{state.kitchenSceneJob.name}}“ noch.</p>
+ <p role="alert" ng-if="state.kitchenSceneIssue">{{state.kitchenSceneIssue}}</p>
+ <p ng-if="state.kidSceneRemoval">„{{state.kidSceneRemoval}}“ wird im Georgszimmer entfernt, sobald eine andere Szene gewählt ist.</p>
+</div>
+<script>
+(function(s){
+ s.edit={};s.transfer={};s.state={rooms:[],universalScenes:[]};s.lights=[];
+ let expected, waitTimer;
+ s.$on('$destroy',()=>window.clearTimeout(waitTimer));
+ function send(command,payload){
+   s.busy='rooms-'+Date.now()+'-'+Math.random();s.feedback='Wird gespeichert …';
+   window.clearTimeout(waitTimer);
+   waitTimer=window.setTimeout(()=>s.$evalAsync(()=>{if(s.busy){s.busy=null;s.feedback='Keine Speicherbestätigung erhalten.';}}),10000);
+   s.send({topic:'scheduler/manage',payload:{...payload,command,revision:s.state.revision,token:s.busy}});
+ }
+ s.$watch('msg.payload',p=>{
+   if(!p)return;
+   if(p.rooms){
+     s.state=p;s.lights=p.targets.filter(t=>t.profileRoom && t.sceneLevels);
+     if(p.ack?.token && p.ack.token===s.busy && p.ack.command==='RenameRoom')window.dispatchEvent(new CustomEvent('georg-room-names',{detail:p.rooms}));
+   }
+   if(s.busy && (p.ack?.token===s.busy || p.failedToken===s.busy)){
+     window.clearTimeout(waitTimer);s.busy=null;s.feedback=p.notice;
+     if(p.failedToken)expected=null;
+   }
+   if(expected && !s.busy && p.targets?.some(t=>t.id===expected.id && JSON.stringify(t.sceneLevels?.[expected.name])===expected.levels)){
+     s.feedback='„'+expected.name+'“ ist im Zielraum verfügbar und im Scheduler auswählbar.';expected=null;
+   }
+ });
+ s.originalName=()=>s.state.rooms.find(r=>r.id===s.edit.room)?.original;
+ s.selectRoom=()=>{s.edit.name=s.state.rooms.find(r=>r.id===s.edit.room)?.name;s.feedback='';};
+ s.rename=()=>send('RenameRoom',{room:s.edit.room,name:s.edit.name || ''});
+ s.resetSource=()=>{s.transfer={source:s.transfer.source};s.feedback='';};
+ s.sourceNames=()=>s.transfer.source==='library' ? s.state.universalScenes.map(v=>v.name) :
+   s.lights.find(t=>t.id===s.transfer.source)?.scenarios || [];
+ s.selectScene=()=>{s.transfer.name=s.transfer.scene;s.feedback='';};
+ s.destination=()=>s.lights.find(t=>t.id===s.transfer.target && t.id!==s.transfer.source);
+ function levels(){
+   const values=s.transfer.source==='library'?s.state.universalScenes.find(v=>v.name===s.transfer.scene)?.levels :
+      s.lights.find(t=>t.id===s.transfer.source)?.sceneLevels[s.transfer.scene];
+   return Array.from({length:s.destination()?.channels || 0},(_,i)=>values?.[i] ?? 0);
+ }
+ s.preview=()=>levels().map(v=>v+' %').join(' · ');
+ s.share=()=>{expected={id:s.transfer.target,name:s.transfer.name.trim(),levels:JSON.stringify(levels())};
+   send('ShareRoomScene',{sourceId:s.transfer.source,scene:s.transfer.scene,targetId:s.transfer.target,name:expected.name});};
+ s.removable=()=>s.lights.find(t=>t.id===s.transfer.source)?.editableScenes?.includes(s.transfer.scene);
+ s.removeRoomScene=()=>{if(window.confirm('„'+s.transfer.scene+'“ aus diesem Raum löschen?')){
+   expected=null;send('DeleteRoomScene',{targetId:s.transfer.source,name:s.transfer.scene});}};
+ s.removeTemplate=()=>{if(window.confirm('Vorlage „'+s.transfer.scene+'“ löschen? Die Raumkopien bleiben erhalten.')){
+   expected=null;send('DeleteUniversalScene',{name:s.transfer.scene});}};
+ s.send({topic:'scheduler/manage',payload:{command:'List'}});
+})(scope);
+</script>

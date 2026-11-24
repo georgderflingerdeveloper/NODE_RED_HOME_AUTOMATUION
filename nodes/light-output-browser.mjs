@@ -86,7 +86,7 @@ class KitchenRoomOutputs extends HTMLElement {
                 row.className = 'kr-channel';
                 row.setAttribute('role', 'listitem');
                 const icon = document.createElement('i');
-                icon.className = 'fa fa-lightbulb-o';
+                icon.className = 'fa fa-fw fa-3x fa-lightbulb-o';
                 icon.setAttribute('aria-hidden', 'true');
                 const label = document.createElement('span');
                 label.className = 'label';

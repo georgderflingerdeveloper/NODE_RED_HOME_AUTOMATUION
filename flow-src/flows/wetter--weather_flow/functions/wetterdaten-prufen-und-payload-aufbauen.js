@@ -26,19 +26,23 @@ if (!times.length || times.length !== sunshine.length || !dailyDates.length || d
 // Clamp percentages to a safe 0..100 range.
 const clampPercent = value => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
 
+const asDate = value => new Date(typeof value === "number" ? value * 1000 : value);
+const localStamp = new Intl.DateTimeFormat("sv-SE", {timeZone:"Europe/Vienna",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"});
+const localText = value => localStamp.format(asDate(value)).replace(" ", "T");
+const solarDateKeys = sunrises.map((rise, i) => rise == null ? String(dailyDates[i]).slice(0,10) : localText(rise).slice(0,10));
 // Resolve the sunrise and sunset timestamps for a given forecast date.
 const solarTimesForDate = timeValue => {
-    const dateIndex = dailyDates.indexOf(String(timeValue).slice(0, 10));
+    const dateIndex = solarDateKeys.indexOf(localText(timeValue).slice(0, 10));
     if (dateIndex < 0) return null;
     return {
-        sunrise: new Date(sunrises[dateIndex]),
-        sunset: new Date(sunsets[dateIndex])
+        sunrise: asDate(sunrises[dateIndex]),
+        sunset: asDate(sunsets[dateIndex])
     };
 };
 
 // Build a normalized hourly interval ending at the given timestamp.
 const hourIntervalEndingAt = timeValue => {
-    const end = new Date(timeValue);
+    const end = asDate(timeValue);
     return {
         start: new Date(end.getTime() - 60 * 60 * 1000),
         end
@@ -46,7 +50,7 @@ const hourIntervalEndingAt = timeValue => {
 };
 
 // Format a timestamp as a compact hour label such as 08:00.
-const formatHour = value => String(value.getHours()).padStart(2, "0") + ":00";
+const formatHour = value => localText(value).slice(11,13) + ":00";
 
 // Create a human-readable label for the weather interval.
 const intervalLabel = timeValue => {
@@ -70,12 +74,12 @@ const sunshineSeconds = (seconds, timeValue) => Math.min(Number(seconds), daylig
 const sunshinePercent = (seconds, timeValue) => clampPercent(sunshineSeconds(seconds, timeValue) / 3600 * 100);
 
 // Determine the current hour as the reference point for historical and future forecasts.
-const now = new Date(data.current?.time || Date.now());
+const now = (data.current?.time ? asDate(data.current.time) : new Date());
 const currentHour = new Date(now);
-currentHour.setMinutes(0, 0, 0);
+currentHour.setTime(Math.floor(+now/3600000)*3600000);
 
 // Convert forecast timestamps into Date objects for reliable comparisons.
-const parsedTimes = times.map(value => new Date(value));
+const parsedTimes = times.map(asDate);
 
 // Track the last forecast hour that is already at or before the current hour.
 let lastHourIndex = -1;
@@ -102,14 +106,14 @@ if (selectedIndexes.some(index => typeof sunshine[index] !== "number" || !Number
 
 // Use the first future hour as the main decision point for solar expectations.
 const nextHourIndex = futureIndexes[0].index;
-const nextMorningIndex = parsedTimes.findIndex(time => time > now && time.getHours() === 6);
+const nextMorningIndex = parsedTimes.findIndex(time => time > now && formatHour(time) === "06:00");
 const actualSunshineLastHour = sunshinePercent(sunshine[lastHourIndex], times[lastHourIndex]);
 const expectedNextHour = sunshinePercent(sunshine[nextHourIndex], times[nextHourIndex]);
 const estimatedTemperatureNextMorning = nextMorningIndex >= 0 && Number.isFinite(Number(temperatures[nextMorningIndex]))
     ? Number(temperatures[nextMorningIndex])
     : null;
 const forecastNext6Hours = futureIndexes.map(item => ({
-    Time: times[item.index],
+    Time: typeof times[item.index] === "number" ? item.time.toISOString() : times[item.index],
     TimeLabel: intervalLabel(times[item.index]),
     SunshineSeconds: sunshineSeconds(sunshine[item.index], times[item.index]),
     SunshineMinutes: Math.round(sunshineSeconds(sunshine[item.index], times[item.index]) / 60 * 10) / 10,
@@ -121,6 +125,16 @@ const forecastNext6Hours = futureIndexes.map(item => ({
     PrecipitationProbabilityPercent: clampPercent(rainProbability[item.index]),
     WeatherCode: Number(weatherCodes[item.index]) || 0
 }));
+const numeric = value => typeof value === "number" && Number.isFinite(value) ? value : null;
+const dashboardHours = times.map((value,i) => {
+    const duration = numeric(sunshine[i]);
+    const seconds = duration !== null && duration >= 0 && duration <= 3600 ? sunshineSeconds(duration,value) : null;
+    return {StartEpoch: +parsedTimes[i]-3600000, SunshinePercent: seconds===null?null:clampPercent(seconds/36),
+        SunshineMinutes:seconds===null?null:Math.round(seconds/6)/10, TemperatureC:numeric(temperatures[i]),
+        CloudCoverPercent:numeric(clouds[i]), PrecipitationProbabilityPercent:numeric(rainProbability[i]),
+        IsDaylight: daylightSecondsForInterval(value)>0};
+});
+const todayIndex=solarDateKeys.indexOf(localText(now).slice(0,10));
 const expectedNext6Hours = clampPercent(forecastNext6Hours.reduce((sum, item) => sum + item.SunshineSeconds, 0) / (forecastNext6Hours.length * 3600) * 100);
 const expectedThresholdPercent = 10;
 const sunPowerExpected = expectedNextHour >= expectedThresholdPercent;
@@ -148,7 +162,7 @@ msg.payload = {
         Timezone: data.timezone || "Europe/Vienna"
     },
     Current: {
-        Time: data.current?.time || "",
+        Time: data.current?.time ? (typeof data.current.time === "number" ? now.toISOString() : data.current.time) : "",
         TemperatureC: Number(data.current?.temperature_2m) || 0,
         CloudCoverPercent: clampPercent(data.current?.cloud_cover),
         WeatherCode: Number(data.current?.weather_code) || 0,
@@ -162,10 +176,11 @@ msg.payload = {
     SunPowerExpected: sunPowerExpected,
     SunPowerExpectedText: sunPowerExpected ? "JA · laufendes Stundenintervall" : "NEIN",
     SunPowerExpectedForHours: 1,
-    SunPowerExpectedUntil: times[nextHourIndex],
+    SunPowerExpectedUntil: forecastNext6Hours[0].Time,
     ExpectedSunshineThresholdPercent: expectedThresholdPercent,
-    SunriseToday: sunrises[0] || "",
-    SunsetToday: sunsets[0] || "",
+    SunriseToday: sunrises[todayIndex] ? localText(sunrises[todayIndex]) : "",
+    SunsetToday: sunsets[todayIndex] ? localText(sunsets[todayIndex]) : "",
+    DashboardHours: dashboardHours,
     EstimatedTemperatureNextMorning: estimatedTemperatureNextMorning,
     ForecastNext6Hours: forecastNext6Hours
 };

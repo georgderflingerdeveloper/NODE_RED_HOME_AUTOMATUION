@@ -5,6 +5,8 @@ const path = require('node:path');
 const { candidates } = require('./scheduler-switches.cjs');
 const { Scheduler } = require('./scheduler-core.cjs');
 const { SchedulerStore } = require('./scheduler-store.cjs');
+const { roomList } = require('./scheduler-rooms.cjs');
+const servedRooms = new WeakMap();
 module.exports = function(RED) {
     function SchedulerNode(config) {
         RED.nodes.createNode(this, config);
@@ -25,6 +27,17 @@ module.exports = function(RED) {
             if (primary) digest = crypto.createHash('sha256').update(fs.readFileSync(store.file)).digest('hex');
         }
         catch (error) { loadError = error; node.status({ fill: 'red', shape: 'ring', text: 'Datendatei prüfen' }); node.error(error); }
+        if (primary && RED.httpNode) {
+            if (!servedRooms.has(RED.httpNode)) {
+                RED.httpNode.get('/home-automation/room-names', (_req,res) => {
+                    const read = servedRooms.get(RED.httpNode);
+                    if (!read) return res.sendStatus(503);
+                    res.set('Cache-Control','no-store').json(read());
+                });
+            }
+            servedRooms.set(RED.httpNode, () => roomList(engine?.state || {}));
+            node.on('close', () => servedRooms.set(RED.httpNode, null));
+        }
         function processInput(msg, send, done, batch = false) {
             if (loadError) { send([null, null, { payload: { failedToken: msg?.payload?.token, notice: `Scheduler gesperrt: ${loadError.message}`, errors: [loadError.message], health: {state:'error',label:'Fehler',color:'red',reasons:[loadError.message]} } }]); done?.(); return; }
             const previousState = JSON.stringify(engine.state), previousLive = JSON.stringify(engine.live);

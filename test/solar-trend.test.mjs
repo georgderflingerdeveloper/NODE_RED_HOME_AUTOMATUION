@@ -50,3 +50,18 @@ test('Stundenenergie verwendet kWh und kennzeichnet Stundenmengen statt Leistung
  db.prepare("INSERT INTO hourly_snapshots(interval_start,interval_end,captured_at,energy_status,pv_energy_kwh,house_consumption_kwh,grid_import_kwh,grid_export_kwh) VALUES(?,?,?,?,?,?,?,?)").run('2026-11-15T10:00:00.000Z','2026-11-15T11:00:00.000Z','2026-11-15T11:00:00.000Z','online',2,3,1,0);db.close();
  const result=readTrend(file,{...range,mode:'energy',metrics:'pv'});assert.equal(result.unit,'kWh');assert.equal(result.series[0].stats.total,2);assert.match(result.note,/keine momentanen Leistungsspitzen/);
 });
+
+test('Markdown für die Analyse enthält UTC-Grenzen, Einheiten, Messstatus und Originalwerte',async t=>{
+ class Response extends EventEmitter {
+  chunks=[];headers={};set(k,v){this.headers[k]=v;}write(chunk){this.chunks.push(chunk);return true;}end(){}
+ }
+ const out=new Response();
+ await streamExport(fixture(t),{query:{dataset:'trend',...range,metrics:'pv',status:'all'}},out,'md');
+ const md=out.chunks.join('');
+ assert.match(out.headers['Content-Type'],/text\/markdown/);
+ assert.match(out.headers['Content-Disposition'],/\.md"/);
+ assert.match(md,/PV-Erzeugung \(W\)/);assert.match(md,/Zeitstempel mit Z sind UTC/);
+ assert.match(md,/\| observed_at \| online \| pv_power_w \|/);assert.match(md,/\| 1 \| 0 \|/);
+ assert.match(md,/\| NULL \|/);assert.match(md,/Anzahl der Aufzeichnungen: 6/);
+ assert.doesNotMatch(md,/house_consumption_w/);
+});

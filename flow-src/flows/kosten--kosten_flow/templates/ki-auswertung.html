@@ -1,0 +1,44 @@
+<style>
+.gh-analysis{box-sizing:border-box;width:100%;padding:12px;color:var(--gh-text);overflow-wrap:anywhere}.gh-analysis header,.gh-analysis .ga-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.gh-analysis h3{margin:0}.gh-analysis header i{color:var(--gh-muted)}.gh-analysis label{display:grid;gap:6px;margin:14px 0}.gh-analysis textarea,.gh-analysis select,.gh-analysis button{box-sizing:border-box;max-width:100%;border:1px solid var(--gh-border);border-radius:9px;background:var(--gh-inset);color:inherit;font:inherit;padding:9px}.gh-analysis textarea{width:100%;min-height:17rem;line-height:1.5;resize:vertical}.gh-analysis .ga-actions button{min-height:44px;cursor:pointer;font-weight:600}.gh-analysis button:disabled{opacity:.6}.gh-analysis a{color:inherit;text-decoration:underline}.gh-analysis pre{font:inherit;line-height:1.5;white-space:pre-wrap}.gh-analysis summary{cursor:pointer}.gh-analysis .ga-note{color:var(--gh-muted)}
+
+.gh-analysis{container-type:inline-size}.ga-tabs{display:flex;gap:4px;margin:14px 0}.ga-tabs button{min-height:42px;flex:1;cursor:pointer}.ga-tabs button[aria-pressed=true]{color:#142c25;background:#a5d9c6}
+.ga-body{display:grid;gap:12px;align-items:start}.ga-body aside{display:grid;gap:10px;margin:14px 0}.ga-body article{border-left:4px solid var(--tone);border-radius:8px;padding:10px 12px;background:var(--gh-inset)}.ga-body article strong{color:var(--tone)}.ga-body article p{margin:.4em 0 0;line-height:1.45}.ga-tip{--tone:#8cd8ad}.ga-finding{--tone:#e9c582}
+@container(min-width:36rem){.ga-body{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+#nr-dashboard .nr-dashboard-cardcontainer:has(.gh-analysis),#nr-dashboard md-card:has(.gh-analysis){height:auto!important}
+#nr-dashboard md-card:has(.gh-analysis){position:relative!important}
+</style>
+<section class="gh-analysis"><header><i class="fa fa-line-chart" aria-hidden="true"></i><h3>{{titles[type]}}</h3></header>
+<div class="ga-tabs" role="group" aria-label="Auswertungszeitraum"><button type="button" ng-repeat="t in types" ng-click="choose(t.id)" ng-attr-aria-pressed="{{type===t.id}}">{{t.name}}</button></div>
+<p class="ga-note">Täglich ab 06:05 Uhr Wiener Zeit. Abgeschlossene Wochen werden montags und Monate am Monatsersten archiviert. „Jetzt auswerten“ berücksichtigt den gewählten Zeitraum bis einschließlich gestern. GPT erhält die berechneten Kennzahlen.</p>
+<div class="ga-actions"><button type="button" ng-click="startAnalysis()" ng-disabled="!result.days || waiting || result.busy">Jetzt auswerten</button>
+<span role="status">{{waiting || result.busy ? 'Auswertung läuft …' : view ? 'Bericht vom ' + displayRange(view) : 'Noch kein Bericht für diesen Zeitraum'}}</span></div>
+<p ng-if="result.issue || loadError" role="alert">{{result.issue || loadError}}</p>
+<div class="ga-body"><label>Kurzfassung<textarea readonly ng-model="view.summary" aria-label="Kurzfassung"></textarea></label>
+<aside ng-if="view.tip || view.insight"><article class="ga-tip" ng-if="view.tip"><strong>Praktischer Tipp</strong><p>{{view.tip}}</p></article><article class="ga-finding" ng-if="view.insight"><strong>Erkenntnis</strong><p>{{view.insight}}</p></article></aside></div>
+<small ng-if="view">Quelle · {{view.source}}</small>
+<details ng-if="view.patterns"><summary>Grundlast und mögliche Gerätezeiten</summary><pre>{{view.patterns}}</pre></details>
+<div ng-if="keys.length"><label>Berichtsarchiv<select ng-model="archive.key" ng-options="d as archiveLabel(d) for d in keys" ng-change="readArchive()"></select></label>
+<a ng-if="view.key" ng-href="/home-automation/daily-analysis/{{view.key}}.md" download>Markdown herunterladen</a></div></section>
+<script>
+(function(s){
+ s.result={};s.archive={};s.type='day';s.types=[{id:'day',name:'Tag'},{id:'week',name:'Woche'},{id:'month',name:'Monat'}];
+ s.titles={day:'Tagesauswertung',week:'Wochenauswertung',month:'Monatsauswertung'};
+ const date=iso=>iso.split('-').reverse().join('.');
+ const typeOf=k=>k.startsWith('woche-')?'week':k.startsWith('monat-')?'month':'day';
+ s.archiveLabel=k=>date(k.slice(-10));
+ s.displayRange=v=>v.start===v.through?date(v.start):date(v.start)+' – '+date(v.through);
+ let reset,request=0;
+ function sync(force){
+   s.keys=(s.result.days||[]).filter(k=>typeOf(k)===s.type);const latest=s.result.latestByType?.[s.type];
+   if(force||!s.keys.includes(s.archive.key)||s.archive.key===latest?.key){s.archive.key=latest?.key;s.view=latest;}
+ }
+ s.choose=t=>{request++;s.loadError='';s.type=t;sync(true);};
+ s.startAnalysis=()=>{s.waiting=true;s.archive.key=null;s.loadError='';s.send({topic:'daily/run',period:s.type});reset=setTimeout(()=>s.$evalAsync(()=>{s.waiting=false;s.send({topic:'daily/status'});}),8000);};
+ s.$watch('msg.payload',p=>{if(!p||!Array.isArray(p.days))return;const finished=s.result.busy&&!p.busy;s.result=p;s.waiting=false;clearTimeout(reset);sync(finished&&typeOf(s.lastBusy||'')===s.type);if(p.busy)s.lastBusy=p.day;});
+ s.readArchive=async()=>{const k=s.archive.key,id=++request;s.loadError='';
+  try{const r=await fetch('/home-automation/daily-analysis/'+encodeURIComponent(k)+'.json',{cache:'no-store'});if(!r.ok)throw Error();const v=await r.json();if(request===id)s.$evalAsync(()=>s.view=v);}
+  catch{if(request===id)s.$evalAsync(()=>{s.view=null;s.loadError='Bericht konnte nicht geladen werden.';});}};
+ const init=setTimeout(()=>s.send({topic:'daily/status'}),150);
+ s.$on('$destroy',()=>{request++;clearTimeout(init);clearTimeout(reset);});
+})(scope);
+</script>
