@@ -277,7 +277,8 @@
         "lightcontrollerkitchen"
       ],
       [
-        "lightcontroller_kitchen_dashboard"
+        "lightcontroller_kitchen_dashboard",
+        "kitchen_room_ui"
       ],
       [
         "kitchen_profile_ui"
@@ -336,6 +337,31 @@
     "className": "",
     "x": 895,
     "y": 600,
+    "wires": [
+      [
+        "kitchen_profile"
+      ]
+    ]
+  },
+  {
+    "id": "kitchen_room_ui",
+    "type": "ui_template",
+    "z": "light_controller_flow",
+    "group": "kitchen_room_group",
+    "name": "Küche · Raumlicht",
+    "order": 1,
+    "width": 6,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/light-controller--light_controller_flow/templates/kuche-raumlicht.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 885,
+    "y": 540,
     "wires": [
       [
         "kitchen_profile"

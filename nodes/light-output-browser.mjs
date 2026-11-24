@@ -7,7 +7,7 @@ function formatPercent(value, formatter, minimum) {
     return percent > 0 && percent < minimum ? '< ' + formatter.format(minimum) + ' %' : formatter.format(percent) + ' %';
 }
 
-function showChannel(card, duty) {
+function showChannel(card, duty, interactive = true) {
     const label = card.querySelector('.label');
     if (!label) return;
     let reading = card.querySelector('.gz-reading');
@@ -28,7 +28,7 @@ function showChannel(card, duty) {
     card.dataset.state = state;
     card.dataset.level = level;
     card.setAttribute('aria-label', label.textContent + ' · ' + description + ' · ' + pwm);
-    if (known) card.setAttribute('aria-pressed', String(duty > 0));
+    if (known && interactive) card.setAttribute('aria-pressed', String(duty > 0));
     else card.removeAttribute('aria-pressed');
     const color = light > 0
         ? 'rgb(' + [139 + 116 * light, 101 + 118 * light, 44 + 68 * light].map(Math.round).join(',') + ')'
@@ -72,6 +72,33 @@ class RoomOutputs extends HTMLElement {
     }
 }
 if (!customElements.get('gz-room-outputs')) customElements.define('gz-room-outputs', RoomOutputs);
+
+// The kitchen profile publishes PWM frames for the configured 1–16 outputs.
+class KitchenRoomOutputs extends HTMLElement {
+    static get observedAttributes() { return ['values']; }
+
+    attributeChangedCallback(_, previous, current) {
+        if (!current || previous === current) return;
+        const values = JSON.parse(current);
+        if (this.children.length !== values.length) {
+            this.replaceChildren(...values.map((_, index) => {
+                const row = document.createElement('div');
+                row.className = 'kr-channel';
+                row.setAttribute('role', 'listitem');
+                const icon = document.createElement('i');
+                icon.className = 'fa fa-lightbulb-o';
+                icon.setAttribute('aria-hidden', 'true');
+                const label = document.createElement('span');
+                label.className = 'label';
+                label.textContent = 'LED ' + (index + 1);
+                row.append(icon, label);
+                return row;
+            }));
+        }
+        values.forEach((duty, index) => showChannel(this.children[index], duty, false));
+    }
+}
+if (!customElements.get('kitchen-room-outputs')) customElements.define('kitchen-room-outputs', KitchenRoomOutputs);
 
 // The kitchen preview reads its locally calculated controller outputs.
 class LightOutput extends HTMLElement {

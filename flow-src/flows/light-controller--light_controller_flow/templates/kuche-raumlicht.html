@@ -1,0 +1,222 @@
+<style>
+/* Keep the two kitchen groups in reading order when the detail panel opens. */
+#nr-dashboard #Tab_KÜCHE {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-height: 0 !important; height: auto !important;
+}
+#nr-dashboard #Tab_KÜCHE > ui-card-panel {
+  position: relative !important; inset: auto !important; transform: none !important;
+}
+#nr-dashboard #Tab_KÜCHE:not(:has(.kr-details[aria-expanded="true"])) > #KÜCHE_KÜCHE {
+  display: none !important;
+}
+#nr-dashboard #Tab_KÜCHE .nr-dashboard-cardcontainer {
+  display: flex; flex-direction: column; height: auto !important;
+}
+#nr-dashboard #Tab_KÜCHE .nr-dashboard-cardcontainer > md-card {
+  position: relative !important; inset: auto !important; height: auto !important;
+}
+#nr-dashboard #Tab_KÜCHE .nr-dashboard-cardcontainer > md-card.nr-dashboard-switch { min-height: 48px; }
+.kr-room { --kr-accent: #90d4c1; box-sizing: border-box; width: 100%; padding: 8px 10px; color: inherit; }
+.kr-power { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: rgba(100,114,118,.18); }
+.kr-power button, .kr-details { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.kr-power button { min-height: 44px; border-radius: 10px; font-weight: 600; }
+.kr-power i { margin-inline-end: 4px; }
+.kr-power button[aria-pressed="true"] { background: var(--kr-accent); color: #132d26; }
+.kr-room :is(button, input, select):focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.kr-level { display: block; margin: 16px 0 4px; }
+.kr-label, .kr-output-title { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-weight: 600; }
+.kr-label span, .kr-output-title small { font-weight: 500; font-variant-numeric: tabular-nums; }
+.kr-level input { display: block; width: 100%; height: 44px; margin: 0; accent-color: var(--kr-accent); }
+.kr-scene { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; font-weight: 600; }
+.kr-scene select { width: 100%; min-width: 0; min-height: 44px; border: 1px solid currentColor; border-radius: 8px; background: transparent; color: inherit; padding: 0 10px; font: inherit; }
+.kr-scene option { background: var(--gh-inset,#242424); color: var(--gh-text,#f1f1f1); }
+.kr-output-title { margin: 18px 0 6px; }
+kitchen-room-outputs { display: block; }
+.kr-channel { display: flex; align-items: center; gap: 12px; padding: 6px 4px; border-top: 1px solid var(--gh-border,#626262); }
+.kr-channel .gz-reading { display: grid; margin-left: auto; text-align: right; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.kr-channel small, .kr-output-title small, .kr-details { color: var(--gh-muted,#c6c6c6); }
+.kr-channel .fa-lightbulb-o {
+  width: 28px; text-align: center; font-size: 24px; color: var(--gz-lamp-color);
+  background: radial-gradient(ellipse 20% 23% at 50% 35%,var(--gz-lamp-fill) 65%,transparent 100%);
+  text-shadow: 0 0 var(--gz-lamp-glow) var(--gz-lamp-color);
+}
+.kr-details { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 4px; margin-top: 6px; font-size: 13px; }
+.kr-details[aria-expanded="true"] i { transform: rotate(90deg); }
+.kr-create { display: flex; align-items: center; gap: 8px; margin: 4px 0 0 auto; padding: 0 8px; min-height: 40px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--kr-accent); font: inherit; cursor: pointer; }
+.kr-wizard { box-sizing: border-box; width: min(420px, calc(100vw - 24px)); max-height: 90dvh; overflow: auto;
+  padding: 20px; border: 1px solid var(--gh-border); border-radius: 16px; background: var(--gh-card); color: var(--gh-text); }
+.kr-wizard::backdrop { background: rgba(10, 16, 15, .7); }
+.kr-wizard header, .kr-wizard footer, .kr-wizard .kr-review li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.kr-wizard header { font-size: 13px; color: var(--gh-muted); }
+.kr-wizard h2 { font-size: 21px; margin: 16px 0; overflow-wrap: anywhere; }
+.kr-wizard button { min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.kr-wizard header button { padding: 0 6px; }
+.kr-wizard input[type=text] { box-sizing: border-box; width: 100%; min-height: 44px; margin: 6px 0; padding: 8px 10px;
+  border: 1px solid var(--gh-border); border-radius: 8px; background: var(--gh-inset); color: inherit; font: inherit; }
+.kr-wizard .kr-level { margin: 8px 0; }
+.kr-wizard .kr-review { list-style: none; margin: 0; padding: 0; }
+.kr-wizard .kr-review li { padding: 6px 0; border-bottom: 1px solid var(--gh-border); font-variant-numeric: tabular-nums; }
+.kr-wizard p { line-height: 1.45; }
+.kr-wizard .kr-error { color: #ffd391; }
+.kr-wizard footer { margin-top: 16px; }
+.kr-wizard footer [type=submit] { margin-left: auto; padding: 8px 14px; font-weight: 600; background: var(--kr-accent); color: #132d26; }
+.kr-wizard button:disabled { opacity: .55; cursor: default; }
+.kr-saved { margin: 4px 0; color: var(--kr-accent); overflow-wrap: anywhere; }
+</style>
+<div class="kr-room">
+  <div ng-if="!room.ready" role="status">{{msg.payload.error || 'Küchensteuerung wird geladen …'}}</div>
+  <div ng-if="room.ready">
+    <div class="kr-power" role="group" aria-label="Küchenlicht">
+      <button type="button" ng-attr-aria-pressed="{{room.on}}" ng-click="command({Command:'AllLightsOn'})"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Ein</button>
+      <button type="button" ng-attr-aria-pressed="{{!room.on}}" ng-click="command({Command:'AllLightsOff'})"><i class="fa fa-power-off" aria-hidden="true"></i> Aus</button>
+    </div>
+    <label class="kr-level"><span class="kr-label">Helligkeit <span>{{room.level}} %</span></span>
+      <input type="range" min="0" max="100" step="1" aria-label="Helligkeit in Prozent" ng-model="room.level"
+        ng-model-options="{updateOn:'change'}" ng-change="command({Command:'SetDutyCycle',DutyCycle:room.level})">
+    </label>
+    <label class="kr-scene">Lichtszene
+      <select ng-model="room.scene" ng-options="s.ScenarioName as s.ScenarioName for s in room.scenes"
+        ng-change="room.scene && command({Command:'ScenarioApply',ScenarioName:room.scene})">
+        <option value="" disabled>Szene wählen</option>
+      </select>
+    </label>
+    <button type="button" class="kr-create" aria-haspopup="dialog" ng-click="openWizard($event)">
+      <i class="fa fa-plus" aria-hidden="true"></i> Szene erstellen
+    </button>
+    <div role="status" class="kr-saved" ng-if="createdScene">„{{createdScene}}“ wurde gespeichert.</div>
+    <div class="kr-output-title">LED-Ausgänge <small>{{room.active}} von {{room.values.length}} aktiv</small></div>
+    <kitchen-room-outputs ng-attr-values="{{room.values | json}}" aria-label="Berechnete LED-Ausgänge der Küche" role="list">{{outputNotice}}</kitchen-room-outputs>
+  </div>
+  <dialog class="kr-wizard" aria-labelledby="kr-wizard-title">
+    <form ng-if="draft" ng-submit="advanceScene()" novalidate>
+      <header><span>Szene erstellen · Schritt {{draft.step}} von 3</span>
+        <button type="button" ng-click="closeWizard()" ng-disabled="draft.pending">Abbrechen</button>
+      </header>
+      <h2 id="kr-wizard-title" tabindex="-1">{{['Szene benennen', 'Lichter einstellen', draft.name][draft.step - 1]}}</h2>
+      <label ng-if="draft.step === 1">Name der Szene
+        <input type="text" ng-model="draft.name" ng-trim="false" autocomplete="off" placeholder="z. B. Abendessen"
+          ng-change="draft.error = ''" ng-attr-aria-invalid="{{!!draft.error}}" aria-describedby="kr-wizard-error">
+      </label>
+      <div ng-if="draft.step === 2">
+        <label class="kr-level" ng-repeat="value in draft.levels track by $index">
+          <span class="kr-label">LED {{$index + 1}} <span>{{value}} %</span></span>
+          <input type="range" min="0" max="100" step="1" ng-model="draft.levels[$index]" ng-attr-aria-label="LED {{$index + 1}}">
+        </label>
+      </div>
+      <div ng-if="draft.step === 3">
+        <ul class="kr-review"><li ng-repeat="value in draft.levels track by $index"><span>LED {{$index + 1}}</span><strong>{{value ? value + ' %' : 'Aus'}}</strong></li></ul>
+        <p>Beim Speichern wird die Szene in der Küche aktiv. Die Gesamthelligkeit beträgt {{room.level}} %.</p>
+      </div>
+      <div id="kr-wizard-error" class="kr-error" role="alert">{{draft.error}}</div>
+      <footer>
+        <button type="button" ng-if="draft.step > 1" ng-disabled="draft.pending" ng-click="backStep()">Zurück</button>
+        <button type="submit" ng-disabled="draft.pending">{{draft.step < 3 ? 'Weiter' : draft.pending ? 'Wird gespeichert …' : 'Speichern und aktivieren'}}</button>
+      </footer>
+    </form>
+  </dialog>
+  <button type="button" class="kr-details" ng-attr-aria-expanded="{{!!detailsOpen}}" aria-controls="KÜCHE_KÜCHE" ng-click="detailsOpen = !detailsOpen">
+    <i class="fa fa-chevron-right" aria-hidden="true"></i> Weitere Küchensteuerung
+  </button>
+</div>
+<script>
+(function(scope) {
+  scope.room = {};
+  scope.command = function(payload) { scope.send({topic:'light-controller/dashboard', payload}); };
+  let dialog;
+  let saveTimer;
+  function focusStep() {
+    window.requestAnimationFrame(() => {
+      if (!dialog?.open) return;
+      dialog.scrollTop = 0;
+      dialog.querySelector(scope.draft.step === 1 ? 'input[type=text]' : 'h2')?.focus();
+    });
+  }
+  function cancelPendingClose(event) {
+    if (scope.draft?.pending) event.preventDefault();
+  }
+  scope.openWizard = function(event) {
+    dialog = event.currentTarget.closest('.kr-room').querySelector('dialog');
+    scope.createdScene = '';
+    scope.draft = { step: 1, name: '', levels: scope.room.values.map(() => 0), error: '' };
+    dialog.addEventListener('cancel', cancelPendingClose);
+    dialog.showModal();
+    focusStep();
+  };
+  scope.closeWizard = () => dialog.close();
+  scope.backStep = function() {
+    scope.draft.step--;
+    scope.draft.error = '';
+    focusStep();
+  };
+  scope.advanceScene = function() {
+    const draft = scope.draft;
+    if (draft.pending) return;
+    draft.name = draft.name.trim();
+    const exists = scope.room.scenes.some(scene =>
+      scene.ScenarioName.toLocaleLowerCase('de-DE') === draft.name.toLocaleLowerCase('de-DE'));
+    if (!draft.name || exists) {
+      draft.step = 1;
+      draft.error = exists ? 'Diesen Namen gibt es schon. Wähle einen anderen.' : 'Gib deiner Szene einen Namen.';
+      focusStep();
+      return;
+    }
+    draft.error = '';
+    if (draft.step < 3) {
+      draft.step++;
+      focusStep();
+      return;
+    }
+    draft.pending = Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-');
+    saveTimer = window.setTimeout(() => scope.$evalAsync(() => {
+      if (!draft.pending) return;
+      draft.pending = null;
+      draft.error = 'Die Küchensteuerung hat das Speichern noch nicht bestätigt. Prüfe die Szenenliste, bevor du es erneut versuchst.';
+    }), 10000);
+    scope.send({topic: 'light-controller/dashboard', sceneCreationId: draft.pending,
+      payload: {Command: 'AddScenario', ScenarioName: draft.name,
+        ScenarioProperties: Object.fromEntries(draft.levels.map((level, index) => [index + 1, level]))}});
+  };
+  scope.$on('$destroy', () => {
+    window.clearTimeout(saveTimer);
+    if (dialog?.open) dialog.close();
+  });
+  scope.$watch('msg.payload', function(status) {
+    if (!Array.isArray(status?.LedOutput)) return;
+    scope.room = {
+      ready: true,
+      on: status.ActiveLights.length > 0,
+      level: status.DutyCycle,
+      scene: status.ScenarioName,
+      scenes: status.ScenarioList,
+      values: status.LedOutput,
+      active: status.LedOutput.filter(value => value > 0).length
+    };
+    const draft = scope.draft;
+    if (!draft || !dialog?.open) return;
+    if (draft.pending && scope.msg.sceneCreationId === draft.pending &&
+        ['scenario_added', 'scenario_create_failed'].includes(status.Event)) {
+      window.clearTimeout(saveTimer);
+      draft.pending = null;
+      if (status.Event === 'scenario_added') {
+        scope.createdScene = draft.name;
+        dialog.close();
+        return;
+      }
+      draft.error = status.CommandResult;
+    }
+    if (!draft.pending && draft.levels.length !== status.LedOutput.length) {
+      draft.levels = status.LedOutput.map((_, index) => draft.levels[index] ?? 0);
+      if (draft.step > 1) {
+        draft.step = 2;
+        draft.error = 'Die Anzahl der LEDs hat sich geändert. Prüfe die Helligkeiten noch einmal.';
+        focusStep();
+      }
+    }
+  });
+  import('/home-automation/light-output.mjs').catch(() =>
+    scope.$evalAsync(() => scope.outputNotice = 'LED-Anzeigen konnten nicht geladen werden.')
+  );
+})(scope);
+</script>

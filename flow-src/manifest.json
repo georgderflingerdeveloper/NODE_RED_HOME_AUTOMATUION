@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "b4c11ce994c612919b62f0ddf5a1955994d2f78c4b9192fe3a198be333e0c5d6",
+  "flowSha256": "09eeb4daf17e69c9371f81164665b0c65471f56a5cd2a8301ac69628d3267712",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -716,7 +716,9 @@
     "kitchen_profile_ui",
     "profiles_config_in",
     "profiles_config_out",
-    "georg_room_output_ui"
+    "georg_room_output_ui",
+    "kitchen_room_group",
+    "kitchen_room_ui"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -857,6 +859,7 @@
     "presence_group_east": "configuration/nodes.json",
     "presence_group_west": "configuration/nodes.json",
     "presence_group_capture": "configuration/nodes.json",
+    "kitchen_room_group": "configuration/nodes.json",
     "956c65fc.759a28": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "f4f718ca.73ad78": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "5e8c7091.07116": "flows/boiler--15e47868.0e5ea8/nodes.json",
@@ -1104,6 +1107,7 @@
     "kitchen_profile_save": "flows/light-controller--light_controller_flow/nodes.json",
     "kitchen_profile_settings": "flows/light-controller--light_controller_flow/nodes.json",
     "kitchen_profile_ui": "flows/light-controller--light_controller_flow/nodes.json",
+    "kitchen_room_ui": "flows/light-controller--light_controller_flow/nodes.json",
     "589874b4.69d95c": "flows/light-door-entry-left--58c186d2.cc7718/nodes.json",
     "7d276b21.d1de14": "flows/light-door-entry-left--58c186d2.cc7718/nodes.json",
     "f5edce8d.7058b": "flows/light-gallery-down--1976d7f.0dd9028/nodes.json",
@@ -1450,7 +1454,7 @@
     "kosten/route-cost-dashboard-request.js": "fce100c26f35445bad7a3ebb78f2f1cf5b40f6c3d595724a9849ecb06e7706d3",
     "light-anteroom-back/light-command-anteroom-back.js": "f84633faa6133fd98862c0ac8d3bcadef6498bf595db6af9be08925a7d733901",
     "light-bath-all/light-command-bathroom-all.js": "9e29a2a2c99c414cbe6f7e65ecbd8af29381e849a14b5e5b67960fc35c7a26a5",
-    "light-controller/lightcontrollerkitchen.js": "2b30ba7f679dc045af28b8c3a333681234b2e8b07d2ab4c0c6d3be4959f6c290",
+    "light-controller/lightcontrollerkitchen.js": "7e0e9c499617b3d5cc5fec92f833ac4a89862a4d117ef93334b4d239d586eb05",
     "light-controller/scheduler-kuche-registrieren-bestatigen.js": "84cb5170ea459df3b94b68d32d65db0c39bb48dd91f4c863828fc452bca0fb7c",
     "light-controller/scheduler-kuchenbefehle-prufen.js": "fdeb9d9079528f20568f32e8190598503c1804bcdd7ce448b5a1ed4d258f041a",
     "light-door-entry-left/light-door-entry-left.js": "f07f19c6e2298302ccbbbebca9f92d354f78ec6d793c1f3750e7c8c80513dd34",
@@ -1527,7 +1531,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "ec977c9e595a7f19d9fe36d9fdfeab9ee38aa78573ded61fe99ead0cb1209926",
+    "configuration/nodes.json": "184148ac1635035c1f2b879f55e84e779aa93c1dc6ff3ade9f4d3e2d16483964",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -1580,11 +1584,12 @@
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",
     "flows/light-bath-all--3486c1a7.a51b3e/functions/light-command-bathroom-all.js": "1e6e1bf586e3ea52f4f9b963edd99a3fdbaf8e7aa6ec6bec562a2dd50a2a5b77",
     "flows/light-bath-all--3486c1a7.a51b3e/nodes.json": "281f4eaba0e17e9f3105d3c9ec6d1af4a2b5d3396e1c6db979a8ca0cabb45803",
-    "flows/light-controller--light_controller_flow/functions/light-controller-kitchen.js": "992d9016869ea0c218e05fe8e96cf7a2bcaa1149818ed830953071033eeb6fe1",
+    "flows/light-controller--light_controller_flow/functions/light-controller-kitchen.js": "d319e889d781e78beb63841d5acae0e927e1157b7c17159f8bb5786134ae2f98",
     "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-command.js": "5a8d2f8af401bd745d14398316787bb77effc4a47f33d7af48fa15a4e02ab47e",
     "flows/light-controller--light_controller_flow/functions/scheduler-kitchen-status.js": "91bca9c7a61c0b766eea7f09ee4dab75493ea150b1224b9d19aff7511d6a620f",
-    "flows/light-controller--light_controller_flow/nodes.json": "3b0b19f62ebcfa1e69861732f9e781d2936023a9f9070e4e62632f409345812d",
+    "flows/light-controller--light_controller_flow/nodes.json": "eb1f1ab1674fb6d133b0a624d4b11db8cbc8efaf71d437ca868f47236e97c9c4",
     "flows/light-controller--light_controller_flow/templates/kitchen-light-controller-dashboard.html": "19e5705b0348dafd3af5b7245ef8978c951be547e438557c737ee593c570121b",
+    "flows/light-controller--light_controller_flow/templates/kuche-raumlicht.html": "37bf85da5ce06bc5b9c1c9e60013dd0c7293030826156948c2fb15a59fa88abe",
     "flows/light-controller--light_controller_flow/templates/lichtprofil-und-rampe.html": "c2a3e0e3fb4f17ca4f2732870b52e4e23ab0653c83dcd0132814ade48dcc820d",
     "flows/light-door-entry-left--58c186d2.cc7718/functions/light-door-entry-left.js": "ea2970dc0b72fb1a23dc7de6ac4e514c234fb35357c66f63e700594b879cb5a3",
     "flows/light-door-entry-left--58c186d2.cc7718/nodes.json": "20de83c18832f21a31c0c37019b20034fed28194cbcb027a0ba158f6389cc388",

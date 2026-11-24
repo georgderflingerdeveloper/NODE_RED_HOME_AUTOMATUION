@@ -121,7 +121,9 @@ test('Kitchen-Dashboard ist bidirektional mit dem echten LightController verbund
     const profile = nodes.find(n=>n.id==='kitchen_profile');
     assert.ok(controller.wires[0].includes(profile.id));
     assert.deepEqual(dashboard.wires, [[profile.id]]);
-    assert.deepEqual(profile.wires.slice(0,2),[[controller.id],[dashboard.id]]);
+    const room = nodes.find(node => node.id === 'kitchen_room_ui');
+    assert.deepEqual(room.wires, [[profile.id]]);
+    assert.deepEqual(profile.wires.slice(0,2), [[controller.id], [dashboard.id, room.id]]);
 });
 
 test('Importierbares Beispiel enthält denselben ausführbaren Dashboard-Inhalt', () => {
