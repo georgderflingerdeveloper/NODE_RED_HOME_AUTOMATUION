@@ -66,7 +66,7 @@ test('Node speichert IO-Werte in eigener Datei; Neustart stellt nur veraltete We
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'io-node-test-'));
  function harness(){let C,tick;const handlers={},messages=[];const mock=sdk();
   const RED={settings:{userDir:dir},nodes:{registerType(_,ctor){C=ctor;},createNode(n){n.id='io';n.on=(k,f)=>handlers[k]=f;n.send=m=>messages.push(m);n.warn=()=>{};}}};
-  const ctx={module:{exports:{}},Date,setInterval(fn){tick=fn;return 1;},clearInterval(){},require(p){if(p.endsWith('/node_modules/phidget22'))return mock.sdk;if(p==='./phidget-io-core.cjs')return require('../nodes/phidget-io-core.cjs');return require(p);}};
+  const ctx={module:{exports:{}},Date,setInterval(fn){tick=fn;return 1;},clearInterval(){},require(p){if(p.endsWith('/node_modules/phidget22'))return mock.sdk;if(p==='./phidget-room-history.cjs')return require('../nodes/phidget-room-history.cjs');if(p==='./phidget-io-core.cjs')return require('../nodes/phidget-io-core.cjs');return require(p);}};
   vm.runInNewContext(fs.readFileSync('nodes/home-automation-phidget-io.js','utf8'),ctx);ctx.module.exports(RED);new C({});
   return {handlers,messages,tick};
  }
@@ -74,4 +74,18 @@ test('Node speichert IO-Werte in eigener Datei; Neustart stellt nur veraltete We
   const file=path.join(dir,'phidget-inventory/io-io.json');assert.equal(JSON.parse(fs.readFileSync(file)).length,3);
   await h.handlers.close(false,()=>{});const h2=harness();h2.handlers.input({});assert.ok(h2.messages.at(-1).payload.rows.every(r=>r.quality==='stale'));await h2.handlers.close(false,()=>{});
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+test('Temperaturkanal bleibt nach UNKNOWN_VALUE für die erste Wandlung geöffnet',async()=>{
+ const mock=sdk();
+ let reads=0;
+ mock.sdk.ErrorCode={UNKNOWN_VALUE:51};
+ mock.sdk.TemperatureSensor=class extends mock.sdk.TemperatureSensor{
+  getTemperature(){if(++reads===1)throw Object.assign(Error('Unknown or Invalid Value'),{errorCode:51});return 24.3;}
+ };
+ const monitor=new Monitor(mock.sdk);
+ monitor.update(inventory);await monitor.tick();
+ assert.equal(monitor.snapshot()[1].quality,'unknown');
+ const count=mock.instances.length;
+ await monitor.tick();assert.equal(mock.instances.length,count);
+ assert.equal(monitor.snapshot()[1].value,24.3);await monitor.close();
 });

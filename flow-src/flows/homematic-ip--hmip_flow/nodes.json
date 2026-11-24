@@ -28,7 +28,8 @@
         "hmip_trends_ui",
         "hmip_reboot_check",
         "hmip_device_snapshot",
-        "hmip_scheduler_inventory"
+        "hmip_scheduler_inventory",
+        "wz_room_io"
       ]
     ],
     "historyDays": 365
@@ -236,5 +237,42 @@
     "x": 850,
     "y": 520,
     "wires": []
+  },
+  {
+    "id": "wz_room_io",
+    "type": "home-automation-living-room",
+    "z": "hmip_flow",
+    "name": "Wohnzimmer · Licht und Kontakte",
+    "x": 610,
+    "y": 460,
+    "wires": [
+      [
+        "wz_room_ui"
+      ]
+    ]
+  },
+  {
+    "id": "wz_room_ui",
+    "type": "ui_template",
+    "z": "hmip_flow",
+    "group": "wz_raumlicht_group",
+    "name": "Wohnzimmer · Raumlicht",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/homematic-ip--hmip_flow/templates/wohnzimmer-raumlicht.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 930,
+    "y": 460,
+    "wires": [
+      [
+        "wz_room_io"
+      ]
+    ]
   }
 ]

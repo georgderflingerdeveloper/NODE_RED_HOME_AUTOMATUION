@@ -17,8 +17,14 @@ function section(md,heading){
 }
 function readView(key,md){
     const period=md.match(/^Zeitraum: ([\d-]+) bis ([\d-]+)$/m);
-    return {key,day:period?period[1]+' bis '+period[2]:key,start:period?.[1]||key,through:period?.[2]||key,
-        source:md.match(/^Auswertung: (.+)$/m)?.[1],summary:section(md,'Kurzfassung'),tip:section(md,'Praktischer Tipp'),insight:section(md,'Erkenntnis'),patterns:section(md,'Grundlast und mögliche Gerätezeiten')};
+    const facts=(section(md,'Berechnete Tageskennzahlen')||section(md,'Berechnete Kennzahlen')).split('\n').filter(line=>line.startsWith('- ')).map(line=>line.slice(2));
+    const topics=[{key:'energy',name:'Energie',lines:[]},{key:'cost',name:'Stromkosten',lines:[]},{key:'motion',name:'Bewegung',lines:[]}];
+    for(const fact of facts){
+        const index=/Bewegung|Meldungsärmstes|Meldungsarmes|Meldungen gespeichert/i.test(fact)?2:/Netzbezugskosten|bepreist|Energiekosten|ct.je|ct pro|ct\/kWh|Stromkosten/i.test(fact)?1:0;
+        topics[index].lines.push(fact);
+    }
+    return {topics:topics.filter(t=>t.lines.length),key,day:period?period[1]+' bis '+period[2]:key,start:period?.[1]||key,through:period?.[2]||key,
+        source:md.match(/^Auswertung: (.+)$/m)?.[1],summary:section(md,'Kurzfassung'),tip:section(md,'Praktischer Tipp'),insight:section(md,'Erkenntnis'),temperatures:section(md,'Temperaturprofile').split(/\n/).filter(Boolean).map(line=>line.replace(/^- /,'')),patterns:section(md,'Grundlast und mögliche Gerätezeiten')};
 }
 async function save(file,content){
     const tmp=file+'.'+randomUUID()+'.tmp';
@@ -26,6 +32,14 @@ async function save(file,content){
     finally{await fs.rm(tmp,{force:true});}
 }
 async function summarize(report,signal){
+    const quotaCheck=process.env.GEORG_CODEX_QUOTA_CHECK;
+    if(quotaCheck){
+        await new Promise((resolve,reject)=>execFile(quotaCheck,[],{timeout:18000,signal,maxBuffer:4096},(err)=>{
+            if(!err)return resolve();
+            const paused=new Error('GPT pausiert wegen der Kontingentprüfung.');
+            paused.code='QUOTA_PAUSED';reject(paused);
+        }));
+    }
     const dir=await fs.mkdtemp(path.join(os.tmpdir(),'georg-daily-'));
     try{
         const skill=await fs.readFile(skillFile,'utf8'), out=path.join(dir,'answer');
@@ -34,7 +48,7 @@ async function summarize(report,signal){
         await new Promise((resolve,reject)=>{
             const child=execFile(binary,args,{cwd:dir,timeout:120000,signal,maxBuffer:256*1024},err=>err?reject(new Error('GPT-Aufruf fehlgeschlagen oder Zeitlimit erreicht.')):resolve());
             child.stdin.on('error',()=>{});
-            child.stdin.end(skill+'\n\n'+names[report.period.type]+' '+report.day+'\n'+[...report.notes,report.tip,...report.patterns].join('\n'));
+            child.stdin.end(skill+'\n\n'+names[report.period.type]+' '+report.day+'\n'+[...report.notes,report.tip,...report.patterns,...report.temperatures].join('\n'));
         });
         const result=(await fs.readFile(out,'utf8')).trim();
         if(!result || result.length>5000)throw Error('GPT lieferte keine verwendbare Kurzfassung.');
@@ -91,7 +105,7 @@ module.exports=function(RED){
                 if(!target)return;
                 busyDay=target.key;issue='';emit();
                 node.status({fill:'blue',shape:'dot',text:names[target.type]+' '+target.start});
-                const report=await collectAsync(db,target,config.cloudSiteId||process.env.SOLAREDGE_SITE_ID||'',abort.signal);
+                const report=await collectAsync(db,target,config.cloudSiteId||process.env.SOLAREDGE_SITE_ID||'',abort.signal,path.join(RED.settings.userDir,'homematic-ip','hmip_reader-history.sqlite'));
                 if(closed)return;
                 const file=path.join(dir,target.key+'.md'),fallback=report.notes.join('\n\n');
                 const hadReport=dates.has(target.key);
@@ -105,10 +119,13 @@ module.exports=function(RED){
                     try{
                         const answer=await summarize(report,abort.signal);
                         if(!closed)await save(file,markdown(report,answer,'GPT · georgshome-tagesanalyse'));
-                    }catch{
+                    }catch(error){
                         if(!closed){
-                            issue='GPT-Auswertung nicht verfügbar. '+(sameInterval?'Der vorhandene Bericht ist verfügbar.':'Die aktuellen Kennzahlen sind gespeichert.');
-                            if(sameInterval && !(await fs.readFile(file,'utf8')).includes('Auswertung: GPT ·'))await save(file,local);
+                            issue=(error.code==='QUOTA_PAUSED'?'GPT pausiert wegen der Kontingentprüfung. ':'GPT-Auswertung nicht verfügbar. ')+(sameInterval?'Der vorhandene Bericht ist verfügbar.':'Die aktuellen Kennzahlen sind gespeichert.');
+                            if(sameInterval){
+                                const prior=readView(target.key,await fs.readFile(file,'utf8'));
+                                await save(file,prior.source?.startsWith('GPT ·')?markdown(report,prior.summary,prior.source):local);
+                            }
                         }
                     }
                 }else await save(file,local);

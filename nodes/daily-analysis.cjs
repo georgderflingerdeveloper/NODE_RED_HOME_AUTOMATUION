@@ -3,6 +3,7 @@ const { DatabaseSync } = require('node:sqlite');
 const { localInstant, calculateRange } = require('./energy-range.cjs');
 const { effectiveRows, METRICS } = require('./solaredge-cloud.cjs');
 const {shiftDay,names} = require('./analysis-periods.cjs');
+const {temperatures}=require('./temperature-analysis.cjs');
 const {loadPatterns} = require('./day-load-patterns.cjs');
 const {Worker, isMainThread, parentPort, workerData}=require('node:worker_threads');
 const HOUR = 3600000;
@@ -92,7 +93,7 @@ function analyze(day,from,to,all,tariffs,events) {
 function reportHeader(report,summary,source){
     const p=report.period,title=p?names[p.type]:'Tagesauswertung';
     return ['# GEORGSHOME · '+title,'','Auswertung: '+source,'Zeitraum: '+(p?p.start:report.day)+' bis '+(p?p.through:report.day),
-        '','## Kurzfassung','',summary,'','## Praktischer Tipp','',report.tip,'','## Erkenntnis','',report.insight];
+        '','## Kurzfassung','',summary,'','## Praktischer Tipp','',report.tip,'','## Erkenntnis','',report.insight,...(report.temperatures?['','## Temperaturprofile','',...report.temperatures.map(n=>'- '+n)]:[])];
 }
 function markdown(report, summary, source) {
     if(report.days)return periodMarkdown(report,summary,source);
@@ -101,11 +102,17 @@ function markdown(report, summary, source) {
     return [...reportHeader(report,summary,source),'','## Berechnete Tageskennzahlen','',...report.notes.map(n=>'- '+n),'','## Grundlast und mögliche Gerätezeiten','',...report.patterns.map(n=>'- '+n),'','## Stundenwerte','','Ortszeit Europe/Vienna. UTC kennzeichnet jede Stunde eindeutig. Fehlende Messwerte sind mit — markiert. Kosten beziehen sich auf den bepreisten Netzbezug. Tarifbasis: '+report.basis+'.','',
         'UTC Beginn | Ortszeit | Haus kWh | PV kWh | Bezug kWh | Einspeisung kWh | Bezug EUR | Bepreist % | Tarif ct/kWh | Quellen','--- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---',...rows,'','## Bewegungsmeldungen je Melder und Stunde','','Melder | UTC Beginn | Meldungen | Erste Ortszeit | Letzte Ortszeit','--- | --- | ---: | --- | ---',...motion,''].join('\n');
 }
-function collectPeriod(file,p,siteId){
-    if(p.type==='day')return {...collect(file,p.start,siteId),period:p};
-    const days=[];
-    for(let day=p.start;day<=p.through;day=shiftDay(day,1))days.push(collect(file,day,siteId));
-    return summarizePeriod(p,days);
+function collectPeriod(file,p,siteId,temperatureFile){
+    let report;
+    if(p.type==='day')report={...collect(file,p.start,siteId),period:p};
+    else {
+        const days=[];
+        for(let day=p.start;day<=p.through;day=shiftDay(day,1))days.push(collect(file,day,siteId));
+        report=summarizePeriod(p,days);
+    }
+    report.temperatures=temperatures(temperatureFile,p.start,p.through);
+    if(report.temperatures.length>1)report.hasData=true;
+    return report;
 }
 function summarizePeriod(p,reports){
     const sum=(rows,key)=>rows.reduce((n,r)=>n+(r[key]??0),0);
@@ -171,9 +178,9 @@ function periodMarkdown(report,summary,source){
         '','Zeitzone Europe/Vienna. Fehlende Energiewerte sind mit — markiert. Eine leere Meldezeit erlaubt keinen Rückschluss auf die Anwesenheit.',''].join('\n');
 }
 // Keep the read transaction and signal processing off the Node-RED control loop.
-function collectAsync(file,period,siteId,signal){
+function collectAsync(file,period,siteId,signal,temperatureFile){
     return new Promise((resolve,reject)=>{
-        const worker=new Worker(__filename,{workerData:{file,period,siteId}});
+        const worker=new Worker(__filename,{workerData:{file,period,siteId,temperatureFile}});
         const stop=()=>worker.terminate();
         signal.addEventListener('abort',stop,{once:true});
         if(signal.aborted)stop();
@@ -185,5 +192,5 @@ function collectAsync(file,period,siteId,signal){
         });
     });
 }
-if(!isMainThread && workerData?.file)parentPort.postMessage(collectPeriod(workerData.file,workerData.period,workerData.siteId));
+if(!isMainThread && workerData?.file)parentPort.postMessage(collectPeriod(workerData.file,workerData.period,workerData.siteId,workerData.temperatureFile));
 module.exports={collect,collectAsync,collectPeriod,summarizePeriod,analyze,markdown,localDate,shiftDay,dueDay};

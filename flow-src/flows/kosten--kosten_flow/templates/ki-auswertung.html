@@ -6,6 +6,12 @@
 @container(min-width:36rem){.ga-body{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
 #nr-dashboard .nr-dashboard-cardcontainer:has(.gh-analysis),#nr-dashboard md-card:has(.gh-analysis){height:auto!important}
 #nr-dashboard md-card:has(.gh-analysis){position:relative!important}
+.gh-analysis .ga-tip p{color:color-mix(in srgb,var(--gh-text,currentColor) 78%,#56a383)}
+.gh-analysis .ga-finding p{color:color-mix(in srgb,var(--gh-text,currentColor) 78%,#c49858)}
+.gh-analysis .ga-temperature{--tone:#91adcd;margin:12px 0;padding:10px 12px;border-left:4px solid var(--tone);border-radius:8px;background:var(--gh-inset)}
+.gh-analysis .ga-temperature h4{margin:0}.gh-analysis .ga-temperature p{color:color-mix(in srgb,var(--gh-text,currentColor) 72%,#669acf);margin:.5em 0;line-height:1.45}
+.ga-facts{display:grid;gap:8px;margin:12px 0}.ga-facts details{background:var(--gh-inset);border-left:3px solid var(--tint);border-radius:7px;padding:8px 12px}.ga-facts :is(summary,p){color:color-mix(in srgb,var(--gh-text,currentColor) 72%,var(--tint))}
+.ga-facts [data-topic="energy"]{--tint:#71ad9f}.ga-facts [data-topic="cost"]{--tint:#bb965f}.ga-facts [data-topic="motion"]{--tint:#ac90b8}
 </style>
 <section class="gh-analysis"><header><i class="fa fa-line-chart" aria-hidden="true"></i><h3>{{titles[type]}}</h3></header>
 <div class="ga-tabs" role="group" aria-label="Auswertungszeitraum"><button type="button" ng-repeat="t in types" ng-click="choose(t.id)" ng-attr-aria-pressed="{{type===t.id}}">{{t.name}}</button></div>
@@ -15,6 +21,8 @@
 <p ng-if="result.issue || loadError" role="alert">{{result.issue || loadError}}</p>
 <div class="ga-body"><label>Kurzfassung<textarea readonly ng-model="view.summary" aria-label="Kurzfassung"></textarea></label>
 <aside ng-if="view.tip || view.insight"><article class="ga-tip" ng-if="view.tip"><strong>Praktischer Tipp</strong><p>{{view.tip}}</p></article><article class="ga-finding" ng-if="view.insight"><strong>Erkenntnis</strong><p>{{view.insight}}</p></article></aside></div>
+<div class="ga-facts" ng-if="view.topics.length"><details ng-repeat="t in view.topics track by t.key" ng-attr-data-topic="{{t.key}}"><summary>{{t.name}}</summary><p ng-repeat="text in t.lines track by $index">{{text}}</p></details></div>
+<section class="ga-temperature" ng-if="view.temperatures.length"><h4>Temperaturprofile und Heizplan</h4><p ng-repeat="line in view.temperatures track by $index">{{line}}</p></section>
 <small ng-if="view">Quelle · {{view.source}}</small>
 <details ng-if="view.patterns"><summary>Grundlast und mögliche Gerätezeiten</summary><pre>{{view.patterns}}</pre></details>
 <div ng-if="keys.length"><label>Berichtsarchiv<select ng-model="archive.key" ng-options="d as archiveLabel(d) for d in keys" ng-change="readArchive()"></select></label>

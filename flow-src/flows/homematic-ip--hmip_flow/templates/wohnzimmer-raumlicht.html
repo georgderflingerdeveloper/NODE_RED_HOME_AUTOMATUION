@@ -1,0 +1,101 @@
+<style>
+#nr-dashboard [id^="Tab_"]:has(.wz-room){display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:10px;width:100%!important;height:auto!important;box-sizing:border-box;padding:6px}
+#nr-dashboard [id^="Tab_"]:has(.wz-room)>ui-card-panel{position:relative!important;inset:auto!important;transform:none!important;max-width:100%}
+#nr-dashboard [id^="Tab_"]:has(.wz-room):not(:has(.wz-more[aria-expanded="true"]))>ui-card-panel:not(:has(.wz-room)){display:none!important}
+#nr-dashboard ui-card-panel:has(.wz-room){width:100%!important;order:-1}
+#nr-dashboard ui-card-panel:has(.wz-room) :is(.nr-dashboard-cardpanel,.nr-dashboard-cardcontainer,md-card){width:100%!important;max-width:100%!important;height:auto!important;box-sizing:border-box}
+#nr-dashboard md-card:has(.wz-room){position:relative!important;inset:auto!important}
+.wz-room{box-sizing:border-box;width:100%;padding:8px 12px 16px;color:var(--gh-text,inherit)}
+.wz-room h3,.wz-room summary{font-size:17px;font-weight:600;margin:12px 0 8px}
+.wz-room summary,.wz-room button{cursor:pointer}
+.wz-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr))}
+.wz-light,.wz-contact{box-sizing:border-box;display:flex;align-items:center;gap:10px;min-height:70px;padding:8px 10px;border-radius:12px;background:var(--gh-inset,rgba(110,124,124,.15))}
+.wz-name{flex:1;min-width:0}.wz-name strong,.wz-name small{display:block}.wz-name small{font-size:13px;margin-top:3px}
+.wz-light i.fa-lightbulb-o{font-size:48px;color:var(--gh-muted,#82918f);flex:none}
+.wz-light[data-state="on"] i,.wz-light[data-state="mixed"] i{color:rgb(255,219,112);background:radial-gradient(ellipse 20% 23% at 50% 35%,currentColor 65%,transparent 100%);text-shadow:0 0 12px currentColor}
+.wz-light[data-state="mixed"] i{opacity:.6}
+.wz-light[data-state="unknown"] i{opacity:.45}
+.wz-room button{font:inherit;color:inherit;border:1px solid var(--gh-muted,#82918f);background:transparent;border-radius:8px;min-height:42px;padding:4px 9px}
+.wz-light button[aria-pressed="true"]{background:#a4d8c7;color:#16332b;border-color:#a4d8c7}
+.wz-room button:disabled{opacity:.55;cursor:default}
+.wz-toggle{display:flex;gap:3px}
+.wz-contact i{font-size:23px;color:var(--gh-muted,#82918f)}.wz-contact[data-state="Offen"] i,.wz-contact[data-state="Gekippt"] i{color:#e9aa66}
+.wz-more{margin-top:16px}.wz-room details{margin:12px 0}.wz-room details p{margin:6px 0;font-size:14px}
+.wz-learn label{display:inline-grid;gap:4px;margin:6px 12px 6px 0}.wz-learn :is(select,input){font:inherit;max-width:100%;box-sizing:border-box;padding:6px}
+</style>
+<section class="wz-room" aria-label="Wohnzimmer">
+ <h3>Fenster- und Türkontakte</h3>
+ <div class="wz-grid">
+  <div class="wz-contact" ng-repeat="c in contacts track by c.id" ng-attr-data-state="{{c.state}}">
+   <i class="fa fa-fw fa-columns" aria-hidden="true"></i>
+   <div class="wz-name"><strong>{{c.name}} · {{c.state}}</strong><small>{{c.source}}<span ng-if="c.at"> · {{c.at | date:'dd.MM. HH:mm'}}</span><span ng-if="c.state==='Unbekannt' && c.last"> · Zuletzt {{c.last | lowercase}}</span></small>
+    <small ng-repeat="r in c.candidates track by r.serial">Karte {{r.serial}} · {{r.level}}</small></div>
+  </div>
+ </div>
+ <details><summary>Fensterkontakt zuordnen</summary>
+ <div class="wz-learn"><label>Controller <select ng-model="learn.side" ng-disabled="learn.busy || learn.step!=='start'"><option value="west">PIWEST</option><option value="east">PIEAST</option></select></label>
+ <label>Fenstername <input ng-model="learn.name" ng-disabled="learn.busy || learn.step!=='start'" maxlength="60" ng-attr-placeholder="{{learn.side==='east'?'Fenster Ost':'Fenster West'}}"></label>
+ <p ng-if="learn.step==='start'">Fenster schließen, dann die erste Messung starten.</p>
+ <p role="status">{{learn.text}}</p>
+ <button ng-click="learnWindow(learn.step)" ng-disabled="learn.busy">{{learn.busy?'Messung läuft …':learn.step==='open'?'Offenes Fenster messen':learn.step==='close'?'Geschlossen messen und speichern':'Geschlossenes Fenster messen'}}</button>
+ <button ng-if="learn.step!=='start'" ng-click="learnWindow('cancel')" ng-disabled="learn.busy">Abbrechen</button></div></details>
+ <div ng-repeat="section in ['Raumlicht','Galerie einzeln']">
+  <h3 ng-if="$first">Raumlicht</h3>
+  <button ng-if="!$first" ng-click="view.gallery=!view.gallery" ng-attr-aria-expanded="{{!!view.gallery}}">Galerie einzeln {{view.gallery ? 'ausblenden' : 'anzeigen'}}</button>
+  <div class="wz-grid" ng-if="$first || view.gallery">
+   <div class="wz-light" ng-repeat="l in lights | filter:{section:section}:true track by l.id" ng-attr-data-state="{{l.state}}">
+    <i class="fa fa-fw fa-3x fa-lightbulb-o" aria-hidden="true"></i>
+    <div class="wz-name"><strong>{{l.name}}</strong><small>{{labels[l.state]}}</small><small role="status" ng-if="notes[l.id]">{{notes[l.id]}}</small></div>
+    <div class="wz-toggle" role="group" ng-attr-aria-label="{{l.name}}">
+     <button ng-repeat="on in [true,false]" ng-click="setLight(l,on)" ng-disabled="l.state==='unknown' || pending[l.id]" ng-attr-aria-pressed="{{l.state===(on?'on':'off')}}" ng-attr-aria-label="{{l.name}} {{on?'ein':'aus'}}">{{on?'Ein':'Aus'}}</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <button class="wz-more" ng-click="view.more=!view.more" ng-attr-aria-expanded="{{!!view.more}}">Weitere Steuerungen {{view.more ? 'ausblenden' : 'anzeigen'}}</button>
+</section>
+<script>
+(function(s){
+ const now=()=>Date.now();
+ let snapshot={lights:[],contacts:[]};
+ let learnTimeout;
+ s.learn={side:'west',step:'start'};
+ s.learnWindow=step=>{
+  s.learn.busy=true;s.send({topic:'living-room/learn',payload:{step,side:s.learn.side,name:s.learn.name}});
+  clearTimeout(learnTimeout);learnTimeout=setTimeout(()=>s.$evalAsync(()=>{s.learn.busy=false;s.learn.step='start';s.learn.text='Keine Rückmeldung. Bitte erneut beginnen.';}),18000);
+ };
+ s.view={}; s.pending={}; s.notes={};
+ s.labels={on:'Ein',off:'Aus',mixed:'Teilweise ein',unknown:'Unbekannt'};
+ function render(){
+  s.lights=snapshot.lights.map(l=>({...l,state:l.until>now()?l.state:'unknown'}));
+  s.contacts=snapshot.contacts.map(c=>c.candidates
+   ? {...c,candidates:c.candidates.map(r=>({...r,level:r.until>now()?r.level:'unbekannt'}))}
+   : {...c,state:c.until>now()?c.state:'Unbekannt'});
+  for(const l of s.lights){
+   const p=s.pending[l.id];
+   if(!p)continue;
+   if(l.until>p.previous && l.state===(p.on?'on':'off')){
+    delete s.pending[l.id];delete s.notes[l.id];
+   }else if(now()>=p.deadline){
+    delete s.pending[l.id];s.notes[l.id]='Schaltung nicht bestätigt';
+   }
+  }
+ }
+ s.setLight=(l,on)=>{
+  if(l.state==='unknown' || s.pending[l.id])return;
+  s.pending[l.id]={on,previous:l.until,deadline:now()+15000};
+  s.notes[l.id]='Warte auf Rückmeldung …';
+  s.send({topic:'living-room/set',payload:{id:l.id,on}});
+ };
+ s.$watch('msg',m=>{
+  if(m?.topic==='living-room/learning'){clearTimeout(learnTimeout);s.learn.busy=false;s.learn.step=m.payload.next;s.learn.text=m.payload.text;}
+  if(m?.topic==='living-room/state'){snapshot=m.payload;render();}
+  if(m?.topic==='living-room/error'){delete s.pending[m.payload.id];s.notes[m.payload.id]='Schalten fehlgeschlagen';}
+ });
+ const poll=()=>{if(!document.hidden)s.send({topic:'living-room/read'});};
+ const timer=setInterval(poll,3500), ticks=setInterval(()=>s.$evalAsync(render),1000);
+ document.addEventListener('visibilitychange',poll);
+ poll();
+ s.$on('$destroy',()=>{clearTimeout(learnTimeout);clearInterval(timer);clearInterval(ticks);document.removeEventListener('visibilitychange',poll);});
+})(scope);
+</script>

@@ -2750,5 +2750,15 @@
     "disp": false,
     "width": "14",
     "collapse": false
+  },
+  {
+    "id": "wz_raumlicht_group",
+    "type": "ui_group",
+    "name": "Licht und Kontakte",
+    "tab": "52acc5d.8b5ba3c",
+    "order": 0,
+    "disp": false,
+    "width": "12",
+    "collapse": false
   }
 ]

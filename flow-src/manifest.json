@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "flowFile": "flows.json",
-  "flowSha256": "ddba7d3fe11af3953e10a2ba0df43360c4d3edbcda15190700363e1056439ab1",
+  "flowSha256": "28b4ba3451123f4d0edf9fce4fa542cf8cf6eb149942ed25a1473729f2da7ed7",
   "formatting": {
     "indent": 4,
     "trailingNewline": true
@@ -726,7 +726,10 @@
     "daily_analysis_tab",
     "daily_analysis_group",
     "daily_analysis_worker",
-    "daily_analysis_ui"
+    "daily_analysis_ui",
+    "wz_raumlicht_group",
+    "wz_room_io",
+    "wz_room_ui"
   ],
   "nodeFiles": {
     "7fa0f8f.5a71708": "configuration/nodes.json",
@@ -872,6 +875,7 @@
     "room_manager_group": "configuration/nodes.json",
     "daily_analysis_tab": "configuration/nodes.json",
     "daily_analysis_group": "configuration/nodes.json",
+    "wz_raumlicht_group": "configuration/nodes.json",
     "956c65fc.759a28": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "f4f718ca.73ad78": "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json",
     "5e8c7091.07116": "flows/boiler--15e47868.0e5ea8/nodes.json",
@@ -1075,6 +1079,8 @@
     "hmip_device_snapshot": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_snapshot_out": "flows/homematic-ip--hmip_flow/nodes.json",
     "hmip_scheduler_inventory": "flows/homematic-ip--hmip_flow/nodes.json",
+    "wz_room_io": "flows/homematic-ip--hmip_flow/nodes.json",
+    "wz_room_ui": "flows/homematic-ip--hmip_flow/nodes.json",
     "host_monitor_tick": "flows/hostrechner--host_monitor_flow/nodes.json",
     "host_monitor_collect": "flows/hostrechner--host_monitor_flow/nodes.json",
     "host_monitor_json": "flows/hostrechner--host_monitor_flow/nodes.json",
@@ -1547,7 +1553,7 @@
     "wetter/wetterubersicht-nach-verbindung-aktualisieren.js": "1e3c1f44ce967ff2c27085e22af79286e12f3c5f98c9d4a1d28efb35bb05eb7c"
   },
   "generatedFiles": {
-    "configuration/nodes.json": "47e2cfea7e16f38efef0f50620b39f8827fe3de61e47aa9af028ced3fcc5b75e",
+    "configuration/nodes.json": "c986d76fcb95ff3e19abfd6eca14dfd46ce5320e2e5eec259b9418d3497ff037",
     "flows/anteroom-gallery-up--732a823b.6349dc/functions/light-command-anteroom-gallery-up.js": "03d90c9ae5768b658098191616709be92526b284990751e5981337f637889ab7",
     "flows/anteroom-gallery-up--732a823b.6349dc/nodes.json": "a67d5f2072c2204afb283455c93d31115c1087e3c7de7428e5220de663616910",
     "flows/boiler--15e47868.0e5ea8/functions/boiler-command.js": "8a60a0a2d0e4075c3458ca89b1f6b8bad2e071c82007c3d192a83b3d39c16e0e",
@@ -1586,16 +1592,17 @@
     "flows/home--7fa0f8f.5a71708/templates/clock-toolbar.html": "d4a3742b4b4191365c32ad860efd1d804f8b16b4eb5704c0679f4f3b5b8a09fd",
     "flows/homematic-ip--hmip_flow/functions/check-hap-offline--hmip_reboot_check.js": "d325880b410bc7e12b19999402b90cdab538c5576354067538dfdc3d14abca97",
     "flows/homematic-ip--hmip_flow/functions/publish-device-snapshot--hmip_device_snapshot.js": "7a42912cea92deeed54408db703d4bee08fa4f71b05bb15391cc054eaf86fae6",
-    "flows/homematic-ip--hmip_flow/nodes.json": "a0d9ef6c800d6f62a1af9d2d7b64c4598dc0ecff4eb8cbb959d0bf201a88afd9",
+    "flows/homematic-ip--hmip_flow/nodes.json": "3ec2b3257a48f19f1abf87d47a7a4808966d262e1c5d83aa76183a48f3579d9e",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-dashboard.html": "0d5a26c1c458166f1d2db9ca0b00ea83ce59afb344cb45c52fde20b6bb9202c5",
     "flows/homematic-ip--hmip_flow/templates/homematic-ip-trends.html": "db9e9de651b88397d36630171d3ec4d14b6e392c99ab20f3018c815bd4d4bf76",
+    "flows/homematic-ip--hmip_flow/templates/wohnzimmer-raumlicht.html": "19a74ad96666eddbf1885e456f337d7be1a16eb4e9b956ea7d1f908675cc730e",
     "flows/hostrechner--host_monitor_flow/nodes.json": "aa471261aa9f830b4049ae8f474462777ce3c5aeb04168278cd0187e10424563",
     "flows/hostrechner--host_monitor_flow/templates/hostrechner-live-ubersicht.html": "11336d32d563783696ab599d0f4114cf9bc2fe80cf0f53e8bb46b0e526b79f1e",
     "flows/kosten--kosten_flow/functions/aktuellen-awattar-tarif-aufbereiten.js": "8cbd096590566a6fb1a33b40614b16c03d101ce9f9dddf817f0a930679946aaf",
     "flows/kosten--kosten_flow/functions/route-cost-dashboard-request.js": "71e9fddd3cec6b4095f7dc90eb032ce9b067070495a6bbddfb31473e4ac79701",
     "flows/kosten--kosten_flow/nodes.json": "38938e8821f40fd64deaa6ecb22b77e4e93a51b76d037d60cea584c263bc096d",
     "flows/kosten--kosten_flow/templates/cost-dashboard.html": "9b2a9d416b7ebb70afa8e27db10db088cb132d619ae1c243c962f7bf1b3ba620",
-    "flows/kosten--kosten_flow/templates/ki-auswertung.html": "bb8dcf730da3c914e9d6577f25a2242110d2f05115963bb3ace25e983529d17a",
+    "flows/kosten--kosten_flow/templates/ki-auswertung.html": "8d961e130843bbe43856f3b5cd3c7605f0f28d1d9d61e73db595794fc685a294",
     "flows/kosten--kosten_flow/templates/solaredge-comparison.html": "e538fe0d9da4a4aad16ebf53d8cd20ab55ec3c6a1e9cc3c383bcac6bb2960dbc",
     "flows/light-anteroom-back--398e4654.d2a5ea/functions/light-command-anteroom-back.js": "f572a4680c53ecd7399546f8d9e3e649640194e876a5e4178a66cc6c36456097",
     "flows/light-anteroom-back--398e4654.d2a5ea/nodes.json": "48e5bec9277d9a3fd684a0841311d3af44cd1a4aaa6fd286678113b2bb383e33",

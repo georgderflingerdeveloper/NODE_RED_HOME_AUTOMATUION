@@ -72,7 +72,13 @@ class Monitor {
      }
      if(this.closed)return;
      if(!ch.getAttached()||!ch.getConnection()?.connected)throw Error('Kanal nicht verbunden');
-     Object.assign(row,readValue(ch,row),{quality:'live',lastRead:this.now(),error:''});
+     let reading;
+     try{reading=readValue(ch,row);}catch(e){
+      // Attached analog channels can need one sampling interval for the first reading.
+      if(e.errorCode!==this.sdk.ErrorCode?.UNKNOWN_VALUE || e.errorCode===undefined)throw e;
+      row.quality='unknown';row.error='Warte auf ersten Messwert';return;
+     }
+     Object.assign(row,reading,{quality:'live',lastRead:this.now(),error:''});
      row.actualServer=ch.getConnection().name;
     }catch(e){row.quality='error';row.error=String(e.message||e).slice(0,200);if(ch){await ch.close().catch(()=>{});this.channels.delete(row.key);}}
    }));
