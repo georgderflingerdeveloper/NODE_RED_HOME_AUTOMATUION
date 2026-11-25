@@ -9,7 +9,7 @@ if (msg.topic === "modbus-reconnect") {
             unitId:1,
             commandDelay:1,
             clientTimeout:1000,
-            reconnectTimeout:2000
+            reconnectTimeout:120000
         }
     }, null];
 }

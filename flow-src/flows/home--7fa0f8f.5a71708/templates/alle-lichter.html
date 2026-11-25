@@ -1,0 +1,19 @@
+<section class="gh-lamp-control" aria-label="Alle Lichter">
+  <div class="gh-lamp-keys">
+    <button type="button" class="gh-lamp-on" ng-disabled="memory.busy" ng-click="setLights(true)"><i class="fa fa-lightbulb-o" aria-hidden="true"></i>Alle Lichter ein</button>
+    <button type="button" ng-disabled="memory.busy" ng-click="setLights(false)"><i class="fa fa-lightbulb-o" aria-hidden="true"></i>Alle Lichter aus</button>
+    <button type="button" class="gh-restore" ng-disabled="!memory.available || memory.busy" ng-click="restore()"><i class="fa fa-lightbulb-o" aria-hidden="true"></i>Letzte Lichter wieder ein</button>
+  </div>
+  <small role="status">{{memory.notice || '„Alle Lichter aus“ merkt sich die zuvor eingeschalteten Lichter mit Rückmeldung.'}}</small>
+  <div class="gh-live-list gh-house-live"><gh-room-live room="entry"></gh-room-live> <gh-room-live room="east"></gh-room-live> <gh-room-live room="west"></gh-room-live> <gh-room-live room="kitchen"></gh-room-live> <gh-room-live room="ante"></gh-room-live> <gh-room-live room="upper"></gh-room-live> <gh-room-live room="bath"></gh-room-live> <gh-room-live room="wc"></gh-room-live> <gh-room-live room="kid"></gh-room-live> <gh-room-live room="sissi"></gh-room-live></div>
+</section>
+<script>
+(function (scope) {
+  scope.$watch('msg', function (msg) {
+    if (msg && msg.topic === 'house/memory') scope.memory = msg.payload;
+  });
+  scope.setLights = function (on) { scope.send({topic:'house/lights', payload:on}); };
+  scope.restore = function () { scope.send({topic:'house/lights/restore'}); };
+  scope.send({topic:'house/memory/read'});
+})(scope);
+</script>

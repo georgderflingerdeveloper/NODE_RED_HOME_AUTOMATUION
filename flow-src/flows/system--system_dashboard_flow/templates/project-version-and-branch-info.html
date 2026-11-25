@@ -29,6 +29,7 @@
       '<div class="ha-info-grid">' +
       '<div class="ha-info-row"><span class="ha-info-label">App-Version</span><span class="ha-info-value ha-version"></span></div>' +
       '<div class="ha-info-row"><span class="ha-info-label">Aktives Projekt</span><span class="ha-info-value ha-project"></span></div>' +
+      '<div class="ha-info-row ha-mobile-deploy"><span class="ha-info-label">Letzter Deploy</span><span class="ha-info-value ha-deployed-at"></span></div>' +
       '<div class="ha-info-row"><span class="ha-info-label">Commit</span><span class="ha-info-value ha-commit"></span></div>' +
       '<div class="ha-info-row"><span class="ha-info-label">Arbeitsbaum</span><span class="ha-info-value ha-working-tree"></span></div>' +
       '<div class="ha-info-row"><span class="ha-info-label">Node-RED</span><span class="ha-info-value ha-node-red"></span></div>' +
@@ -96,6 +97,7 @@
     value(panel, ".ha-version", app.version);
     value(panel, ".ha-project", source.project);
     value(panel, ".ha-commit", source.commit);
+    value(panel, ".ha-deployed-at", deployTime);
     value(panel, ".ha-working-tree", source.dirty ? source.changedFiles + " nicht committete Dateien" : "sauber");
     value(panel, ".ha-node-red", runtime.nodeRedVersion);
     value(panel, ".ha-node", runtime.nodeVersion);

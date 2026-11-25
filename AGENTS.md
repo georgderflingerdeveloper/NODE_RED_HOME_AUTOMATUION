@@ -9,6 +9,18 @@ Installationspaket muss die aktualisierte `package.json` mit installieren.
 
 ## Deployment und Neustart
 
+Für Flow-Funktionen, Dashboard-Vorlagen und eigene Nodes gilt die
+Lesbarkeitsregel aus der Home-PC-AGENTS.md. Messwertverarbeitung und
+Dashboard-Aktualisierungen besonders auf wiederholte Arbeit prüfen.
+
+Bei jeder Flow-Änderung vor dem Deployment den VS-Code-Roundtrip prüfen.
+Nach Änderungen in `flow-src/` zuerst `npm run flow:import` ausführen. Danach
+mit `npm run flow:check` die Synchronität prüfen und die VS-Code-Task
+„Flow: bytegenauer Round-Trip“ ausführen. Headless läuft dieselbe Prüfung mit
+`npm run flow:roundtrip`. Der isolierte Export und Rückimport muss eine
+bytegleiche `flows.json` ergeben. Abweichungen vor dem Deployment beheben und
+das Prüfergebnis im Abschlussbericht nennen.
+
 Nach beauftragten Projektänderungen die erforderlichen Tests und Flow-Prüfungen
 abschließen, den geprüften Stand in die aktive Node-RED-Instanz deployen und
 Node-RED anschließend neu starten. Deployment und Neustart gehören zur Aufgabe

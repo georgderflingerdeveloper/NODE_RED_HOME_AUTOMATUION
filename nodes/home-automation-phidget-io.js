@@ -14,6 +14,8 @@ module.exports=RED=>{
   try{const sdk=require(path.join(RED.settings.userDir,'phidget-monitor-runtime/node_modules/phidget22'));monitor=new Monitor(sdk,previous);}
   catch(e){monitor=new Monitor(null,previous);dependencyError='Phidget-Lesebibliothek fehlt/defekt. Bitte setup-sdk.sh aus dem Update-Paket ausführen. '+e.message;}
   function save(){if(!monitor)return;try{fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file+'.tmp',JSON.stringify(monitor.snapshot()),{mode:0o600});fs.renameSync(file+'.tmp',file);storageError='';lastSave=Date.now();}catch(e){storageError=e.message;}}
+  node.kidOutputRows = () => monitor ? [...monitor.rows.values()].filter(r =>
+   r.serial === '800330' && r.port === 2 && r.server === 'hub5000' && r.className === 'DigitalOutput') : [];
   function emit(){if(closed)return;
    const rows=monitor?monitor.snapshot():previous.map(r=>({...r,quality:'stale'})),now=Date.now();
    if(now>=archiveRetry)try{archive.record(rows,now);}catch{archiveRetry=now+60000;node.warn('Temperaturarchiv Georgszimmer konnte nicht geschrieben werden.');}

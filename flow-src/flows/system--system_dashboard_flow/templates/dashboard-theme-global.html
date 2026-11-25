@@ -75,7 +75,6 @@ body.nr-dashboard-theme md-sidenav md-list-item .md-button:focus-visible{outline
   #dashboard-reconnect-button { min-width:30px; padding:0 6px; font-size:11px; letter-spacing:.02em; }
   #clock { white-space:nowrap; font-size:13px; line-height:1.35; margin:0; font-variant-numeric:tabular-nums; }
   @media (max-width:1100px) { #home-automation-project-status .ha-status-name { display:none; } }
-  @media (max-width:700px) { #nr-dashboard-toolbar { flex-wrap:wrap; height:auto; min-height:64px; padding:8px 12px; gap:6px; } #nr-dashboard-toolbar h1 { font-size:17px; } #home-automation-project-status { margin-left:4px; } #dashboard-reconnect-button { font-size:0; width:28px; min-width:28px; margin:0!important; } #dashboard-reconnect-button::after { content:"↻"; font-size:19px; } #clock { font-size:11px; } #home-automation-project-hash { font-size:10px; margin-left:auto; } }
   @media (max-width:520px) { #home-automation-project-info-panel .ha-info-grid { grid-template-columns:1fr; } }
 
 /* GEORGSHOME GRAUSTUFEN v0.14.2: Fokus und Bedienzustände zentral anpassen.
@@ -91,15 +90,30 @@ body.nr-dashboard-theme button:not(:disabled):hover {filter:brightness(1.13);}
 body.nr-dashboard-theme button:not(:disabled):active {filter:brightness(.90);}
 body.nr-dashboard-theme table {font-variant-numeric:tabular-nums;}
 
-@media (max-width:700px) {
- body.nr-dashboard-theme md-toolbar { height:88px!important; min-height:88px!important; }
- #nr-dashboard-toolbar { display:grid; grid-template-columns:minmax(0,1fr) auto auto; grid-template-rows:32px 28px; height:88px!important; box-sizing:border-box; }
- #nr-dashboard-toolbar h1:not(.ng-hide) { grid-column:1; grid-row:1; font-size:16px; }
- #home-automation-project-status { grid-column:2 / 4; grid-row:1; margin:0; gap:6px; }
- #dashboard-reconnect-button { grid-column:1; grid-row:2; justify-self:start; }
- #nr-dashboard-toolbar > div:has(> #clock) { grid-column:2; grid-row:2; margin:0!important; }
- #home-automation-project-hash { grid-column:3; grid-row:2; margin:0 0 0 8px; }
+html.gh-mobile body.nr-dashboard-theme md-toolbar:has(#nr-dashboard-toolbar) {
+  height:52px !important; min-height:52px !important;
 }
+html.gh-mobile #nr-dashboard-toolbar {
+  display:flex; flex-wrap:nowrap; align-items:center; gap:4px;
+  height:52px; min-height:52px; padding:0 10px 0 16px; box-sizing:border-box;
+}
+html.gh-mobile #nr-dashboard-toolbar h1:not(.ng-hide) {
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; font-size:17px;
+}
+html.gh-mobile #home-automation-project-status { flex:none; margin:0; }
+html.gh-mobile #home-automation-project-status > span,
+html.gh-mobile #home-automation-project-hash,
+html.gh-mobile #nr-dashboard-toolbar > div:has(> #clock) { display:none; }
+html.gh-mobile #home-automation-project-info-button,
+html.gh-mobile #dashboard-reconnect-button {
+  display:flex; align-items:center; justify-content:center; width:44px; min-width:44px; height:44px;
+  margin:0 !important; padding:0; background:transparent; border:0;
+  color:var(--gh-text); font-size:0; line-height:1;
+}
+html.gh-mobile #home-automation-project-info-button::after { content:"Info"; font:600 14px/1 system-ui; }
+html.gh-mobile #dashboard-reconnect-button::after { content:"↻"; font-size:23px; }
+html.gh-mobile #home-automation-project-info-panel { top:52px; }
+html:not(.gh-mobile) #home-automation-project-info-panel .ha-mobile-deploy { display:none; }
 </style>
 <script>
 (function(){
@@ -162,4 +176,47 @@ window.georgConfirmNodeRedRestart = function(onConfirm) {
   document.body.appendChild(dialog);
   dialog.showModal();
 };
+</script>
+
+<style>
+.gh-lamp-control { width:100%; padding:6px; box-sizing:border-box; color:var(--gh-text); }
+.gh-lamp-keys { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.gh-lamp-keys button {
+  display:flex; align-items:center; justify-content:center; gap:8px; min-height:52px; padding:6px 8px;
+  background:var(--gh-inset); color:var(--gh-text); border:1px solid var(--gh-border);
+  border-radius:8px; font:600 15px/1.2 Roboto,Arial,sans-serif; cursor:pointer;
+}
+.gh-lamp-keys i { font-size:24px; }
+.gh-lamp-keys .gh-lamp-on i { color:#ffdb70; }
+.gh-lamp-keys [aria-pressed="true"] { border-color:currentColor; background:var(--gh-control); }
+.gh-lamp-control small { display:block; line-height:1.4; color:var(--gh-muted); }
+.gh-lamp-control small:not(:empty) { margin:6px 0; }
+</style>
+
+<style>
+.gh-live-list { display:flex; flex-wrap:wrap; align-items:center; gap:5px 14px; margin:4px 0 8px; }
+gh-room-live { display:inline-block; max-width:100%; color:var(--gh-text,inherit); }
+#nr-dashboard gh-room-live button { width:100%; min-height:40px; display:flex; align-items:center; gap:8px; text-align:left; padding:5px 8px; border:0; border-radius:7px; background:transparent; color:inherit; cursor:pointer; font:inherit; font-size:14px; }
+gh-room-live .fa-info-circle { margin-left:auto; }
+gh-room-live .gh-condition { flex:none; min-width:4.2em; display:inline-flex; align-items:center; gap:6px; font-size:13px; white-space:nowrap; }
+/* Feste Größe erhält den kleinen Statuspunkt auch in schmalen Raumzeilen. */
+.gh-signal-dot { display:inline-block; flex:0 0 9px; width:9px; height:9px; border-radius:50%; box-sizing:border-box; border:1px solid #9aa3a0; background:#9aa3a0; }
+[data-status="Live"] .gh-signal-dot { background:#76ba91; border-color:#76ba91; box-shadow:0 0 0 2px rgba(118,186,145,.14); }
+[data-status="Error"] .gh-signal-dot { background:#e47777; border-color:#e47777; }
+.gh-connection-dialog dt { display:flex; align-items:center; gap:8px; }
+#nr-dashboard gh-room-live:not(.gh-house-live gh-room-live) button { border:1px solid var(--gh-border,#899); background:var(--gh-inset,transparent); border-radius:8px; min-height:44px; }
+.gh-house-live { display:grid; grid-template-columns:minmax(0,1fr); gap:0; }
+.gh-house-live gh-room-live + gh-room-live { border-top:1px solid var(--gh-border,#777); }
+.gh-connection-dialog { box-sizing:border-box; width:min(390px,calc(100% - 24px)); border:1px solid var(--gh-border,#788); border-radius:14px; padding:20px; background:var(--gh-card,#293335); color:var(--gh-text,#fff); }
+.gh-connection-dialog::backdrop { background:rgba(0,0,0,.55); }
+.gh-connection-dialog h2 { margin:0 0 12px; font-size:20px; }
+.gh-connection-dialog dl>div { padding:10px 0; border-bottom:1px solid var(--gh-border,#899); }
+.gh-connection-dialog dt { font-weight:bold; }
+.gh-connection-dialog dd { margin:4px 0 0; line-height:1.4; }
+.gh-connection-dialog button { font:inherit; color:inherit; padding:8px 16px; border:1px solid currentColor; border-radius:7px; background:transparent; cursor:pointer; }
+.gh-lamp-keys .gh-restore { grid-column:1 / -1; }
+.gh-lamp-keys button:disabled { opacity:.55; cursor:default; }
+</style>
+<script>
+import('/home-automation/room-live.mjs?v=0813');
 </script>

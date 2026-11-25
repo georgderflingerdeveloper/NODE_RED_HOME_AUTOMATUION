@@ -367,5 +367,21 @@
         "kitchen_profile"
       ]
     ]
+  },
+  {
+    "id": "house_kitchen_in",
+    "type": "link in",
+    "z": "light_controller_flow",
+    "name": "Hauslicht · Küche",
+    "links": [
+      "house_kitchen_out"
+    ],
+    "x": 160,
+    "y": 1200,
+    "wires": [
+      [
+        "kitchen_profile"
+      ]
+    ]
   }
 ]

@@ -221,28 +221,18 @@
   },
   {
     "id": "46c0d0f8.ce014",
-    "type": "ui_switch",
+    "type": "function",
     "z": "7fa0f8f.5a71708",
     "g": "d25553b5.e1268",
-    "name": "ALL LIGHTS",
-    "label": "ALLE LICHTER ",
-    "tooltip": "",
-    "group": "f082d23.5870f3",
-    "order": 1,
-    "width": 0,
-    "height": 0,
-    "passthru": true,
-    "decouple": "false",
-    "topic": "",
-    "style": "",
-    "onvalue": "true",
-    "onvalueType": "bool",
-    "onicon": "",
-    "oncolor": "",
-    "offvalue": "false",
-    "offvalueType": "bool",
-    "officon": "",
-    "offcolor": "",
+    "name": "Hauslicht verteilen",
+    "func": {
+      "$flowSource": "flows/home--7fa0f8f.5a71708/functions/hauslicht-verteilen.js"
+    },
+    "outputs": 4,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
     "x": 770,
     "y": 320,
     "wires": [
@@ -259,7 +249,17 @@
         "1f08d9ae.1ea606",
         "2e6ea3e2.15e3bc",
         "8902ca66.b29778",
-        "71ee541a.3a062c"
+        "71ee541a.3a062c",
+        "house_entry_out"
+      ],
+      [
+        "house_kitchen_out"
+      ],
+      [
+        "house_kid_out"
+      ],
+      [
+        "house_sissi_out"
       ]
     ]
   },
@@ -348,41 +348,26 @@
   },
   {
     "id": "f141cad7.25f818",
-    "type": "ui_button",
+    "type": "ui_template",
     "z": "7fa0f8f.5a71708",
     "g": "d25553b5.e1268",
-    "name": "RESET",
+    "name": "Alle Lichter ein und aus",
     "group": "f082d23.5870f3",
-    "order": 8,
-    "width": 0,
-    "height": 0,
-    "passthru": false,
-    "label": "ALLE LICHTER  AUS",
-    "tooltip": "",
-    "color": "",
-    "bgcolor": "",
-    "icon": "fa-2x fa-lightbulb-o",
-    "payload": "false",
-    "payloadType": "bool",
-    "topic": "",
-    "x": 760,
+    "order": 1,
+    "width": 6,
+    "height": 12,
+    "format": {
+      "$flowSource": "flows/home--7fa0f8f.5a71708/templates/alle-lichter.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 750,
     "y": 460,
     "wires": [
       [
-        "46c0d0f8.ce014",
-        "65acd935.85f9b8",
-        "34f4f74.85d2b08",
-        "d3afa9e1.b3b358",
-        "b53402c9.abef1",
-        "6fc6b4bc.2db89c",
-        "528d8119.b5e69",
-        "2ef3deb7.89c4c2",
-        "234d0ad4.aa5936",
-        "a030b27e.8deae",
-        "7a79026c.f00c8c",
-        "1f08d9ae.1ea606",
-        "2e6ea3e2.15e3bc",
-        "8902ca66.b29778"
+        "house_light_memory"
       ]
     ]
   },
@@ -857,5 +842,98 @@
     "x": 2500,
     "y": 420,
     "wires": []
+  },
+  {
+    "id": "house_entry_out",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "name": "Hauslicht → Vorraum",
+    "mode": "link",
+    "links": [
+      "house_entry_in"
+    ],
+    "x": 960,
+    "y": 1140,
+    "wires": []
+  },
+  {
+    "id": "house_kitchen_out",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "name": "Hauslicht → Küche",
+    "mode": "link",
+    "links": [
+      "house_kitchen_in"
+    ],
+    "x": 960,
+    "y": 1190,
+    "wires": []
+  },
+  {
+    "id": "house_kid_out",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "name": "Hauslicht → Kinderzimmer",
+    "mode": "link",
+    "links": [
+      "house_kid_in"
+    ],
+    "x": 960,
+    "y": 1240,
+    "wires": []
+  },
+  {
+    "id": "house_sissi_out",
+    "type": "link out",
+    "z": "7fa0f8f.5a71708",
+    "name": "Hauslicht → Sissis Zimmer",
+    "mode": "link",
+    "links": [
+      "house_sissi_in"
+    ],
+    "x": 960,
+    "y": 1290,
+    "wires": []
+  },
+  {
+    "id": "house_light_memory",
+    "type": "home-automation-house-lights",
+    "z": "7fa0f8f.5a71708",
+    "name": "Letzte Lichter merken",
+    "x": 590,
+    "y": 1080,
+    "wires": [
+      [
+        "46c0d0f8.ce014"
+      ],
+      [
+        "house_entry_out"
+      ],
+      [
+        "house_kitchen_out"
+      ],
+      [
+        "house_sissi_out"
+      ],
+      [
+        "f141cad7.25f818"
+      ]
+    ]
+  },
+  {
+    "id": "wc_group_in",
+    "type": "link in",
+    "z": "7fa0f8f.5a71708",
+    "name": "WC-Gruppenbefehl",
+    "links": [
+      "wc_group_out"
+    ],
+    "x": 1400,
+    "y": 100,
+    "wires": [
+      [
+        "2ef3deb7.89c4c2"
+      ]
+    ]
   }
 ]

@@ -113,5 +113,21 @@
         "sissi_ewelink_control"
       ]
     ]
+  },
+  {
+    "id": "house_sissi_in",
+    "type": "link in",
+    "z": "sissi_zigbee_flow",
+    "name": "Hauslicht · Sissis Zimmer",
+    "links": [
+      "house_sissi_out"
+    ],
+    "x": 160,
+    "y": 1200,
+    "wires": [
+      [
+        "sissi_ewelink_control"
+      ]
+    ]
   }
 ]

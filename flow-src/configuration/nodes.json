@@ -87,7 +87,7 @@
     "id": "77c01f18.55ba",
     "type": "tab",
     "label": "FLOW_BOILER",
-    "disabled": false,
+    "disabled": true,
     "info": ""
   },
   {
@@ -367,7 +367,7 @@
         "y": 375.00568771362305,
         "wires": [
           {
-            "id": "85d91908.2b8968"
+            "id": "b9f3a229.09629"
           }
         ]
       }
@@ -2177,21 +2177,21 @@
     "type": "ui_tab",
     "name": "KÜCHE",
     "icon": "kitchen",
-    "order": 3
+    "order": 4
   },
   {
     "id": "52acc5d.8b5ba3c",
     "type": "ui_tab",
     "name": "WOHNZIMMER",
     "icon": "weekend",
-    "order": 2
+    "order": 3
   },
   {
     "id": "ea22f5b5.5af548",
     "type": "ui_tab",
     "name": "VORHAUS",
     "icon": "fa-sign-in",
-    "order": 4
+    "order": 5
   },
   {
     "id": "fd93ca25.397518",
@@ -2208,7 +2208,7 @@
     "type": "ui_tab",
     "name": "OBEN",
     "icon": "fa-level-up",
-    "order": 5
+    "order": 6
   },
   {
     "id": "b210f56e.db6368",
@@ -2225,7 +2225,7 @@
     "type": "ui_tab",
     "name": "BAD",
     "icon": "fa-tint",
-    "order": 6
+    "order": 7
   },
   {
     "id": "83673fe2.3b03d",
@@ -2242,7 +2242,7 @@
     "type": "ui_tab",
     "name": "WC",
     "icon": "wc",
-    "order": 7
+    "order": 8
   },
   {
     "id": "f055e626.392288",
@@ -2269,7 +2269,7 @@
     "type": "ui_tab",
     "name": "KINDERZIMMER",
     "icon": "child_care",
-    "order": 8,
+    "order": 9,
     "disabled": false,
     "hidden": false
   },
@@ -2395,7 +2395,7 @@
     "commandDelay": 1,
     "clientTimeout": 1000,
     "reconnectOnTimeout": true,
-    "reconnectTimeout": 2000,
+    "reconnectTimeout": 120000,
     "parallelUnitIdsAllowed": true,
     "showErrors": false,
     "showWarnings": true,
@@ -2404,9 +2404,9 @@
   {
     "id": "1132541c42ce2a8d",
     "type": "ui_tab",
-    "name": "SOLAR",
+    "name": "Solar + Energie",
     "icon": "wb_sunny",
-    "order": 11,
+    "order": 12,
     "disabled": false,
     "hidden": false
   },
@@ -2426,7 +2426,7 @@
     "type": "ui_tab",
     "name": "WETTER",
     "icon": "wb_cloudy",
-    "order": 10,
+    "order": 11,
     "disabled": false,
     "hidden": false
   },
@@ -2446,7 +2446,7 @@
     "type": "ui_tab",
     "name": "KOSTEN",
     "icon": "euro_symbol",
-    "order": 14,
+    "order": 15,
     "disabled": false,
     "hidden": false
   },
@@ -2466,7 +2466,7 @@
     "type": "ui_tab",
     "name": "SYSTEM",
     "icon": "dns",
-    "order": 15,
+    "order": 16,
     "disabled": false,
     "hidden": false
   },
@@ -2486,7 +2486,7 @@
     "type": "ui_tab",
     "name": "Schedulers",
     "icon": "schedule",
-    "order": 16,
+    "order": 17,
     "disabled": false,
     "hidden": false
   },
@@ -2512,7 +2512,7 @@
     "type": "ui_tab",
     "name": "Darstellung",
     "icon": "palette",
-    "order": 20,
+    "order": 21,
     "disabled": false,
     "hidden": false
   },
@@ -2531,7 +2531,7 @@
     "type": "ui_tab",
     "name": "Homematic IP",
     "icon": "devices",
-    "order": 17,
+    "order": 18,
     "disabled": false,
     "hidden": false
   },
@@ -2558,7 +2558,7 @@
     "type": "ui_tab",
     "name": "SolarEdge Vergleich",
     "icon": "compare_arrows",
-    "order": 18,
+    "order": 19,
     "disabled": false,
     "hidden": false
   },
@@ -2585,7 +2585,7 @@
     "type": "ui_tab",
     "name": "HOSTRECHNER",
     "icon": "computer",
-    "order": 19,
+    "order": 20,
     "disabled": false,
     "hidden": false
   },
@@ -2622,7 +2622,7 @@
     "type": "ui_tab",
     "name": "Sissis Zimmer",
     "icon": "girl",
-    "order": 9,
+    "order": 10,
     "disabled": false,
     "hidden": false
   },
@@ -2659,7 +2659,7 @@
     "type": "ui_tab",
     "name": "Melder",
     "icon": "directions_walk",
-    "order": 21,
+    "order": 22,
     "disabled": false,
     "hidden": false
   },
@@ -2718,7 +2718,7 @@
     "type": "ui_tab",
     "name": "Raummanager",
     "icon": "fa-sitemap",
-    "order": 22,
+    "order": 24,
     "disabled": false,
     "hidden": false
   },
@@ -2737,7 +2737,7 @@
     "type": "ui_tab",
     "name": "KI-Auswertung",
     "icon": "fa-line-chart",
-    "order": 23,
+    "order": 25,
     "disabled": false,
     "hidden": false
   },
@@ -2752,6 +2752,25 @@
     "collapse": false
   },
   {
+    "id": "vorraum_tab",
+    "type": "ui_tab",
+    "name": "VORRAUM",
+    "icon": "fa-key",
+    "order": 2,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "vorraum_group",
+    "type": "ui_group",
+    "name": "Raumlicht",
+    "tab": "vorraum_tab",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
     "id": "wz_raumlicht_group",
     "type": "ui_group",
     "name": "Licht und Kontakte",
@@ -2762,11 +2781,41 @@
     "collapse": false
   },
   {
+    "id": "piante_ante_group",
+    "type": "ui_group",
+    "name": "Raumlicht",
+    "tab": "ea22f5b5.5af548",
+    "order": 0,
+    "disp": false,
+    "width": "12",
+    "collapse": false
+  },
+  {
+    "id": "piante_bath_group",
+    "type": "ui_group",
+    "name": "Raumlicht",
+    "tab": "c1a8c6ed.e57098",
+    "order": 0,
+    "disp": false,
+    "width": "12",
+    "collapse": false
+  },
+  {
+    "id": "piante_upper_group",
+    "type": "ui_group",
+    "name": "Raumlicht",
+    "tab": "56be4a6.19911b4",
+    "order": 0,
+    "disp": false,
+    "width": "12",
+    "collapse": false
+  },
+  {
     "id": "smartmeter_tab",
     "type": "ui_tab",
     "name": "Smartmeter",
     "icon": "fa-tachometer",
-    "order": 12,
+    "order": 13,
     "disabled": false,
     "hidden": false
   },
@@ -2823,7 +2872,7 @@
     "type": "ui_tab",
     "name": "Wallbox",
     "icon": "fa-plug",
-    "order": 13,
+    "order": 14,
     "disabled": false,
     "hidden": false
   },
@@ -2837,5 +2886,15 @@
     "width": 12,
     "collapse": false,
     "className": ""
+  },
+  {
+    "id": "piante_wc_group",
+    "type": "ui_group",
+    "name": "Raumlicht",
+    "tab": "60261446.7371fc",
+    "order": 0,
+    "disp": false,
+    "width": "12",
+    "collapse": false
   }
 ]

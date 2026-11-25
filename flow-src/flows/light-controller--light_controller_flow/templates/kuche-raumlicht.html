@@ -66,6 +66,7 @@ kitchen-room-outputs { display: block; }
 .kr-saved { margin: 4px 0; color: var(--kr-accent); overflow-wrap: anywhere; }
 </style>
 <div class="kr-room">
+<div class="gh-live-list"><gh-room-live room="kitchen"></gh-room-live></div>
   <div ng-if="!room.ready" role="status">{{msg.payload.error || 'Küchensteuerung wird geladen …'}}</div>
   <div ng-if="room.ready">
     <div class="kr-power" role="group" aria-label="Küchenlicht">
@@ -89,7 +90,7 @@ kitchen-room-outputs { display: block; }
     <button type="button" class="kr-create" ng-click="openDelete($event)" aria-haspopup="dialog">Szene löschen</button>
     <div class="kr-saved" role="status" ng-if="deleteNotice">{{deleteNotice}}</div>
     <div role="status" class="kr-saved" ng-if="createdScene">„{{createdScene}}“ wurde gespeichert.</div>
-    <div class="kr-output-title">LED-Ausgänge <small>{{room.active}} von {{room.values.length}} aktiv</small></div>
+    <div class="kr-output-title">LED-Sollwerte <small>{{room.active}} von {{room.values.length}} aktiv</small></div>
     <kitchen-room-outputs ng-attr-values="{{room.values | json}}" aria-label="Berechnete LED-Ausgänge der Küche" role="list">{{outputNotice}}</kitchen-room-outputs>
   </div>
   <dialog class="kr-wizard" aria-labelledby="kr-wizard-title">

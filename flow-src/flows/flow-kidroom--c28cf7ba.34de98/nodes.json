@@ -412,5 +412,21 @@
     "fwdInMessages": false,
     "resendOnRefresh": false,
     "templateScope": "local"
+  },
+  {
+    "id": "house_kid_in",
+    "type": "link in",
+    "z": "c28cf7ba.34de98",
+    "name": "Hauslicht · Kinderzimmer",
+    "links": [
+      "house_kid_out"
+    ],
+    "x": 160,
+    "y": 1200,
+    "wires": [
+      [
+        "kid_profile"
+      ]
+    ]
   }
 ]

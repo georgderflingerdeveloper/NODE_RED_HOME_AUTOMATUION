@@ -1,0 +1,66 @@
+<style>
+.gh-room-outputs{box-sizing:border-box;width:100%;padding:0 0 6px;color:var(--gh-text)}
+.gh-room-output{display:flex;align-items:center;gap:12px;min-height:48px;padding:2px 10px;border-radius:12px;background:var(--gh-inset);box-sizing:border-box}
+.gh-room-output+.gh-room-output{margin-top:8px}
+.gh-room-output strong{margin-inline-start:auto}
+.gh-room-output i{font-size:34px;color:var(--gh-muted)}
+.gh-room-output[data-state="on"] .fa-lightbulb-o{color:rgb(255,219,112);background:radial-gradient(ellipse 20% 23% at 50% 35%,currentColor 65%,transparent 100%);text-shadow:0 0 12px currentColor}
+.gh-room-output[data-state="unknown"] i{opacity:.55}
+</style>
+<section class="gh-lamp-control" aria-label="Vorraumlicht">
+<div class="gh-live-list"><gh-room-live room="entry"></gh-room-live></div>
+<div class="gh-room-outputs" role="list" aria-label="Ausgangszustände" aria-live="polite">
+ <div class="gh-room-output" role="listitem" ng-repeat="device in devices track by device.id" ng-attr-data-state="{{device.state}}">
+  <i class="fa fa-fw fa-3x" ng-class="device.kind==='fan' ? 'fa-refresh' : 'fa-lightbulb-o'" aria-hidden="true"></i>
+  <span>{{device.name}}</span><strong>{{device.state==='on' ? 'Ein' : device.state==='off' ? 'Aus' : 'Unbekannt'}}</strong>
+ </div>
+ <span ng-if="!devices.length">Warte auf Ausgangsdaten …</span>
+</div>
+<div class="gh-lamp-keys">
+  <button type="button" class="gh-lamp-on" ng-disabled="!ready || pending" ng-attr-aria-pressed="{{lampState==='on'}}" ng-click="setLight(true)"><i class="fa fa-lightbulb-o" aria-hidden="true"></i>Ein</button>
+  <button type="button" ng-disabled="!ready || pending" ng-attr-aria-pressed="{{lampState==='off'}}" ng-click="setLight(false)"><i class="fa fa-lightbulb-o" aria-hidden="true"></i>Aus</button>
+</div>
+<small role="status">{{notice}}</small>
+</section>
+<script>
+(function (scope) {
+  let timer;
+  function render() {
+    clearTimeout(timer);
+    const now = Date.now();
+    scope.devices = (scope.msg?.payload?.devices || []).map(device => ({
+      ...device, state:device.validUntil > now ? device.state : 'unknown'
+    }));
+    const lamp = scope.devices.find(device => device.id === 'vorraum-licht');
+    const nextState = lamp?.state || 'unknown';
+    if (!scope.pending && scope.lampState !== nextState) scope.notice = '';
+    scope.lampState = nextState;
+    scope.ready = scope.lampState !== 'unknown';
+    const deadlines = scope.devices.filter(device => device.state !== 'unknown').map(device => device.validUntil);
+    const pending = scope.pending;
+    if (pending) {
+      if (lamp?.sampledAt > pending.started && scope.lampState === pending.state) {
+        scope.notice = pending.state === 'on' ? 'Ein bestätigt.' : 'Aus bestätigt.';
+        scope.pending = null;
+      } else if (now >= pending.until) {
+        scope.notice = 'Keine Bestätigung vom Lampenausgang.';
+        scope.pending = null;
+      } else {
+        deadlines.push(pending.until);
+      }
+    }
+    if (deadlines.length) timer = setTimeout(() => scope.$evalAsync(render), Math.max(1, Math.min(...deadlines) - now));
+  }
+  scope.setLight = function (on) {
+    render();
+    if (!scope.ready || scope.pending) return;
+    const now = Date.now();
+    scope.pending = {state:on ? 'on' : 'off', started:now, until:now + 10000};
+    scope.notice = 'Warte auf Rückmeldung …';
+    scope.send({topic:'vorraum/set', payload:on});
+    render();
+  };
+  scope.$watch('msg', render);
+  scope.$on('$destroy', () => clearTimeout(timer));
+})(scope);
+</script>

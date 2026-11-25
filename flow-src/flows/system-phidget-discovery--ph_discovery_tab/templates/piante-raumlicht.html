@@ -1,0 +1,77 @@
+<style>
+#nr-dashboard [id^="Tab_"]:has(.pi-room){display:flex;flex-direction:column;align-items:center;gap:8px;width:100%!important;height:auto!important;box-sizing:border-box;padding:6px}
+#nr-dashboard [id^="Tab_"]:has(.pi-room)>ui-card-panel{position:relative!important;inset:auto!important;transform:none!important;max-width:100%}
+#nr-dashboard [id^="Tab_"]:has(.pi-room)>ui-card-panel:is([node-id="fd93ca25.397518"],[node-id="83673fe2.3b03d"],[node-id="b210f56e.db6368"],[node-id="f055e626.392288"]){display:none!important}
+#nr-dashboard ui-card-panel:has(.pi-room){width:100%!important;order:-1}
+#nr-dashboard ui-card-panel:has(.pi-room) :is(.nr-dashboard-cardpanel,.nr-dashboard-cardcontainer,md-card){width:100%!important;max-width:100%!important;height:auto!important;box-sizing:border-box}
+#nr-dashboard md-card:has(.pi-room){position:relative!important;inset:auto!important}
+.pi-room{box-sizing:border-box;width:100%;padding:8px 12px 16px;color:var(--gh-text,inherit)}
+.pi-room h3{font-size:17px;margin:12px 0 8px}
+.pi-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.pi-heading h3{margin-bottom:0}
+.pi-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr))}
+.pi-light{display:flex;align-items:center;gap:10px;min-height:70px;padding:8px 10px;box-sizing:border-box;border-radius:12px;background:var(--gh-inset,rgba(110,124,124,.15))}
+.pi-light .fa-lightbulb-o{font-size:48px;color:var(--gh-muted,#82918f);flex:none}
+.pi-light[data-state="on"] i{color:rgb(255,219,112);background:radial-gradient(ellipse 20% 23% at 50% 35%,currentColor 65%,transparent 100%);text-shadow:0 0 12px currentColor}
+.pi-light[data-state="unknown"] i{opacity:.45}
+.pi-name{flex:1;min-width:0}.pi-name small{display:block;font-size:13px;margin-top:3px}.pi-buttons{display:flex;gap:3px}
+.pi-buttons button{font:inherit;color:inherit;border:1px solid var(--gh-muted,#82918f);background:transparent;border-radius:8px;min-height:42px;padding:4px 9px;cursor:pointer}
+.pi-buttons button[aria-pressed=true]{background:#a4d8c7;color:#16332b;border-color:#a4d8c7}.pi-buttons button:disabled{opacity:.55;cursor:default}
+.pi-inputs{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}.pi-inputs i{margin-right:6px}
+.pi-dim{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:16px 0 0;color:var(--gh-muted,#82918f)}
+.pi-dim input{width:min(160px,100%);filter:grayscale(1);opacity:.5}
+</style>
+<section class="pi-room">
+ <div class="pi-heading">
+  <h3>Raumlicht</h3>
+  <gh-room-live data-piante></gh-room-live>
+ </div>
+ <div ng-if="status.groupName" class="pi-light" style="margin-bottom:8px">
+  <div class="pi-name"><strong>{{status.groupName}}</strong><small>{{live ? labels[status.group] : labels.unknown}}</small><small role="status">{{notes.ALL}}</small></div>
+  <div class="pi-buttons"><button type="button" ng-repeat="on in [true,false]" ng-click="set({index:'ALL'},on)" ng-disabled="!live || !status.ready || pending.ALL" ng-attr-aria-pressed="{{live && status.group===(on?'on':'off')}}" ng-attr-aria-label="{{status.groupName}} {{on?'ein':'aus'}}">{{on?'Ein':'Aus'}}</button></div>
+ </div>
+ <div class="pi-grid">
+  <div class="pi-light" ng-repeat="lamp in status.lights track by lamp.index" ng-attr-data-state="{{state(lamp)}}">
+   <i class="fa fa-fw fa-3x fa-lightbulb-o" aria-hidden="true"></i>
+   <div class="pi-name"><strong>{{lamp.name}}</strong><small>{{labels[state(lamp)]}}</small><small role="status" ng-if="notes[lamp.index]">{{notes[lamp.index]}}</small></div>
+   <div class="pi-buttons" ng-if="status.room!=='wc'" role="group" ng-attr-aria-label="{{lamp.name}}">
+    <button type="button" ng-repeat="on in [true,false]" ng-click="set(lamp,on)" ng-disabled="!live || !status.ready || pending[lamp.index]" ng-attr-aria-pressed="{{live && lamp.on===on}}" ng-attr-aria-label="{{lamp.name}} {{on?'ein':'aus'}}">{{on?'Ein':'Aus'}}</button>
+   </div>
+  </div>
+ </div>
+ <p ng-if="!status.lights.length || !live" role="status">Warte auf die Rückmeldung von PIANTE …</p>
+ <p ng-if="live && !status.ready" role="status">Die Einzelsteuerung auf PIANTE ist noch nicht verfügbar.</p>
+ <label class="pi-dim" ng-if="status.room==='bath' || status.room==='upper'"><strong>Helligkeit</strong><input type="range" disabled aria-label="Helligkeit – später verfügbar"><small>Später verfügbar</small></label>
+ <h3 ng-if="status.hasButton">Schalter<span ng-if="status.room==='ante'"> und Melder</span></h3>
+ <div class="pi-inputs" ng-if="status.hasButton"><span><i class="fa fa-hand-pointer-o" aria-hidden="true"></i>Wandtaster · {{input(status.button)}}</span><span ng-if="status.room==='ante'"><i class="fa fa-street-view" aria-hidden="true"></i>Bewegungsmelder · {{input(status.presence)}}</span></div>
+</section>
+<script>
+(function(s){
+ s.status={lights:[]};s.labels={on:'Ein',off:'Aus',mixed:'Teilweise ein',unknown:'Unbekannt'};s.pending={};s.notes={};
+ s.state=l=>!s.live || typeof l.on!=='boolean'?'unknown':l.on?'on':'off';
+ s.input=v=>!s.live || typeof v!=='boolean'?'Unbekannt':v?'Signal ein':'Signal aus';
+ function render(){
+  s.live=s.status.until>Date.now();
+  const group={index:'ALL',on:s.status.group==='on'?true:s.status.group==='off'?false:null};
+  for(const l of [...s.status.lights,group]){
+   const p=s.pending[l.index];if(!p)continue;
+   if(s.live && l.on===p.on && s.status.until>p.previous){delete s.pending[l.index];delete s.notes[l.index];}
+   else if(Date.now()>=p.end){delete s.pending[l.index];s.notes[l.index]='Schaltung nicht bestätigt';}
+  }
+ }
+ s.set=(l,on)=>{
+  if(!s.live || !s.status.ready || s.pending[l.index])return;
+  s.pending[l.index]={on,previous:s.status.until,end:Date.now()+15000};
+  s.notes[l.index]='Warte auf Rückmeldung …';
+  s.send({topic:'ante/set',payload:{index:l.index,on}});
+ };
+ s.$watch('msg',m=>{
+  if(m?.topic==='ante/state'){s.status=m.payload;render();}
+  if(m?.topic==='ante/error'){delete s.pending[m.payload.index];s.notes[m.payload.index]='Schalten fehlgeschlagen';}
+ });
+ const poll=()=>{if(!document.hidden)s.send({topic:'ante/read'});};
+ const timer=setInterval(poll,3500),ticks=setInterval(()=>s.$evalAsync(render),750);
+ document.addEventListener('visibilitychange',poll);poll();
+ s.$on('$destroy',()=>{clearInterval(timer);clearInterval(ticks);document.removeEventListener('visibilitychange',poll);});
+})(scope);
+</script>

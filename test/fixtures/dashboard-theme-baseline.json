@@ -16,8 +16,8 @@
     "markup": "3b55b14ecbbec40bcec53da0cd6925249d31048dd69a546456ff319a690168a1"
   },
   "flow-src/flows/system--system_dashboard_flow/templates/project-version-and-branch-info.html": {
-    "scripts": "1cdd2b75e25c0194a95e0f6cad9669880793ac6fee84538e74db501b8c3db0e8",
-    "markup": "1cdd2b75e25c0194a95e0f6cad9669880793ac6fee84538e74db501b8c3db0e8"
+    "scripts": "3f38413ac7bf8e481825f9372bab47d4f6e42eaa1b2f2a3b13f0b2ca74559489",
+    "markup": "3f38413ac7bf8e481825f9372bab47d4f6e42eaa1b2f2a3b13f0b2ca74559489"
   },
   "flow-src/flows/wetter--weather_flow/templates/wettertabelle-sonnenampel.html": {
     "scripts": "6da17f972f9b830298f3524dd1a9046a0e46e09e46ccdc2d32bf25fff6e24052",
@@ -29,7 +29,7 @@
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solaredge-verbindungsstatus.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "markup": "0b48bc8ef8057163f5f78a59c3232c90b957cc99f360728610b3b1af71f7bf8c"
+    "markup": "d25fc4a0979a2dbb4b340fc523ea083f709e8e55345759dc0377f2f8b81d0bb7"
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/netzbezug.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -41,7 +41,7 @@
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/solaredge-und-node-red-steuerung.html": {
     "scripts": "98b426c40ec9acd6f323f606e9f2e85c5127d6b7fa02cf56ce2ea4cec95a79e2",
-    "markup": "bc22294c597121855cb4a862d653c80361e6d6a71b42d74f5200e776c052318d"
+    "markup": "1772ce8ba65b2665b61165b4e2223c83829d1dcc0386a4aefc31dc18f53dcd7e"
   },
   "flow-src/flows/solar-dashboard--b86cb602995b0261/templates/netzeinspeisung.html": {
     "scripts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

@@ -41,3 +41,18 @@ test('Speicherfehler und veränderte Kanalzahl lassen keine teilweise angelegte 
         assert.equal(flow.get('LightControllerKitchenConfiguration'), undefined);
     }
 });
+
+test('Wiederherstellen prüft die gemerkten LED-Stufen vor der Ausgabe', async () => {
+    let config;
+    const store = {load:()=>config,save:(_,value)=>{config=value;}};
+    const scene = (await submit(store)).result.payload;
+    const request = outputs => runFunctionNode('lightcontrollerkitchen',{
+        msg:{topic:'house/kitchen/restore',payload:{outputs,state:scene.PersistentState}},
+        globalValues:{LightControllerModule:controllerModule},
+        contextValues:{lightControllerKitchenScenarioStore:store}
+    });
+    assert.equal((await request([1,1,1,1,1,1])).result,null);
+    const restored = (await request(scene.LedOutput)).result;
+    assert.deepEqual(restored.payload.LedOutput,scene.LedOutput);
+    assert.equal(restored.payload.PersistentStateChanged,true);
+});

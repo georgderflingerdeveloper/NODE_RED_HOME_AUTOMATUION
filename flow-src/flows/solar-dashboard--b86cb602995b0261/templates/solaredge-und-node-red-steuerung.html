@@ -5,7 +5,7 @@
 .se-control-restart{background:#b71c1c;color:white}
 </style>
 <div class="se-control-row">
-  <button class="se-control-button se-control-reconnect" ng-click="reconnectSolarEdge()">↻ SOLAREDGE NEU VERBINDEN</button>
+  <button class="se-control-button se-control-reconnect" ng-disabled="!msg.payload.CanReconnect" ng-click="reconnectSolarEdge()">↻ SOLAREDGE NEU VERBINDEN</button>
   <button class="se-control-button se-control-restart" ng-click="restartNodeRed()">⏻ NODE-RED SERVER NEU STARTEN</button>
 </div>
 <script>

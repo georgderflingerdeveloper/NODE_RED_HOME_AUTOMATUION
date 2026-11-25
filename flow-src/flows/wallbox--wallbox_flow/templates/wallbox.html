@@ -1,8 +1,22 @@
-<style>@import url("/home-automation/meter-dashboard.css");</style>
+<style>@import url("/home-automation/meter-dashboard.css");
+.wb-plug { display:flex; align-items:center; gap:12px; margin:12px 0; }
+.wb-plug svg { width:48px; height:36px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.wb-plug[data-plug="connected"] svg { color:var(--gh-accent,#65a887); }
+.wb-plug[data-plug="connected"] .wb-socket { transform:translateX(-5px); }
+.wb-plug[data-plug="connected"] .wb-connector { transform:translateX(5px); }
+.wb-plug small { display:block; font-weight:normal; }
+</style>
 <section class="gh-meter gh-wallbox" id="wallbox-{{$id}}">
  <div class="wb-statusline"><div class="meter-status" role="status" ng-class="connection.state">{{statusLabels[connection.state]}}</div>
  <small ng-if="connection.lastSeen">Letzte Messung {{when(connection.lastSeen)}}</small></div>
- <h3>{{sample ? states[sample.state] : 'Warte auf die erste Messung'}}</h3>
+ <div class="wb-plug" role="status" ng-attr-data-plug="{{plug()}}">
+  <svg viewBox="0 0 48 32" aria-hidden="true" ng-if="plug()!=='unknown'">
+   <g class="wb-connector"><path d="M1 16h6m0-5h6a5 5 0 0 1 5 5 5 5 0 0 1-5 5H7z M18 13h5m-5 6h5"/></g>
+   <g class="wb-socket"><path d="M32 9h4a7 7 0 0 1 0 14h-4z M43 16h4"/></g>
+  </svg>
+  <i class="fa fa-question-circle fa-2x" aria-hidden="true" ng-if="plug()==='unknown'"></i>
+  <div><strong>{{plugLabels[plug()]}}</strong><small ng-if="connection.state==='online' && sample">{{states[sample.state]}}</small></div>
+ </div>
  <div class="meter-grid wb-grid">
   <div class="meter-value">Ladeleistung · 1-min-Mittel<strong>{{fmt(sample.power_kw,'kW')}}</strong></div>
   <div class="meter-value">Energie der Ladung<strong>{{fmt(sample.energy_kwh,'kWh')}}</strong></div>
@@ -74,6 +88,15 @@
   temperature:{label:'Gerätetemperatur',unit:'°C',lines:['Temperatur']}
  };
  scope.statusLabels={loading:'Verbindung wird geprüft …',online:'Wallbox online',offline:'Wallbox offline',unknown:'Wallboxstatus unbekannt'};
+ scope.plugLabels={connected:'Fahrzeug angesteckt',disconnected:'Fahrzeug abgesteckt',unknown:'Steckzustand unbekannt'};
+ scope.plug=()=>{
+  const sample=scope.sample;
+  const age=Date.now()-Date.parse(sample?.observed_at);
+  if(scope.connection?.state!=='online' || !(age>=0 && age<90000))return 'unknown';
+  if([1,2].includes(sample.state))return 'disconnected';
+  if([3,4,5,6].includes(sample.state))return 'connected';
+  return 'unknown';
+ };
  scope.states=['Initialisierung','Bereit · kein Fahrzeug','Bereit · A2','Fahrzeug wartet auf Freigabe','Fahrzeug verbunden','Ladepause','Ladung läuft','Störung'];
  const faults=['Kein Fehler','Übertemperatur','DC-Fehlerstrom','Lüftung angefordert','CP-Signal E/F','CP-Überbrückung','CP-Diodenfehler','DC-Sensor · Kalibrierung','DC-Sensor · Kommunikation','DC-Sensorfehler'];
  scope.fault=code=>faults[code] || 'Fehlercode '+code;

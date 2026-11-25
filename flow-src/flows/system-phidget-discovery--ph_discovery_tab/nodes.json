@@ -56,8 +56,299 @@
     "y": 260,
     "wires": [
       [
-        "ph_discovery_result_out"
+        "ph_discovery_result_out",
+        "vorraum_outputs"
       ]
     ]
+  },
+  {
+    "id": "vorraum_outputs",
+    "type": "function",
+    "z": "ph_discovery_tab",
+    "name": "Vorraum · Ausgangszustände",
+    "func": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/functions/entry-room-output-status.js"
+    },
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 680,
+    "y": 380,
+    "wires": [
+      [
+        "vorraum_outputs_ui"
+      ]
+    ]
+  },
+  {
+    "id": "vorraum_outputs_ui",
+    "type": "ui_template",
+    "z": "ph_discovery_tab",
+    "group": "vorraum_group",
+    "name": "Vorraum · Lichtsteuerung",
+    "order": 1,
+    "width": 6,
+    "height": 4,
+    "format": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/templates/room-output-indicators.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 930,
+    "y": 380,
+    "wires": [
+      [
+        "vorraum_command"
+      ]
+    ]
+  },
+  {
+    "id": "piante_ante_io",
+    "type": "home-automation-piante-room",
+    "z": "ph_discovery_tab",
+    "name": "Vorhaus · PIANTE",
+    "room": "ante",
+    "x": 620,
+    "y": 480,
+    "wires": [
+      [
+        "piante_ante_ui"
+      ]
+    ]
+  },
+  {
+    "id": "piante_ante_ui",
+    "type": "ui_template",
+    "z": "ph_discovery_tab",
+    "group": "piante_ante_group",
+    "name": "Vorhaus · Raumlicht",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/templates/piante-raumlicht.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 920,
+    "y": 480,
+    "wires": [
+      [
+        "piante_ante_io"
+      ]
+    ]
+  },
+  {
+    "id": "piante_bath_io",
+    "type": "home-automation-piante-room",
+    "z": "ph_discovery_tab",
+    "name": "Badezimmer · PIANTE",
+    "room": "bath",
+    "x": 620,
+    "y": 550,
+    "wires": [
+      [
+        "piante_bath_ui"
+      ]
+    ]
+  },
+  {
+    "id": "piante_bath_ui",
+    "type": "ui_template",
+    "z": "ph_discovery_tab",
+    "group": "piante_bath_group",
+    "name": "Badezimmer · Raumlicht",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/templates/piante-raumlicht.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 920,
+    "y": 550,
+    "wires": [
+      [
+        "piante_bath_io"
+      ]
+    ]
+  },
+  {
+    "id": "piante_upper_io",
+    "type": "home-automation-piante-room",
+    "z": "ph_discovery_tab",
+    "name": "Oben · PIANTE",
+    "room": "upper",
+    "x": 620,
+    "y": 620,
+    "wires": [
+      [
+        "piante_upper_ui"
+      ]
+    ]
+  },
+  {
+    "id": "piante_upper_ui",
+    "type": "ui_template",
+    "z": "ph_discovery_tab",
+    "group": "piante_upper_group",
+    "name": "Oben · Raumlicht",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/templates/piante-raumlicht.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 920,
+    "y": 620,
+    "wires": [
+      [
+        "piante_upper_io"
+      ]
+    ]
+  },
+  {
+    "id": "house_entry_in",
+    "type": "link in",
+    "z": "ph_discovery_tab",
+    "name": "Hauslicht · Vorraum",
+    "links": [
+      "house_entry_out"
+    ],
+    "x": 160,
+    "y": 1200,
+    "wires": [
+      [
+        "vorraum_command"
+      ]
+    ]
+  },
+  {
+    "id": "vorraum_command",
+    "type": "function",
+    "z": "ph_discovery_tab",
+    "name": "Vorraumlicht anfordern",
+    "func": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/functions/vorraumlicht-anfordern.js"
+    },
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 690,
+    "y": 1140,
+    "wires": [
+      [
+        "vorraum_lamp_udp"
+      ]
+    ]
+  },
+  {
+    "id": "vorraum_lamp_udp",
+    "type": "udp out",
+    "z": "ph_discovery_tab",
+    "name": "Vorraumlicht · PIENTRY",
+    "addr": "192.168.0.190",
+    "iface": "",
+    "port": "5020",
+    "ipv": "udp4",
+    "outport": "",
+    "base64": false,
+    "multicast": "false",
+    "x": 930,
+    "y": 1140,
+    "wires": []
+  },
+  {
+    "id": "piante_wc_io",
+    "type": "home-automation-piante-room",
+    "z": "ph_discovery_tab",
+    "name": "WC · PIANTE",
+    "room": "wc",
+    "x": 620,
+    "y": 800,
+    "wires": [
+      [
+        "piante_wc_ui",
+        "wc_group_filter"
+      ]
+    ]
+  },
+  {
+    "id": "piante_wc_ui",
+    "type": "ui_template",
+    "z": "ph_discovery_tab",
+    "group": "piante_wc_group",
+    "name": "WC · Raumlicht",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/system-phidget-discovery--ph_discovery_tab/templates/piante-raumlicht.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 920,
+    "y": 800,
+    "wires": [
+      [
+        "piante_wc_io"
+      ]
+    ]
+  },
+  {
+    "id": "wc_group_filter",
+    "type": "switch",
+    "z": "ph_discovery_tab",
+    "name": "Nur WC-Gruppenbefehle",
+    "property": "topic",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "wc/group",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 800,
+    "y": 860,
+    "wires": [
+      [
+        "wc_group_out"
+      ]
+    ]
+  },
+  {
+    "id": "wc_group_out",
+    "type": "link out",
+    "z": "ph_discovery_tab",
+    "name": "WC-Gruppenschalter",
+    "mode": "link",
+    "links": [
+      "wc_group_in"
+    ],
+    "x": 950,
+    "y": 860,
+    "wires": []
   }
 ]

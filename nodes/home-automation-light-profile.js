@@ -2,7 +2,7 @@
 const {toDuty, interpolateDuty} = require('./light-profile-curve.cjs');
 
 module.exports = RED => {
-    if(RED.httpNode)require('./light-output-http.cjs').register(RED.httpNode);
+    if(RED.httpNode)require('./light-output-http.cjs').register(RED.httpNode,RED);
     function LightProfile(config) {
         RED.nodes.createNode(this, config);
         const node = this, kitchen = config.adapter === 'controller';

@@ -415,7 +415,7 @@
     "func": {
       "$flowSource": "flows/solar-power--79160448dc533f1d/functions/solaredge-verbindung-uberwachen.js"
     },
-    "outputs": 5,
+    "outputs": 4,
     "timeout": 0,
     "noerr": 0,
     "initialize": "",
@@ -435,9 +435,6 @@
       ],
       [
         "se_status_out"
-      ],
-      [
-        "se_modbus_reconnector"
       ]
     ]
   },

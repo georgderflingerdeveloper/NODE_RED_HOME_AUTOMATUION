@@ -1,0 +1,108 @@
+--- a/ADVANCED_COMPONENTS/LightCommander.cs
++++ b/ADVANCED_COMPONENTS/LightCommander.cs
+@@ -17,6 +17,17 @@
+         #endregion
+ 
+         #region INTERFACE_IMPLEMENTATION
++        public void SetLight(int index, bool on)
++        {
++            if (index < _config.Startindex || index > _config.Lastindex) return;
++            TurnSingleDevice(index, on);
++            PresetToggling(index, on);
++            if (on) {
++                _inhibitpresencedetection = false;
++                _devicecontroltimer.RestartOff();
++            }
++        }
++
+         public void SetGroup(bool on)
+         {
+             _devicecontroltimer.StopOffTimers();
+--- a/ROOMS/ANTE_BATH_WASH_ROOM_CONTROLLER/AnteBathWashRoomController.cs
++++ b/ROOMS/ANTE_BATH_WASH_ROOM_CONTROLLER/AnteBathWashRoomController.cs
+@@ -205,6 +205,26 @@
+             }
+         }
+ 
++        public void SetBathGroup(bool on)
++        {
++            _DeviceScenarioControlBathRoom.Reset();
++            _LightCommanderBathRoom.SetGroup(on);
++        }
++
++        public void SetBathLight(int index, bool on)
++        {
++            if (index >= 7 && index <= 11)
++                _LightCommanderBathRoom.SetLight(index, on);
++        }
++
++        public void SetAnteLight(int index, bool on)
++        {
++            if (index == IOAssignmentControllerAnteBathWashRoom.indDigitalOutputAnteRoomNightLight)
++                _PresenceLight.SetLight(index, on);
++            else if (index >= 0 && index <= 3)
++                _LightCommanderAnteRoom.SetLight(index, on);
++        }
++
+         public void SetRoomLights(bool on)
+         {
+             _DeviceScenarioControlAnteRoom.Reset();
+--- a/HomeControlMain.cs
++++ b/HomeControlMain.cs
+@@ -121,7 +121,7 @@
+                 Console.WriteLine( basicstringconstants.OperationMode + _SelectedRoomMode );
+                 Console.WriteLine( );
+                 _AnteBathWashRoomController = new AnteBathWashRoomController( _AnteBathWashRoomConfiguration, _HeartBeat, IOHandler_ );
+-                LightBroadcast.Start(_AnteBathWashRoomController.SetRoomLights);
++                LightBroadcast.Start(_AnteBathWashRoomController.SetRoomLights, _AnteBathWashRoomController.SetAnteLight, _AnteBathWashRoomController.SetBathLight, _AnteBathWashRoomController.SetBathGroup);
+                 WaitUntilKeyPressed( );
+                 IOHandler_.SetAllOutputs( false );
+                 Environment.Exit( 0 );
+--- a/LightBroadcast.cs
++++ b/LightBroadcast.cs
+@@ -8,14 +8,14 @@
+ {
+     internal static class LightBroadcast
+     {
+-        internal static void Start(Action<bool> setLights)
++        internal static void Start(Action<bool> setLights, Action<int,bool> setAnteLight, Action<int,bool> setBathLight, Action<bool> setBathGroup)
+         {
+-            var thread = new Thread(() => Listen(setLights));
++            var thread = new Thread(() => Listen(setLights, setAnteLight, setBathLight, setBathGroup));
+             thread.IsBackground = true;
+             thread.Start();
+         }
+ 
+-        private static void Listen(Action<bool> setLights)
++        private static void Listen(Action<bool> setLights, Action<int,bool> setAnteLight, Action<int,bool> setBathLight, Action<bool> setBathGroup)
+         {
+             while (true)
+             {
+@@ -30,6 +30,27 @@
+                             byte[] packet = socket.Receive(ref sender);
+                             if (packet.Length > 64) continue;
+                             var command = Encoding.ASCII.GetString(packet).TrimEnd('\r', '\n');
++                            if (sender.Address.ToString() == "192.168.0.149" && (command.StartsWith("ANTE-", StringComparison.Ordinal) || command.StartsWith("BATH-", StringComparison.Ordinal)))
++                            {
++                                if (command == "ANTE-CONTROLS?" || command == "BATH-CONTROLS?")
++                                {
++                                    var reply = Encoding.ASCII.GetBytes(command.TrimEnd('?') + "-V1");
++                                    socket.Send(reply, reply.Length, sender);
++                                }
++                                else if (command == "BATH-ALL-ON" || command == "BATH-ALL-OFF")
++                                    setBathGroup(command == "BATH-ALL-ON");
++                                else
++                                {
++                                    var parts = command.Split('-');
++                                    if (parts.Length == 3 && parts[0] == "ANTE" && parts[1].Length == 1 &&
++                                        parts[1][0] >= '0' && parts[1][0] <= '4' && (parts[2] == "ON" || parts[2] == "OFF"))
++                                        setAnteLight(parts[1][0] - '0', parts[2] == "ON");
++                                    if (parts.Length == 3 && parts[0] == "BATH" && parts[1].Length == 1 &&
++                                        parts[1][0] >= '0' && parts[1][0] <= '4' && (parts[2] == "ON" || parts[2] == "OFF"))
++                                        setBathLight(7 + parts[1][0] - '0', parts[2] == "ON");
++                                }
++                                continue;
++                            }
+                             bool on;
+                             switch (command)
+                             {

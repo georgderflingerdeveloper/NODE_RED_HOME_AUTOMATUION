@@ -6,7 +6,7 @@ const { promisify } = require('node:util');
 const run = promisify(require('node:child_process').execFile);
 const udp = require('node:dgram');
 
-const hosts = { east: '192.168.0.104', west: '192.168.0.105' };
+const hosts = { east: '192.168.0.104', west: '192.168.0.105', ante: '192.168.0.125' };
 const first = '345764', second = '346077', west = '348403';
 const upper = [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 function lamp(id, name, serial, channels, command, section = 'Raumlicht') {
@@ -29,18 +29,30 @@ const lights = [
 ];
 const READ_TTL = 12000;
 
+// Mehrere Ansichten teilen sich eine laufende USB-Abfrage pro Raspberry.
+const pendingSamples = new Map();
 async function sample(side) {
+    return (await sampleController(side)).cards;
+}
+function sampleController(side) {
+    if (!pendingSamples.has(side)) {
+        pendingSamples.set(side, readCards(side).finally(() => pendingSamples.delete(side)));
+    }
+    return pendingSamples.get(side);
+}
+
+async function readCards(side) {
     if (!Object.hasOwn(hosts, side)) throw Error('Unbekannter Controller');
     const helper = path.join(os.homedir(), 'Homeautomation-Recovery', 'remote.cjs');
     const command = 'sudo -n modprobe usbmon && (sudo -n mountpoint -q /sys/kernel/debug || sudo -n mount -t debugfs debugfs /sys/kernel/debug) && sudo -n timeout 5 python - ' + side;
     const { stdout } = await run(process.execPath, [helper, hosts[side], command, path.join(__dirname, 'living-room-report.py')], {timeout: 13000, maxBuffer: 16384});
     const data = JSON.parse(stdout), result = {};
-    for (const serial of side === 'west' ? [west] : [first, second]) {
+    for (const serial of {east:[first, second], west:[west], ante:['311893']}[side]) {
         const row = data[serial];
         if (row && [row.inputs, row.outputs].every(v => Number.isInteger(v) && v >= 0 && v <= 65535))
             result[serial] = {...row, until: Date.now() + READ_TTL};
     }
-    return result;
+    return {cards: result, application: data.application};
 }
 
 function status(devices, now = Date.now()) {
@@ -94,4 +106,4 @@ function sendUdp(host, port, text) {
         });
     });
 }
-module.exports = {sample, status, contacts, switchLight, lights, first, second, west};
+module.exports = {sampleController, sample, status, contacts, switchLight, lights, first, second, west};

@@ -24,6 +24,7 @@
 .wz-learn label{display:inline-grid;gap:4px;margin:6px 12px 6px 0}.wz-learn :is(select,input){font:inherit;max-width:100%;box-sizing:border-box;padding:6px}
 </style>
 <section class="wz-room" aria-label="Wohnzimmer">
+<div class="gh-live-list"><gh-room-live room="east"></gh-room-live> <gh-room-live room="west"></gh-room-live></div>
  <h3>Fenster- und Türkontakte</h3>
  <div class="wz-grid">
   <div class="wz-contact" ng-repeat="c in contacts track by c.id" ng-attr-data-state="{{c.state}}">

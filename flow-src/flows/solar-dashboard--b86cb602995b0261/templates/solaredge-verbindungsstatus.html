@@ -8,5 +8,6 @@
 <div class="se-state" data-updated-at="{{msg.payload.UpdatedAt}}" ng-class="msg.payload.State === 'RECOVERING' ? 'recovering' : (msg.payload.OfflineFlag ? 'offline' : 'online')">
   <div class="se-state-title">SolarEdge · {{msg.payload.State === 'RECOVERING' ? 'VERBINDE' : (msg.payload.OfflineFlag ? 'OFFLINE' : 'ONLINE')}}</div>
   <div class="se-state-reason" ng-if="msg.payload.OfflineReason">{{msg.payload.OfflineReason}}</div>
+  <div class="se-state-reason" ng-if="msg.payload.ReconnectInSeconds > 0">Neu verbinden in {{msg.payload.ReconnectInSeconds}} s</div>
   <div class="se-state-reason">Stand: {{msg.payload.UpdatedAt | date:'dd.MM.yyyy HH:mm:ss'}}</div>
 </div>
