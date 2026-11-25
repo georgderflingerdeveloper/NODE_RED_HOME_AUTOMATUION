@@ -2858,7 +2858,7 @@
         "type": "ui_tab",
         "name": "KOSTEN",
         "icon": "euro_symbol",
-        "order": 13,
+        "order": 14,
         "disabled": false,
         "hidden": false
     },
@@ -2878,7 +2878,7 @@
         "type": "ui_tab",
         "name": "SYSTEM",
         "icon": "dns",
-        "order": 14,
+        "order": 15,
         "disabled": false,
         "hidden": false
     },
@@ -2898,7 +2898,7 @@
         "type": "ui_tab",
         "name": "Schedulers",
         "icon": "schedule",
-        "order": 15,
+        "order": 16,
         "disabled": false,
         "hidden": false
     },
@@ -12632,7 +12632,7 @@
         "type": "ui_tab",
         "name": "Darstellung",
         "icon": "palette",
-        "order": 19,
+        "order": 20,
         "disabled": false,
         "hidden": false
     },
@@ -12691,7 +12691,7 @@
         "type": "ui_tab",
         "name": "Homematic IP",
         "icon": "devices",
-        "order": 16,
+        "order": 17,
         "disabled": false,
         "hidden": false
     },
@@ -12797,7 +12797,7 @@
         "type": "ui_tab",
         "name": "SolarEdge Vergleich",
         "icon": "compare_arrows",
-        "order": 17,
+        "order": 18,
         "disabled": false,
         "hidden": false
     },
@@ -12870,7 +12870,7 @@
         "type": "ui_tab",
         "name": "HOSTRECHNER",
         "icon": "computer",
-        "order": 18,
+        "order": 19,
         "disabled": false,
         "hidden": false
     },
@@ -13536,7 +13536,7 @@
         "type": "ui_tab",
         "name": "Melder",
         "icon": "directions_walk",
-        "order": 20,
+        "order": 21,
         "disabled": false,
         "hidden": false
     },
@@ -14255,7 +14255,7 @@
         "order": 1,
         "width": 14,
         "height": 0,
-        "format": "<style>\n.gh-analysis{box-sizing:border-box;width:100%;padding:12px;color:var(--gh-text);overflow-wrap:anywhere}.gh-analysis header,.gh-analysis .ga-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.gh-analysis h3{margin:0}.gh-analysis header i{color:var(--gh-muted)}.gh-analysis label{display:grid;gap:6px;margin:14px 0}.gh-analysis textarea,.gh-analysis select,.gh-analysis button{box-sizing:border-box;max-width:100%;border:1px solid var(--gh-border);border-radius:9px;background:var(--gh-inset);color:inherit;font:inherit;padding:9px}.gh-analysis textarea{width:100%;min-height:17rem;line-height:1.5;resize:vertical}.gh-analysis .ga-actions button{min-height:44px;cursor:pointer;font-weight:600}.gh-analysis button:disabled{opacity:.6}.gh-analysis a{color:inherit;text-decoration:underline}.gh-analysis pre{font:inherit;line-height:1.5;white-space:pre-wrap}.gh-analysis summary{cursor:pointer}.gh-analysis .ga-note{color:var(--gh-muted)}\n\n.gh-analysis{container-type:inline-size}.ga-tabs{display:flex;gap:4px;margin:14px 0}.ga-tabs button{min-height:42px;flex:1;cursor:pointer}.ga-tabs button[aria-pressed=true]{color:#142c25;background:#a5d9c6}\n.ga-body{display:grid;gap:12px;align-items:start}.ga-body aside{display:grid;gap:10px;margin:14px 0}.ga-body article{border-left:4px solid var(--tone);border-radius:8px;padding:10px 12px;background:var(--gh-inset)}.ga-body article strong{color:var(--tone)}.ga-body article p{margin:.4em 0 0;line-height:1.45}.ga-tip{--tone:#8cd8ad}.ga-finding{--tone:#e9c582}\n@container(min-width:36rem){.ga-body{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}\n#nr-dashboard .nr-dashboard-cardcontainer:has(.gh-analysis),#nr-dashboard md-card:has(.gh-analysis){height:auto!important}\n#nr-dashboard md-card:has(.gh-analysis){position:relative!important}\n.gh-analysis .ga-tip p{color:color-mix(in srgb,var(--gh-text,currentColor) 78%,#56a383)}\n.gh-analysis .ga-finding p{color:color-mix(in srgb,var(--gh-text,currentColor) 78%,#c49858)}\n.gh-analysis .ga-temperature{--tone:#91adcd;margin:12px 0;padding:10px 12px;border-left:4px solid var(--tone);border-radius:8px;background:var(--gh-inset)}\n.gh-analysis .ga-temperature h4{margin:0}.gh-analysis .ga-temperature p{color:color-mix(in srgb,var(--gh-text,currentColor) 72%,#669acf);margin:.5em 0;line-height:1.45}\n.ga-facts{display:grid;gap:8px;margin:12px 0}.ga-facts details{background:var(--gh-inset);border-left:3px solid var(--tint);border-radius:7px;padding:8px 12px}.ga-facts :is(summary,p){color:color-mix(in srgb,var(--gh-text,currentColor) 72%,var(--tint))}\n.ga-facts [data-topic=\"energy\"]{--tint:#71ad9f}.ga-facts [data-topic=\"cost\"]{--tint:#bb965f}.ga-facts [data-topic=\"motion\"]{--tint:#ac90b8}\n</style>\n<section class=\"gh-analysis\"><header><i class=\"fa fa-line-chart\" aria-hidden=\"true\"></i><h3>{{titles[type]}}</h3></header>\n<div class=\"ga-tabs\" role=\"group\" aria-label=\"Auswertungszeitraum\"><button type=\"button\" ng-repeat=\"t in types\" ng-click=\"choose(t.id)\" ng-attr-aria-pressed=\"{{type===t.id}}\">{{t.name}}</button></div>\n<p class=\"ga-note\">Täglich ab 06:05 Uhr Wiener Zeit. Abgeschlossene Wochen werden montags und Monate am Monatsersten archiviert. „Jetzt auswerten“ berücksichtigt den gewählten Zeitraum bis einschließlich gestern. GPT erhält die berechneten Kennzahlen.</p>\n<div class=\"ga-actions\"><button type=\"button\" ng-click=\"startAnalysis()\" ng-disabled=\"!result.days || waiting || result.busy\">Jetzt auswerten</button>\n<span role=\"status\">{{waiting || result.busy ? 'Auswertung läuft …' : view ? 'Bericht vom ' + displayRange(view) : 'Noch kein Bericht für diesen Zeitraum'}}</span></div>\n<p ng-if=\"result.issue || loadError\" role=\"alert\">{{result.issue || loadError}}</p>\n<div class=\"ga-body\"><label>Kurzfassung<textarea readonly ng-model=\"view.summary\" aria-label=\"Kurzfassung\"></textarea></label>\n<aside ng-if=\"view.tip || view.insight\"><article class=\"ga-tip\" ng-if=\"view.tip\"><strong>Praktischer Tipp</strong><p>{{view.tip}}</p></article><article class=\"ga-finding\" ng-if=\"view.insight\"><strong>Erkenntnis</strong><p>{{view.insight}}</p></article></aside></div>\n<div class=\"ga-facts\" ng-if=\"view.topics.length\"><details ng-repeat=\"t in view.topics track by t.key\" ng-attr-data-topic=\"{{t.key}}\"><summary>{{t.name}}</summary><p ng-repeat=\"text in t.lines track by $index\">{{text}}</p></details></div>\n<section class=\"ga-temperature\" ng-if=\"view.temperatures.length\"><h4>Temperaturprofile und Heizplan</h4><p ng-repeat=\"line in view.temperatures track by $index\">{{line}}</p></section>\n<small ng-if=\"view\">Quelle · {{view.source}}</small>\n<details ng-if=\"view.patterns\"><summary>Grundlast und mögliche Gerätezeiten</summary><pre>{{view.patterns}}</pre></details>\n<div ng-if=\"keys.length\"><label>Berichtsarchiv<select ng-model=\"archive.key\" ng-options=\"d as archiveLabel(d) for d in keys\" ng-change=\"readArchive()\"></select></label>\n<a ng-if=\"view.key\" ng-href=\"/home-automation/daily-analysis/{{view.key}}.md\" download>Markdown herunterladen</a></div></section>\n<script>\n(function(s){\n s.result={};s.archive={};s.type='day';s.types=[{id:'day',name:'Tag'},{id:'week',name:'Woche'},{id:'month',name:'Monat'}];\n s.titles={day:'Tagesauswertung',week:'Wochenauswertung',month:'Monatsauswertung'};\n const date=iso=>iso.split('-').reverse().join('.');\n const typeOf=k=>k.startsWith('woche-')?'week':k.startsWith('monat-')?'month':'day';\n s.archiveLabel=k=>date(k.slice(-10));\n s.displayRange=v=>v.start===v.through?date(v.start):date(v.start)+' – '+date(v.through);\n let reset,request=0;\n function sync(force){\n   s.keys=(s.result.days||[]).filter(k=>typeOf(k)===s.type);const latest=s.result.latestByType?.[s.type];\n   if(force||!s.keys.includes(s.archive.key)||s.archive.key===latest?.key){s.archive.key=latest?.key;s.view=latest;}\n }\n s.choose=t=>{request++;s.loadError='';s.type=t;sync(true);};\n s.startAnalysis=()=>{s.waiting=true;s.archive.key=null;s.loadError='';s.send({topic:'daily/run',period:s.type});reset=setTimeout(()=>s.$evalAsync(()=>{s.waiting=false;s.send({topic:'daily/status'});}),8000);};\n s.$watch('msg.payload',p=>{if(!p||!Array.isArray(p.days))return;const finished=s.result.busy&&!p.busy;s.result=p;s.waiting=false;clearTimeout(reset);sync(finished&&typeOf(s.lastBusy||'')===s.type);if(p.busy)s.lastBusy=p.day;});\n s.readArchive=async()=>{const k=s.archive.key,id=++request;s.loadError='';\n  try{const r=await fetch('/home-automation/daily-analysis/'+encodeURIComponent(k)+'.json',{cache:'no-store'});if(!r.ok)throw Error();const v=await r.json();if(request===id)s.$evalAsync(()=>s.view=v);}\n  catch{if(request===id)s.$evalAsync(()=>{s.view=null;s.loadError='Bericht konnte nicht geladen werden.';});}};\n const init=setTimeout(()=>s.send({topic:'daily/status'}),150);\n s.$on('$destroy',()=>{request++;clearTimeout(init);clearTimeout(reset);});\n})(scope);\n</script>\n",
+        "format": "<style>\n.gh-analysis{box-sizing:border-box;width:100%;padding:12px;color:var(--gh-text);overflow-wrap:anywhere}.gh-analysis header,.gh-analysis .ga-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.gh-analysis h3{margin:0}.gh-analysis header i{color:var(--gh-muted)}.gh-analysis label{display:grid;gap:6px;margin:14px 0}.gh-analysis textarea,.gh-analysis select,.gh-analysis button{box-sizing:border-box;max-width:100%;border:1px solid var(--gh-border);border-radius:9px;background:var(--gh-inset);color:inherit;font:inherit;padding:9px}.gh-analysis textarea{width:100%;min-height:17rem;line-height:1.5;resize:vertical}.gh-analysis .ga-actions button{min-height:44px;cursor:pointer;font-weight:600}.gh-analysis button:disabled{opacity:.6}.gh-analysis a{color:inherit;text-decoration:underline}.gh-analysis pre{font:inherit;line-height:1.5;white-space:pre-wrap}.gh-analysis summary{cursor:pointer}.gh-analysis .ga-note{color:var(--gh-muted)}\n\n.gh-analysis{container-type:inline-size}.ga-tabs{display:flex;gap:4px;margin:14px 0}.ga-tabs button{min-height:42px;flex:1;cursor:pointer}.ga-tabs button[aria-pressed=true]{color:#142c25;background:#a5d9c6}\n.ga-body{display:grid;gap:12px;align-items:start}.ga-body aside{display:grid;gap:10px;margin:14px 0}.ga-body article{border-left:4px solid var(--tone);border-radius:8px;padding:10px 12px;background:var(--gh-inset)}.ga-body article strong{color:var(--tone)}.ga-body article p{margin:.4em 0 0;line-height:1.45}.ga-tip{--tone:#8cd8ad}.ga-finding{--tone:#e9c582}\n@container(min-width:36rem){.ga-body{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}\n#nr-dashboard .nr-dashboard-cardcontainer:has(.gh-analysis),#nr-dashboard md-card:has(.gh-analysis){height:auto!important}\n#nr-dashboard md-card:has(.gh-analysis){position:relative!important}\n.gh-analysis .ga-tip p{color:color-mix(in srgb,var(--gh-text,currentColor) 78%,#56a383)}\n.gh-analysis .ga-finding p{color:color-mix(in srgb,var(--gh-text,currentColor) 78%,#c49858)}\n.gh-analysis .ga-temperature{--tone:#91adcd;margin:12px 0;padding:10px 12px;border-left:4px solid var(--tone);border-radius:8px;background:var(--gh-inset)}\n.gh-analysis .ga-temperature h4{margin:0}.gh-analysis .ga-temperature p{color:color-mix(in srgb,var(--gh-text,currentColor) 72%,#669acf);margin:.5em 0;line-height:1.45}\n.ga-facts{display:grid;gap:8px;margin:12px 0}.ga-facts details{background:var(--gh-inset);border-left:3px solid var(--tint);border-radius:7px;padding:8px 12px}.ga-facts :is(summary,p){color:color-mix(in srgb,var(--gh-text,currentColor) 72%,var(--tint))}\n.ga-facts [data-topic=\"energy\"]{--tint:#71ad9f}.ga-facts [data-topic=\"cost\"]{--tint:#bb965f}.ga-facts [data-topic=\"motion\"]{--tint:#ac90b8}\n.ga-facts [data-topic=\"charging\"]{--tint:#82ad86}.ga-facts [data-topic=\"meter\"]{--tint:#819fc2}.ga-facts [data-topic=\"heating\"]{--tint:#c78c73}\n</style>\n<section class=\"gh-analysis\"><header><i class=\"fa fa-line-chart\" aria-hidden=\"true\"></i><h3>{{titles[type]}}</h3></header>\n<div class=\"ga-tabs\" role=\"group\" aria-label=\"Auswertungszeitraum\"><button type=\"button\" ng-repeat=\"t in types\" ng-click=\"choose(t.id)\" ng-attr-aria-pressed=\"{{type===t.id}}\">{{t.name}}</button></div>\n<p class=\"ga-note\">Täglich ab 06:05 Uhr Wiener Zeit. Abgeschlossene Wochen werden montags und Monate am Monatsersten archiviert. „Jetzt auswerten“ berücksichtigt den gewählten Zeitraum bis einschließlich gestern. GPT erhält die berechneten Kennzahlen.</p>\n<div class=\"ga-actions\"><button type=\"button\" ng-click=\"startAnalysis()\" ng-disabled=\"!result.days || waiting || result.busy\">Jetzt auswerten</button>\n<span role=\"status\">{{waiting || result.busy ? 'Auswertung läuft …' : view ? 'Bericht vom ' + displayRange(view) : 'Noch kein Bericht für diesen Zeitraum'}}</span></div>\n<p ng-if=\"result.issue || loadError\" role=\"alert\">{{result.issue || loadError}}</p>\n<div class=\"ga-body\"><label>Kurzfassung<textarea readonly ng-model=\"view.summary\" aria-label=\"Kurzfassung\"></textarea></label>\n<aside ng-if=\"view.tip || view.insight\"><article class=\"ga-tip\" ng-if=\"view.tip\"><strong>Praktischer Tipp</strong><p>{{view.tip}}</p></article><article class=\"ga-finding\" ng-if=\"view.insight\"><strong>Erkenntnis</strong><p>{{view.insight}}</p></article></aside></div>\n<div class=\"ga-facts\" ng-if=\"view.topics.length\"><details ng-repeat=\"t in view.topics track by t.key\" ng-attr-data-topic=\"{{t.key}}\"><summary>{{t.name}}</summary><p ng-repeat=\"text in t.lines track by $index\">{{text}}</p></details></div>\n<section class=\"ga-temperature\" ng-if=\"view.temperatures.length\"><h4>Temperaturprofile und Heizplan</h4><p ng-repeat=\"line in view.temperatures track by $index\">{{line}}</p></section>\n<small ng-if=\"view\">Quelle · {{view.source}}</small>\n<details ng-if=\"view.patterns\"><summary>Grundlast und mögliche Gerätezeiten</summary><pre>{{view.patterns}}</pre></details>\n<div ng-if=\"keys.length\"><label>Berichtsarchiv<select ng-model=\"archive.key\" ng-options=\"d as archiveLabel(d) for d in keys\" ng-change=\"readArchive()\"></select></label>\n<a ng-if=\"view.key\" ng-href=\"/home-automation/daily-analysis/{{view.key}}.md\" download>Markdown herunterladen</a></div></section>\n<script>\n(function(s){\n s.result={};s.archive={};s.type='day';s.types=[{id:'day',name:'Tag'},{id:'week',name:'Woche'},{id:'month',name:'Monat'}];\n s.titles={day:'Tagesauswertung',week:'Wochenauswertung',month:'Monatsauswertung'};\n const date=iso=>iso.split('-').reverse().join('.');\n const typeOf=k=>k.startsWith('woche-')?'week':k.startsWith('monat-')?'month':'day';\n s.archiveLabel=k=>date(k.slice(-10));\n s.displayRange=v=>v.start===v.through?date(v.start):date(v.start)+' – '+date(v.through);\n let reset,request=0;\n function sync(force){\n   s.keys=(s.result.days||[]).filter(k=>typeOf(k)===s.type);const latest=s.result.latestByType?.[s.type];\n   if(force||!s.keys.includes(s.archive.key)||s.archive.key===latest?.key){s.archive.key=latest?.key;s.view=latest;}\n }\n s.choose=t=>{request++;s.loadError='';s.type=t;sync(true);};\n s.startAnalysis=()=>{s.waiting=true;s.archive.key=null;s.loadError='';s.send({topic:'daily/run',period:s.type});reset=setTimeout(()=>s.$evalAsync(()=>{s.waiting=false;s.send({topic:'daily/status'});}),8000);};\n s.$watch('msg.payload',p=>{if(!p||!Array.isArray(p.days))return;const finished=s.result.busy&&!p.busy;s.result=p;s.waiting=false;clearTimeout(reset);sync(finished&&typeOf(s.lastBusy||'')===s.type);if(p.busy)s.lastBusy=p.day;});\n s.readArchive=async()=>{const k=s.archive.key,id=++request;s.loadError='';\n  try{const r=await fetch('/home-automation/daily-analysis/'+encodeURIComponent(k)+'.json',{cache:'no-store'});if(!r.ok)throw Error();const v=await r.json();if(request===id)s.$evalAsync(()=>s.view=v);}\n  catch{if(request===id)s.$evalAsync(()=>{s.view=null;s.loadError='Bericht konnte nicht geladen werden.';});}};\n const init=setTimeout(()=>s.send({topic:'daily/status'}),150);\n s.$on('$destroy',()=>{request++;clearTimeout(init);clearTimeout(reset);});\n})(scope);\n</script>\n",
         "storeOutMessages": false,
         "fwdInMessages": false,
         "resendOnRefresh": false,
@@ -14403,7 +14403,7 @@
         "order": 1,
         "width": 12,
         "height": 0,
-        "format": "<style>\n.gh-meter{padding:16px;line-height:1.45;color:var(--gh-text);font-variant-numeric:tabular-nums}\n.gh-meter .meter-status{display:inline-flex;align-items:center;gap:7px;font-weight:700}.gh-meter .meter-status::before{content:\"\";width:10px;height:10px;border-radius:50%;background:#aaa}.gh-meter .meter-status.online::before{background:#64d8ac}.gh-meter .meter-status.offline::before{background:#ff8a83}\n.gh-meter h3{font-size:18px;margin:18px 0 8px}.gh-meter p{margin:5px 0;color:var(--gh-muted)}\n.gh-meter .meter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}\n.gh-meter .meter-value{background:var(--gh-inset);border:1px solid var(--gh-border);border-radius:8px;padding:10px}\n.gh-meter strong{display:block;font-size:20px}.gh-meter table{width:100%;border-collapse:collapse}.gh-meter td,.gh-meter th{text-align:right;padding:7px 4px;border-bottom:1px solid var(--gh-border)}.gh-meter th:first-child{text-align:left}\n.gh-meter .meter-controls,.gh-meter .meter-legend{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}\n.gh-meter label{display:grid;font-size:12px;gap:4px}.gh-meter select,.gh-meter button{color:var(--gh-text);background:var(--gh-inset);border:1px solid var(--gh-border);border-radius:6px;padding:6px;min-height:34px}\n.gh-meter button:disabled{opacity:.45}.gh-meter canvas{display:block;width:100%;height:210px}.gh-meter .meter-legend i{display:inline-block;width:12px;height:3px;vertical-align:middle;margin-right:5px}\n@media(max-width:700px){\n [id^=\"Tab_\"]:has(.gh-meter),[id^=\"Tab_\"]:has(.gh-meter)>ui-card-panel,[id^=\"Tab_\"]:has(.gh-meter) .nr-dashboard-cardpanel,[id^=\"Tab_\"]:has(.gh-meter) .nr-dashboard-cardcontainer,md-card:has(.gh-meter){box-sizing:border-box;width:100%!important;max-width:100%!important}\n [id^=\"Tab_\"]:has(.gh-meter)>ui-card-panel{left:0!important}\n .gh-meter{padding:8px}.gh-meter .meter-value{padding:6px}.gh-meter strong{font-size:16px}\n}\n</style>\n<section class=\"gh-meter\" id=\"smartmeter-{{$id}}\">\n <div class=\"meter-status\" role=\"status\" ng-class=\"connection.state\">{{statusLabels[connection.state]}}</div>\n <p ng-if=\"connection.lastSeen\">Letzter Zählerkontakt {{when(connection.lastSeen)}}</p>\n <p>{{sample.observed_at ? 'Leistungs- und Phasenwerte vom '+when(sample.observed_at) : 'Warte auf die erste Phasenmessung.'}}</p>\n <div class=\"meter-grid\">\n  <div class=\"meter-value\">Netzbezug<strong>{{fmt(importW,'W')}}</strong></div>\n  <div class=\"meter-value\">Einspeisung<strong>{{fmt(exportW,'W')}}</strong></div>\n  <div class=\"meter-value\">Frequenz<strong>{{fmt(sample.frequency,'Hz')}}</strong></div>\n </div>\n <h3>Phasen am Netzanschluss</h3>\n <table><thead><tr><th>Phase</th><th>Spannung</th><th>Strom</th><th>Wirkleistung</th></tr></thead>\n <tbody><tr ng-repeat=\"n in [1,2,3]\"><th scope=\"row\">L{{n}}</th><td>{{fmt(sample['voltage_l'+n],'V')}}</td><td>{{fmt(sample['current_l'+n],'A')}}</td><td>{{fmt(sample['power_l'+n],'W')}}</td></tr></tbody></table>\n <p>Wirkleistung je Phase: − Bezug, + Einspeisung.</p>\n <h3>Zählerstände</h3>\n <div>Bezug <b>{{fmt(energy.grid_import_total_kwh,'kWh')}}</b> · Einspeisung <b>{{fmt(energy.grid_export_total_kwh,'kWh')}}</b></div>\n <p>{{energy.observed_at ? 'Abgelesen '+when(energy.observed_at) : 'Noch keine Zählerstände vorhanden.'}}</p>\n <h3>Historischer Verlauf</h3>\n <div class=\"meter-controls\">\n  <label>Messgröße<select ng-model=\"metric\" ng-options=\"key as group.label for (key,group) in groups\" ng-change=\"reload()\"></select></label>\n  <label>Zeitraum<select ng-model=\"hours\" ng-options=\"r.hours as r.label for r in ranges\" ng-change=\"resetRange()\"></select></label>\n  <button type=\"button\" ng-click=\"shift(-1)\" aria-label=\"Vorheriger Zeitraum\">←</button>\n  <button type=\"button\" ng-click=\"shift(1)\" ng-disabled=\"!until\" aria-label=\"Nächster Zeitraum\">→</button>\n  <button type=\"button\" ng-click=\"resetRange()\">Jetzt</button>\n </div>\n <p ng-if=\"data\">{{when(data.start)}} – {{when(data.end)}}</p>\n <p role=\"alert\" ng-if=\"meterError\">{{meterError}}</p>\n <canvas role=\"img\" aria-label=\"Zeitverlauf der gewählten Smartmeter-Messgröße\"></canvas>\n <p ng-if=\"data && !hasValues\">Keine Messwerte in diesem Zeitraum.</p>\n <div class=\"meter-legend\"><span ng-repeat=\"label in groups[metric].lines track by $index\"><i ng-style=\"{'background-color':colors[$index]}\"></i>{{label}}</span></div>\n</section>\n<script>\n(function(scope){\n const phases=['L1','L2','L3'], directions=['Bezug','Einspeisung'];\n scope.groups={\n  grid:{label:'Netzbezug und Einspeisung',unit:'W',lines:directions},\n  voltage:{label:'Spannung je Phase',unit:'V',lines:phases},\n  current:{label:'Strom je Phase',unit:'A',lines:phases},\n  power:{label:'Wirkleistung je Phase',unit:'W',lines:phases},\n  frequency:{label:'Netzfrequenz',unit:'Hz',lines:['Netzfrequenz']},\n  energy:{label:'Zählerstände',unit:'kWh',lines:directions}\n };\n scope.ranges=[{hours:1,label:'1 Stunde'},{hours:6,label:'6 Stunden'},{hours:24,label:'24 Stunden'},\n  {hours:168,label:'7 Tage'},{hours:720,label:'30 Tage'}];\n scope.colors=['#69baff','#ffb86e','#64d8ac'];\n scope.metric='grid';scope.hours=1;scope.connection={state:'loading'};\n scope.statusLabels={loading:'Verbindung wird geprüft …',online:'Zähler online',offline:'Zähler offline',unknown:'Zählerstatus unbekannt'};\n const number=new Intl.NumberFormat('de-AT',{maximumFractionDigits:3});\n const stamp=new Intl.DateTimeFormat('de-AT',{timeZone:'Europe/Vienna',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});\n scope.when=value=>stamp.format(new Date(value));\n scope.fmt=(v,unit)=>Number.isFinite(v)?number.format(v)+' '+unit:'—';\n const root=()=>document.getElementById('smartmeter-'+scope.$id);\n let controller,observer,disposed=false;\n function draw(){\n  const canvas=root()?.querySelector('canvas'),data=scope.data;\n  if(!canvas || !canvas.clientWidth)return;\n  const w=canvas.clientWidth,h=canvas.clientHeight,ratio=window.devicePixelRatio||1;\n  canvas.width=w*ratio;canvas.height=h*ratio;\n  const ctx=canvas.getContext('2d');ctx.scale(ratio,ratio);\n  if(!data || !scope.hasValues)return;\n  const values=data.points.flatMap(p=>data.columns.map(key=>p[key])).filter(Number.isFinite);\n  let low=Math.min(...values),high=Math.max(...values);\n  const pad=(high-low)*.06 || Math.max(.01,Math.abs(high)*.0001);\n  low-=pad;high+=pad;\n  const start=Date.parse(data.start),end=Date.parse(data.end);\n  const x=t=>66+(t-start)/(end-start)*(w-78),y=v=>h-28-(v-low)/(high-low)*(h-50);\n  const style=getComputedStyle(canvas);\n  ctx.font='11px sans-serif';ctx.fillStyle=style.color;ctx.textAlign='left';ctx.fillText(scope.groups[data.metric].unit,4,13);\n  for(let i=0;i<4;i++){\n   const v=low+(high-low)*i/3,yy=y(v);\n   ctx.textAlign='right';ctx.fillText(number.format(v),61,yy+3);\n   ctx.strokeStyle=style.getPropertyValue('--gh-border')||'#555';ctx.beginPath();ctx.moveTo(66,yy);ctx.lineTo(w-12,yy);ctx.stroke();\n  }\n  for(let i=0;i<3;i++){\n   const t=start+(end-start)*i/2;\n   ctx.textAlign=['left','center','right'][i];\n   ctx.fillText(new Date(t).toLocaleString('de-AT',scope.hours>24?{day:'2-digit',month:'2-digit',timeZone:'Europe/Vienna'}:{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Vienna'}),x(t),h-6);\n  }\n  data.columns.forEach((key,index)=>{\n   let last=null;ctx.lineWidth=1.8;ctx.strokeStyle=ctx.fillStyle=scope.colors[index];\n   for(const pt of data.points){\n    if(!Number.isFinite(pt[key])){last=null;continue;}\n    const xx=x(pt.time),yy=y(pt[key]);\n    if(last && last.segment===pt.segment){ctx.beginPath();ctx.moveTo(x(last.time),y(last[key]));ctx.lineTo(xx,yy);ctx.stroke();}\n    ctx.beginPath();ctx.arc(xx,yy,1.8,0,2*Math.PI);ctx.fill();last=pt;\n   }\n  });\n }\n scope.reload=async function(){\n  controller?.abort();const active=new AbortController();controller=active;\n  const query=new URLSearchParams({metric:scope.metric,hours:scope.hours});\n  if(scope.until)query.set('end',new Date(scope.until).toISOString());\n  try{\n   const response=await fetch('/home-automation/smartmeter?'+query,{signal:active.signal,cache:'no-store'});\n   if(!response.ok)throw Error();\n   const data=await response.json();\n   if(disposed || controller!==active)return;\n   scope.$evalAsync(()=>{\n    scope.data=data;scope.meterError='';scope.sample=data.latest;scope.energy=data.energy;\n    const power=data.latest?.grid_power;\n    scope.importW=Number.isFinite(power)?Math.max(0,-power):null;\n    scope.exportW=Number.isFinite(power)?Math.max(0,power):null;\n    scope.connection=data.connection;\n    scope.hasValues=data.points.some(p=>data.columns.some(key=>Number.isFinite(p[key])));\n    requestAnimationFrame(draw);\n   });\n  }catch(err){if(!disposed && controller===active && err.name!=='AbortError')scope.$evalAsync(()=>{\n   scope.meterError='Messarchiv nicht erreichbar.';scope.data=null;scope.connection={state:'unknown',lastSeen:scope.connection.lastSeen};requestAnimationFrame(draw);\n  });}\n };\n scope.resetRange=()=>{scope.until=null;scope.reload();};\n scope.shift=dir=>{\n  const next=(scope.until||Date.now())+dir*scope.hours*3600000;\n  scope.until=next>=Date.now()-1000?null:next;scope.reload();\n };\n const init=setTimeout(()=>{\n  const panel=root();if(!panel)return;\n  observer=new ResizeObserver(draw);observer.observe(panel);scope.reload();\n },0);\n const timer=setInterval(()=>{if(root()?.getClientRects().length && !document.hidden)scope.reload();},30000);\n scope.$on('$destroy',()=>{disposed=true;clearTimeout(init);clearInterval(timer);controller?.abort();observer?.disconnect();});\n})(scope);\n</script>\n",
+        "format": "<style>@import url(\"/home-automation/meter-dashboard.css\");</style>\n<section class=\"gh-meter\" id=\"smartmeter-{{$id}}\">\n <div class=\"meter-status\" role=\"status\" ng-class=\"connection.state\">{{statusLabels[connection.state]}}</div>\n <p ng-if=\"connection.lastSeen\">Letzter Zählerkontakt {{when(connection.lastSeen)}}</p>\n <p>{{sample.observed_at ? 'Leistungs- und Phasenwerte vom '+when(sample.observed_at) : 'Warte auf die erste Phasenmessung.'}}</p>\n <div class=\"meter-grid\">\n  <div class=\"meter-value\">Netzbezug<strong>{{fmt(importW,'W')}}</strong></div>\n  <div class=\"meter-value\">Einspeisung<strong>{{fmt(exportW,'W')}}</strong></div>\n  <div class=\"meter-value\">Frequenz<strong>{{fmt(sample.frequency,'Hz')}}</strong></div>\n </div>\n <h3>Phasen am Netzanschluss</h3>\n <table><thead><tr><th>Phase</th><th>Spannung</th><th>Strom</th><th>Wirkleistung</th></tr></thead>\n <tbody><tr ng-repeat=\"n in [1,2,3]\"><th scope=\"row\">L{{n}}</th><td>{{fmt(sample['voltage_l'+n],'V')}}</td><td>{{fmt(sample['current_l'+n],'A')}}</td><td>{{fmt(sample['power_l'+n],'W')}}</td></tr></tbody></table>\n <p>Wirkleistung je Phase: − Bezug, + Einspeisung.</p>\n <h3>Zählerstände</h3>\n <div>Bezug <b>{{fmt(energy.grid_import_total_kwh,'kWh')}}</b> · Einspeisung <b>{{fmt(energy.grid_export_total_kwh,'kWh')}}</b></div>\n <p>{{energy.observed_at ? 'Abgelesen '+when(energy.observed_at) : 'Noch keine Zählerstände vorhanden.'}}</p>\n <h3>Historischer Verlauf</h3>\n <div class=\"meter-controls\">\n  <label>Messgröße<select ng-model=\"metric\" ng-options=\"key as group.label for (key,group) in groups\" ng-change=\"reload()\"></select></label>\n  <label>Zeitraum<select ng-model=\"hours\" ng-options=\"r.hours as r.label for r in ranges\" ng-change=\"resetRange()\"></select></label>\n  <button type=\"button\" ng-click=\"shift(-1)\" aria-label=\"Vorheriger Zeitraum\">←</button>\n  <button type=\"button\" ng-click=\"shift(1)\" ng-disabled=\"!until\" aria-label=\"Nächster Zeitraum\">→</button>\n  <button type=\"button\" ng-click=\"resetRange()\">Jetzt</button>\n </div>\n <p ng-if=\"data\">{{when(data.start)}} – {{when(data.end)}}</p>\n <p role=\"alert\" ng-if=\"meterError\">{{meterError}}</p>\n <canvas role=\"img\" aria-label=\"Zeitverlauf der gewählten Smartmeter-Messgröße\"></canvas>\n <p ng-if=\"data && !hasValues\">Keine Messwerte in diesem Zeitraum.</p>\n <div class=\"meter-legend\"><span ng-repeat=\"label in groups[metric].lines track by $index\"><i ng-style=\"{'background-color':colors[$index]}\"></i>{{label}}</span></div>\n</section>\n<script>\n(function(scope){\n const phases=['L1','L2','L3'], directions=['Bezug','Einspeisung'];\n scope.groups={\n  grid:{label:'Netzbezug und Einspeisung',unit:'W',lines:directions},\n  voltage:{label:'Spannung je Phase',unit:'V',lines:phases},\n  current:{label:'Strom je Phase',unit:'A',lines:phases},\n  power:{label:'Wirkleistung je Phase',unit:'W',lines:phases},\n  frequency:{label:'Netzfrequenz',unit:'Hz',lines:['Netzfrequenz']},\n  energy:{label:'Zählerstände',unit:'kWh',lines:directions}\n };\n scope.statusLabels={loading:'Verbindung wird geprüft …',online:'Zähler online',offline:'Zähler offline',unknown:'Zählerstatus unbekannt'};\n\n import('/home-automation/meter-trend.mjs').then(({initMeterTrend})=>{\n  initMeterTrend(scope,'smartmeter','grid',30000,data=>{\n   scope.energy=data.energy;\n   const power=data.latest?.grid_power;\n   scope.importW=Number.isFinite(power)?Math.max(0,-power):null;\n   scope.exportW=Number.isFinite(power)?Math.max(0,power):null;\n  });\n }).catch(()=>{if(!scope.$$destroyed)scope.$evalAsync(()=>scope.meterError='Trendanzeige konnte nicht geladen werden.');});\n})(scope);\n</script>\n",
         "storeOutMessages": false,
         "fwdInMessages": false,
         "resendOnRefresh": false,
@@ -14411,6 +14411,145 @@
         "className": "",
         "x": 560,
         "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "wallbox_flow",
+        "type": "tab",
+        "label": "WALLBOX",
+        "disabled": false,
+        "info": "PCE-Wallbox · Messwerte und Ladehistorie"
+    },
+    {
+        "id": "wallbox_client",
+        "type": "modbus-client",
+        "name": "PCE-Wallbox · LAN",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "192.168.0.129",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": 9600,
+        "serialDatabits": 8,
+        "serialStopbits": 1,
+        "serialParity": "none",
+        "serialConnectionDelay": 100,
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": 1,
+        "commandDelay": 1,
+        "clientTimeout": 1000,
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": 15000,
+        "parallelUnitIdsAllowed": true,
+        "showErrors": false,
+        "showWarnings": true,
+        "showLogs": true
+    },
+    {
+        "id": "wallbox_tab",
+        "type": "ui_tab",
+        "name": "Wallbox",
+        "icon": "fa-plug",
+        "order": 13,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "wallbox_group",
+        "type": "ui_group",
+        "name": "PCE · Ladestation",
+        "tab": "wallbox_tab",
+        "order": 1,
+        "disp": true,
+        "width": 12,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "wallbox_archive_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "Wallbox · Messwerte empfangen",
+        "links": [
+            "wallbox_archive_out"
+        ],
+        "x": 155,
+        "y": 430,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "wallbox_read",
+        "type": "modbus-read",
+        "z": "wallbox_flow",
+        "name": "PCE-Wallbox · Ladestatus und Energie",
+        "topic": "history/source/wallbox",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "100",
+        "quantity": "11",
+        "rate": "15",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "wallbox_client",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 220,
+        "y": 100,
+        "wires": [
+            [
+                "wallbox_archive_out"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "wallbox_archive_out",
+        "type": "link out",
+        "z": "wallbox_flow",
+        "name": "Ladewerte ins Archiv",
+        "mode": "link",
+        "links": [
+            "wallbox_archive_in"
+        ],
+        "x": 520,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "wallbox_dashboard",
+        "type": "ui_template",
+        "z": "wallbox_flow",
+        "group": "wallbox_group",
+        "name": "Wallbox",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "format": "<style>@import url(\"/home-automation/meter-dashboard.css\");</style>\n<section class=\"gh-meter gh-wallbox\" id=\"wallbox-{{$id}}\">\n <div class=\"wb-statusline\"><div class=\"meter-status\" role=\"status\" ng-class=\"connection.state\">{{statusLabels[connection.state]}}</div>\n <small ng-if=\"connection.lastSeen\">Letzte Messung {{when(connection.lastSeen)}}</small></div>\n <h3>{{sample ? states[sample.state] : 'Warte auf die erste Messung'}}</h3>\n <div class=\"meter-grid wb-grid\">\n  <div class=\"meter-value\">Ladeleistung · 1-min-Mittel<strong>{{fmt(sample.power_kw,'kW')}}</strong></div>\n  <div class=\"meter-value\">Energie der Ladung<strong>{{fmt(sample.energy_kwh,'kWh')}}</strong></div>\n  <div class=\"meter-value\">Ladedauer<strong>{{duration(sample.duration_s)}}</strong></div>\n </div>\n <dl class=\"wb-details\" ng-if=\"sample\">\n  <dt ng-if=\"sample.started_at\">Ladebeginn · ca.</dt><dd ng-if=\"sample.started_at\">{{when(sample.started_at)}}</dd>\n  <dt>Stromvorgabe fürs Auto</dt><dd>{{fmt(sample.offered_a,'A')}}</dd>\n  <dt>Stromlimit der Wallbox</dt><dd>{{fmt(sample.limit_a,'A')}}</dd>\n  <dt>Aktive Ladephasen</dt><dd>{{sample.phases}}</dd>\n  <dt>Gerätetemperatur</dt><dd>{{fmt(sample.temperature_c,'°C')}}</dd>\n  <dt>Gerätestatus</dt><dd>{{fault(sample.error_code)}}</dd>\n </dl>\n <h3>Zuletzt in der Wallbox gespeichert</h3>\n <div>Letzte Ladung <b>{{fmt(sample.previous_kwh,'kWh')}}</b> · Vorletzte <b>{{fmt(sample.penultimate_kwh,'kWh')}}</b></div>\n <h3>Historischer Verlauf</h3>\n <div class=\"meter-controls\">\n  <label>Messgröße<select ng-model=\"metric\" ng-options=\"key as group.label for (key,group) in groups\" ng-change=\"reload()\"></select></label>\n  <label>Zeitraum<select ng-model=\"hours\" ng-options=\"r.hours as r.label for r in ranges\" ng-change=\"resetRange()\"></select></label>\n  <button type=\"button\" ng-click=\"shift(-1)\" aria-label=\"Vorheriger Zeitraum\">←</button>\n  <button type=\"button\" ng-click=\"shift(1)\" ng-disabled=\"!until\" aria-label=\"Nächster Zeitraum\">→</button>\n  <button type=\"button\" ng-click=\"resetRange()\">Jetzt</button>\n </div>\n <p ng-if=\"data\">{{when(data.start)}} – {{when(data.end)}}</p>\n <p role=\"alert\" ng-if=\"meterError\">{{meterError}}</p>\n <canvas role=\"img\" aria-label=\"Zeitverlauf der gewählten Wallbox-Messgröße\"></canvas>\n <p ng-if=\"data && !hasValues\">Keine Messwerte in diesem Zeitraum.</p>\n <div class=\"meter-legend\"><span ng-repeat=\"label in groups[metric].lines track by $index\"><i ng-style=\"{'background-color':colors[$index]}\"></i>{{label}}</span></div>\n <h3>Ladekosten</h3>\n <div class=\"meter-controls\">\n  <label>Stichtag<input type=\"date\" ng-model=\"chargeDate\" ng-change=\"reload()\"></label>\n  <button type=\"button\" ng-click=\"chargeDate=null;reload()\">Heute</button>\n </div>\n <div class=\"meter-grid wb-periods\">\n  <button type=\"button\" ng-repeat=\"p in data.periods\" ng-class=\"{'wb-selected':p.type===period}\"\n   aria-pressed=\"{{p.type===period}}\" ng-click=\"setPeriod(p.type)\">{{periodLabels[p.type]}}<strong>{{cost(p.total)}}</strong>{{fmt(p.total.kwh,'kWh')}}</button>\n </div>\n <p>Gesamte Ladeenergie zum archivierten Energiepreis, auch bei PV-Anteil. aWATTar zum Börsenpreis. Netzgebühren, weitere Zuschläge und Grundpreis sind ausgenommen.</p>\n <div ng-if=\"billPeriod\"><h4>{{periodLabels[period]}} · {{billPeriod.start}} – {{billPeriod.end}}</h4>\n <table><thead><tr><th>Fahrzeug</th><th>Ladungen mit Energie</th><th>Energie</th><th>Preis</th></tr></thead>\n <tbody><tr ng-repeat=\"v in billPeriod.vehicles\"><th>{{v.vehicle}}</th><td>{{v.count}}</td><td>{{fmt(v.kwh,'kWh')}}</td><td>{{cost(v)}}</td></tr></tbody></table>\n <p ng-if=\"billPeriod.comparison.count\">Hyundai-Vergleich · {{billPeriod.comparison.count}} abgeschlossene Ladung(en) mit App-Wert nach Enddatum: Wallbox {{fmt(billPeriod.comparison.wallbox_kwh,'kWh')}}, myHyundai {{fmt(billPeriod.comparison.app_kwh,'kWh')}}, Differenz {{fmt(billPeriod.comparison.wallbox_kwh-billPeriod.comparison.app_kwh,'kWh')}}.</p>\n <p ng-if=\"billPeriod.total.missing>0\">Tarif fehlt für {{fmt(billPeriod.total.missing,'kWh')}}. Bisher zugeordnet: {{money(billPeriod.total.eur)}}.</p></div>\n <h3>Ladungen · {{periodLabels[period]}}</h3>\n <p ng-if=\"data && !data.calendarSessions.length\">Keine aufgezeichnete Ladung in diesem Zeitraum.</p>\n <article class=\"wb-charge\" ng-repeat=\"s in data.calendarSessions track by s.id\">\n  <div class=\"wb-statusline\"><b>{{s.vehicle==='Offen'?'Fahrzeug offen':s.vehicle}}</b><b>{{s.cost_eur===null?'Preis unvollständig':money(s.cost_eur)}}</b></div>\n  <div>{{when(s.started_at)}} – {{s.ended_at ? when(s.ended_at) : (connection.state==='online'?'läuft':'zuletzt offen')}}</div>\n  <div>{{duration(s.duration_s)}} · {{fmt(s.energy_kwh,'kWh')}}<span ng-if=\"s.incomplete\"> · Messlücke</span></div>\n  <small ng-if=\"s.cost_eur===null\">Bepreist: {{fmt(s.priced_kwh,'kWh')}} · {{money(s.partial_eur)}}</small>\n  <div ng-if=\"s.app_kwh!==null\">myHyundai {{fmt(s.app_kwh,'kWh')}} · Wallbox minus App {{fmt(s.energy_kwh-s.app_kwh,'kWh')}}</div>\n  <button type=\"button\" ng-click=\"editCharge(s)\">{{s.vehicle==='Offen'?'Fahrzeug zuordnen':'Zuordnung bearbeiten'}}</button>\n  <form class=\"meter-controls\" ng-if=\"edit.id===s.id\" ng-submit=\"saveCharge()\">\n   <label>Fahrzeug<select ng-model=\"edit.vehicle\"><option>Offen</option><option>Hyundai</option><option>MG</option></select></label>\n   <label ng-if=\"edit.vehicle==='Hyundai' && s.ended_at\">myHyundai · Energie dieser Ladung (kWh)<input type=\"number\" min=\"0\" max=\"1000\" step=\"any\" ng-model=\"edit.app\"></label>\n   <button type=\"submit\" ng-disabled=\"saving\">Speichern</button><button type=\"button\" ng-disabled=\"saving\" ng-click=\"cancelCharge()\">Abbrechen</button>\n  </form>\n </article>\n <p ng-if=\"data.calendarSessions.length\">Pro Ladung steht der Gesamtpreis. Die Kalenderübersicht verteilt grenzüberschreitende Ladungen nach Ladezeit und Energiezuwachs.</p>\n <p role=\"status\" aria-live=\"polite\" ng-if=\"chargeNotice\">{{chargeNotice}}</p>\n</section>\n<script>\n(function(scope){\n scope.groups={\n  power:{label:'Mittlere Ladeleistung',unit:'kW',lines:['Ladeleistung · 1-min-Mittel']},\n  energy:{label:'Energie der Ladung',unit:'kWh',lines:['Energie seit Ladebeginn']},\n  current:{label:'Stromvorgabe und Limit',unit:'A',lines:['Stromvorgabe','Stromlimit']},\n  duration:{label:'Ladezeit',unit:'min',lines:['Ladezeit seit Beginn']},\n  temperature:{label:'Gerätetemperatur',unit:'°C',lines:['Temperatur']}\n };\n scope.statusLabels={loading:'Verbindung wird geprüft …',online:'Wallbox online',offline:'Wallbox offline',unknown:'Wallboxstatus unbekannt'};\n scope.states=['Initialisierung','Bereit · kein Fahrzeug','Bereit · A2','Fahrzeug wartet auf Freigabe','Fahrzeug verbunden','Ladepause','Ladung läuft','Störung'];\n const faults=['Kein Fehler','Übertemperatur','DC-Fehlerstrom','Lüftung angefordert','CP-Signal E/F','CP-Überbrückung','CP-Diodenfehler','DC-Sensor · Kalibrierung','DC-Sensor · Kommunikation','DC-Sensorfehler'];\n scope.fault=code=>faults[code] || 'Fehlercode '+code;\n scope.duration=s=>Number.isFinite(s)?[Math.floor(s/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,'0')).join(':'):'—';\n\n scope.period='day';\n scope.periodLabels={day:'Tag',week:'Woche',month:'Monat'};\n const euro=new Intl.NumberFormat('de-AT',{style:'currency',currency:'EUR'});\n scope.money=n=>Number.isFinite(n)?euro.format(n):'—';\n scope.cost=v=>v.missing>0?'Tarif fehlt':scope.money(v.eur ?? 0);\n scope.setPeriod=p=>{scope.period=p;scope.reload();};\n scope.editCharge=s=>{scope.chargeNotice='';scope.edit={id:s.id,vehicle:s.vehicle,app:s.app_kwh,revision:s.revision};};\n scope.cancelCharge=()=>{scope.edit=null;};\n scope.saveCharge=async()=>{\n  if(scope.saving || !scope.edit)return;\n  const e=scope.edit;scope.saving=true;\n  try{\n   const res=await fetch('/home-automation/wallbox/sessions/'+e.id,{method:'POST',headers:{'Content-Type':'application/json'},\n    body:JSON.stringify({vehicle:e.vehicle,appKwh:e.vehicle==='Hyundai'?(e.app ?? null):null,revision:e.revision})});\n   const body=await res.json();if(!res.ok)throw Error(body.error || 'Speichern fehlgeschlagen.');\n   scope.$evalAsync(()=>{scope.edit=null;scope.chargeNotice='Zuordnung gespeichert.';scope.reload();});\n  }catch(err){scope.$evalAsync(()=>scope.chargeNotice=err.message);}\n  finally{scope.$evalAsync(()=>scope.saving=false);}\n };\n import('/home-automation/meter-trend.mjs').then(({initMeterTrend})=>{\n  initMeterTrend(scope,'wallbox','power',15000,data=>{\n   scope.billPeriod=data.periods.find(p=>p.type===data.period);\n  },()=>{\n   const query={period:scope.period};\n   if(scope.chargeDate instanceof Date && Number.isFinite(+scope.chargeDate)){\n    const d=scope.chargeDate;\n    query.day=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');\n   }\n   return query;\n  });\n }).catch(()=>{if(!scope.$$destroyed)scope.$evalAsync(()=>scope.meterError='Trendanzeige konnte nicht geladen werden.');});\n})(scope);\n</script>\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 220,
+        "y": 200,
         "wires": [
             []
         ]

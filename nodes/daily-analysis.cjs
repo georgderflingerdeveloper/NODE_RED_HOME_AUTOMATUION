@@ -3,6 +3,7 @@ const { DatabaseSync } = require('node:sqlite');
 const { localInstant, calculateRange } = require('./energy-range.cjs');
 const { effectiveRows, METRICS } = require('./solaredge-cloud.cjs');
 const {shiftDay,names} = require('./analysis-periods.cjs');
+const {measurementTopics}=require('./meter-heating-analysis.cjs');
 const {temperatures}=require('./temperature-analysis.cjs');
 const {loadPatterns} = require('./day-load-patterns.cjs');
 const {Worker, isMainThread, parentPort, workerData}=require('node:worker_threads');
@@ -93,7 +94,8 @@ function analyze(day,from,to,all,tariffs,events) {
 function reportHeader(report,summary,source){
     const p=report.period,title=p?names[p.type]:'Tagesauswertung';
     return ['# GEORGSHOME · '+title,'','Auswertung: '+source,'Zeitraum: '+(p?p.start:report.day)+' bis '+(p?p.through:report.day),
-        '','## Kurzfassung','',summary,'','## Praktischer Tipp','',report.tip,'','## Erkenntnis','',report.insight,...(report.temperatures?['','## Temperaturprofile','',...report.temperatures.map(n=>'- '+n)]:[])];
+        '','## Kurzfassung','',summary,'','## Praktischer Tipp','',report.tip,'','## Erkenntnis','',report.insight,...(report.temperatures?['','## Temperaturprofile','',...report.temperatures.map(n=>'- '+n)]:[]),
+        ...(report.measurements||[]).flatMap(topic=>['','## '+topic.name,'',...topic.lines.map(n=>'- '+n)])];
 }
 function markdown(report, summary, source) {
     if(report.days)return periodMarkdown(report,summary,source);
@@ -111,7 +113,8 @@ function collectPeriod(file,p,siteId,temperatureFile){
         report=summarizePeriod(p,days);
     }
     report.temperatures=temperatures(temperatureFile,p.start,p.through);
-    if(report.temperatures.length>1)report.hasData=true;
+    report.measurements=measurementTopics(file,temperatureFile,p.start,p.through);
+    if(report.measurements.some(t=>t.hasData) || report.temperatures.some(t=>t.includes(' °C')))report.hasData=true;
     return report;
 }
 function summarizePeriod(p,reports){

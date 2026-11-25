@@ -187,3 +187,39 @@ CREATE TABLE IF NOT EXISTS smartmeter_samples (
   frequency REAL, grid_power REAL,
   power_l1 REAL, power_l2 REAL, power_l3 REAL
 );
+
+CREATE TABLE IF NOT EXISTS wallbox_sessions (
+  id INTEGER PRIMARY KEY, started_at TEXT NOT NULL, last_seen TEXT NOT NULL, ended_at TEXT,
+  duration_s INTEGER NOT NULL, energy_kwh REAL NOT NULL, incomplete INTEGER NOT NULL DEFAULT 0
+);
+CREATE UNIQUE INDEX IF NOT EXISTS wallbox_one_open ON wallbox_sessions((1)) WHERE ended_at IS NULL;
+CREATE INDEX IF NOT EXISTS wallbox_sessions_start ON wallbox_sessions(started_at);
+
+CREATE TABLE IF NOT EXISTS wallbox_samples (
+  observed_at TEXT PRIMARY KEY, state INTEGER NOT NULL, phases INTEGER NOT NULL,
+  limit_a REAL NOT NULL, offered_a REAL NOT NULL, duration_s INTEGER NOT NULL,
+  energy_kwh REAL NOT NULL, previous_kwh REAL NOT NULL, penultimate_kwh REAL NOT NULL,
+  temperature_c REAL NOT NULL, error_code INTEGER NOT NULL, power_kw REAL,
+  session_id INTEGER REFERENCES wallbox_sessions(id)
+);
+
+CREATE INDEX IF NOT EXISTS wallbox_samples_session ON wallbox_samples(session_id, observed_at);
+CREATE TABLE IF NOT EXISTS wallbox_session_details (
+  session_id INTEGER PRIMARY KEY REFERENCES wallbox_sessions(id),
+  vehicle TEXT NOT NULL CHECK (vehicle IN ('Hyundai','MG','Offen')),
+  app_kwh REAL CHECK (app_kwh IS NULL OR (vehicle='Hyundai' AND app_kwh>=0)),
+  revision INTEGER NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS wallbox_energy_deltas (
+  id INTEGER PRIMARY KEY, session_id INTEGER NOT NULL REFERENCES wallbox_sessions(id),
+  from_at TEXT NOT NULL, to_at TEXT NOT NULL, kwh REAL NOT NULL CHECK(kwh>0)
+);
+CREATE INDEX IF NOT EXISTS wallbox_delta_session ON wallbox_energy_deltas(session_id);
+CREATE INDEX IF NOT EXISTS wallbox_delta_time ON wallbox_energy_deltas(to_at);
+CREATE TABLE IF NOT EXISTS wallbox_price_parts (
+  delta_id INTEGER NOT NULL REFERENCES wallbox_energy_deltas(id), from_at TEXT NOT NULL, to_at TEXT NOT NULL,
+  local_day TEXT NOT NULL, kwh REAL NOT NULL, ct_kwh REAL,
+  cost_eur REAL GENERATED ALWAYS AS (kwh * ct_kwh / 100.0) STORED,
+  PRIMARY KEY(delta_id,from_at)
+);
+CREATE INDEX IF NOT EXISTS wallbox_parts_day ON wallbox_price_parts(local_day);

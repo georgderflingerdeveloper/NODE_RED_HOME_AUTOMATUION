@@ -16,7 +16,8 @@ import zipfile
 
 TABLES = ('solar_power_samples', 'hourly_snapshots', 'solaredge_meter_readings',
           'solaredge_inverter_readings', 'daily_energy_balance',
-          'daily_energy_reconciliation', 'solaredge_cloud_energy')
+          'daily_energy_reconciliation', 'solaredge_cloud_energy', 'wallbox_sessions', 'wallbox_samples',
+          'wallbox_session_details', 'wallbox_energy_deltas', 'wallbox_price_parts', 'tariff_slots')
 
 
 def cell(value):

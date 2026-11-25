@@ -57,4 +57,4 @@ function calculateRange(rows,tariffs,{from,to}){
  if(Object.values(metrics).some(m=>!m.complete))warnings.add('Teilergebnis: keine vollständige Aussage über den gesamten Zeitraum.');
  return {from:new Date(from).toISOString(),to:new Date(to).toISOString(),timeZone:'Europe/Vienna',priceSeries:segments,metrics,warnings:[...warnings],basis:'Stundenwerte; reine Energiepreise ohne Netzgebühren, Steuern und Zuschläge.'};
 }
-module.exports={localInstant,parseRange,calculateRange};
+module.exports={priceSeries,localInstant,parseRange,calculateRange};

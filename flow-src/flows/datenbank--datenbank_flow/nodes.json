@@ -391,5 +391,21 @@
         "datenbank_history_store"
       ]
     ]
+  },
+  {
+    "id": "wallbox_archive_in",
+    "type": "link in",
+    "z": "datenbank_flow",
+    "name": "Wallbox · Messwerte empfangen",
+    "links": [
+      "wallbox_archive_out"
+    ],
+    "x": 155,
+    "y": 430,
+    "wires": [
+      [
+        "datenbank_history_store"
+      ]
+    ]
   }
 ]

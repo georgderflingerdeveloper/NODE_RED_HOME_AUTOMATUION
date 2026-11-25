@@ -1,3 +1,5 @@
+const chargeBilling = require("./wallbox-billing.cjs");
+const wallbox = require("./wallbox.cjs");
 const smartmeter = require("./smartmeter.cjs");
 const { readTrend, trendRequest } = require("./solar-trend.cjs");
 const { streamExport, historyStatus } = require("./solar-history-export.cjs");
@@ -69,18 +71,38 @@ module.exports = function registerHistoryStore(RED) {
       try { response.set('Cache-Control','no-store'); response.json(readTrend(activeDatabasePath,request.query)); }
       catch { response.status(500).json({error:'Trenddaten konnten nicht gelesen werden.'}); }
     });
-    RED.httpNode.get('/home-automation/smartmeter', (request, response) => {
-      if (!activeDatabasePath) return response.status(503).json({error: 'Messarchiv nicht verfügbar.'});
-      let spec, db;
-      try { spec = smartmeter.trendQuery(request.query); }
-      catch (error) { return response.status(400).json({error: error.message}); }
+    for (const [name, source] of Object.entries({smartmeter, wallbox})) {
+      RED.httpNode.get('/home-automation/' + name, (request, response) => {
+        if (!activeDatabasePath) return response.status(503).json({error: 'Messarchiv nicht verfügbar.'});
+        let spec, db;
+        try { spec = source.trendQuery(request.query); }
+        catch (error) { return response.status(400).json({error: error.message}); }
+        try {
+          db = new DatabaseSync(activeDatabasePath, {readOnly: true});
+          response.set('Cache-Control', 'no-store').json(source.readDashboard(db, spec));
+        } catch {
+          response.status(500).json({error: 'Messarchiv nicht lesbar.'});
+        } finally { db?.close(); }
+      });
+    }
+    RED.httpNode.post?.('/home-automation/wallbox/sessions/:id', require('express').json({limit:'4kb'}), (req,res)=>{
+      if (!activeDatabasePath) return res.status(503).json({error:'Messarchiv nicht verfügbar.'});
+      const origin=req.headers.origin;
+      if (!req.is('application/json') || (origin && !['http://'+req.get('host'),'https://'+req.get('host')].includes(origin)))
+        return res.status(403).json({error:'Ungültiger Aufruf.'});
+      let db;
       try {
-        db = new DatabaseSync(activeDatabasePath, {readOnly: true});
-        response.set('Cache-Control', 'no-store').json(smartmeter.readDashboard(db, spec));
-      } catch {
-        response.status(500).json({error: 'Smartmeter-Archiv nicht lesbar.'});
-      } finally { db?.close(); }
+        db=new DatabaseSync(activeDatabasePath);
+        db.exec('PRAGMA busy_timeout=3000');
+        res.json(chargeBilling.saveDetails(db,Number(req.params.id),req.body));
+      } catch(e){res.status(e.status || 500).json({error:e.status ? e.message : 'Speichern fehlgeschlagen.'});}
+      finally{db?.close();}
     });
+    for (const asset of ['meter-trend.mjs','meter-dashboard.css']) {
+      RED.httpNode.get('/home-automation/' + asset, (_request,response) => {
+        response.set('Cache-Control','no-cache').sendFile(path.join(__dirname,asset));
+      });
+    }
     RED.httpNode.get('/home-automation/solar/history-status', (_request,response) => {
       if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
       try { response.set('Cache-Control','no-store'); response.json(historyStatus(activeDatabasePath)); }
@@ -112,6 +134,8 @@ module.exports = function registerHistoryStore(RED) {
         CREATE INDEX tariff_slots_valid_until_idx ON tariff_slots(valid_until);
         COMMIT;`);
     }
+    const billing = chargeBilling.createBilling(database);
+    const writeWallbox = wallbox.createSampleWriter(database,billing);
     const writeSmartmeter = smartmeter.createSampleWriter(database);
     activeDatabasePath = databasePath;
     const insertPowerSample = database.prepare(`INSERT OR IGNORE INTO solar_power_samples
@@ -823,6 +847,11 @@ module.exports = function registerHistoryStore(RED) {
     node.status({ fill: "green", shape: "dot", text: "SQLite bereit" });
     node.on("input", (msg, send, done) => {
       try {
+        if (msg.topic === "history/source/wallbox") {
+          writeWallbox(msg.payload, new Date().toISOString());
+          done();
+          return;
+        }
         if (msg.topic === "history/source/smartmeter") {
           writeSmartmeter(msg.payload, new Date().toISOString());
           done();
@@ -1013,12 +1042,15 @@ module.exports = function registerHistoryStore(RED) {
               database.prepare("DELETE FROM tariff_slots WHERE provider='Energie AG' AND valid_from>=?").run(hourStartIso(payload.fetchedAt));
             }
             const slots = Array.isArray(payload.slots) && payload.slots.length ? payload.slots : [payload];
+            let earliest, latest;
             for (const slot of slots) {
               if (!slot?.validFrom || !slot?.validUntil || !Number.isFinite(Number(slot.priceCtPerKWh))) continue;
               if (slot.provider === "Energie AG") {
                 database.prepare("DELETE FROM tariff_slots WHERE valid_from>=? AND valid_from<? AND provider='aWATTar'")
                   .run(slot.validFrom, slot.validUntil);
               }
+              if (!earliest || slot.validFrom<earliest) earliest=slot.validFrom;
+              if (!latest || slot.validUntil>latest) latest=slot.validUntil;
               insertTariff.run(
                 slot.validFrom,
                 slot.validUntil,
@@ -1029,6 +1061,7 @@ module.exports = function registerHistoryStore(RED) {
                 JSON.stringify(slot)
               );
             }
+            if (earliest && latest) billing.reprice(earliest,latest);
             storeSource("tariff", payload, asIso(payload.fetchedAt || payload.validFrom), payload.online !== false);
             database.exec("RELEASE tariff_update");
           } catch (e) {

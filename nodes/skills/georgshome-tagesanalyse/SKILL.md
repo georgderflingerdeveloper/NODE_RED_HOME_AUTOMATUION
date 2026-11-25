@@ -1,6 +1,6 @@
 ---
 name: georgshome-tagesanalyse
-description: Formuliert kurze deutsche Tages-, Wochen- und Monatsberichte aus den berechneten GEORGSHOME-Kennzahlen zu Solarenergie, Stromkosten, Bewegungsmeldern und Temperaturprofilen.
+description: Formuliert kurze deutsche Tages-, Wochen- und Monatsberichte aus den berechneten GEORGSHOME-Kennzahlen zu Solarenergie, Stromkosten, Bewegungsmeldern, Temperaturprofilen, Wallbox-Ladungen, Smartmeter und Homematic-Heizwerten.
 ---
 
 Schreibe für die Bewohner in verständlichem Deutsch. Die mitgelieferten Kennzahlen für den jeweiligen Zeitraum sind die einzige Quelle. Verwende keine Werkzeuge. Gib reinen Text mit höchstens 120 Wörtern in drei bis fünf kurzen Absätzen aus. Nenne zuerst die wichtigste Auffälligkeit. Die vollständigen Tageskennzahlen und Gerätefenster stehen separat im Bericht. Wähle pro Thema den aussagekräftigsten Wert. Ordne den gemessenen Verbrauch nur bei vorhandenem Vergleich ein. Benenne bei genügend Daten die Spitzenstunde und ein konkretes Zeitfenster für verschiebbaren Verbrauch.
@@ -12,3 +12,5 @@ Melder messen Auslösungen. Beschreibe Zeitfenster als Zeiten mit wenig *registr
 Für Wochen und Monate nenne den abgedeckten Zeitraum und vergleiche nur ausreichend belegte Tage. Erwähne die geschätzte Grundlast und auffällige Gerätefenster, sofern geliefert. Benenne die Identifikation als Lastmuster mit mehreren möglichen Ursachen.
 
 Berichte eine belegte Temperaturauffälligkeit mit Raum, Zeitraum und Messquelle. Unterscheide Solltemperatur, Raumfühler und Heizkörperfühler. Nenne die Abdeckung bei Lücken. Ein nächtlicher Temperaturrückgang allein belegt keine Heizenergie- oder Kostenersparnis. Übernimm Spartipps zum Heizplan nur, wenn die gelieferten Kennzahlen sie stützen.
+
+Berücksichtige bei vorhandenen Werten Wallbox, Smartmeter und Homematic-Heizung in der Kurzfassung. Nenne für Ladungen die gelieferte Fahrzeugzuordnung, Ladeenergie und Tarifbewertung. Teilbeträge gelten nur für die bepreisten kWh. Der Ladetarifwert belegt keine zusätzlichen Netzbezugskosten. Übernimm für Netzspitzen die gemessene Richtung, Leistung und Ortszeit. Messminuten können Lücken enthalten. Unterscheide gemessene Wallbox-Ladungen von möglichen Lastmustern. Gib die Ventilöffnung als beobachteten Stellwert an. Berichte Sollwert, Raum- und Heizkörpertemperatur mit ihrer jeweiligen Quelle. Aus Ventilstellung und Temperatur lässt sich keine Wärmemenge ableiten.

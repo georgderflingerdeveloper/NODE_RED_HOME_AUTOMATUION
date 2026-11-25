@@ -12,6 +12,7 @@
 .gh-analysis .ga-temperature h4{margin:0}.gh-analysis .ga-temperature p{color:color-mix(in srgb,var(--gh-text,currentColor) 72%,#669acf);margin:.5em 0;line-height:1.45}
 .ga-facts{display:grid;gap:8px;margin:12px 0}.ga-facts details{background:var(--gh-inset);border-left:3px solid var(--tint);border-radius:7px;padding:8px 12px}.ga-facts :is(summary,p){color:color-mix(in srgb,var(--gh-text,currentColor) 72%,var(--tint))}
 .ga-facts [data-topic="energy"]{--tint:#71ad9f}.ga-facts [data-topic="cost"]{--tint:#bb965f}.ga-facts [data-topic="motion"]{--tint:#ac90b8}
+.ga-facts [data-topic="charging"]{--tint:#82ad86}.ga-facts [data-topic="meter"]{--tint:#819fc2}.ga-facts [data-topic="heating"]{--tint:#c78c73}
 </style>
 <section class="gh-analysis"><header><i class="fa fa-line-chart" aria-hidden="true"></i><h3>{{titles[type]}}</h3></header>
 <div class="ga-tabs" role="group" aria-label="Auswertungszeitraum"><button type="button" ng-repeat="t in types" ng-click="choose(t.id)" ng-attr-aria-pressed="{{type===t.id}}">{{t.name}}</button></div>

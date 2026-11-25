@@ -1,0 +1,70 @@
+[
+  {
+    "id": "wallbox_read",
+    "type": "modbus-read",
+    "z": "wallbox_flow",
+    "name": "PCE-Wallbox · Ladestatus und Energie",
+    "topic": "history/source/wallbox",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "100",
+    "quantity": "11",
+    "rate": "15",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "wallbox_client",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 220,
+    "y": 100,
+    "wires": [
+      [
+        "wallbox_archive_out"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "wallbox_archive_out",
+    "type": "link out",
+    "z": "wallbox_flow",
+    "name": "Ladewerte ins Archiv",
+    "mode": "link",
+    "links": [
+      "wallbox_archive_in"
+    ],
+    "x": 520,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "wallbox_dashboard",
+    "type": "ui_template",
+    "z": "wallbox_flow",
+    "group": "wallbox_group",
+    "name": "Wallbox",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/wallbox--wallbox_flow/templates/wallbox.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 220,
+    "y": 200,
+    "wires": [
+      []
+    ]
+  }
+]

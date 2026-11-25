@@ -6,6 +6,7 @@ const {execFile}=require('node:child_process');
 const {randomUUID}=require('node:crypto');
 const {collectAsync,markdown,shiftDay,dueDay,localDate}=require('./daily-analysis.cjs');
 const {names,periodFor,typeOf,nextAutomatic}=require('./analysis-periods.cjs');
+const {titles}=require('./meter-heating-analysis.cjs');
 const skillFile=path.join(__dirname,'skills/georgshome-tagesanalyse/SKILL.md');
 const datePattern=/^\d{4}-\d{2}-\d{2}$/;
 const archivePattern=/^(?:woche-|monat-)?\d{4}-\d{2}-\d{2}$/;
@@ -22,6 +23,10 @@ function readView(key,md){
     for(const fact of facts){
         const index=/Bewegung|Meldungsärmstes|Meldungsarmes|Meldungen gespeichert/i.test(fact)?2:/Netzbezugskosten|bepreist|Energiekosten|ct.je|ct pro|ct\/kWh|Stromkosten/i.test(fact)?1:0;
         topics[index].lines.push(fact);
+    }
+    for(const [key,name] of Object.entries(titles)){
+        const lines=section(md,name).split('\n').filter(line=>line.startsWith('- ')).map(line=>line.slice(2));
+        if(lines.length)topics.push({key,name,lines});
     }
     return {topics:topics.filter(t=>t.lines.length),key,day:period?period[1]+' bis '+period[2]:key,start:period?.[1]||key,through:period?.[2]||key,
         source:md.match(/^Auswertung: (.+)$/m)?.[1],summary:section(md,'Kurzfassung'),tip:section(md,'Praktischer Tipp'),insight:section(md,'Erkenntnis'),temperatures:section(md,'Temperaturprofile').split(/\n/).filter(Boolean).map(line=>line.replace(/^- /,'')),patterns:section(md,'Grundlast und mögliche Gerätezeiten')};
@@ -48,7 +53,7 @@ async function summarize(report,signal){
         await new Promise((resolve,reject)=>{
             const child=execFile(binary,args,{cwd:dir,timeout:120000,signal,maxBuffer:256*1024},err=>err?reject(new Error('GPT-Aufruf fehlgeschlagen oder Zeitlimit erreicht.')):resolve());
             child.stdin.on('error',()=>{});
-            child.stdin.end(skill+'\n\n'+names[report.period.type]+' '+report.day+'\n'+[...report.notes,report.tip,...report.patterns,...report.temperatures].join('\n'));
+            child.stdin.end(skill+'\n\n'+names[report.period.type]+' '+report.day+'\n'+[...report.notes,report.tip,...report.patterns,...report.temperatures,...report.measurements.flatMap(t=>[t.name,...t.lines])].join('\n'));
         });
         const result=(await fs.readFile(out,'utf8')).trim();
         if(!result || result.length>5000)throw Error('GPT lieferte keine verwendbare Kurzfassung.');

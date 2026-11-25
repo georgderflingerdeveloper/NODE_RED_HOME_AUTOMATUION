@@ -42,10 +42,10 @@ function createSampleWriter(db) {
   };
 }
 
-function trendQuery(query, now = Date.now()) {
-  const metric = query.metric ?? 'grid', hours = Number(query.hours ?? 1);
+function trendQuery(query, now = Date.now(), allowed = metrics, defaultMetric = 'grid') {
+  const metric = query.metric ?? defaultMetric, hours = Number(query.hours ?? 1);
   const end = query.end === undefined ? now : Date.parse(query.end);
-  if (!Object.hasOwn(metrics, metric) || ![1, 6, 24, 168, 720].includes(hours) ||
+  if (!Object.hasOwn(allowed, metric) || ![1, 6, 24, 168, 720].includes(hours) ||
       !Number.isFinite(end) || Math.abs(end) > 1e14) throw Error('Ungültiger Trendzeitraum oder Messgröße.');
   return {metric, start: new Date(end - hours * 3600000).toISOString(), end: new Date(end).toISOString(),
     step: Math.max(30, Math.ceil(hours * 3600 / 360))};
@@ -70,14 +70,17 @@ function readDashboard(db, spec) {
     return key;
   };
   const aggregates = columns.map(key => `AVG(${expression(key)}) AS ${key}`).join(',');
+  const points = readPoints(db, spec, table, aggregates);
+  return {latest: latest ?? null, energy: energy ?? null, connection: meterConnection(latest, energy), ...spec, columns, points};
+}
+function readPoints(db, spec, table, aggregates) {
   // Separate runs across outages even when a long chart interval puts both ends into one bucket.
-  const points = db.prepare(`WITH timed AS (
+  return db.prepare(`WITH timed AS (
       SELECT *, unixepoch(observed_at) AS t, unixepoch(LAG(observed_at) OVER (ORDER BY observed_at)) AS previous
       FROM ${table} WHERE observed_at >= ? AND observed_at < ?
     ), runs AS (
       SELECT *, SUM(CASE WHEN t - previous > 90 THEN 1 ELSE 0 END) OVER (ORDER BY observed_at) AS segment FROM timed
     ) SELECT AVG(t) * 1000 AS time, segment, ${aggregates} FROM runs
     GROUP BY segment, CAST(t / ? AS INTEGER) ORDER BY time`).all(spec.start, spec.end, spec.step);
-  return {latest: latest ?? null, energy: energy ?? null, connection: meterConnection(latest, energy), ...spec, columns, points};
 }
-module.exports = {createSampleWriter, parseSample, readDashboard, trendQuery, meterConnection};
+module.exports = {readPoints, createSampleWriter, parseSample, readDashboard, trendQuery, meterConnection};

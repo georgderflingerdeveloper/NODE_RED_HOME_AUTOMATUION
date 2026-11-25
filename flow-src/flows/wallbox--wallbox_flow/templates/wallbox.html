@@ -1,0 +1,114 @@
+<style>@import url("/home-automation/meter-dashboard.css");</style>
+<section class="gh-meter gh-wallbox" id="wallbox-{{$id}}">
+ <div class="wb-statusline"><div class="meter-status" role="status" ng-class="connection.state">{{statusLabels[connection.state]}}</div>
+ <small ng-if="connection.lastSeen">Letzte Messung {{when(connection.lastSeen)}}</small></div>
+ <h3>{{sample ? states[sample.state] : 'Warte auf die erste Messung'}}</h3>
+ <div class="meter-grid wb-grid">
+  <div class="meter-value">Ladeleistung · 1-min-Mittel<strong>{{fmt(sample.power_kw,'kW')}}</strong></div>
+  <div class="meter-value">Energie der Ladung<strong>{{fmt(sample.energy_kwh,'kWh')}}</strong></div>
+  <div class="meter-value">Ladedauer<strong>{{duration(sample.duration_s)}}</strong></div>
+ </div>
+ <dl class="wb-details" ng-if="sample">
+  <dt ng-if="sample.started_at">Ladebeginn · ca.</dt><dd ng-if="sample.started_at">{{when(sample.started_at)}}</dd>
+  <dt>Stromvorgabe fürs Auto</dt><dd>{{fmt(sample.offered_a,'A')}}</dd>
+  <dt>Stromlimit der Wallbox</dt><dd>{{fmt(sample.limit_a,'A')}}</dd>
+  <dt>Aktive Ladephasen</dt><dd>{{sample.phases}}</dd>
+  <dt>Gerätetemperatur</dt><dd>{{fmt(sample.temperature_c,'°C')}}</dd>
+  <dt>Gerätestatus</dt><dd>{{fault(sample.error_code)}}</dd>
+ </dl>
+ <h3>Zuletzt in der Wallbox gespeichert</h3>
+ <div>Letzte Ladung <b>{{fmt(sample.previous_kwh,'kWh')}}</b> · Vorletzte <b>{{fmt(sample.penultimate_kwh,'kWh')}}</b></div>
+ <h3>Historischer Verlauf</h3>
+ <div class="meter-controls">
+  <label>Messgröße<select ng-model="metric" ng-options="key as group.label for (key,group) in groups" ng-change="reload()"></select></label>
+  <label>Zeitraum<select ng-model="hours" ng-options="r.hours as r.label for r in ranges" ng-change="resetRange()"></select></label>
+  <button type="button" ng-click="shift(-1)" aria-label="Vorheriger Zeitraum">←</button>
+  <button type="button" ng-click="shift(1)" ng-disabled="!until" aria-label="Nächster Zeitraum">→</button>
+  <button type="button" ng-click="resetRange()">Jetzt</button>
+ </div>
+ <p ng-if="data">{{when(data.start)}} – {{when(data.end)}}</p>
+ <p role="alert" ng-if="meterError">{{meterError}}</p>
+ <canvas role="img" aria-label="Zeitverlauf der gewählten Wallbox-Messgröße"></canvas>
+ <p ng-if="data && !hasValues">Keine Messwerte in diesem Zeitraum.</p>
+ <div class="meter-legend"><span ng-repeat="label in groups[metric].lines track by $index"><i ng-style="{'background-color':colors[$index]}"></i>{{label}}</span></div>
+ <h3>Ladekosten</h3>
+ <div class="meter-controls">
+  <label>Stichtag<input type="date" ng-model="chargeDate" ng-change="reload()"></label>
+  <button type="button" ng-click="chargeDate=null;reload()">Heute</button>
+ </div>
+ <div class="meter-grid wb-periods">
+  <button type="button" ng-repeat="p in data.periods" ng-class="{'wb-selected':p.type===period}"
+   aria-pressed="{{p.type===period}}" ng-click="setPeriod(p.type)">{{periodLabels[p.type]}}<strong>{{cost(p.total)}}</strong>{{fmt(p.total.kwh,'kWh')}}</button>
+ </div>
+ <p>Gesamte Ladeenergie zum archivierten Energiepreis, auch bei PV-Anteil. aWATTar zum Börsenpreis. Netzgebühren, weitere Zuschläge und Grundpreis sind ausgenommen.</p>
+ <div ng-if="billPeriod"><h4>{{periodLabels[period]}} · {{billPeriod.start}} – {{billPeriod.end}}</h4>
+ <table><thead><tr><th>Fahrzeug</th><th>Ladungen mit Energie</th><th>Energie</th><th>Preis</th></tr></thead>
+ <tbody><tr ng-repeat="v in billPeriod.vehicles"><th>{{v.vehicle}}</th><td>{{v.count}}</td><td>{{fmt(v.kwh,'kWh')}}</td><td>{{cost(v)}}</td></tr></tbody></table>
+ <p ng-if="billPeriod.comparison.count">Hyundai-Vergleich · {{billPeriod.comparison.count}} abgeschlossene Ladung(en) mit App-Wert nach Enddatum: Wallbox {{fmt(billPeriod.comparison.wallbox_kwh,'kWh')}}, myHyundai {{fmt(billPeriod.comparison.app_kwh,'kWh')}}, Differenz {{fmt(billPeriod.comparison.wallbox_kwh-billPeriod.comparison.app_kwh,'kWh')}}.</p>
+ <p ng-if="billPeriod.total.missing>0">Tarif fehlt für {{fmt(billPeriod.total.missing,'kWh')}}. Bisher zugeordnet: {{money(billPeriod.total.eur)}}.</p></div>
+ <h3>Ladungen · {{periodLabels[period]}}</h3>
+ <p ng-if="data && !data.calendarSessions.length">Keine aufgezeichnete Ladung in diesem Zeitraum.</p>
+ <article class="wb-charge" ng-repeat="s in data.calendarSessions track by s.id">
+  <div class="wb-statusline"><b>{{s.vehicle==='Offen'?'Fahrzeug offen':s.vehicle}}</b><b>{{s.cost_eur===null?'Preis unvollständig':money(s.cost_eur)}}</b></div>
+  <div>{{when(s.started_at)}} – {{s.ended_at ? when(s.ended_at) : (connection.state==='online'?'läuft':'zuletzt offen')}}</div>
+  <div>{{duration(s.duration_s)}} · {{fmt(s.energy_kwh,'kWh')}}<span ng-if="s.incomplete"> · Messlücke</span></div>
+  <small ng-if="s.cost_eur===null">Bepreist: {{fmt(s.priced_kwh,'kWh')}} · {{money(s.partial_eur)}}</small>
+  <div ng-if="s.app_kwh!==null">myHyundai {{fmt(s.app_kwh,'kWh')}} · Wallbox minus App {{fmt(s.energy_kwh-s.app_kwh,'kWh')}}</div>
+  <button type="button" ng-click="editCharge(s)">{{s.vehicle==='Offen'?'Fahrzeug zuordnen':'Zuordnung bearbeiten'}}</button>
+  <form class="meter-controls" ng-if="edit.id===s.id" ng-submit="saveCharge()">
+   <label>Fahrzeug<select ng-model="edit.vehicle"><option>Offen</option><option>Hyundai</option><option>MG</option></select></label>
+   <label ng-if="edit.vehicle==='Hyundai' && s.ended_at">myHyundai · Energie dieser Ladung (kWh)<input type="number" min="0" max="1000" step="any" ng-model="edit.app"></label>
+   <button type="submit" ng-disabled="saving">Speichern</button><button type="button" ng-disabled="saving" ng-click="cancelCharge()">Abbrechen</button>
+  </form>
+ </article>
+ <p ng-if="data.calendarSessions.length">Pro Ladung steht der Gesamtpreis. Die Kalenderübersicht verteilt grenzüberschreitende Ladungen nach Ladezeit und Energiezuwachs.</p>
+ <p role="status" aria-live="polite" ng-if="chargeNotice">{{chargeNotice}}</p>
+</section>
+<script>
+(function(scope){
+ scope.groups={
+  power:{label:'Mittlere Ladeleistung',unit:'kW',lines:['Ladeleistung · 1-min-Mittel']},
+  energy:{label:'Energie der Ladung',unit:'kWh',lines:['Energie seit Ladebeginn']},
+  current:{label:'Stromvorgabe und Limit',unit:'A',lines:['Stromvorgabe','Stromlimit']},
+  duration:{label:'Ladezeit',unit:'min',lines:['Ladezeit seit Beginn']},
+  temperature:{label:'Gerätetemperatur',unit:'°C',lines:['Temperatur']}
+ };
+ scope.statusLabels={loading:'Verbindung wird geprüft …',online:'Wallbox online',offline:'Wallbox offline',unknown:'Wallboxstatus unbekannt'};
+ scope.states=['Initialisierung','Bereit · kein Fahrzeug','Bereit · A2','Fahrzeug wartet auf Freigabe','Fahrzeug verbunden','Ladepause','Ladung läuft','Störung'];
+ const faults=['Kein Fehler','Übertemperatur','DC-Fehlerstrom','Lüftung angefordert','CP-Signal E/F','CP-Überbrückung','CP-Diodenfehler','DC-Sensor · Kalibrierung','DC-Sensor · Kommunikation','DC-Sensorfehler'];
+ scope.fault=code=>faults[code] || 'Fehlercode '+code;
+ scope.duration=s=>Number.isFinite(s)?[Math.floor(s/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,'0')).join(':'):'—';
+
+ scope.period='day';
+ scope.periodLabels={day:'Tag',week:'Woche',month:'Monat'};
+ const euro=new Intl.NumberFormat('de-AT',{style:'currency',currency:'EUR'});
+ scope.money=n=>Number.isFinite(n)?euro.format(n):'—';
+ scope.cost=v=>v.missing>0?'Tarif fehlt':scope.money(v.eur ?? 0);
+ scope.setPeriod=p=>{scope.period=p;scope.reload();};
+ scope.editCharge=s=>{scope.chargeNotice='';scope.edit={id:s.id,vehicle:s.vehicle,app:s.app_kwh,revision:s.revision};};
+ scope.cancelCharge=()=>{scope.edit=null;};
+ scope.saveCharge=async()=>{
+  if(scope.saving || !scope.edit)return;
+  const e=scope.edit;scope.saving=true;
+  try{
+   const res=await fetch('/home-automation/wallbox/sessions/'+e.id,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({vehicle:e.vehicle,appKwh:e.vehicle==='Hyundai'?(e.app ?? null):null,revision:e.revision})});
+   const body=await res.json();if(!res.ok)throw Error(body.error || 'Speichern fehlgeschlagen.');
+   scope.$evalAsync(()=>{scope.edit=null;scope.chargeNotice='Zuordnung gespeichert.';scope.reload();});
+  }catch(err){scope.$evalAsync(()=>scope.chargeNotice=err.message);}
+  finally{scope.$evalAsync(()=>scope.saving=false);}
+ };
+ import('/home-automation/meter-trend.mjs').then(({initMeterTrend})=>{
+  initMeterTrend(scope,'wallbox','power',15000,data=>{
+   scope.billPeriod=data.periods.find(p=>p.type===data.period);
+  },()=>{
+   const query={period:scope.period};
+   if(scope.chargeDate instanceof Date && Number.isFinite(+scope.chargeDate)){
+    const d=scope.chargeDate;
+    query.day=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+   }
+   return query;
+  });
+ }).catch(()=>{if(!scope.$$destroyed)scope.$evalAsync(()=>scope.meterError='Trendanzeige konnte nicht geladen werden.');});
+})(scope);
+</script>
