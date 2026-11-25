@@ -179,3 +179,11 @@ CREATE TABLE IF NOT EXISTS solar_power_samples (
  grid_export_w REAL,
  raw_json TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS smartmeter_samples (
+  observed_at TEXT PRIMARY KEY,
+  voltage_l1 REAL, voltage_l2 REAL, voltage_l3 REAL,
+  current_l1 REAL, current_l2 REAL, current_l3 REAL,
+  frequency REAL, grid_power REAL,
+  power_l1 REAL, power_l2 REAL, power_l3 REAL
+);

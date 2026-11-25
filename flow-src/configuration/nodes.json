@@ -2446,7 +2446,7 @@
     "type": "ui_tab",
     "name": "KOSTEN",
     "icon": "euro_symbol",
-    "order": 12,
+    "order": 13,
     "disabled": false,
     "hidden": false
   },
@@ -2466,7 +2466,7 @@
     "type": "ui_tab",
     "name": "SYSTEM",
     "icon": "dns",
-    "order": 13,
+    "order": 14,
     "disabled": false,
     "hidden": false
   },
@@ -2486,7 +2486,7 @@
     "type": "ui_tab",
     "name": "Schedulers",
     "icon": "schedule",
-    "order": 14,
+    "order": 15,
     "disabled": false,
     "hidden": false
   },
@@ -2512,7 +2512,7 @@
     "type": "ui_tab",
     "name": "Darstellung",
     "icon": "palette",
-    "order": 18,
+    "order": 19,
     "disabled": false,
     "hidden": false
   },
@@ -2531,7 +2531,7 @@
     "type": "ui_tab",
     "name": "Homematic IP",
     "icon": "devices",
-    "order": 15,
+    "order": 16,
     "disabled": false,
     "hidden": false
   },
@@ -2558,7 +2558,7 @@
     "type": "ui_tab",
     "name": "SolarEdge Vergleich",
     "icon": "compare_arrows",
-    "order": 16,
+    "order": 17,
     "disabled": false,
     "hidden": false
   },
@@ -2585,7 +2585,7 @@
     "type": "ui_tab",
     "name": "HOSTRECHNER",
     "icon": "computer",
-    "order": 17,
+    "order": 18,
     "disabled": false,
     "hidden": false
   },
@@ -2659,7 +2659,7 @@
     "type": "ui_tab",
     "name": "Melder",
     "icon": "directions_walk",
-    "order": 19,
+    "order": 20,
     "disabled": false,
     "hidden": false
   },
@@ -2718,7 +2718,7 @@
     "type": "ui_tab",
     "name": "Raummanager",
     "icon": "fa-sitemap",
-    "order": 21,
+    "order": 22,
     "disabled": false,
     "hidden": false
   },
@@ -2737,7 +2737,7 @@
     "type": "ui_tab",
     "name": "KI-Auswertung",
     "icon": "fa-line-chart",
-    "order": 22,
+    "order": 23,
     "disabled": false,
     "hidden": false
   },
@@ -2760,5 +2760,25 @@
     "disp": false,
     "width": "12",
     "collapse": false
+  },
+  {
+    "id": "smartmeter_tab",
+    "type": "ui_tab",
+    "name": "Smartmeter",
+    "icon": "fa-tachometer",
+    "order": 12,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "smartmeter_group",
+    "type": "ui_group",
+    "name": "SolarEdge · Netzzähler",
+    "tab": "smartmeter_tab",
+    "order": 1,
+    "disp": true,
+    "width": 12,
+    "collapse": false,
+    "className": ""
   }
 ]

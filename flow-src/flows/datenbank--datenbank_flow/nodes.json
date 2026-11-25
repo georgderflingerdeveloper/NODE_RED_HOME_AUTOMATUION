@@ -375,5 +375,21 @@
         "datenbank_history_store"
       ]
     ]
+  },
+  {
+    "id": "smartmeter_database_in",
+    "type": "link in",
+    "z": "datenbank_flow",
+    "name": "Smartmeter · Phasenwerte empfangen",
+    "links": [
+      "smartmeter_database_out"
+    ],
+    "x": 155,
+    "y": 390,
+    "wires": [
+      [
+        "datenbank_history_store"
+      ]
+    ]
   }
 ]

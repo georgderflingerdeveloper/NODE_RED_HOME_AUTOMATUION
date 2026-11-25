@@ -50,6 +50,7 @@ const files = [
   "home-automation-motion.html",
   "solar-history-export.cjs",
   "solar-trend.cjs",
+  "smartmeter.cjs",
   "home-automation-history.html",
   "home-automation-history.schema.sql",
   "reconcile-solaredge-daily-energy.cjs",

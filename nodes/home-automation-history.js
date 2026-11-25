@@ -1,3 +1,4 @@
+const smartmeter = require("./smartmeter.cjs");
 const { readTrend, trendRequest } = require("./solar-trend.cjs");
 const { streamExport, historyStatus } = require("./solar-history-export.cjs");
 const { createCloudStore, effectiveRows, compareSources, METRICS } = require("./solaredge-cloud.cjs");
@@ -68,6 +69,18 @@ module.exports = function registerHistoryStore(RED) {
       try { response.set('Cache-Control','no-store'); response.json(readTrend(activeDatabasePath,request.query)); }
       catch { response.status(500).json({error:'Trenddaten konnten nicht gelesen werden.'}); }
     });
+    RED.httpNode.get('/home-automation/smartmeter', (request, response) => {
+      if (!activeDatabasePath) return response.status(503).json({error: 'Messarchiv nicht verfügbar.'});
+      let spec, db;
+      try { spec = smartmeter.trendQuery(request.query); }
+      catch (error) { return response.status(400).json({error: error.message}); }
+      try {
+        db = new DatabaseSync(activeDatabasePath, {readOnly: true});
+        response.set('Cache-Control', 'no-store').json(smartmeter.readDashboard(db, spec));
+      } catch {
+        response.status(500).json({error: 'Smartmeter-Archiv nicht lesbar.'});
+      } finally { db?.close(); }
+    });
     RED.httpNode.get('/home-automation/solar/history-status', (_request,response) => {
       if(!activeDatabasePath) return response.status(503).json({error:'Historie nicht verfügbar.'});
       try { response.set('Cache-Control','no-store'); response.json(historyStatus(activeDatabasePath)); }
@@ -99,6 +112,7 @@ module.exports = function registerHistoryStore(RED) {
         CREATE INDEX tariff_slots_valid_until_idx ON tariff_slots(valid_until);
         COMMIT;`);
     }
+    const writeSmartmeter = smartmeter.createSampleWriter(database);
     activeDatabasePath = databasePath;
     const insertPowerSample = database.prepare(`INSERT OR IGNORE INTO solar_power_samples
       (observed_at,received_at,online,pv_power_w,house_consumption_w,grid_import_w,grid_export_w,raw_json)
@@ -809,6 +823,11 @@ module.exports = function registerHistoryStore(RED) {
     node.status({ fill: "green", shape: "dot", text: "SQLite bereit" });
     node.on("input", (msg, send, done) => {
       try {
+        if (msg.topic === "history/source/smartmeter") {
+          writeSmartmeter(msg.payload, new Date().toISOString());
+          done();
+          return;
+        }
         if (msg.topic === "history/backup") {
           const backupPath = createBackup();
           msg.history = { action: "backup", databasePath, backupPath };

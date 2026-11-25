@@ -2858,7 +2858,7 @@
         "type": "ui_tab",
         "name": "KOSTEN",
         "icon": "euro_symbol",
-        "order": 12,
+        "order": 13,
         "disabled": false,
         "hidden": false
     },
@@ -2878,7 +2878,7 @@
         "type": "ui_tab",
         "name": "SYSTEM",
         "icon": "dns",
-        "order": 13,
+        "order": 14,
         "disabled": false,
         "hidden": false
     },
@@ -2898,7 +2898,7 @@
         "type": "ui_tab",
         "name": "Schedulers",
         "icon": "schedule",
-        "order": 14,
+        "order": 15,
         "disabled": false,
         "hidden": false
     },
@@ -12632,7 +12632,7 @@
         "type": "ui_tab",
         "name": "Darstellung",
         "icon": "palette",
-        "order": 18,
+        "order": 19,
         "disabled": false,
         "hidden": false
     },
@@ -12691,7 +12691,7 @@
         "type": "ui_tab",
         "name": "Homematic IP",
         "icon": "devices",
-        "order": 15,
+        "order": 16,
         "disabled": false,
         "hidden": false
     },
@@ -12797,7 +12797,7 @@
         "type": "ui_tab",
         "name": "SolarEdge Vergleich",
         "icon": "compare_arrows",
-        "order": 16,
+        "order": 17,
         "disabled": false,
         "hidden": false
     },
@@ -12870,7 +12870,7 @@
         "type": "ui_tab",
         "name": "HOSTRECHNER",
         "icon": "computer",
-        "order": 17,
+        "order": 18,
         "disabled": false,
         "hidden": false
     },
@@ -13536,7 +13536,7 @@
         "type": "ui_tab",
         "name": "Melder",
         "icon": "directions_walk",
-        "order": 19,
+        "order": 20,
         "disabled": false,
         "hidden": false
     },
@@ -14157,7 +14157,7 @@
         "type": "ui_tab",
         "name": "Raummanager",
         "icon": "fa-sitemap",
-        "order": 21,
+        "order": 22,
         "disabled": false,
         "hidden": false
     },
@@ -14218,7 +14218,7 @@
         "type": "ui_tab",
         "name": "KI-Auswertung",
         "icon": "fa-line-chart",
-        "order": 22,
+        "order": 23,
         "disabled": false,
         "hidden": false
     },
@@ -14311,6 +14311,108 @@
             [
                 "wz_room_io"
             ]
+        ]
+    },
+    {
+        "id": "smartmeter_tab",
+        "type": "ui_tab",
+        "name": "Smartmeter",
+        "icon": "fa-tachometer",
+        "order": 12,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "smartmeter_group",
+        "type": "ui_group",
+        "name": "SolarEdge · Netzzähler",
+        "tab": "smartmeter_tab",
+        "order": 1,
+        "disp": true,
+        "width": 12,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "smartmeter_database_in",
+        "type": "link in",
+        "z": "datenbank_flow",
+        "name": "Smartmeter · Phasenwerte empfangen",
+        "links": [
+            "smartmeter_database_out"
+        ],
+        "x": 155,
+        "y": 390,
+        "wires": [
+            [
+                "datenbank_history_store"
+            ]
+        ]
+    },
+    {
+        "id": "smartmeter_read",
+        "type": "modbus-read",
+        "z": "tab_read_feedin",
+        "name": "Smartmeter · Phasenwerte und Frequenz",
+        "topic": "history/source/smartmeter",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "190",
+        "quantity": "21",
+        "rate": "30",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "befceeb9cba11998",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 220,
+        "y": 680,
+        "wires": [
+            [
+                "smartmeter_database_out"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "smartmeter_database_out",
+        "type": "link out",
+        "z": "tab_read_feedin",
+        "name": "Smartmeter-Messung ans Archiv",
+        "mode": "link",
+        "links": [
+            "smartmeter_database_in"
+        ],
+        "x": 875,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "smartmeter_dashboard",
+        "type": "ui_template",
+        "z": "b86cb602995b0261",
+        "group": "smartmeter_group",
+        "name": "Smartmeter · Messwerte und Trend",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "format": "<style>\n.gh-meter{padding:16px;line-height:1.45;color:var(--gh-text);font-variant-numeric:tabular-nums}\n.gh-meter .meter-status{display:inline-flex;align-items:center;gap:7px;font-weight:700}.gh-meter .meter-status::before{content:\"\";width:10px;height:10px;border-radius:50%;background:#aaa}.gh-meter .meter-status.online::before{background:#64d8ac}.gh-meter .meter-status.offline::before{background:#ff8a83}\n.gh-meter h3{font-size:18px;margin:18px 0 8px}.gh-meter p{margin:5px 0;color:var(--gh-muted)}\n.gh-meter .meter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}\n.gh-meter .meter-value{background:var(--gh-inset);border:1px solid var(--gh-border);border-radius:8px;padding:10px}\n.gh-meter strong{display:block;font-size:20px}.gh-meter table{width:100%;border-collapse:collapse}.gh-meter td,.gh-meter th{text-align:right;padding:7px 4px;border-bottom:1px solid var(--gh-border)}.gh-meter th:first-child{text-align:left}\n.gh-meter .meter-controls,.gh-meter .meter-legend{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}\n.gh-meter label{display:grid;font-size:12px;gap:4px}.gh-meter select,.gh-meter button{color:var(--gh-text);background:var(--gh-inset);border:1px solid var(--gh-border);border-radius:6px;padding:6px;min-height:34px}\n.gh-meter button:disabled{opacity:.45}.gh-meter canvas{display:block;width:100%;height:210px}.gh-meter .meter-legend i{display:inline-block;width:12px;height:3px;vertical-align:middle;margin-right:5px}\n@media(max-width:700px){\n [id^=\"Tab_\"]:has(.gh-meter),[id^=\"Tab_\"]:has(.gh-meter)>ui-card-panel,[id^=\"Tab_\"]:has(.gh-meter) .nr-dashboard-cardpanel,[id^=\"Tab_\"]:has(.gh-meter) .nr-dashboard-cardcontainer,md-card:has(.gh-meter){box-sizing:border-box;width:100%!important;max-width:100%!important}\n [id^=\"Tab_\"]:has(.gh-meter)>ui-card-panel{left:0!important}\n .gh-meter{padding:8px}.gh-meter .meter-value{padding:6px}.gh-meter strong{font-size:16px}\n}\n</style>\n<section class=\"gh-meter\" id=\"smartmeter-{{$id}}\">\n <div class=\"meter-status\" role=\"status\" ng-class=\"connection.state\">{{statusLabels[connection.state]}}</div>\n <p ng-if=\"connection.lastSeen\">Letzter Zählerkontakt {{when(connection.lastSeen)}}</p>\n <p>{{sample.observed_at ? 'Leistungs- und Phasenwerte vom '+when(sample.observed_at) : 'Warte auf die erste Phasenmessung.'}}</p>\n <div class=\"meter-grid\">\n  <div class=\"meter-value\">Netzbezug<strong>{{fmt(importW,'W')}}</strong></div>\n  <div class=\"meter-value\">Einspeisung<strong>{{fmt(exportW,'W')}}</strong></div>\n  <div class=\"meter-value\">Frequenz<strong>{{fmt(sample.frequency,'Hz')}}</strong></div>\n </div>\n <h3>Phasen am Netzanschluss</h3>\n <table><thead><tr><th>Phase</th><th>Spannung</th><th>Strom</th><th>Wirkleistung</th></tr></thead>\n <tbody><tr ng-repeat=\"n in [1,2,3]\"><th scope=\"row\">L{{n}}</th><td>{{fmt(sample['voltage_l'+n],'V')}}</td><td>{{fmt(sample['current_l'+n],'A')}}</td><td>{{fmt(sample['power_l'+n],'W')}}</td></tr></tbody></table>\n <p>Wirkleistung je Phase: − Bezug, + Einspeisung.</p>\n <h3>Zählerstände</h3>\n <div>Bezug <b>{{fmt(energy.grid_import_total_kwh,'kWh')}}</b> · Einspeisung <b>{{fmt(energy.grid_export_total_kwh,'kWh')}}</b></div>\n <p>{{energy.observed_at ? 'Abgelesen '+when(energy.observed_at) : 'Noch keine Zählerstände vorhanden.'}}</p>\n <h3>Historischer Verlauf</h3>\n <div class=\"meter-controls\">\n  <label>Messgröße<select ng-model=\"metric\" ng-options=\"key as group.label for (key,group) in groups\" ng-change=\"reload()\"></select></label>\n  <label>Zeitraum<select ng-model=\"hours\" ng-options=\"r.hours as r.label for r in ranges\" ng-change=\"resetRange()\"></select></label>\n  <button type=\"button\" ng-click=\"shift(-1)\" aria-label=\"Vorheriger Zeitraum\">←</button>\n  <button type=\"button\" ng-click=\"shift(1)\" ng-disabled=\"!until\" aria-label=\"Nächster Zeitraum\">→</button>\n  <button type=\"button\" ng-click=\"resetRange()\">Jetzt</button>\n </div>\n <p ng-if=\"data\">{{when(data.start)}} – {{when(data.end)}}</p>\n <p role=\"alert\" ng-if=\"meterError\">{{meterError}}</p>\n <canvas role=\"img\" aria-label=\"Zeitverlauf der gewählten Smartmeter-Messgröße\"></canvas>\n <p ng-if=\"data && !hasValues\">Keine Messwerte in diesem Zeitraum.</p>\n <div class=\"meter-legend\"><span ng-repeat=\"label in groups[metric].lines track by $index\"><i ng-style=\"{'background-color':colors[$index]}\"></i>{{label}}</span></div>\n</section>\n<script>\n(function(scope){\n const phases=['L1','L2','L3'], directions=['Bezug','Einspeisung'];\n scope.groups={\n  grid:{label:'Netzbezug und Einspeisung',unit:'W',lines:directions},\n  voltage:{label:'Spannung je Phase',unit:'V',lines:phases},\n  current:{label:'Strom je Phase',unit:'A',lines:phases},\n  power:{label:'Wirkleistung je Phase',unit:'W',lines:phases},\n  frequency:{label:'Netzfrequenz',unit:'Hz',lines:['Netzfrequenz']},\n  energy:{label:'Zählerstände',unit:'kWh',lines:directions}\n };\n scope.ranges=[{hours:1,label:'1 Stunde'},{hours:6,label:'6 Stunden'},{hours:24,label:'24 Stunden'},\n  {hours:168,label:'7 Tage'},{hours:720,label:'30 Tage'}];\n scope.colors=['#69baff','#ffb86e','#64d8ac'];\n scope.metric='grid';scope.hours=1;scope.connection={state:'loading'};\n scope.statusLabels={loading:'Verbindung wird geprüft …',online:'Zähler online',offline:'Zähler offline',unknown:'Zählerstatus unbekannt'};\n const number=new Intl.NumberFormat('de-AT',{maximumFractionDigits:3});\n const stamp=new Intl.DateTimeFormat('de-AT',{timeZone:'Europe/Vienna',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});\n scope.when=value=>stamp.format(new Date(value));\n scope.fmt=(v,unit)=>Number.isFinite(v)?number.format(v)+' '+unit:'—';\n const root=()=>document.getElementById('smartmeter-'+scope.$id);\n let controller,observer,disposed=false;\n function draw(){\n  const canvas=root()?.querySelector('canvas'),data=scope.data;\n  if(!canvas || !canvas.clientWidth)return;\n  const w=canvas.clientWidth,h=canvas.clientHeight,ratio=window.devicePixelRatio||1;\n  canvas.width=w*ratio;canvas.height=h*ratio;\n  const ctx=canvas.getContext('2d');ctx.scale(ratio,ratio);\n  if(!data || !scope.hasValues)return;\n  const values=data.points.flatMap(p=>data.columns.map(key=>p[key])).filter(Number.isFinite);\n  let low=Math.min(...values),high=Math.max(...values);\n  const pad=(high-low)*.06 || Math.max(.01,Math.abs(high)*.0001);\n  low-=pad;high+=pad;\n  const start=Date.parse(data.start),end=Date.parse(data.end);\n  const x=t=>66+(t-start)/(end-start)*(w-78),y=v=>h-28-(v-low)/(high-low)*(h-50);\n  const style=getComputedStyle(canvas);\n  ctx.font='11px sans-serif';ctx.fillStyle=style.color;ctx.textAlign='left';ctx.fillText(scope.groups[data.metric].unit,4,13);\n  for(let i=0;i<4;i++){\n   const v=low+(high-low)*i/3,yy=y(v);\n   ctx.textAlign='right';ctx.fillText(number.format(v),61,yy+3);\n   ctx.strokeStyle=style.getPropertyValue('--gh-border')||'#555';ctx.beginPath();ctx.moveTo(66,yy);ctx.lineTo(w-12,yy);ctx.stroke();\n  }\n  for(let i=0;i<3;i++){\n   const t=start+(end-start)*i/2;\n   ctx.textAlign=['left','center','right'][i];\n   ctx.fillText(new Date(t).toLocaleString('de-AT',scope.hours>24?{day:'2-digit',month:'2-digit',timeZone:'Europe/Vienna'}:{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Vienna'}),x(t),h-6);\n  }\n  data.columns.forEach((key,index)=>{\n   let last=null;ctx.lineWidth=1.8;ctx.strokeStyle=ctx.fillStyle=scope.colors[index];\n   for(const pt of data.points){\n    if(!Number.isFinite(pt[key])){last=null;continue;}\n    const xx=x(pt.time),yy=y(pt[key]);\n    if(last && last.segment===pt.segment){ctx.beginPath();ctx.moveTo(x(last.time),y(last[key]));ctx.lineTo(xx,yy);ctx.stroke();}\n    ctx.beginPath();ctx.arc(xx,yy,1.8,0,2*Math.PI);ctx.fill();last=pt;\n   }\n  });\n }\n scope.reload=async function(){\n  controller?.abort();const active=new AbortController();controller=active;\n  const query=new URLSearchParams({metric:scope.metric,hours:scope.hours});\n  if(scope.until)query.set('end',new Date(scope.until).toISOString());\n  try{\n   const response=await fetch('/home-automation/smartmeter?'+query,{signal:active.signal,cache:'no-store'});\n   if(!response.ok)throw Error();\n   const data=await response.json();\n   if(disposed || controller!==active)return;\n   scope.$evalAsync(()=>{\n    scope.data=data;scope.meterError='';scope.sample=data.latest;scope.energy=data.energy;\n    const power=data.latest?.grid_power;\n    scope.importW=Number.isFinite(power)?Math.max(0,-power):null;\n    scope.exportW=Number.isFinite(power)?Math.max(0,power):null;\n    scope.connection=data.connection;\n    scope.hasValues=data.points.some(p=>data.columns.some(key=>Number.isFinite(p[key])));\n    requestAnimationFrame(draw);\n   });\n  }catch(err){if(!disposed && controller===active && err.name!=='AbortError')scope.$evalAsync(()=>{\n   scope.meterError='Messarchiv nicht erreichbar.';scope.data=null;scope.connection={state:'unknown',lastSeen:scope.connection.lastSeen};requestAnimationFrame(draw);\n  });}\n };\n scope.resetRange=()=>{scope.until=null;scope.reload();};\n scope.shift=dir=>{\n  const next=(scope.until||Date.now())+dir*scope.hours*3600000;\n  scope.until=next>=Date.now()-1000?null:next;scope.reload();\n };\n const init=setTimeout(()=>{\n  const panel=root();if(!panel)return;\n  observer=new ResizeObserver(draw);observer.observe(panel);scope.reload();\n },0);\n const timer=setInterval(()=>{if(root()?.getClientRects().length && !document.hidden)scope.reload();},30000);\n scope.$on('$destroy',()=>{disposed=true;clearTimeout(init);clearInterval(timer);controller?.abort();observer?.disconnect();});\n})(scope);\n</script>\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 560,
+        "y": 680,
+        "wires": [
+            []
         ]
     }
 ]

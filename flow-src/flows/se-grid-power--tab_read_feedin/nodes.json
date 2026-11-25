@@ -279,5 +279,50 @@
     "x": 875,
     "y": 580,
     "wires": []
+  },
+  {
+    "id": "smartmeter_read",
+    "type": "modbus-read",
+    "z": "tab_read_feedin",
+    "name": "Smartmeter · Phasenwerte und Frequenz",
+    "topic": "history/source/smartmeter",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "1",
+    "dataType": "HoldingRegister",
+    "adr": "190",
+    "quantity": "21",
+    "rate": "30",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "befceeb9cba11998",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 220,
+    "y": 680,
+    "wires": [
+      [
+        "smartmeter_database_out"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "smartmeter_database_out",
+    "type": "link out",
+    "z": "tab_read_feedin",
+    "name": "Smartmeter-Messung ans Archiv",
+    "mode": "link",
+    "links": [
+      "smartmeter_database_in"
+    ],
+    "x": 875,
+    "y": 680,
+    "wires": []
   }
 ]

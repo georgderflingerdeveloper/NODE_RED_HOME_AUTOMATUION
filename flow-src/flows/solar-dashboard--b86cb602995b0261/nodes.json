@@ -571,5 +571,28 @@
     "x": 805,
     "y": 860,
     "wires": []
+  },
+  {
+    "id": "smartmeter_dashboard",
+    "type": "ui_template",
+    "z": "b86cb602995b0261",
+    "group": "smartmeter_group",
+    "name": "Smartmeter · Messwerte und Trend",
+    "order": 1,
+    "width": 12,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/solar-dashboard--b86cb602995b0261/templates/smartmeter.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 560,
+    "y": 680,
+    "wires": [
+      []
+    ]
   }
 ]
