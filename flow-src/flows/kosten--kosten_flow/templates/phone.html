@@ -1,0 +1,24 @@
+<style>
+.gh-gal{color:var(--gh-text);padding:12px;width:100%;box-sizing:border-box}.gh-gal h3,.gh-gal h4{margin:.5em 0}.gh-gal label{display:grid;gap:4px;margin:8px 0}.gh-gal input,.gh-gal select,.gh-gal button,.gh-gal a.ga-button{background:var(--gh-inset);color:inherit;border:1px solid var(--gh-border);border-radius:8px;font:inherit;padding:8px;max-width:100%;box-sizing:border-box}.gh-gal button,.gh-gal a.ga-button{cursor:pointer;margin:2px}.gh-gal .ga-box{margin:12px 0;padding:10px;border:1px solid var(--gh-border);border-radius:9px}.gh-gal .ga-help{border-left:4px solid #70af99;padding-left:10px;line-height:1.5}.gh-gal img{max-width:190px;width:100%;display:block;margin:.5em 0}.gh-gal code{overflow-wrap:anywhere}.gh-gal [role=alert]{color:var(--gh-text);border-left:4px solid #d99365;padding-left:.6em}.gh-gal a{color:inherit}.gh-gal small{color:var(--gh-muted)}
+#nr-dashboard md-card:has(.gh-gal),#nr-dashboard .nr-dashboard-cardcontainer:has(.gh-gal){height:auto!important}#nr-dashboard md-card:has(.gh-gal){position:relative!important}
+</style>
+<section class="gh-gal" id="gallery-{{$id}}"><p ng-if="error||data.issue" role="alert">{{error||data.issue}}</p><h3>Handy verbinden</h3><label>Hausnetzadresse<select ng-model="form.address" ng-options="a for a in data.addresses"></select></label>
+<button ng-click="pair(false)" ng-disabled="working || !form.address">Handy per QR-Code verbinden</button>
+<button ng-click="pair(true)" ng-disabled="working || !form.address">Dieses Handy verwenden</button>
+<div ng-if="link.url"><img ng-src="{{link.qr}}" alt="QR-Code zur Handy-Kopplung"><a ng-href="{{link.url}}" target="_blank" rel="noopener">Sensorseite auf diesem Gerät öffnen</a><p>Gültig bis {{when(link.until)}}. Handy verbinden und auf der Sensorseite „Lernlauf starten / übernehmen“ antippen. Dort erscheinen die Anweisungen.</p></div>
+<details><summary>HTTPS auf dem Handy einrichten</summary><p>Für GPS und Kamera muss das Handy der lokalen GEORGSHOME-Zertifizierungsstelle vertrauen. Lade das Zertifikat im Hausnetz herunter, prüfe seinen SHA-256-Fingerabdruck und installiere es als vertrauenswürdige CA. Unter iOS zusätzlich das volle Vertrauen in den Zertifikatseinstellungen aktivieren.</p><a href="/home-automation/gallery/ca.crt" download>Lokales CA-Zertifikat</a><p><code>{{data.fingerprint}}</code></p></details><h4>Gekoppelte Handys</h4><p ng-if="!data.phones.length">Noch kein Handy verbunden.</p><div class="ga-box" ng-repeat="p in data.phones track by p.id"><b>{{p.name}}</b> · {{p.online?'empfängt':'offline'}}<p ng-if="p.last">Letzte Übertragung {{when(p.last)}}</p><span ng-if="p.reading">{{p.reading.value | number:1}} {{p.reading.kind==='lux'?'lx':'% relative Bildhelligkeit'}} · {{when(p.reading.at)}}</span><phone-diagnostics ng-attr-phone-id="{{p.id}}"></phone-diagnostics></div></section>
+<script>
+(function(s){
+ import('/home-automation/gallery/phone-diagnostics.js').catch(()=>s.$evalAsync(()=>s.error='Handy-Diagnose konnte nicht geladen werden.'));
+ const url='/home-automation/gallery',root=()=>document.getElementById('gallery-'+s.$id);let stopped=false,init=false;
+ s.form={place:'Sofa'};s.data={};s.ratings=['zu dunkel','angenehm','zu hell'];s.when=t=>new Date(t).toLocaleString('de-AT',{timeZone:'Europe/Vienna'});
+ s.names=m=>(s.data.lights||[]).filter((v,i)=>m&(1<<i)).join(', ')||'alle aus';
+ async function json(url,opts){const r=await fetch(url,{cache:'no-store',...opts});const j=await r.json();if(!r.ok)throw Error(j.error||'Anfrage fehlgeschlagen');return j;}
+ async function refresh(){try{const d=await json(url);if(stopped)return;s.$evalAsync(()=>{s.data=d;if(!init){init=true;Object.assign(s.form,{mode:d.config.mode,seconds:d.config.seconds,scheduled:!!d.config.scheduled,start:d.config.start_time,end:d.config.end_time});}if(!s.form.address)s.form.address=d.addresses.includes(location.hostname)?location.hostname:d.addresses[0];});}catch(e){if(!stopped)s.$evalAsync(()=>s.error=e.message);}}
+ async function post(action,b){return json(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...b,action})});}
+ s.act=async(a,b={})=>{s.working=true;s.error='';try{await post(a,b);await refresh();}catch(e){s.error=e.message;}finally{s.$evalAsync(()=>s.working=false);}};
+ s.pair=async direct=>{s.error='';s.working=true;try{const d=await post('pair',{address:s.form.address});s.link=d;if(direct)location.assign(d.url);}catch(e){s.error=e.message;}finally{s.$evalAsync(()=>s.working=false);}};
+ s.archive=async a=>{try{const d=await json(url+'/archive/'+a.id);s.$evalAsync(()=>s.detail=d);}catch(e){s.$evalAsync(()=>s.error=e.message);}};
+ refresh();const timer=setInterval(()=>{if(root()?.getClientRects().length&&!document.hidden)refresh();},2200);
+ s.$on('$destroy',()=>{stopped=true;clearInterval(timer);});
+})(scope);</script>

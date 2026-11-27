@@ -223,3 +223,13 @@ CREATE TABLE IF NOT EXISTS wallbox_price_parts (
   PRIMARY KEY(delta_id,from_at)
 );
 CREATE INDEX IF NOT EXISTS wallbox_parts_day ON wallbox_price_parts(local_day);
+
+CREATE TABLE IF NOT EXISTS gallery_config(id INTEGER PRIMARY KEY CHECK(id=1),area TEXT NOT NULL DEFAULT 'oben',mode TEXT NOT NULL DEFAULT 'sequenziell',seconds INTEGER NOT NULL DEFAULT 90,scheduled INTEGER NOT NULL DEFAULT 0,start_time TEXT NOT NULL DEFAULT '19:00',end_time TEXT NOT NULL DEFAULT '22:30',last_window TEXT);
+INSERT OR IGNORE INTO gallery_config(id) VALUES(1);
+CREATE TABLE IF NOT EXISTS gallery_phone(id INTEGER PRIMARY KEY,name TEXT NOT NULL,token_hash TEXT NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS gallery_teach(id INTEGER PRIMARY KEY,start INTEGER NOT NULL,end INTEGER,place TEXT NOT NULL,phone INTEGER REFERENCES gallery_phone(id));
+CREATE TABLE IF NOT EXISTS gallery_step(id INTEGER PRIMARY KEY,teach INTEGER NOT NULL REFERENCES gallery_teach(id),at INTEGER NOT NULL,mask INTEGER NOT NULL,rating TEXT,temperature REAL,temp_at INTEGER,temp_source TEXT);
+CREATE INDEX IF NOT EXISTS gallery_step_teach ON gallery_step(teach,at);
+CREATE TABLE IF NOT EXISTS gallery_sample(id INTEGER PRIMARY KEY,step INTEGER NOT NULL REFERENCES gallery_step(id),phone INTEGER NOT NULL REFERENCES gallery_phone(id),at INTEGER NOT NULL,received INTEGER NOT NULL,kind TEXT NOT NULL,value REAL,latitude REAL,longitude REAL,accuracy REAL,UNIQUE(step,phone,kind,at));
+CREATE INDEX IF NOT EXISTS gallery_sample_step ON gallery_sample(step,at);
+CREATE INDEX IF NOT EXISTS gallery_sample_phone_at ON gallery_sample(phone,at);

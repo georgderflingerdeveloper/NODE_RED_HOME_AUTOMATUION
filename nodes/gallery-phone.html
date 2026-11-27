@@ -1,0 +1,100 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Handy · GEORGSHOME</title>
+<style>
+:root{color-scheme:dark;font:17px system-ui;background:#15221f;color:#eff5f1}main{max-width:34rem;margin:5vh auto;padding:1.2rem}section{padding:1rem;background:#20322d;border-radius:.8rem;margin:1rem 0}label{display:block;margin:.8em 0}input,select,button{font:inherit;max-width:100%;box-sizing:border-box;padding:.65em;border-radius:.45em;border:1px solid #728e80}button{background:#a9d9be;color:#12281e;margin:.3rem .3rem .3rem 0}output{display:block;margin:1em 0}video,canvas,[hidden]{display:none!important}</style>
+<main><small>GEORGSHOME</small><h1>Dieses Handy</h1>
+<section id="pair"><label>Anzeigename <input id="name" maxlength="60" placeholder="Georgs Handy"></label><button id="connect">Dieses Handy verbinden</button></section>
+<section id="controls" hidden><h2 id="device"></h2><label>Helligkeit <select id="source"><option value="manual">Manuelle Bewertung</option></select></label>
+<label><input type="checkbox" id="gps"> Standort während des Teach-Laufs freigeben</label>
+<p>Das Handy am Messplatz liegen lassen und diese Seite geöffnet halten.</p>
+<button id="start">Übertragung starten</button><button id="stop" disabled>Übertragung stoppen</button>
+<output id="status" role="status">Übertragung aus</output><output id="value"></output><output id="pos"></output><div id="guide"><h3>Geführter Lernlauf</h3><p id="instruction" aria-live="polite">Setz dich an den Messplatz. Mit „Lernlauf starten / übernehmen“ beginnt die Übertragung und du erhältst die erste Anweisung.</p><div id="setup"><label>Messplatz <input id="place" value="Sofa" maxlength="80"></label><button id="begin">Lernlauf starten / übernehmen</button></div><output id="actionStatus" role="status"></output><div id="steps" hidden><div id="ratings"></div><button id="next">Nächste Szene</button><button id="finish">Teach beenden</button></div></div></section>
+<phone-diagnostics id="diag" hidden></phone-diagnostics>
+<script type="module" src="/phone-diagnostics.js"></script>
+<p role="alert" id="issue"></p><video playsinline muted></video><canvas width="24" height="18"></canvas></main>
+<script>
+const el=id=>document.getElementById(id),video=document.querySelector('video'),canvas=document.querySelector('canvas');
+const source=el('source'),gps=el('gps'),code=location.hash.slice(1);
+let key=localStorage.getItem('gh-phone-key'),running=false,generation=0,timer,sensor,stream,watch,step=null,reading,position;
+async function api(action,body){
+ const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),35000);
+ try{
+ const res=await fetch('/sensor/'+action,{signal:abort.signal,method:'POST',headers:{'content-type':'application/json',...(key?{authorization:'Bearer '+key}:{})},body:JSON.stringify(body)});
+ const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.error||'Anfrage fehlgeschlagen (HTTP '+res.status+'). Bitte die Verbindung prüfen.');return data;
+ }catch(e){if(abort.signal.aborted)throw Error('Der Home-PC antwortet noch nicht. Verbindung prüfen und den aktuellen Lernschritt abwarten.');throw e;}
+ finally{clearTimeout(timeout);}
+}
+function ready(name){el('diag').requestData=(from,to)=>api('diagnostics',{from,to});el('diag').hidden=false;history.replaceState(null,'',location.pathname);el('device').textContent=name;el('controls').hidden=false;el('pair').hidden=true;}
+if('AmbientLightSensor' in window)source.add(new Option('Umgebungslichtsensor · Lux','lux'));
+if(navigator.mediaDevices?.getUserMedia)source.add(new Option('Kamera · relative Helligkeit','camera'));
+gps.disabled=!navigator.geolocation;
+if(key)api('info',{}).then(d=>{el('name').value=d.name;if(!code)ready(d.name);}).catch(()=>{if(!code)el('issue').textContent='Kopplung nicht verfügbar. Bitte einen neuen QR-Code im Dashboard öffnen.';});
+if(!code&&!key)el('issue').textContent='Bitte im Dashboard unter Handy einen neuen QR-Code öffnen.';
+el('connect').onclick=async()=>{try{const r=await api('pair',{code,name:el('name').value});if(r.key){key=r.key;localStorage.setItem('gh-phone-key',key);}ready(r.name);el('issue').textContent='';}catch(e){el('issue').textContent=e.message;}};
+function geolocation(){
+ const wanted=running&&step&&gps.checked;
+ if(!wanted&&watch!=null){navigator.geolocation.clearWatch(watch);watch=null;position=null;el('pos').textContent='';}
+ if(wanted&&watch==null)watch=navigator.geolocation.watchPosition(p=>{
+  if(!running||!step||!gps.checked)return;
+  position={kind:'position',at:Math.round(p.timestamp),lat:p.coords.latitude,lon:p.coords.longitude,accuracy:p.coords.accuracy};el('pos').textContent='Standort · Genauigkeit '+Math.round(p.coords.accuracy)+' m';
+ },e=>{el('pos').textContent=e.message;},{enableHighAccuracy:true,maximumAge:0,timeout:12000});
+}
+gps.onchange=geolocation;
+function stop(){
+ running=false;generation++;clearTimeout(timer);sensor?.stop();sensor=null;stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;
+ step=null;el('steps').hidden=true;el('setup').hidden=false;el('begin').disabled=false;el('instruction').textContent='Übertragung gestoppt. Tippe auf „Lernlauf starten / übernehmen“, um am Messplatz weiterzumachen.';geolocation();position=null;reading=null;el('start').disabled=false;el('stop').disabled=true;source.disabled=false;
+ el('status').textContent='Übertragung aus';el('value').textContent='';api('readings',{stop:true}).catch(()=>{});
+}
+let actionVersion=0,pending=false;
+function render(r){
+  if(step!==r.step){step=null;geolocation();position=null;}step=r.step;geolocation();el('steps').hidden=!step;el('setup').hidden=!!step;el('begin').disabled=!r.available||r.busy||pending;el('instruction').textContent=r.message;el('ratings').querySelectorAll('button').forEach(b=>b.disabled=!r.guide?.ready||pending||r.busy);
+  el('next').disabled=pending||r.busy;el('finish').disabled=pending;el('status').textContent=step?'Teach läuft · '+(r.scene?'Licht an: '+r.scene:'Alle Galerielichter sind aus'):'Verbunden · wartet auf Teach-Lauf';
+}
+async function send(g){
+ const version=actionVersion;
+ if(!running||g!==generation)return;
+ try{
+  if(stream&&video.readyState>=2){const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(video,0,0,24,18);
+   const pixels=ctx.getImageData(0,0,24,18).data;let total=0;
+   for(let i=0;i<pixels.length;i+=4)total+=.2126*pixels[i]+.7152*pixels[i+1]+.0722*pixels[i+2];
+   reading={kind:'camera',at:Date.now(),value:100*total/(24*18*255)};
+  }
+  const batch=[reading,position].filter(Boolean),r=await api('readings',{step,kind:source.value,gps:gps.checked,samples:batch});
+  if(!running||g!==generation)return;
+  if(!pending&&version===actionVersion)render(r);
+  el('value').textContent=reading?reading.value.toFixed(1)+(reading.kind==='lux'?' lx':' % relative Bildhelligkeit'):'';
+ }catch(e){if(running&&g===generation){el('status').textContent='Signal unterbrochen · neuer Versuch in 3 Sekunden';el('instruction').textContent=e.message;el('steps').hidden=true;el('begin').disabled=true;step=null;geolocation();}}
+ if(running&&g===generation)timer=setTimeout(()=>send(g),2500);
+}
+async function startTransmission(){
+ if(running)return;running=true;const g=++generation;el('start').disabled=true;el('stop').disabled=false;source.disabled=true;el('issue').textContent='';
+ try{
+  if(source.value==='camera'){
+   const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:320}},audio:false});
+   if(g!==generation){s.getTracks().forEach(t=>t.stop());return;}stream=s;video.srcObject=s;await video.play();
+  }else if(source.value==='lux'){
+   sensor=new AmbientLightSensor({frequency:1});
+   sensor.onreading=()=>{if(Number.isFinite(sensor?.illuminance))reading={kind:'lux',value:sensor.illuminance,at:Date.now()};};
+   sensor.onerror=e=>{el('issue').textContent=e.error.message;stop();};sensor.start();
+  }
+  if(g===generation){send(g);return true;}
+ }catch(e){if(g===generation){el('issue').textContent=e.message;stop();}}
+};
+el('start').onclick=startTransmission;
+async function teachAction(action,rating){
+ if(pending)return;
+ pending=true;actionVersion++;
+ const msg=el('actionStatus');el('issue').textContent='';
+ msg.textContent={start:'Die aktuelle Lichtszene wird eingelesen …',advance:'Lichtkreis wird geschaltet und die Rückmeldung geprüft …',rate:'Bewertung wird gespeichert …',stop:'Lernlauf wird beendet …'}[action];
+ for(const b of document.querySelectorAll('#guide button'))b.disabled=true;
+ try{
+  if(!running&&!await startTransmission()){msg.textContent='Übertragung konnte nicht gestartet werden.';return;}
+  const r=await api('teach',{step,action,rating,place:el('place').value});pending=false;actionVersion++;render(r);
+  msg.textContent={start:'Lernlauf aktiv.',advance:'Neue Szene bestätigt.',rate:'Bewertung gespeichert: '+(rating||''),stop:'Lernlauf beendet.'}[action];
+ }catch(e){msg.textContent='Aktion nicht abgeschlossen.';el('issue').textContent=e.message;}
+ finally{pending=false;el('begin').disabled=false;}
+}
+el('begin').onclick=()=>teachAction('start');
+for(const rating of ['zu dunkel','angenehm','zu hell']){const button=document.createElement('button');button.textContent=rating;button.onclick=()=>teachAction('rate',rating);el('ratings').append(button);}
+el('next').onclick=()=>teachAction('advance');el('finish').onclick=()=>teachAction('stop');
+el('stop').onclick=stop;window.addEventListener('pagehide',()=>{if(running)stop();});
+</script></html>

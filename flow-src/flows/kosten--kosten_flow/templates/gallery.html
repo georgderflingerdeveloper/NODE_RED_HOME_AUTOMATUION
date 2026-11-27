@@ -1,0 +1,10 @@
+<style>
+#nr-dashboard md-card:has(.ga-standalone),#nr-dashboard .nr-dashboard-cardcontainer:has(.ga-standalone){height:auto!important}#nr-dashboard md-card:has(.ga-standalone){position:relative!important}
+</style>
+<div class="ga-standalone" id="gallery-{{$id}}"><div ng-include="'/home-automation/gallery/controls.html'"></div></div>
+<script>(function(scope){
+ let closed=false;
+ scope.$on('$destroy',()=>{closed=true;});
+ import('/home-automation/gallery/dashboard.js').then(m=>{if(!closed)m.mount(scope);})
+ .catch(()=>scope.$evalAsync(()=>scope.error='Galerie-Bedienung konnte nicht geladen werden.'));
+})(scope);</script>

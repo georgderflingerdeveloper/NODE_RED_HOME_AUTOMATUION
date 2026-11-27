@@ -2896,5 +2896,62 @@
     "disp": false,
     "width": "12",
     "collapse": false
+  },
+  {
+    "id": "gallery_effects_tab",
+    "type": "ui_tab",
+    "name": "Galerie-Effektmanager",
+    "icon": "fa-magic",
+    "order": 27,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "gallery_effects_group",
+    "type": "ui_group",
+    "name": "Galerie-Effektmanager",
+    "tab": "gallery_effects_tab",
+    "order": 1,
+    "disp": false,
+    "width": "14",
+    "collapse": false
+  },
+  {
+    "id": "phone_effects_tab",
+    "type": "ui_tab",
+    "name": "Handy",
+    "icon": "fa-mobile",
+    "order": 28,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "phone_effects_group",
+    "type": "ui_group",
+    "name": "Handy",
+    "tab": "phone_effects_tab",
+    "order": 1,
+    "disp": false,
+    "width": "14",
+    "collapse": false
+  },
+  {
+    "id": "gallery_learned_tab",
+    "type": "ui_tab",
+    "name": "Gelernte Effekte",
+    "icon": "fa-star-o",
+    "order": 29,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "gallery_learned_group",
+    "type": "ui_group",
+    "name": "Gelernte Effekte",
+    "tab": "gallery_learned_tab",
+    "order": 1,
+    "disp": false,
+    "width": "14",
+    "collapse": false
   }
 ]

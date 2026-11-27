@@ -56,7 +56,9 @@ function sortDashboardRows(rows) {
 }
 
 module.exports = function registerHistoryStore(RED) {
-  let activeDatabasePath = null;
+  let activeDatabasePath = null, galleryRuntime;
+  const gallery=require('./gallery-http.cjs');
+  if(RED.httpNode?.post)gallery.register(RED.httpNode,()=>galleryRuntime);
   if (RED.httpNode?.get) {
     for (const format of ['csv','md']) {
       RED.httpNode.get('/home-automation/solar/export.'+format, (request,response) => {
@@ -137,6 +139,8 @@ module.exports = function registerHistoryStore(RED) {
     const billing = chargeBilling.createBilling(database);
     const writeWallbox = wallbox.createSampleWriter(database,billing);
     const writeSmartmeter = smartmeter.createSampleWriter(database);
+    const galleryService=gallery.runtime(database,RED.settings.userDir,message=>node.warn(message));
+    galleryRuntime=galleryService;
     activeDatabasePath = databasePath;
     const insertPowerSample = database.prepare(`INSERT OR IGNORE INTO solar_power_samples
       (observed_at,received_at,online,pv_power_w,house_consumption_w,grid_import_w,grid_export_w,raw_json)
@@ -1083,6 +1087,7 @@ module.exports = function registerHistoryStore(RED) {
       cloudClosed=true;clearTimeout(cloudStart);clearInterval(cloudTimer);cloud.close();
       persistEnergyAccumulator();
       if(activeDatabasePath === databasePath) activeDatabasePath=null;
+      galleryService.close();if(galleryRuntime===galleryService)galleryRuntime=null;
       database.close();
     });
   }

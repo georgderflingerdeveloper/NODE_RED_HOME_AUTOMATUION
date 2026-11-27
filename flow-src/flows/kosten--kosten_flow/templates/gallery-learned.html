@@ -1,0 +1,40 @@
+<style>
+.gh-gal{color:var(--gh-text);padding:12px;width:100%;box-sizing:border-box}.gh-gal h3,.gh-gal h4{margin:.5em 0}.gh-gal label{display:grid;gap:4px;margin:8px 0}.gh-gal input,.gh-gal select,.gh-gal button,.gh-gal a.ga-button{background:var(--gh-inset);color:inherit;border:1px solid var(--gh-border);border-radius:8px;font:inherit;padding:8px;max-width:100%;box-sizing:border-box}.gh-gal button,.gh-gal a.ga-button{cursor:pointer;margin:2px}.gh-gal .ga-box{margin:12px 0;padding:10px;border:1px solid var(--gh-border);border-radius:9px}.gh-gal .ga-help{border-left:4px solid #70af99;padding-left:10px;line-height:1.5}.gh-gal img{max-width:190px;width:100%;display:block;margin:.5em 0}.gh-gal code{overflow-wrap:anywhere}.gh-gal [role=alert]{color:var(--gh-text);border-left:4px solid #d99365;padding-left:.6em}.gh-gal a{color:inherit}.gh-gal small{color:var(--gh-muted)}
+#nr-dashboard md-card:has(.gh-gal),#nr-dashboard .nr-dashboard-cardcontainer:has(.gh-gal){height:auto!important}#nr-dashboard md-card:has(.gh-gal){position:relative!important}
+
+.gh-gal .ga-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.gh-gal .ga-buttons button,.gh-gal .ga-buttons a{min-height:44px;flex:1 1 120px;margin:0;text-align:center}
+.gh-gal button[aria-pressed=true]{background:var(--gh-text,#eee);color:var(--gh-card,#303030);font-weight:700}.gh-gal button:disabled{opacity:.6;cursor:default}
+.gh-gal .ga-time input{width:8em}.gh-gal .ga-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+</style>
+<section class="gh-gal" id="gallery-{{$id}}"><p ng-if="error||data.issue" role="alert">{{error||data.issue}}</p><h3>Gelernte Effekte</h3><p role="status" ng-if="data.config">{{data.active==='effect' ? (data.learnedId?'Gelernter Effekt aktiv':'Abendeffekt aktiv')+' · '+(data.config.mode==='zufall'?'Zufällig':'Sequenziell')+' · '+data.config.seconds+' s · '+data.config.area : data.active==='teach'?'Lernlauf aktiv':'Effekt aus'}}</p>
+<p ng-if="data.config && !data.learned.length">Noch kein abgeschlossener Lernlauf mit einem als angenehm bewerteten Lichtbild.</p>
+<div ng-if="data.learned.length"><div class="ga-buttons" role="group" aria-label="Galeriebereich">
+ <button type="button" ng-repeat="area in areas track by area.id" ng-disabled="!data.config||working" ng-click="form.area=area.id" ng-attr-aria-pressed="{{form.area===area.id}}">{{area.label}}</button>
+</div>
+</div>
+<div class="ga-box" ng-repeat="run in data.learned track by run.id"><strong>{{run.place}}</strong> · {{when(run.start)}}
+<p>{{run.count}} {{run.count===1?'Lichtbild':'Lichtbilder'}} · {{data.config.seconds}} s pro Schritt</p>
+<div class="ga-buttons"><button type="button" ng-disabled="working||data.busy||data.active" ng-click="act('effect',{learnedId:run.id,area:form.area})">{{run.count===1?'Lichtbild aufrufen':'Effekt abspielen'}}</button></div></div>
+<button type="button" ng-if="data.active==='effect'" ng-click="act('stop')" ng-disabled="working">Effekt aus</button>
+<details class="ga-box" ng-open="data.active==='teach'"><summary>Neuen Effekt lernen</summary><div ng-if="!data.teach"><p class="ga-help">Setz dich an deinen üblichen Platz. Lege das Handy mit gleichbleibender Blickrichtung ab. Pro Szene sind mindestens acht Sekunden zum Beurteilen vorgesehen.</p>
+<label>Messplatz<input ng-model="form.place" maxlength="80" placeholder="z. B. Sofa"></label><label>Messquelle<select ng-model="form.phone" ng-options="p.id as (p.name + (p.online?' · online':' · offline')) for p in data.phones"><option value="">Manuell / Handy später verbinden</option></select></label>
+<button ng-click="act('teach',{phone:form.phone,place:form.place})" ng-disabled="working||data.busy||data.active">Teach starten</button></div>
+<div ng-if="data.teach"><button type="button" ng-click="act('stop')" ng-disabled="working">Lernlauf beenden</button><p>{{data.teach.place}} · Lichtschritt {{data.step.id}}</p><p class="ga-help" role="status">{{data.guide.message}}</p>
+<button ng-repeat="r in ratings" ng-click="act('rate',{rating:r,step:data.step.id})" ng-disabled="working||data.busy||!data.guide.ready">{{r}}</button>
+<button ng-click="act('advance')" ng-disabled="working||data.busy">Nächste Szene</button>
+<details ng-if="!data.teach.phone"><summary>Handy zu diesem Lauf koppeln</summary><label>Hausnetzadresse<select ng-model="form.address" ng-options="a for a in data.addresses"></select></label>
+<button ng-click="pair(false)" ng-disabled="working || !form.address">Handy per QR-Code verbinden</button>
+<button ng-click="pair(true)" ng-disabled="working || !form.address">Dieses Handy verwenden</button>
+<div ng-if="link.url"><img ng-src="{{link.qr}}" alt="QR-Code zur Handy-Kopplung"><a ng-href="{{link.url}}" target="_blank" rel="noopener">Sensorseite auf diesem Gerät öffnen</a><p>Gültig bis {{when(link.until)}}. Handy verbinden und auf der Sensorseite „Lernlauf starten / übernehmen“ antippen. Dort erscheinen die Anweisungen.</p></div>
+<details><summary>HTTPS auf dem Handy einrichten</summary><p>Für GPS und Kamera muss das Handy der lokalen GEORGSHOME-Zertifizierungsstelle vertrauen. Lade das Zertifikat im Hausnetz herunter, prüfe seinen SHA-256-Fingerabdruck und installiere es als vertrauenswürdige CA. Unter iOS zusätzlich das volle Vertrauen in den Zertifikatseinstellungen aktivieren.</p><a href="/home-automation/gallery/ca.crt" download>Lokales CA-Zertifikat</a><p><code>{{data.fingerprint}}</code></p></details></details></div></details>
+<p ng-if="data.mask!=null">Eingeschaltete Galeriekreise · {{names(data.mask)}}</p>
+<details class="ga-box"><summary>Teach-Archiv · letzte 100 Lichtschritte</summary>
+<div ng-repeat="a in data.archive track by a.id"><button ng-click="archive(a)">{{when(a.at)}} · {{a.place}} · {{a.rating || 'offen'}}</button></div>
+<div ng-if="detail"><h4>{{detail.step.place}} · {{when(detail.step.at)}}</h4><p>{{names(detail.step.mask)}} · {{detail.step.rating || 'offen'}}</p><p ng-if="detail.step.temperature!=null">Wohnzimmer · {{detail.step.temperature}} °C · {{detail.step.temp_source}} · {{when(detail.step.temp_at)}}</p>
+<p ng-repeat="v in detail.samples track by $index">{{when(v.at)}} · {{v.kind==='position'?(v.latitude+', '+v.longitude+' · Genauigkeit '+v.accuracy+' m'):(v.value.toFixed(1)+(v.kind==='lux'?' lx':' % relative Bildhelligkeit'))}}</p><p ng-if="!detail.samples.length">Keine Handywerte für diesen Lichtschritt.</p></div></details></section>
+<script>(function(scope){
+ let closed=false;
+ scope.$on('$destroy',()=>{closed=true;});
+ import('/home-automation/gallery/dashboard.js').then(m=>{if(!closed)m.mount(scope);})
+ .catch(()=>scope.$evalAsync(()=>scope.error='Galerie-Bedienung konnte nicht geladen werden.'));
+})(scope);</script>

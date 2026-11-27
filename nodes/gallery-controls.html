@@ -1,0 +1,21 @@
+<style>
+.gh-gal{color:var(--gh-text);padding:12px;width:100%;box-sizing:border-box}.gh-gal h3,.gh-gal h4{margin:.5em 0}.gh-gal label{display:grid;gap:4px;margin:8px 0}.gh-gal input,.gh-gal select,.gh-gal button,.gh-gal a.ga-button{background:var(--gh-inset);color:inherit;border:1px solid var(--gh-border);border-radius:8px;font:inherit;padding:8px;max-width:100%;box-sizing:border-box}.gh-gal button,.gh-gal a.ga-button{cursor:pointer;margin:2px}.gh-gal .ga-box{margin:12px 0;padding:10px;border:1px solid var(--gh-border);border-radius:9px}.gh-gal .ga-help{border-left:4px solid #70af99;padding-left:10px;line-height:1.5}.gh-gal img{max-width:190px;width:100%;display:block;margin:.5em 0}.gh-gal code{overflow-wrap:anywhere}.gh-gal [role=alert]{color:var(--gh-text);border-left:4px solid #d99365;padding-left:.6em}.gh-gal a{color:inherit}.gh-gal small{color:var(--gh-muted)}
+
+.gh-gal .ga-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.gh-gal .ga-buttons button,.gh-gal .ga-buttons a{min-height:44px;flex:1 1 120px;margin:0;text-align:center}
+.gh-gal button[aria-pressed=true]{background:var(--gh-text,#eee);color:var(--gh-card,#303030);font-weight:700}.gh-gal button:disabled{opacity:.6;cursor:default}
+.gh-gal .ga-time input{width:8em}.gh-gal .ga-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+</style>
+<section class="gh-gal"><p ng-if="error||data.issue" role="alert">{{error||data.issue}}</p><h3>Galerie-Effektmanager</h3><p role="status" ng-if="data.config">{{data.active==='effect' ? (data.learnedId?'Gelernter Effekt aktiv':'Abendeffekt aktiv')+' · '+(data.config.mode==='zufall'?'Zufällig':'Sequenziell')+' · '+data.config.seconds+' s · '+data.config.area : data.active==='teach'?'Lernlauf aktiv':'Effekt aus'}}</p><div class="ga-box"><h4>Feste Abendeffekte</h4>
+<div class="ga-buttons" role="group" aria-label="Galeriebereich">
+ <button type="button" ng-repeat="area in areas track by area.id" ng-disabled="!data.config||working" ng-click="form.area=area.id" ng-attr-aria-pressed="{{form.area===area.id}}">{{area.label}}</button>
+</div>
+<div class="ga-buttons" role="group" aria-label="Reihenfolge"><button type="button" ng-disabled="!data.config||working" ng-click="form.mode='zufall'" ng-attr-aria-pressed="{{form.mode==='zufall'}}">Zufällig</button><button type="button" ng-disabled="!data.config||working" ng-click="form.mode='sequenziell'" ng-attr-aria-pressed="{{form.mode==='sequenziell'}}">Sequenziell</button></div>
+<label class="ga-time">Schrittzeit in Sekunden (2–3600)<input type="number" inputmode="numeric" min="2" max="3600" step="1" required ng-disabled="!data.config||working" ng-model="form.seconds"></label>
+<div class="ga-buttons"><button type="button" ng-disabled="!validPlayback()||working||data.active||data.busy" ng-click="act('effect',playback())">Effekt ein</button>
+<button type="button" ng-disabled="working||data.active!=='effect'" ng-click="act('stop')">Effekt aus</button>
+<button type="button" ng-if="changed()" ng-disabled="!validPlayback()||working" ng-click="act('playback',playback())">Übernehmen</button></div></div>
+<p ng-if="data.mask!=null">Zuletzt bestätigte Galeriekreise · {{names(data.mask)}}</p>
+<details class="ga-box"><summary>Abendprogramm und Zeiten</summary><label><span><input type="checkbox" ng-model="form.scheduled"> Zeitprogramm aktiv</span></label>
+<label>Beginn (HH:MM, Wien)<input type="text" ng-model="form.start" maxlength="5"></label><label>Ende (HH:MM, Wien)<input type="text" ng-model="form.end" maxlength="5"></label>
+<button ng-click="act('settings',form)" ng-disabled="working||!validPlayback()">Zeitprogramm speichern</button></details>
+<div class="ga-buttons"><a class="ga-button" href="#!/26">Gelernte Effekte</a></div></section>

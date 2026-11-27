@@ -22,9 +22,20 @@
 .wz-contact i{font-size:23px;color:var(--gh-muted,#82918f)}.wz-contact[data-state="Offen"] i,.wz-contact[data-state="Gekippt"] i{color:#e9aa66}
 .wz-more{margin-top:16px}.wz-room details{margin:12px 0}.wz-room details p{margin:6px 0;font-size:14px}
 .wz-learn label{display:inline-grid;gap:4px;margin:6px 12px 6px 0}.wz-learn :is(select,input){font:inherit;max-width:100%;box-sizing:border-box;padding:6px}
+.wz-room .wz-gallery-open{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:46px;margin:8px 0 14px;background:var(--gh-inset);font-weight:600}
+.wz-gallery-dialog{box-sizing:border-box;width:min(34rem,calc(100% - 24px));max-height:88vh;max-height:88dvh;padding:0;background:var(--gh-card,#303030);color:var(--gh-text,#eee);border:1px solid var(--gh-border,#888);border-radius:12px;overflow:auto}
+.wz-gallery-dialog::backdrop{background:rgba(0,0,0,.58)}
+.wz-gallery-bar{display:flex;justify-content:flex-end;position:sticky;top:0;z-index:1;padding:6px 12px;background:var(--gh-card,#303030)}
 </style>
 <section class="wz-room" aria-label="Wohnzimmer">
 <div class="gh-live-list"><gh-room-live room="east"></gh-room-live> <gh-room-live room="west"></gh-room-live></div>
+ <button class="wz-gallery-open" type="button" aria-haspopup="dialog" ng-click="openGallery($event)"><i class="fa fa-magic" aria-hidden="true"></i> Galerie-Effekte</button>
+ <dialog class="wz-gallery-dialog" aria-label="Galerie-Effektmanager">
+  <div class="wz-gallery-bar"><button type="button" ng-click="closeGallery()" autofocus>Schließen</button></div>
+  <div ng-if="view.galleryDialog" ng-init="loadGallery(this)" id="gallery-{{$id}}">
+   <div ng-include="'/home-automation/gallery/controls.html'"></div>
+  </div>
+ </dialog>
  <h3>Fenster- und Türkontakte</h3>
  <div class="wz-grid">
   <div class="wz-contact" ng-repeat="c in contacts track by c.id" ng-attr-data-state="{{c.state}}">
@@ -66,6 +77,32 @@
   clearTimeout(learnTimeout);learnTimeout=setTimeout(()=>s.$evalAsync(()=>{s.learn.busy=false;s.learn.step='start';s.learn.text='Keine Rückmeldung. Bitte erneut beginnen.';}),18000);
  };
  s.view={}; s.pending={}; s.notes={};
+ let galleryDialog;
+ function galleryClosed(){
+  s.$evalAsync(()=>{s.view.galleryDialog=!!galleryDialog?.open;});
+ }
+ s.openGallery=event=>{
+  if(!galleryDialog){
+   galleryDialog=event.currentTarget.closest('.wz-room').querySelector('dialog');
+   galleryDialog.addEventListener('close',galleryClosed);
+  }
+  galleryDialog.showModal();
+  s.view.galleryDialog=true;
+ };
+ s.closeGallery=()=>{if(galleryDialog?.open)galleryDialog.close();};
+ s.loadGallery=child=>{
+  let closed=false;
+  child.$on('$destroy',()=>{closed=true;});
+  import('/home-automation/gallery/dashboard.js')
+   .then(module=>{if(!closed)module.mount(child);})
+   .catch(()=>{if(!closed)child.$evalAsync(()=>child.error='Galerie-Bedienung konnte nicht geladen werden.');});
+ };
+ window.addEventListener('hashchange',s.closeGallery);
+ s.$on('$destroy',()=>{
+  window.removeEventListener('hashchange',s.closeGallery);
+  galleryDialog?.removeEventListener('close',galleryClosed);
+  s.closeGallery();
+ });
  s.labels={on:'Ein',off:'Aus',mixed:'Teilweise ein',unknown:'Unbekannt'};
  function render(){
   s.lights=snapshot.lights.map(l=>({...l,state:l.until>now()?l.state:'unknown'}));

@@ -410,5 +410,71 @@
         "daily_analysis_worker"
       ]
     ]
+  },
+  {
+    "id": "gallery_effects_ui",
+    "type": "ui_template",
+    "z": "kosten_flow",
+    "group": "gallery_effects_group",
+    "name": "Galerie-Effektmanager",
+    "order": 1,
+    "width": 14,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/kosten--kosten_flow/templates/gallery.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 600,
+    "y": 774,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "phone_effects_ui",
+    "type": "ui_template",
+    "z": "kosten_flow",
+    "group": "phone_effects_group",
+    "name": "Handy",
+    "order": 1,
+    "width": 14,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/kosten--kosten_flow/templates/phone.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 600,
+    "y": 776,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "gallery_learned_ui",
+    "type": "ui_template",
+    "z": "kosten_flow",
+    "group": "gallery_learned_group",
+    "name": "Gelernte Effekte",
+    "order": 1,
+    "width": 14,
+    "height": 0,
+    "format": {
+      "$flowSource": "flows/kosten--kosten_flow/templates/gallery-learned.html"
+    },
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "x": 600,
+    "y": 820,
+    "wires": [
+      []
+    ]
   }
 ]
